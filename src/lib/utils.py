@@ -1,10 +1,14 @@
-# BismillahBot -- Explore the Holy Qur'an on Telegram
-# May Allah reward Rahiel Kasim
-# 
-# Copyright (C) 1436-1438 AH  Rahiel Kasim
+import ujson as json
+from typing import Optional
+from config import RedisSingleton, Environment
 
-class File:
-  def message_to_dict(file):
+class File(Environment):
+  redis_namespace = ""
+
+  def __init__(self):
+    self.redis = RedisSingleton().connection
+
+  def message_to_dict(self, file):
     """Parse file data to store in redis db."""
     if isinstance(file, str):
       return { 'file': file }
@@ -39,35 +43,42 @@ class File:
       'supergroup_chat_created': file.supergroup_chat_created
     }
 
-  def save_user(chat_id: int, state: Tuple[int, int, str]):
+  def save_user(self, chat_id: int, state: tuple[int, int, str]):
     """State is a tuple: (surah, ayah, type)"""
-    r.set(redis_namespace + str(chat_id),
+    self.redis.set(self.redis_namespace + str(chat_id),
           json.dumps(state), ex=60 * 60 * 24 * 2)  # keep state for two days for making it month add 31 instead of 2
 
-  def get_user(chat_id: int):
-    v = r.get(redis_namespace + str(chat_id))
+  def get_user(self, chat_id: int):
+    v = self.redis.get(self.redis_namespace + str(chat_id))
     if v is not None:
-        return json.loads(v)
+      return json.loads(v)
 
-  def save_file(filename: str, file_id: str):
+  def save_file(self, filename: str, file_id: str):
     message = ''
     try:
-      message = message_to_dict(file_id)
+      message = self.message_to_dict(file_id)
     except Exception as err:
       message = ''
       print("Error", err)
-    r.set(redis_namespace + "file:" + filename,
+    self.redis.set(self.redis_namespace + "file:" + filename,
           json.dumps(message), ex=60 * 60 * 24 * 2)  # keep for 2 days for making it month add 31 instead of 2
 
-  def get_file(filename: str):
-    f = r.get(redis_namespace + "file:" + filename)
+  def get_file(self, filename: str):
+    f = self.redis.get(self.redis_namespace + "file:" + filename)
     if f is not None:
       return json.loads(f)
 
+  def get_audio_filename(self, surah: int, ayah: int, performer: Optional[str] = "Husary_128kbps") -> str:
+    with open(self.get_env("performers_file_path")) as file:
+      data = json.load(file)
+      performers = data["performers"]
+      for perform in performers:
+        if perform["subfolder"] == performer:
+          perf = perform["subfolder"]
+      file = self.get_env("audio_base_url") + "/" + perf + "/" + str(surah).zfill(3) + str(ayah).zfill(3) + ".mp3"
+      self.save_file(file, file)
+      return file
+    return ""
 
-  def get_audio_filename(performer: str, surah: int, ayah: int) -> str:
-    return str(performer) + str(surah).zfill(3) + str(ayah).zfill(3) + ".mp3"
-
-
-  def get_image_filename(s: int, a: int) -> str:
-    return "quranic_images/" + str(s) + "_" + str(a) + ".png"
+  def get_image_filename(self, s: int, a: int) -> str:
+    return self.get_env("quranic_images_file_path") + str(s) + "_" + str(a) + ".png"

@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt && pip install -U python-dotenv
 
 COPY . .
 
-CMD [ "python", "bismillah.py" ]
+CMD [ "python", "src/main.py" ]

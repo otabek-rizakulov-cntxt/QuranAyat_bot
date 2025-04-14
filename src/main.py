@@ -16,55 +16,40 @@
 from dotenv import load_dotenv
 load_dotenv()
 import re
-import os
 import sys
 import asyncio
 import telegram
-import ujson as json
 from time import sleep, time
-from typing import Tuple
-from redis import StrictRedis
 from telegram import InlineQueryResultArticle, InputTextMessageContent
-from telegram.constants import MessageLimit
 from telegram.error import NetworkError, TelegramError, Forbidden
-from bismillahbot import Quran, make_index
+from modules import Quran, make_index
 from lib.utils import File
+from modules import Bot
 
-TOKEN = os.getenv("TOKEN")
-REDIS_URL = os.getenv("REDIS_URL")
-
-print("Redis host ", REDIS_URL)
-r = StrictRedis.from_url("redis://default:fParUvajBrMAtmAVudRPoEQFySnnbyMr@autorack.proxy.rlwy.net:26141")
-
-redis_namespace = ""
 update_id = None
-
 
 async def send_file(bot, filename, quran_type, **kwargs):
     """Tries to send file from Telegram's cache, only uploads from disk if necessary.
     Always saves the Telegram cache file_id in Redis and returns it.
     """
-
+    file = File()
     async def upload(f):
         if quran_type == "arabic":
             result = await bot.send_photo(photo=f, **kwargs)
             v = result["photo"][-1]["file_id"]
         elif quran_type == "audio":
-            print('FIle', f)
             result = await bot.send_audio(audio=f, **kwargs)
             await bot.get_updates()
 
             v = result["audio"]["file_id"]
-            print("Printing uploaded audio ", v)
-        File.save_file(filename, v)
+        file.save_file(filename, v)
         return v
 
     async def upload_from_disk():
         with open(filename, "rb") as f:
             return await upload(f)
 
-    f = File.get_file(filename) or "https://www.everyayah.com/data/Husary_128kbps/001001.mp3"
-    print("File ", f)
+    f = file.get_file(filename)["file"]
     if f is not None:
         try:
             return await upload(f)
@@ -75,7 +60,6 @@ async def send_file(bot, filename, quran_type, **kwargs):
                 raise e
     else:
         return await upload_from_disk()
-
 
 def get_default_query_results(quran: Quran):
     results = []
@@ -93,11 +77,9 @@ def get_default_query_results(quran: Quran):
         )
     return results
 
-
-
 async def main():
     global update_id
-    bot = telegram.Bot(token=TOKEN)
+    bot = Bot.get_instance()
 
     try:
         result = await bot.get_updates()
@@ -134,28 +116,28 @@ async def main():
 
 async def serve(bot, data):
     global update_id
-
-    async def send_quran(performer: str, surah: int, ayah: int, quran_type: str, chat_id: int, reply_markup=None):
+    file = File()
+    async def send_quran(surah: int, ayah: int, quran_type: str, chat_id: int, performer: str, reply_markup=None):
         if quran_type in ("english", "tafsir"):
             text = data[quran_type].get_ayah(surah, ayah)
             await bot.send_message(chat_id=chat_id, text=text[:4096],
-                             reply_markup=reply_markup)
+                            reply_markup=reply_markup)
         elif quran_type == "arabic":
             await bot.send_chat_action(chat_id=chat_id,
-                                 action=telegram.constants.ChatAction.UPLOAD_PHOTO)
-            image = File.get_image_filename(surah, ayah)
+                                action=telegram.constants.ChatAction.UPLOAD_PHOTO)
+            image = file.get_image_filename(surah, ayah)
             await send_file(bot, image, quran_type, chat_id=chat_id,
                       caption="Quran %d:%d" % (surah, ayah),
                       reply_markup=reply_markup)
         elif quran_type == "audio":
             await bot.send_chat_action(chat_id=chat_id,
-                                 action=telegram.constants.ChatAction.UPLOAD_DOCUMENT)
-            audio = File.get_audio_filename(performer, surah, ayah)
+                                action=telegram.constants.ChatAction.UPLOAD_DOCUMENT)
+            audio = file.get_audio_filename(surah, ayah, performer)
             await send_file(bot, audio, quran_type, chat_id=chat_id,
                       performer="Shaykh Mahmoud Khalil al-Husary",
                       title="Quran %d:%d" % (surah, ayah),
                       reply_markup=reply_markup)
-        File.save_user(chat_id, (surah, ayah, quran_type))
+        file.save_user(chat_id, (surah, ayah, quran_type))
 
     for update in await bot.get_updates(offset=update_id, timeout=10):
         update_id = update.update_id + 1
@@ -188,9 +170,9 @@ async def serve(bot, data):
         if not update.message or not update.message.text:  # updates without text
             continue
 
-        chat_id = update.message.chat_id
+        chat_id = update.message.chat.id
         message = update.message.text.lower()
-        state = File.get_user(chat_id)
+        state = file.get_user(chat_id)
         if state is not None:
             surah, ayah, quran_type = state
         else:
@@ -226,7 +208,7 @@ async def serve(bot, data):
                 continue
 
         if message in ("english", "tafsir", "audio", "arabic"):
-            await send_quran("performer", surah, ayah, message, chat_id)
+            await send_quran(surah, ayah, message, chat_id, "Husary_128kbps")
             continue
         elif message in ("next", "previous", "random", "/random"):
             if message == "next":
@@ -235,13 +217,13 @@ async def serve(bot, data):
                 surah, ayah = Quran.get_previous_ayah(surah, ayah)
             elif message in ("random", "/random"):
                 surah, ayah = Quran.get_random_ayah()
-            await send_quran("performer", surah, ayah, quran_type, chat_id)
+            await send_quran(surah, ayah, quran_type, chat_id, "Husary_128kbps")
             continue
 
         surah, ayah = parse_ayah(message)
         if surah:
             if Quran.exists(surah, ayah):
-                await send_quran("performer", surah, ayah, quran_type, chat_id, reply_markup=data["interface"])
+                await send_quran(surah, ayah, quran_type, chat_id, "Husary_128kbps", reply_markup=data["interface"])
             else:
                 await bot.send_message(chat_id=chat_id, text="Ayah does not exist!")
 
