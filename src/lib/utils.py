@@ -1,3 +1,4 @@
+import os
 import ujson as json
 from typing import Optional
 from config import RedisSingleton, Environment
@@ -70,7 +71,10 @@ class File(Environment):
     return filename
 
   def get_audio_filename(self, surah: int, ayah: int, performer: Optional[str] = "Husary_128kbps") -> str:
-    with open(self.get_env("performers_file_path")) as file:
+    base_dir = os.path.dirname(os.path.dirname(__file__))  # Goes up from lib/ to src/
+    file_path = os.path.join(base_dir, "common", "performers.json")
+
+    with open(file_path, "r", encoding="utf-8") as file:
       data = json.load(file)
       performers = data["performers"]
       for perform in performers:

@@ -128,7 +128,6 @@ async def serve(bot, data):
             await bot.send_chat_action(chat_id=chat_id,
                                 action=telegram.constants.ChatAction.UPLOAD_PHOTO)
             image = file.get_image_filename(surah, ayah)
-            print("IMAGE IN send_quran = ", image)
             await send_file(bot, image, quran_type, chat_id=chat_id,
                       caption="Quran %d:%d" % (surah, ayah),
                       reply_markup=reply_markup)
