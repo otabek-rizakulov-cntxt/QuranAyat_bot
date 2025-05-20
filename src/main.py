@@ -37,29 +37,31 @@ async def send_file(bot, filename, quran_type, **kwargs):
         if quran_type == "arabic":
             result = await bot.send_photo(photo=f, **kwargs)
             v = result["photo"][-1]["file_id"]
+            print("RESULT IN QURAN_TYPE arabic = ", result)
         elif quran_type == "audio":
             result = await bot.send_audio(audio=f, **kwargs)
+            print("RESULT IN QURAN_TYPE audio = ", result)
             await bot.get_updates()
 
             v = result["audio"]["file_id"]
         file.save_file(filename, v)
         return v
 
-    async def upload_from_disk():
-        with open(filename, "rb") as f:
-            return await upload(f)
+    async def upload_from_remote():
+        return await upload(f)
 
-    f = file.get_file(filename)["file"]
+    f = file.get_file(filename)
+    print("FILE FROM MAIN.py = ", f, filename)
     if f is not None:
         try:
             return await upload(f)
         except telegram.error.TelegramError as e:
             if "file_id" in e.message:
-                return await upload_from_disk()
+                return await upload_from_remote()
             else:
                 raise e
     else:
-        return await upload_from_disk()
+        return await upload_from_remote()
 
 def get_default_query_results(quran: Quran):
     results = []
@@ -126,6 +128,7 @@ async def serve(bot, data):
             await bot.send_chat_action(chat_id=chat_id,
                                 action=telegram.constants.ChatAction.UPLOAD_PHOTO)
             image = file.get_image_filename(surah, ayah)
+            print("IMAGE IN send_quran = ", image)
             await send_file(bot, image, quran_type, chat_id=chat_id,
                       caption="Quran %d:%d" % (surah, ayah),
                       reply_markup=reply_markup)
@@ -133,6 +136,7 @@ async def serve(bot, data):
             await bot.send_chat_action(chat_id=chat_id,
                                 action=telegram.constants.ChatAction.UPLOAD_DOCUMENT)
             audio = file.get_audio_filename(surah, ayah, performer)
+            print("AUDIO IN send_quran = ", audio)
             await send_file(bot, audio, quran_type, chat_id=chat_id,
                       performer="Shaykh Mahmoud Khalil al-Husary",
                       title="Quran %d:%d" % (surah, ayah),

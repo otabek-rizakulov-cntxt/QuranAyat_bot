@@ -60,13 +60,14 @@ class File(Environment):
     except Exception as err:
       message = ''
       print("Error", err)
-    self.redis.set(self.redis_namespace + "file:" + filename,
-          json.dumps(message), ex=60 * 60 * 24 * 2)  # keep for 2 days for making it month add 31 instead of 2
+    # keep for 2 days for making it month add 31 instead of 2
+    self.redis.set(filename, json.dumps(message), ex=60 * 60 * 24 * 2)
 
   def get_file(self, filename: str):
     f = self.redis.get(self.redis_namespace + "file:" + filename)
     if f is not None:
       return json.loads(f)
+    return filename
 
   def get_audio_filename(self, surah: int, ayah: int, performer: Optional[str] = "Husary_128kbps") -> str:
     with open(self.get_env("performers_file_path")) as file:
@@ -76,9 +77,8 @@ class File(Environment):
         if perform["subfolder"] == performer:
           perf = perform["subfolder"]
       file = self.get_env("audio_base_url") + "/" + perf + "/" + str(surah).zfill(3) + str(ayah).zfill(3) + ".mp3"
-      self.save_file(file, file)
       return file
     return ""
 
   def get_image_filename(self, s: int, a: int) -> str:
-    return self.get_env("quranic_images_file_path") + str(s) + "_" + str(a) + ".png"
+    return self.get_env("quranic_images_file_path") + "/" + str(s) + "_" + str(a) + ".png"

@@ -9,8 +9,8 @@ class Environment:
     TOKEN = os.getenv("TOKEN")
     REDIS_URL = os.getenv("REDIS_HOST_URL")
     AUDIO_BASE_URL = os.getenv("AUDIO_BASE_URL")
-    PERFORMERS_FILE_PATH = os.path.join(BASE_DIR, "../common/performers.json")
-    QURANIC_IMAGES_FILE_PATH = os.path.join(BASE_DIR, "../quranic_images")
+    QURANIC_IMAGES_FILE_PATH = os.getenv("PHOTO_BASE_URL")
+    PERFORMERS_FILE_PATH = os.getenv("RECITATIONS_BASE_URL")
     variable = {
       "token": TOKEN,
       "redis": REDIS_URL,
