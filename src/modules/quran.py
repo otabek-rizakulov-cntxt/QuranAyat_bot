@@ -69,7 +69,7 @@ def parse_quran_tafsir():
     with open("Al_Jalalain_Eng.txt", "r") as f:
         for line in f.readlines():
             if line == "\n": continue
-            if re.match("\d+\w*", line): continue
+            if re.match(r"\d+\w*", line): continue
             elif line.startswith("[%d:%d]" % (s, v)):
                 in_verse = True
             elif line.startswith("[%d:%d]" % (s, v + 1)):
