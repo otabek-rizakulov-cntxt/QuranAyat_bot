@@ -329,7 +329,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 # ---------------------------------------------------------------------------
 
 app = FastAPI()
-bot = Bot.get_instance()
+bot = None  # created in startup (guarded) so a bad/missing TOKEN can't crash import
 data = None  # populated on startup
 
 
@@ -350,27 +350,42 @@ def _webhook_base_url() -> str | None:
 
 @app.on_event("startup")
 async def on_startup():
-    global data
-    data = build_data()
+    # Every step is guarded so the HTTP server ALWAYS comes up and listens.
+    # If it doesn't, the platform reports "connection refused"/502 and we can't tell
+    # a config error from a port mismatch. Booting-then-logging makes that diagnosable.
+    global data, bot
+
+    try:
+        bot = Bot.get_instance()
+    except Exception as e:
+        print("STARTUP ERROR (bot init — check TOKEN):", type(e).__name__, e)
+
+    try:
+        data = build_data()
+    except Exception as e:
+        print("STARTUP ERROR (build_data — check corpus files):", type(e).__name__, e)
 
     webhook_base = _webhook_base_url()
-    if webhook_base:
+    if bot and webhook_base:
         try:
             token = Environment.get_env("token")
             await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
             print("Webhook registered at", webhook_base)
         except Exception as e:
-            # Never let webhook registration failure crash startup — the server must
-            # still come up and listen, or the platform reports "connection refused".
-            print("WARNING: set_webhook failed:", type(e).__name__, e)
+            print("STARTUP ERROR (set_webhook):", type(e).__name__, e)
     else:
-        print("No WEBHOOK_URL / RAILWAY_PUBLIC_DOMAIN set; webhook not registered")
-    print("Webhook server has been started")
+        print("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
+
+    print("Startup complete — HTTP server is listening")
 
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    await bot.delete_webhook()
+    if bot is not None:
+        try:
+            await bot.delete_webhook()
+        except Exception as e:
+            print("Shutdown: delete_webhook failed:", type(e).__name__, e)
 
 
 @app.get("/")
@@ -395,6 +410,9 @@ async def _process_update(update: telegram.Update) -> None:
 async def telegram_webhook(token: str, request: Request):
     if token != Environment.get_env("token"):
         return Response(status_code=404)
+    if bot is None or data is None:
+        print("Webhook hit but bot/data not initialized — check startup logs")
+        return {"ok": True}
 
     payload = await request.json()
     update = telegram.Update.de_json(payload, bot)
