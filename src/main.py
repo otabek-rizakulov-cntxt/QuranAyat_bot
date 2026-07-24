@@ -355,9 +355,14 @@ async def on_startup():
 
     webhook_base = _webhook_base_url()
     if webhook_base:
-        token = Environment.get_env("token")
-        await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
-        print("Webhook registered at", webhook_base)
+        try:
+            token = Environment.get_env("token")
+            await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
+            print("Webhook registered at", webhook_base)
+        except Exception as e:
+            # Never let webhook registration failure crash startup — the server must
+            # still come up and listen, or the platform reports "connection refused".
+            print("WARNING: set_webhook failed:", type(e).__name__, e)
     else:
         print("No WEBHOOK_URL / RAILWAY_PUBLIC_DOMAIN set; webhook not registered")
     print("Webhook server has been started")
