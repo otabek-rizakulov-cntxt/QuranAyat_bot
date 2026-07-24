@@ -27,6 +27,20 @@ Required env vars (see .env.example):
 """
 import os
 import re
+"""Webhook entrypoint: Telegram pushes updates to us; we never poll.
+
+Run with: uvicorn main:app --host 0.0.0.0 --port 8000
+
+Required env vars (see .env.example):
+  TOKEN                  Telegram bot token
+  REDIS_HOST_URL         Redis connection URL (user state + media file-id cache)
+  AUDIO_BASE_URL         base URL for recitation mp3s
+  PHOTO_BASE_URL         base URL/path for Arabic ayah images
+  WEBHOOK_URL            public HTTPS base URL Telegram should POST updates to;
+                         the webhook is registered as WEBHOOK_URL + "/webhook/" + TOKEN
+"""
+import os
+import re
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -329,7 +343,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 # ---------------------------------------------------------------------------
 
 app = FastAPI()
-bot = None  # created in startup (guarded) so a bad/missing TOKEN can't crash import
+bot = Bot.get_instance()
 data = None  # populated on startup
 
 
@@ -350,42 +364,27 @@ def _webhook_base_url() -> str | None:
 
 @app.on_event("startup")
 async def on_startup():
-    # Every step is guarded so the HTTP server ALWAYS comes up and listens.
-    # If it doesn't, the platform reports "connection refused"/502 and we can't tell
-    # a config error from a port mismatch. Booting-then-logging makes that diagnosable.
-    global data, bot
-
-    try:
-        bot = Bot.get_instance()
-    except Exception as e:
-        print("STARTUP ERROR (bot init — check TOKEN):", type(e).__name__, e)
-
-    try:
-        data = build_data()
-    except Exception as e:
-        print("STARTUP ERROR (build_data — check corpus files):", type(e).__name__, e)
+    global data
+    data = build_data()
 
     webhook_base = _webhook_base_url()
-    if bot and webhook_base:
+    if webhook_base:
         try:
             token = Environment.get_env("token")
             await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
             print("Webhook registered at", webhook_base)
         except Exception as e:
-            print("STARTUP ERROR (set_webhook):", type(e).__name__, e)
+            # Never let webhook registration failure crash startup — the server must
+            # still come up and listen, or the platform reports "connection refused".
+            print("WARNING: set_webhook failed:", type(e).__name__, e)
     else:
-        print("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
-
-    print("Startup complete — HTTP server is listening")
+        print("No WEBHOOK_URL / RAILWAY_PUBLIC_DOMAIN set; webhook not registered")
+    print("Webhook server has been started")
 
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    if bot is not None:
-        try:
-            await bot.delete_webhook()
-        except Exception as e:
-            print("Shutdown: delete_webhook failed:", type(e).__name__, e)
+    await bot.delete_webhook()
 
 
 @app.get("/")
@@ -410,9 +409,6 @@ async def _process_update(update: telegram.Update) -> None:
 async def telegram_webhook(token: str, request: Request):
     if token != Environment.get_env("token"):
         return Response(status_code=404)
-    if bot is None or data is None:
-        print("Webhook hit but bot/data not initialized — check startup logs")
-        return {"ok": True}
 
     payload = await request.json()
     update = telegram.Update.de_json(payload, bot)
