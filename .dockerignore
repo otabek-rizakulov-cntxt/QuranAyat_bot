@@ -1,0 +1,16 @@
+# Media served from the CDN (everyayah.com) — not needed in the image
+Husary/
+quranic_images/
+*.mp3
+*.png
+Al_Jalalain_Eng.pdf
+
+# Local/dev artifacts
+venv/
+.venv/
+dump.rdb
+.env
+.git/
+__pycache__/
+*.pyc
+.DS_Store
