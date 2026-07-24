@@ -27,6 +27,20 @@ Required env vars (see .env.example):
 """
 import os
 import re
+"""Webhook entrypoint: Telegram pushes updates to us; we never poll.
+
+Run with: uvicorn main:app --host 0.0.0.0 --port 8000
+
+Required env vars (see .env.example):
+  TOKEN                  Telegram bot token
+  REDIS_HOST_URL         Redis connection URL (user state + media file-id cache)
+  AUDIO_BASE_URL         base URL for recitation mp3s
+  PHOTO_BASE_URL         base URL/path for Arabic ayah images
+  WEBHOOK_URL            public HTTPS base URL Telegram should POST updates to;
+                         the webhook is registered as WEBHOOK_URL + "/webhook/" + TOKEN
+"""
+import os
+import re
 from dotenv import load_dotenv
 load_dotenv()
 
