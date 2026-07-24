@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(timeout 25 python3 -c ' *)",
+      "Bash(python3 -m py_compile main.py config/redis.py)",
+      "Bash(rtk grep *)",
+      "Bash(TOKEN=dummy REDIS_HOST_URL=redis://localhost:6379 AUDIO_BASE_URL=x PHOTO_BASE_URL=x python3 -c ' *)",
+      "Bash(rtk ls *)",
+      "Bash(TOKEN=x REDIS_HOST_URL=redis://localhost:6379 AUDIO_BASE_URL=https://www.everyayah.com/data PHOTO_BASE_URL=x python3 -c ' *)",
+      "Bash(rm -f /tmp/qa_53_1-7.mp3 && echo cleaned)",
+      "Bash(python3 -m py_compile main.py)",
+      "Bash(python3 -m py_compile src/main.py)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp"
+    ]
+  }
+}

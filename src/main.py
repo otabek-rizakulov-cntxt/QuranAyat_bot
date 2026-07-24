@@ -27,6 +27,20 @@ Required env vars (see .env.example):
 """
 import os
 import re
+"""Webhook entrypoint: Telegram pushes updates to us; we never poll.
+
+Run with: uvicorn main:app --host 0.0.0.0 --port 8000
+
+Required env vars (see .env.example):
+  TOKEN                  Telegram bot token
+  REDIS_HOST_URL         Redis connection URL (user state + media file-id cache)
+  AUDIO_BASE_URL         base URL for recitation mp3s
+  PHOTO_BASE_URL         base URL/path for Arabic ayah images
+  WEBHOOK_URL            public HTTPS base URL Telegram should POST updates to;
+                         the webhook is registered as WEBHOOK_URL + "/webhook/" + TOKEN
+"""
+import os
+import re
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -329,8 +343,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 # ---------------------------------------------------------------------------
 
 app = FastAPI()
-bot = None  # created in startup (guarded) so a bad/missing TOKEN can't crash import
-data = None  # populated on startup
+bot = None  # created during background init (guarded) so a bad/missing TOKEN can't crash import
+data = None  # populated by background init after corpora finish parsing
 
 
 def _webhook_base_url() -> str | None:
@@ -348,22 +362,27 @@ def _webhook_base_url() -> str | None:
     return None
 
 
-@app.on_event("startup")
-async def on_startup():
-    # Every step is guarded so the HTTP server ALWAYS comes up and listens.
-    # If it doesn't, the platform reports "connection refused"/502 and we can't tell
-    # a config error from a port mismatch. Booting-then-logging makes that diagnosable.
+async def _initialize():
+    """Heavy init (bot, corpora parsing, webhook registration) done OFF the startup path.
+
+    Parsing the Quran translation + tafsir is CPU-bound and slow on small free instances;
+    if it ran inside the startup event, uvicorn wouldn't accept connections until it finished
+    and the platform's health check would fail the deploy. So we return from startup immediately
+    and do this in the background — the server listens right away and answers `/`.
+    """
     global data, bot
 
     try:
         bot = Bot.get_instance()
     except Exception as e:
-        print("STARTUP ERROR (bot init — check TOKEN):", type(e).__name__, e)
+        print("INIT ERROR (bot — check TOKEN):", type(e).__name__, e)
 
     try:
-        data = build_data()
+        # run the blocking parse in a worker thread so the event loop stays responsive
+        data = await asyncio.to_thread(build_data)
+        print("Corpora loaded; bot is ready")
     except Exception as e:
-        print("STARTUP ERROR (build_data — check corpus files):", type(e).__name__, e)
+        print("INIT ERROR (build_data — check corpus files):", type(e).__name__, e)
 
     webhook_base = _webhook_base_url()
     if bot and webhook_base:
@@ -372,11 +391,19 @@ async def on_startup():
             await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
             print("Webhook registered at", webhook_base)
         except Exception as e:
-            print("STARTUP ERROR (set_webhook):", type(e).__name__, e)
+            print("INIT ERROR (set_webhook):", type(e).__name__, e)
     else:
         print("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
 
-    print("Startup complete — HTTP server is listening")
+
+@app.on_event("startup")
+async def on_startup():
+    # Kick off heavy init in the background and return immediately so the HTTP server
+    # starts listening and passes health checks without waiting on corpora parsing.
+    task = asyncio.create_task(_initialize())
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
+    print("Startup event returned — HTTP server is listening")
 
 
 @app.on_event("shutdown")
@@ -411,7 +438,8 @@ async def telegram_webhook(token: str, request: Request):
     if token != Environment.get_env("token"):
         return Response(status_code=404)
     if bot is None or data is None:
-        print("Webhook hit but bot/data not initialized — check startup logs")
+        # still initializing (corpora parsing) — ack so Telegram doesn't retry-flood
+        print("Webhook hit before init finished; acking without processing")
         return {"ok": True}
 
     payload = await request.json()

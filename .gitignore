@@ -15,3 +15,6 @@ en.ahmedraza
 quran-data.xml
 venv
 .DS_Store
+
+# Claude Code local settings — machine/user-specific, never commit
+.claude/
