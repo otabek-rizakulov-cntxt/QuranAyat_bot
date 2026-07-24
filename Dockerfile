@@ -10,4 +10,5 @@ COPY . .
 
 # cwd stays /app so the Quran corpus files (quran-data.xml, en.ahmedraza, ...)
 # resolve; --app-dir puts src/ on the import path for `main:app`.
-CMD ["uvicorn", "main:app", "--app-dir", "src", "--host", "0.0.0.0", "--port", "8000"]
+# Shell form so ${PORT} (injected by Railway/Render/etc.) is expanded; falls back to 8000 locally.
+CMD uvicorn main:app --app-dir src --host 0.0.0.0 --port ${PORT:-8000}

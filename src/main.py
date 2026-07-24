@@ -333,15 +333,33 @@ bot = Bot.get_instance()
 data = None  # populated on startup
 
 
+def _webhook_base_url() -> str | None:
+    """Public HTTPS base URL for the webhook.
+
+    Prefer an explicit WEBHOOK_URL; otherwise fall back to Railway's auto-injected
+    RAILWAY_PUBLIC_DOMAIN (host only, so we prepend https://).
+    """
+    explicit = os.getenv("WEBHOOK_URL")
+    if explicit:
+        return explicit.rstrip("/")
+    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+    if railway_domain:
+        return "https://" + railway_domain.rstrip("/")
+    return None
+
+
 @app.on_event("startup")
 async def on_startup():
     global data
     data = build_data()
 
-    webhook_base = os.getenv("WEBHOOK_URL")
+    webhook_base = _webhook_base_url()
     if webhook_base:
         token = Environment.get_env("token")
-        await bot.set_webhook(url=f"{webhook_base.rstrip('/')}/webhook/{token}")
+        await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
+        print("Webhook registered at", webhook_base)
+    else:
+        print("No WEBHOOK_URL / RAILWAY_PUBLIC_DOMAIN set; webhook not registered")
     print("Webhook server has been started")
 
 
