@@ -343,8 +343,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 # ---------------------------------------------------------------------------
 
 app = FastAPI()
-bot = Bot.get_instance()
-data = None  # populated on startup
+bot = None  # created during background init (guarded) so a bad/missing TOKEN can't crash import
+data = None  # populated by background init after corpora finish parsing
 
 
 def _webhook_base_url() -> str | None:
@@ -362,29 +362,57 @@ def _webhook_base_url() -> str | None:
     return None
 
 
-@app.on_event("startup")
-async def on_startup():
-    global data
-    data = build_data()
+async def _initialize():
+    """Heavy init (bot, corpora parsing, webhook registration) done OFF the startup path.
+
+    Parsing the Quran translation + tafsir is CPU-bound and slow on small free instances;
+    if it ran inside the startup event, uvicorn wouldn't accept connections until it finished
+    and the platform's health check would fail the deploy. So we return from startup immediately
+    and do this in the background — the server listens right away and answers `/`.
+    """
+    global data, bot
+
+    try:
+        bot = Bot.get_instance()
+    except Exception as e:
+        print("INIT ERROR (bot — check TOKEN):", type(e).__name__, e)
+
+    try:
+        # run the blocking parse in a worker thread so the event loop stays responsive
+        data = await asyncio.to_thread(build_data)
+        print("Corpora loaded; bot is ready")
+    except Exception as e:
+        print("INIT ERROR (build_data — check corpus files):", type(e).__name__, e)
 
     webhook_base = _webhook_base_url()
-    if webhook_base:
+    if bot and webhook_base:
         try:
             token = Environment.get_env("token")
             await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
             print("Webhook registered at", webhook_base)
         except Exception as e:
-            # Never let webhook registration failure crash startup — the server must
-            # still come up and listen, or the platform reports "connection refused".
-            print("WARNING: set_webhook failed:", type(e).__name__, e)
+            print("INIT ERROR (set_webhook):", type(e).__name__, e)
     else:
-        print("No WEBHOOK_URL / RAILWAY_PUBLIC_DOMAIN set; webhook not registered")
-    print("Webhook server has been started")
+        print("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
+
+
+@app.on_event("startup")
+async def on_startup():
+    # Kick off heavy init in the background and return immediately so the HTTP server
+    # starts listening and passes health checks without waiting on corpora parsing.
+    task = asyncio.create_task(_initialize())
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
+    print("Startup event returned — HTTP server is listening")
 
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    await bot.delete_webhook()
+    if bot is not None:
+        try:
+            await bot.delete_webhook()
+        except Exception as e:
+            print("Shutdown: delete_webhook failed:", type(e).__name__, e)
 
 
 @app.get("/")
@@ -409,6 +437,10 @@ async def _process_update(update: telegram.Update) -> None:
 async def telegram_webhook(token: str, request: Request):
     if token != Environment.get_env("token"):
         return Response(status_code=404)
+    if bot is None or data is None:
+        # still initializing (corpora parsing) — ack so Telegram doesn't retry-flood
+        print("Webhook hit before init finished; acking without processing")
+        return {"ok": True}
 
     payload = await request.json()
     update = telegram.Update.de_json(payload, bot)
