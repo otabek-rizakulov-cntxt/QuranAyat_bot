@@ -5,17 +5,14 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 class Environment:
 
   @classmethod
-  def get_env(self, name: str) -> str:
-    TOKEN = os.getenv("TOKEN")
-    REDIS_URL = os.getenv("REDIS_HOST_URL")
-    AUDIO_BASE_URL = os.getenv("AUDIO_BASE_URL")
-    QURANIC_IMAGES_FILE_PATH = os.getenv("PHOTO_BASE_URL")
-    PERFORMERS_FILE_PATH = os.getenv("RECITATIONS_BASE_URL")
-    variable = {
-      "token": TOKEN,
-      "redis": REDIS_URL,
-      "audio_base_url": AUDIO_BASE_URL,
-      "performers_file_path": PERFORMERS_FILE_PATH,
-      "quranic_images_file_path": QURANIC_IMAGES_FILE_PATH
+  def get_env(cls, name: str) -> str:
+    variables = {
+      "token": os.getenv("TOKEN"),
+      "redis": os.getenv("REDIS_HOST_URL"),
+      "audio_base_url": os.getenv("AUDIO_BASE_URL"),
+      "performers_file_path": os.getenv("RECITATIONS_BASE_URL"),
+      "quranic_images_file_path": os.getenv("PHOTO_BASE_URL"),
     }
-    return variable[name]
+    if name not in variables:
+      raise KeyError(f"Unknown environment variable requested: {name}")
+    return variables[name]
