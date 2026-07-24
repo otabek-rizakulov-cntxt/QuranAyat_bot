@@ -1,5 +1,8 @@
 FROM python:3.10.6
 
+# Unbuffered stdout/stderr so print() logs show up live in Railway/Docker logs.
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 COPY requirements.txt .
