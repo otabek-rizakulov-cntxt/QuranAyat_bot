@@ -32,7 +32,6 @@ from bismillahbot import Quran, make_index
 TOKEN = os.getenv("TOKEN")
 REDIS_HOST_URL = os.getenv("REDIS_HOST_URL")
 
-print("Redis host ", REDIS_HOST_URL)
 r = StrictRedis.from_url(REDIS_HOST_URL)
 
 redis_namespace = ""
