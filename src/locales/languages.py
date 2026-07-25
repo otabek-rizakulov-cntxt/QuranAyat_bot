@@ -5,10 +5,10 @@
 # right-to-left, and (for the offline bundler) which tanzil/alquran.cloud edition
 # supplies the Qur'an translation text.
 #
-# The running bot only reads `code`, `native`, `english`, `rtl`. The `edition`
-# field is consumed exclusively by scripts/bundle_translations.py when it fetches
-# and converts the translation files into translations/<code>.txt — the app never
-# touches the network.
+# The running bot only reads `code`, `native`, `english`, `rtl`, `flag`. The
+# `edition` field is consumed exclusively by scripts/bundle_translations.py when it
+# fetches and converts the translation files into translations/<code>.txt — the app
+# never touches the network.
 
 from dataclasses import dataclass
 
@@ -27,61 +27,68 @@ class Language:
     english: str       # English name (for logs, attribution, fallback labels)
     rtl: bool          # right-to-left script (Telegram renders it correctly on its own)
     edition: str       # alquran.cloud edition id, or a sentinel above
+    flag: str = ""     # representative flag emoji for the /language picker (see note below)
 
 
 # Ordered for the /language picker: English first, then the Central-Asia-focused
 # core (the bot's primary audience), then the rest grouped roughly by region.
+#
+# `flag` is a representative flag emoji shown before the endonym in the picker.
+# A language is not a country, so a few are judgment calls: Arabic uses a pan-Arab
+# stand-in (🇸🇦), and stateless languages with no flag emoji of their own (Kurdish,
+# Uyghur, Tatar, Chechen, Berber) use the flag of the country with the most
+# speakers purely as a geographic marker. Any of these is a one-line change here.
 LANGUAGES: list[Language] = [
-    Language("en",      "English",           "English",             False, "en.ahmedraza"),
-    Language("ar",      "العربية",            "Arabic",              True,  ARABIC_ORIGINAL),
-    Language("ru",      "Русский",           "Russian",             False, "ru.kuliev"),
-    Language("uz-Cyrl", "Ўзбекча (Кирилл)",  "Uzbek (Cyrillic)",    False, "uz.sodik"),
-    Language("uz",      "Oʻzbekcha (Lotin)", "Uzbek (Latin)",       False, TRANSLIT_UZ),
-    Language("tr",      "Türkçe",            "Turkish",             False, "tr.diyanet"),
-    Language("ur",      "اردو",               "Urdu",                True,  "ur.jalandhry"),
-    Language("fa",      "فارسی",              "Persian",             True,  "fa.makarem"),
-    Language("tg",      "Тоҷикӣ",            "Tajik",               False, "tg.ayati"),
-    Language("az",      "Azərbaycan",        "Azerbaijani",         False, "az.musayev"),
-    Language("id",      "Bahasa Indonesia",  "Indonesian",          False, "id.indonesian"),
-    Language("ms",      "Bahasa Melayu",     "Malay",               False, "ms.basmeih"),
-    Language("fr",      "Français",          "French",              False, "fr.hamidullah"),
-    Language("de",      "Deutsch",           "German",              False, "de.bubenheim"),
-    Language("es",      "Español",           "Spanish",             False, "es.cortes"),
-    Language("pt",      "Português",         "Portuguese",          False, "pt.elhayek"),
-    Language("it",      "Italiano",          "Italian",             False, "it.piccardo"),
-    Language("nl",      "Nederlands",        "Dutch",               False, "nl.siregar"),
-    Language("bs",      "Bosanski",          "Bosnian",             False, "bs.korkut"),
-    Language("sq",      "Shqip",             "Albanian",            False, "sq.nahi"),
-    Language("bg",      "Български",          "Bulgarian",           False, "bg.theophanov"),
-    Language("cs",      "Čeština",           "Czech",               False, "cs.hrbek"),
-    Language("pl",      "Polski",            "Polish",              False, "pl.bielawskiego"),
-    Language("ro",      "Română",            "Romanian",            False, "ro.grigore"),
-    Language("sv",      "Svenska",           "Swedish",             False, "sv.bernstrom"),
-    Language("no",      "Norsk",             "Norwegian",           False, "no.berg"),
-    Language("bn",      "বাংলা",              "Bengali",             False, "bn.bengali"),
-    Language("hi",      "हिन्दी",              "Hindi",               False, "hi.farooq"),
-    Language("ta",      "தமிழ்",              "Tamil",               False, "ta.tamil"),
-    Language("ml",      "മലയാളം",            "Malayalam",           False, "ml.abdulhameed"),
-    Language("th",      "ไทย",                "Thai",                False, "th.thai"),
-    Language("zh",      "中文",               "Chinese",             False, "zh.majian"),
-    Language("ja",      "日本語",              "Japanese",            False, "ja.japanese"),
-    Language("ko",      "한국어",              "Korean",              False, "ko.korean"),
+    Language("en",      "English",           "English",             False, "en.ahmedraza",    "🇬🇧"),
+    Language("ar",      "العربية",            "Arabic",              True,  ARABIC_ORIGINAL,   "🇸🇦"),
+    Language("ru",      "Русский",           "Russian",             False, "ru.kuliev",       "🇷🇺"),
+    Language("uz-Cyrl", "Ўзбекча (Кирилл)",  "Uzbek (Cyrillic)",    False, "uz.sodik",        "🇺🇿"),
+    Language("uz",      "Oʻzbekcha (Lotin)", "Uzbek (Latin)",       False, TRANSLIT_UZ,       "🇺🇿"),
+    Language("tr",      "Türkçe",            "Turkish",             False, "tr.diyanet",      "🇹🇷"),
+    Language("ur",      "اردو",               "Urdu",                True,  "ur.jalandhry",    "🇵🇰"),
+    Language("fa",      "فارسی",              "Persian",             True,  "fa.makarem",      "🇮🇷"),
+    Language("tg",      "Тоҷикӣ",            "Tajik",               False, "tg.ayati",        "🇹🇯"),
+    Language("az",      "Azərbaycan",        "Azerbaijani",         False, "az.musayev",      "🇦🇿"),
+    Language("id",      "Bahasa Indonesia",  "Indonesian",          False, "id.indonesian",   "🇮🇩"),
+    Language("ms",      "Bahasa Melayu",     "Malay",               False, "ms.basmeih",      "🇲🇾"),
+    Language("fr",      "Français",          "French",              False, "fr.hamidullah",   "🇫🇷"),
+    Language("de",      "Deutsch",           "German",              False, "de.bubenheim",    "🇩🇪"),
+    Language("es",      "Español",           "Spanish",             False, "es.cortes",       "🇪🇸"),
+    Language("pt",      "Português",         "Portuguese",          False, "pt.elhayek",      "🇵🇹"),
+    Language("it",      "Italiano",          "Italian",             False, "it.piccardo",     "🇮🇹"),
+    Language("nl",      "Nederlands",        "Dutch",               False, "nl.siregar",      "🇳🇱"),
+    Language("bs",      "Bosanski",          "Bosnian",             False, "bs.korkut",       "🇧🇦"),
+    Language("sq",      "Shqip",             "Albanian",            False, "sq.nahi",         "🇦🇱"),
+    Language("bg",      "Български",          "Bulgarian",           False, "bg.theophanov",   "🇧🇬"),
+    Language("cs",      "Čeština",           "Czech",               False, "cs.hrbek",        "🇨🇿"),
+    Language("pl",      "Polski",            "Polish",              False, "pl.bielawskiego", "🇵🇱"),
+    Language("ro",      "Română",            "Romanian",            False, "ro.grigore",      "🇷🇴"),
+    Language("sv",      "Svenska",           "Swedish",             False, "sv.bernstrom",    "🇸🇪"),
+    Language("no",      "Norsk",             "Norwegian",           False, "no.berg",         "🇳🇴"),
+    Language("bn",      "বাংলা",              "Bengali",             False, "bn.bengali",      "🇧🇩"),
+    Language("hi",      "हिन्दी",              "Hindi",               False, "hi.farooq",       "🇮🇳"),
+    Language("ta",      "தமிழ்",              "Tamil",               False, "ta.tamil",        "🇮🇳"),
+    Language("ml",      "മലയാളം",            "Malayalam",           False, "ml.abdulhameed",  "🇮🇳"),
+    Language("th",      "ไทย",                "Thai",                False, "th.thai",         "🇹🇭"),
+    Language("zh",      "中文",               "Chinese",             False, "zh.majian",       "🇨🇳"),
+    Language("ja",      "日本語",              "Japanese",            False, "ja.japanese",     "🇯🇵"),
+    Language("ko",      "한국어",              "Korean",              False, "ko.korean",       "🇰🇷"),
     # ku.asan is Sorani in Arabic script, so this entry is RTL and its endonym
     # is written in that script (not the Latin/Kurmanji "Kurdî").
-    Language("ku",      "کوردی",              "Kurdish (Sorani)",    True,  "ku.asan"),
-    Language("ha",      "Hausa",             "Hausa",               False, "ha.gumi"),
-    Language("so",      "Soomaali",          "Somali",              False, "so.abduh"),
-    Language("sw",      "Kiswahili",         "Swahili",             False, "sw.barwani"),
-    Language("am",      "አማርኛ",              "Amharic",             False, "am.sadiq"),
-    Language("sd",      "سنڌي",               "Sindhi",              True,  "sd.amroti"),
-    Language("ug",      "ئۇيغۇرچە",           "Uyghur",              True,  "ug.saleh"),
-    Language("ps",      "پښتو",               "Pashto",              True,  "ps.abdulwali"),
-    Language("dv",      "ދިވެހި",              "Divehi",              True,  "dv.divehi"),
-    Language("si",      "සිංහල",              "Sinhala",             False, "si.naseemismail"),
-    Language("my",      "မြန်မာ",              "Burmese",             False, "my.ghazi"),
-    Language("tt",      "Татарча",           "Tatar",               False, "tt.nugman"),
-    Language("ce",      "Нохчийн",           "Chechen",             False, "ce.magomedov"),
-    Language("ber",     "Tamaziɣt",          "Berber",              False, "ber.mensur"),
+    Language("ku",      "کوردی",              "Kurdish (Sorani)",    True,  "ku.asan",         "🇮🇶"),
+    Language("ha",      "Hausa",             "Hausa",               False, "ha.gumi",         "🇳🇬"),
+    Language("so",      "Soomaali",          "Somali",              False, "so.abduh",        "🇸🇴"),
+    Language("sw",      "Kiswahili",         "Swahili",             False, "sw.barwani",      "🇹🇿"),
+    Language("am",      "አማርኛ",              "Amharic",             False, "am.sadiq",        "🇪🇹"),
+    Language("sd",      "سنڌي",               "Sindhi",              True,  "sd.amroti",       "🇵🇰"),
+    Language("ug",      "ئۇيغۇرچە",           "Uyghur",              True,  "ug.saleh",        "🇨🇳"),
+    Language("ps",      "پښتو",               "Pashto",              True,  "ps.abdulwali",    "🇦🇫"),
+    Language("dv",      "ދިވެހި",              "Divehi",              True,  "dv.divehi",       "🇲🇻"),
+    Language("si",      "සිංහල",              "Sinhala",             False, "si.naseemismail", "🇱🇰"),
+    Language("my",      "မြန်မာ",              "Burmese",             False, "my.ghazi",        "🇲🇲"),
+    Language("tt",      "Татарча",           "Tatar",               False, "tt.nugman",       "🇷🇺"),
+    Language("ce",      "Нохчийн",           "Chechen",             False, "ce.magomedov",    "🇷🇺"),
+    Language("ber",     "Tamaziɣt",          "Berber",              False, "ber.mensur",      "🇩🇿"),
 ]
 
 # code -> Language, and the default the whole bot falls back to.
