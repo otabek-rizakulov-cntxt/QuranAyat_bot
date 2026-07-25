@@ -1,0 +1,104 @@
+# BismillahBot -- Explore the Holy Qur'an on Telegram
+#
+# Dependency-free UI internationalization: a dict-of-dicts keyed by language code,
+# with a t(key, lang) helper that falls back to English per-key. Locale tables may
+# be partial — any key a locale omits is served from English, so a half-translated
+# language still works everywhere.
+
+from functools import lru_cache
+from importlib import import_module
+
+from .languages import (  # re-exported for callers
+    LANGUAGES, LANGUAGES_BY_CODE, DEFAULT_LANG, Language,
+    get_language, is_supported, normalize_lang,
+)
+
+
+def _module_name(code: str) -> str:
+    """Locale module basename for a language code: "uz-Cyrl" -> "uz_cyrl"."""
+    return code.replace("-", "_").lower()
+
+
+def _load_locales() -> dict[str, dict]:
+    """Import one string table per catalogued language, keyed by language code.
+
+    Driven by LANGUAGES rather than a hand-written import list, so adding a
+    language to the catalogue is enough. A language whose module is missing is
+    skipped with a warning instead of breaking startup — `t()` then serves it
+    from English. `missing_locales()` reports the gap (the test suite asserts
+    it is empty).
+    """
+    tables: dict[str, dict] = {}
+    for lang in LANGUAGES:
+        try:
+            module = import_module("." + _module_name(lang.code), __name__)
+        except ImportError:
+            print("LOCALE MISSING: %s (%s) falls back to English"
+                  % (lang.code, lang.english))
+            continue
+        tables[lang.code] = module.strings
+    return tables
+
+
+LOCALES: dict[str, dict] = _load_locales()
+
+
+def missing_locales() -> list[str]:
+    """Catalogued languages with no locale table of their own."""
+    return [lang.code for lang in LANGUAGES if lang.code not in LOCALES]
+
+
+def missing_keys(lang: str) -> list[str]:
+    """English keys a locale does not define (each falls back to English)."""
+    table = LOCALES.get(lang, {})
+    return [key for key in LOCALES[DEFAULT_LANG] if key not in table]
+
+
+def t(key: str, lang: str = DEFAULT_LANG) -> str:
+    """Localized UI string for `key`, falling back to English (then the key itself)."""
+    table = LOCALES.get(lang)
+    if table is not None and key in table:
+        return table[key]
+    return LOCALES[DEFAULT_LANG].get(key, key)
+
+
+# --- Reply-keyboard localization -----------------------------------------------
+# The reply keyboard shows localized labels, but taps arrive as plain text. We map
+# each incoming label back to a canonical action so navigation stays intact whatever
+# the user's language is.
+
+# canonical action -> its button string key
+ACTION_BUTTON_KEYS = {
+    "arabic": "btn_arabic",
+    "audio": "btn_audio",
+    "translation": "btn_translation",
+    "tafsir": "btn_tafsir",
+    "previous": "btn_previous",
+    "random": "btn_random",
+    "next": "btn_next",
+}
+
+
+def keyboard_rows(lang: str) -> list[list[str]]:
+    """The reply-keyboard layout with localized labels, in display order."""
+    return [
+        [t("btn_arabic", lang), t("btn_audio", lang), t("btn_translation", lang), t("btn_tafsir", lang)],
+        [t("btn_previous", lang), t("btn_random", lang), t("btn_next", lang)],
+    ]
+
+
+@lru_cache(maxsize=None)
+def _reverse_button_map(lang: str) -> dict[str, str]:
+    """{lowercased label -> canonical action} for `lang`, English, and canonical words."""
+    m: dict[str, str] = {}
+    for action, btn_key in ACTION_BUTTON_KEYS.items():
+        m[action] = action                                     # canonical word ("next")
+        m[t(btn_key, DEFAULT_LANG).strip().lower()] = action   # English label
+        m[t(btn_key, lang).strip().lower()] = action           # localized label
+    m["english"] = "translation"  # legacy: old label and stored state value
+    return m
+
+
+def button_action(text: str, lang: str) -> str | None:
+    """Canonical action for an incoming button tap, or None if it isn't a button."""
+    return _reverse_button_map(lang).get(text.strip().lower())

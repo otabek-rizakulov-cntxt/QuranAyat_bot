@@ -13,10 +13,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import os
 import re
 import xml.etree.ElementTree as ET
 from random import randint
 from typing import Tuple
+
+from locales.languages import DEFAULT_LANG
+
+# translations/ lives at the repo root (next to en.ahmedraza, quran-data.xml).
+# Resolve it absolutely from this file so it works regardless of the process cwd.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+TRANSLATIONS_DIR = os.path.join(_REPO_ROOT, "translations")
 
 
 def parse_quran(filename: str):
@@ -49,7 +57,7 @@ def parse_quran(filename: str):
     return quran
 
 
-def parse_quran_tafsir():
+def parse_quran_tafsir(filename: str = "Al_Jalalain_Eng.txt"):
     """Parse tafsir al-Jalalayn from http://www.altafsir.com/Al-Jalalayn.asp, after
     that PDF was processed with `pdftotext -nopgbrk Al_Jalalain_Eng.pdf`.
     """
@@ -66,7 +74,7 @@ def parse_quran_tafsir():
         """Add line and replace for Arabic ligatures (salawat)"""
         verse.append(line.strip().replace("(s)", "ﷺ‎"))
 
-    with open("Al_Jalalain_Eng.txt", "r") as f:
+    with open(filename, "r") as f:
         for line in f.readlines():
             if line == "\n": continue
             if re.match(r"\d+\w*", line): continue
@@ -108,13 +116,18 @@ class Quran:
 
     surah_names = [s.attrib["tname"] for s in ET.parse("quran-data.xml").getroot().find("suras")]
 
-    def __init__(self, data: str) -> None:
-        if data == "arabic":
-            self.text = parse_quran("quran-uthmani.txt")
-        elif data == "translation":
-            self.text = parse_quran("en.ahmedraza")
-        elif data == "tafsir":
-            self.text = parse_quran_tafsir()
+    def __init__(self, text: list) -> None:
+        """`text` is a list of surahs, each a list of ayah strings (see parse_quran)."""
+        self.text = text
+
+    @classmethod
+    def from_file(cls, path: str) -> "Quran":
+        """Build a Quran from a tanzil-format `surah|ayah|text` file."""
+        return cls(parse_quran(path))
+
+    @classmethod
+    def from_tafsir(cls, path: str = "Al_Jalalain_Eng.txt") -> "Quran":
+        return cls(parse_quran_tafsir(path))
 
     def get_surah(self, surah: int) -> str:
         """Get surah by number."""
@@ -164,6 +177,57 @@ class Quran:
     @staticmethod
     def get_surah_name(surah: int) -> str:
         return Quran.surah_names[surah - 1]
+
+
+class TranslationRegistry:
+    """Lazily loads and caches Qur'an translations, one per language.
+
+    Only the default language is preloaded at startup (see preload()); every other
+    language is parsed from translations/<code>.txt on first request and then kept
+    in memory. This keeps startup fast and memory proportional to the languages
+    actually used — important on the 512 MB free instance.
+    """
+    _cache: dict[str, Quran] = {}
+
+    @classmethod
+    def _path(cls, code: str) -> str:
+        return os.path.join(TRANSLATIONS_DIR, code + ".txt")
+
+    @classmethod
+    def available(cls) -> set[str]:
+        """Language codes that have a bundled translation file on disk."""
+        try:
+            return {f[:-4] for f in os.listdir(TRANSLATIONS_DIR) if f.endswith(".txt")}
+        except OSError:
+            return set()
+
+    @classmethod
+    def is_cached(cls, code: str) -> bool:
+        return code in cls._cache
+
+    @classmethod
+    def preload(cls, code: str) -> Quran:
+        """Parse and cache a language now (called at startup for the default)."""
+        cls._cache[code] = Quran.from_file(cls._path(code))
+        return cls._cache[code]
+
+    @classmethod
+    def get(cls, code: str) -> Quran:
+        """Return the translation for `code`, parsing on first use.
+
+        Falls back to the default language if the requested file is missing, so a
+        trimmed/partial bundle degrades gracefully instead of erroring.
+        """
+        cached = cls._cache.get(code)
+        if cached is not None:
+            return cached
+        path = cls._path(code)
+        if not os.path.exists(path):
+            if code != DEFAULT_LANG:
+                return cls.get(DEFAULT_LANG)
+            raise FileNotFoundError("Missing default translation: " + path)
+        cls._cache[code] = Quran.from_file(path)
+        return cls._cache[code]
 
 
 def make_index():
