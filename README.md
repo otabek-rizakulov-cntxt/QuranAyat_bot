@@ -36,6 +36,28 @@ Also see [AudioQuranBot][], a bot that sends audio files of complete surahs.
 [example]: https://i.imgur.com/kITXcHz.png "Example conversation"
 [AudioQuranBot]: https://github.com/rahiel/AudioQuranBot
 
+# Languages
+
+The bot is multilingual. Send `/language` to choose from 48 languages; the
+menus, buttons, error messages, and the verse translation then follow that
+choice. On first contact the interface auto-detects your Telegram language
+(falling back to English), and you can change it any time.
+
+Uzbek is offered in both **Cyrillic** (Ўзбекча) and **Latin** (Oʻzbekcha)
+scripts — the Latin text is produced by deterministic transliteration of the
+Cyrillic edition. Translations are sourced from [tanzil.net][] via the
+[alquran.cloud][] API and bundled under `translations/`; each edition and
+translator is listed in [ATTRIBUTIONS.md](ATTRIBUTIONS.md) (review each
+translation's licence before public distribution). The tafsir remains English.
+
+Only English is parsed at startup; every other language is loaded on first use
+and cached, keeping memory proportional to the languages actually used. To
+refresh or extend the bundled set, edit `src/locales/languages.py` and run
+`python3 scripts/bundle_translations.py`.
+
+[tanzil.net]: https://tanzil.net
+[alquran.cloud]: https://alquran.cloud
+
 # Installation
 
 You can run your own instance of BismillahBot. First you need to request a

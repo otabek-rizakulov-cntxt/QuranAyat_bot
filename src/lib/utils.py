@@ -25,6 +25,22 @@ class File(Environment):
       return json.loads(v)
     return None
 
+  def _lang_key(self, chat_id: int) -> str:
+    return self.redis_namespace + "lang:" + str(chat_id)
+
+  def save_lang(self, chat_id: int, code: str):
+    """Persist the user's UI/translation language.
+
+    Stored separately from navigation state and without an expiry, because a
+    language choice is a durable preference while (surah, ayah, type) resets
+    after two days.
+    """
+    self.redis.set(self._lang_key(chat_id), code)
+
+  def get_lang(self, chat_id: int):
+    """Return the user's saved language code, or None if they haven't chosen one."""
+    return self.redis.get(self._lang_key(chat_id))
+
   def save_file(self, filename: str, file_id: str):
     """Cache the Telegram file_id for a media file so we can skip re-uploading."""
     if not file_id:
