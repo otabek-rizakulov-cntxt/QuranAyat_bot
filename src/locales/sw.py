@@ -21,8 +21,7 @@ strings = {
         "wa kila tafsiri). Sauti ni usomaji wa Shekh Mahmoud Khalil al-Husary "
         "(everyayah.com). Tafsir ni Tafsir al-Jalalayn (altafsir.com), "
         "inapatikana kwa Kiingereza.\n\n"
-        "Badilisha lugha wakati wowote kwa /language.\n"
-        "Kodi ya chanzo: https://github.com/rahiel/BismillahBot"
+        "Badilisha lugha wakati wowote kwa /language."
     ),
     "ayah_not_found": "Aya hiyo haipo!",
     "range_too_large": "Kipenyo ni kikubwa mno, tafadhali omba aya {n} kwa wakati mmoja.",

@@ -20,8 +20,7 @@ strings = {
         "ATTRIBUTIONS.md ተመልከት)። ድምፁ የሸይኽ መሕሙድ ኻሊል አል-ሑሰሪ ቅርአት ነው "
         "(everyayah.com)። ተፍሲሩ ተፍሲር አል-ጀላለይን (altafsir.com) ሲሆን በእንግሊዝኛ "
         "ይገኛል።\n\n"
-        "ቋንቋን በፈለከው ጊዜ በ /language ቀይር።\n"
-        "የምንጭ ኮድ: https://github.com/rahiel/BismillahBot"
+        "ቋንቋን በፈለከው ጊዜ በ /language ቀይር።"
     ),
     "ayah_not_found": "እንዲህ ያለ አያት አይገኝም!",
     "range_too_large": "ክልሉ በጣም ትልቅ ነው፤ በአንድ ጊዜ ቢበዛ {n} አያቶች ጠይቅ።",

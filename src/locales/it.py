@@ -21,8 +21,7 @@ strings = {
         "l'edizione e il traduttore di ogni traduzione). L'audio è una "
         "recitazione dello sceicco Mahmoud Khalil al-Husary (everyayah.com). Il "
         "tafsir è il Tafsir al-Jalalayn (altafsir.com), disponibile in inglese.\n\n"
-        "Cambia lingua in qualsiasi momento con /language.\n"
-        "Codice sorgente: https://github.com/rahiel/BismillahBot"
+        "Cambia lingua in qualsiasi momento con /language."
     ),
     "ayah_not_found": "Questo versetto non esiste!",
     "range_too_large": "Intervallo troppo grande, richiedi al massimo {n} versetti alla volta.",

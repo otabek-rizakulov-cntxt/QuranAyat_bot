@@ -20,8 +20,7 @@ strings = {
         "wydanie i tłumacza każdego przekładu). Nagranie to recytacja szejka "
         "Mahmuda Chalila al-Husariego (everyayah.com). Tafsir to Tafsir "
         "al-Dżalalajn (altafsir.com), dostępny po angielsku.\n\n"
-        "Język zmienisz w każdej chwili poleceniem /language.\n"
-        "Kod źródłowy: https://github.com/rahiel/BismillahBot"
+        "Język zmienisz w każdej chwili poleceniem /language."
     ),
     "ayah_not_found": "Taki werset nie istnieje!",
     "range_too_large": "Zakres jest za duży, poproś o maksymalnie {n} wersetów naraz.",

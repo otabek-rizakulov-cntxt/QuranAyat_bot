@@ -21,8 +21,7 @@ strings = {
         "l'édition et le traducteur de chaque traduction). L'audio est une "
         "récitation du cheikh Mahmoud Khalil al-Hussary (everyayah.com). Le "
         "tafsir est le Tafsir al-Jalalayn (altafsir.com), disponible en anglais.\n\n"
-        "Changez de langue à tout moment avec /language.\n"
-        "Code source : https://github.com/rahiel/BismillahBot"
+        "Changez de langue à tout moment avec /language."
     ),
     "ayah_not_found": "Ce verset n'existe pas !",
     "range_too_large": "Plage trop grande, veuillez demander au maximum {n} versets à la fois.",

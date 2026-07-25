@@ -21,8 +21,7 @@ strings = {
         "översättnings utgåva och översättare). Ljudet är en recitation av "
         "shejk Mahmoud Khalil al-Husary (everyayah.com). Tafsir är Tafsir "
         "al-Jalalayn (altafsir.com), tillgänglig på engelska.\n\n"
-        "Byt språk när du vill med /language.\n"
-        "Källkod: https://github.com/rahiel/BismillahBot"
+        "Byt språk när du vill med /language."
     ),
     "ayah_not_found": "Den versen finns inte!",
     "range_too_large": "Intervallet är för stort, begär högst {n} verser åt gången.",

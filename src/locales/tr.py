@@ -18,8 +18,7 @@ strings = {
         "ATTRIBUTIONS.md dosyasına bakın). Ses, Şeyh Mahmud Halil el-Husari'nin "
         "okuyuşudur (everyayah.com). Tefsir, Tefsir el-Celaleyn'dir (altafsir.com), "
         "İngilizce olarak mevcuttur.\n\n"
-        "Dili istediğiniz zaman /language ile değiştirebilirsiniz.\n"
-        "Kaynak kodu: https://github.com/rahiel/BismillahBot"
+        "Dili istediğiniz zaman /language ile değiştirebilirsiniz."
     ),
     "ayah_not_found": "Böyle bir ayet yok!",
     "range_too_large": "Aralık çok geniş, tek seferde en fazla {n} ayet isteyin.",

@@ -21,8 +21,7 @@ strings = {
         "ATTRIBUTIONS.md وګورئ). صوت د شیخ محمود خلیل الحصري تلاوت دی "
         "(everyayah.com). تفسیر، تفسیر الجلالین (altafsir.com) دی، چې په "
         "انګلیسي کې موجود دی.\n\n"
-        "ژبه هر وخت د /language په مرسته بدله کړئ.\n"
-        "سرچینه کوډ: https://github.com/rahiel/BismillahBot"
+        "ژبه هر وخت د /language په مرسته بدله کړئ."
     ),
     "ayah_not_found": "داسې آیت نشته!",
     "range_too_large": "محدوده ډېره لویه ده، مهرباني وکړئ په یو وخت کې تر {n} آیتونو پورې غوښتنه وکړئ.",

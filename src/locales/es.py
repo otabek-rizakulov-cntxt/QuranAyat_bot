@@ -21,8 +21,7 @@ strings = {
         "para ver la edición y el traductor de cada traducción). El audio es "
         "una recitación del jeque Mahmud Jalil al-Husari (everyayah.com). El "
         "tafsir es el Tafsir al-Yalalayn (altafsir.com), disponible en inglés.\n\n"
-        "Cambia de idioma en cualquier momento con /language.\n"
-        "Código fuente: https://github.com/rahiel/BismillahBot"
+        "Cambia de idioma en cualquier momento con /language."
     ),
     "ayah_not_found": "¡Esa aleya no existe!",
     "range_too_large": "Rango demasiado grande, solicita como máximo {n} aleyas a la vez.",

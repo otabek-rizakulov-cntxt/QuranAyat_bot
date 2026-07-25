@@ -21,8 +21,7 @@ strings = {
         "edisi dan penterjemah setiap terjemahan). Audio ialah bacaan Syeikh "
         "Mahmud Khalil al-Husari (everyayah.com). Tafsir ialah Tafsir "
         "al-Jalalayn (altafsir.com), tersedia dalam bahasa Inggeris.\n\n"
-        "Tukar bahasa pada bila-bila masa dengan /language.\n"
-        "Kod sumber: https://github.com/rahiel/BismillahBot"
+        "Tukar bahasa pada bila-bila masa dengan /language."
     ),
     "ayah_not_found": "Ayat itu tidak wujud!",
     "range_too_large": "Julat terlalu besar, mohon paling banyak {n} ayat pada satu masa.",

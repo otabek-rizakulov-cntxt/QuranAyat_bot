@@ -21,8 +21,7 @@ strings = {
         "tradutor de cada tradução). O áudio é uma recitação do xeique Mahmoud "
         "Khalil al-Husary (everyayah.com). O tafsir é o Tafsir al-Jalalayn "
         "(altafsir.com), disponível em inglês.\n\n"
-        "Mude de idioma a qualquer momento com /language.\n"
-        "Código-fonte: https://github.com/rahiel/BismillahBot"
+        "Mude de idioma a qualquer momento com /language."
     ),
     "ayah_not_found": "Esse versículo não existe!",
     "range_too_large": "Intervalo grande demais, peça no máximo {n} versículos por vez.",

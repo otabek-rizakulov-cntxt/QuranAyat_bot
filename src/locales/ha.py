@@ -21,8 +21,7 @@ strings = {
         "mai fassara na kowace fassara). Muryar ita ce karatun Shaikh Mahmud "
         "Khalil al-Husari (everyayah.com). Tafsirin shi ne Tafsir al-Jalalayn "
         "(altafsir.com), yana samuwa da Ingilishi.\n\n"
-        "Canza harshe a kowane lokaci da /language.\n"
-        "Lambar tushe: https://github.com/rahiel/BismillahBot"
+        "Canza harshe a kowane lokaci da /language."
     ),
     "ayah_not_found": "Babu wannan ayar!",
     "range_too_large": "Zangon ya yi girma sosai, don Allah ka nemi aya {n} kaɗai a lokaci guda.",

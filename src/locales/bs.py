@@ -21,8 +21,7 @@ strings = {
         "izdanje i prevodioca svakog prijevoda). Audio je učenje šejha Mahmuda "
         "Halila el-Husarija (everyayah.com). Tefsir je Tefsir el-Dželalejn "
         "(altafsir.com), dostupan na engleskom.\n\n"
-        "Jezik promijeni bilo kada pomoću /language.\n"
-        "Izvorni kod: https://github.com/rahiel/BismillahBot"
+        "Jezik promijeni bilo kada pomoću /language."
     ),
     "ayah_not_found": "Taj ajet ne postoji!",
     "range_too_large": "Raspon je prevelik, zatraži najviše {n} ajeta odjednom.",
