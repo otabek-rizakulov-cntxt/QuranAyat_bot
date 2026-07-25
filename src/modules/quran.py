@@ -129,10 +129,6 @@ class Quran:
     def from_tafsir(cls, path: str = "Al_Jalalain_Eng.txt") -> "Quran":
         return cls(parse_quran_tafsir(path))
 
-    def get_surah(self, surah: int) -> str:
-        """Get surah by number."""
-        return self.text[surah - 1]
-
     def get_ayah(self, surah: int, ayah: int) -> str:
         """Get verse by surah and ayah numbers."""
         return self.text[surah - 1][ayah - 1] + " (%d:%d)" % (surah, ayah)
@@ -246,11 +242,3 @@ def make_index():
         index.append("/{} <code>{}</code>/{} {}"
                      .format(i, chapters[i - 1], j, chapters[j - 1]))
     return "\n".join(index)
-
-
-def save_json(quran):
-    """Save Quran to a json file."""
-    import json
-
-    with open("quran.json", "w") as f:
-        json.dump(quran, f, ensure_ascii=False)

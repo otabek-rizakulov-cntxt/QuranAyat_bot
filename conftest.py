@@ -30,7 +30,6 @@ os.environ["TOKEN"] = "123456:TEST-abcdefghijklmnopqrstuvwxyz012345"
 os.environ["REDIS_HOST_URL"] = ""          # -> in-memory store, no network
 os.environ["AUDIO_BASE_URL"] = "https://cdn.test/audio"
 os.environ["PHOTO_BASE_URL"] = "https://cdn.test/images"
-os.environ["RECITATIONS_BASE_URL"] = "https://cdn.test/recitations"
 
 import pytest
 

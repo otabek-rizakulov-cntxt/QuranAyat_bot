@@ -8,8 +8,10 @@ BismillahBot is a bot on Telegram to explore the Holy Qur'an.
 **Table of Contents**
 
 - [Usage](#usage)
+- [Languages](#languages)
 - [Installation](#installation)
-    - [Data files](#data-files)
+    - [Configuration](#configuration)
+    - [Running](#running)
     - [Updating](#updating)
 - [License](#license)
 
@@ -69,68 +71,62 @@ refresh or extend the bundled set, edit `src/locales/languages.py` and run
 
 # Installation
 
-You can run your own instance of BismillahBot. First you need to request a
-[bot username and token](https://core.telegram.org/bots#3-how-do-i-create-a-bot).
-You also need a Unix-like system to run the bot on. BismillahBot is running on a
-Debian server. The following gets the code, and installs the dependencies on
-Debian/Ubuntu in a virtualenv:
+You can run your own instance of BismillahBot. First request a
+[bot username and token](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
+from the [BotFather](https://telegram.me/botfather), and disable group chats for
+the bot with the `/setjoingroups` command. The bot is a
+[FastAPI](https://fastapi.tiangolo.com/) app that receives updates over a
+Telegram **webhook** (it never polls), so it needs a public HTTPS URL.
+
+Get the code and install the dependencies in a virtualenv:
 
 ```bash
-sudo apt install redis-server git python3-pip python3-dev virtualenv
 git clone https://github.com/rahiel/BismillahBot.git
 cd BismillahBot/
-virtualenv -p python3 venv
+python3 -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt --upgrade
 ```
 
-In the same directory you should define a `secret.py` with the token you got
-from the [BotFather](https://telegram.me/botfather):
+## Configuration
 
-```python
-TOKEN = "<your-token-here>"
-```
-
-Disable group chats for the bot by sending the BotFather the `/setjoingroups`
-command and customize the bot further.
-
-## Data files
-
-The bot serves Quranic data collected from several projects. These are necessary
-for the bot to function. Run the following in the bot's directory to get the
-data:
+Configuration is read from environment variables (loaded from a local `.env` in
+development). Copy the template and fill it in:
 
 ```bash
-wget "http://tanzil.net/trans/en.ahmedraza"
-wget "http://tanzil.net/res/text/metadata/quran-data.xml"
-wget "http://www.altafsir.com/Books/Al_Jalalain_Eng.pdf"
-pdftotext -nopgbrk Al_Jalalain_Eng.pdf
-wget "http://www.everyayah.com/data/Husary_128kbps/000_versebyverse.zip"
-unzip -d Husary 000_versebyverse.zip
-wget "http://www.everyayah.com/data/quranpngs/000_images.zip"
-unzip -d quranic_images 000_images.zip
+cp .env.example .env
 ```
 
-We do some post-processing on the images. First we remove the empty area's from
-the edges with [ImageMagick](https://www.imagemagick.org/script/index.php) and
-[GNU parallel](https://www.gnu.org/software/parallel/):
-``` shell
-cd quranic_images/
-parallel "echo {}; convert {} -trim {}" ::: *.png
-```
-Then we optimize the images with [pngout](http://www.jonof.id.au/kenutils):
-``` shell
-parallel "pngout {}" ::: *.png
+| Variable         | Purpose                                                              |
+|------------------|---------------------------------------------------------------------|
+| `TOKEN`          | Telegram bot token from the BotFather                               |
+| `REDIS_HOST_URL` | Redis URL for user state + the media file-id cache (falls back to an in-memory store if unset) |
+| `AUDIO_BASE_URL` | Base URL of the recitation mp3s (e.g. an everyayah.com mirror/CDN)  |
+| `PHOTO_BASE_URL` | Base URL of the Arabic ayah images                                 |
+| `WEBHOOK_URL`    | Public HTTPS base URL Telegram POSTs updates to; the webhook is registered as `WEBHOOK_URL` + `/webhook/` + `TOKEN` |
+
+Media (audio + images) is fetched from the configured CDN base URLs at runtime,
+so no local media download is required. The Qur'an text corpora that ship in the
+repo — `quran-data.xml` (surah metadata), `Al_Jalalain_Eng.txt` (tafsir), and
+the per-language files under `translations/` — are all the bot needs on disk.
+
+## Running
+
+Run the webhook app with [uvicorn](https://www.uvicorn.org/) from the repo root
+(the same command the `Procfile` and `Dockerfile` use):
+
+```bash
+uvicorn main:app --app-dir src --host 0.0.0.0 --port 8000
 ```
 
-You could use other data files, like
-[other translations](http://tanzil.net/trans/) or
-[audio recitations](http://www.everyayah.com/data/status.php). These choices are
-currently hardcoded in the bot, so
-[file an issue](https://github.com/rahiel/BismillahBot/issues/new) if you'd like
-to use different data.
+On startup the bot registers its webhook with Telegram and loads the corpora in
+the background, so it starts serving `/` (health check) immediately. A container
+image is also provided:
 
-If all went fine you can now run the bot with `python bismillah.py`.
+```bash
+docker build -t quranayat-bot .
+docker run --env-file .env -p 8000:8000 quranayat-bot
+```
 
 ## Updating
 
