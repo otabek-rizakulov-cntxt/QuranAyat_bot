@@ -37,4 +37,5 @@ strings = {
     "cmd_random": "Случайный аят",
     "cmd_language": "Сменить язык",
     "cmd_about": "Источники и благодарности",
+    "quran_name": "Коран",
 }

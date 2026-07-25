@@ -38,4 +38,5 @@ strings = {
     "cmd_random": "A random verse",
     "cmd_language": "Change language",
     "cmd_about": "Sources & credits",
+    "quran_name": "Qur'an",
 }

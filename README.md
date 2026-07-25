@@ -43,6 +43,15 @@ menus, buttons, error messages, and the verse translation then follow that
 choice. On first contact the interface auto-detects your Telegram language
 (falling back to English), and you can change it any time.
 
+Every one of the 48 languages has a complete UI string table in
+`src/locales/<code>.py` — no language falls back to English for any interface
+text. `python3 scripts/check_locales.py` verifies that: it checks each locale
+defines every key, keeps the same `{placeholders}` as English, balances its
+HTML tags, and that each localized button label still maps back to the right
+action. Telegram's per-language slash-command menu only accepts two-letter
+ISO 639-1 codes, so `uz-Cyrl` and `ber` see the English command menu while the
+rest of their interface is localized.
+
 Uzbek is offered in both **Cyrillic** (Ўзбекча) and **Latin** (Oʻzbekcha)
 scripts — the Latin text is produced by deterministic transliteration of the
 Cyrillic edition. Translations are sourced from [tanzil.net][] via the

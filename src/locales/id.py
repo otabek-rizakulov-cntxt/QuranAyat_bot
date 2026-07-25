@@ -38,4 +38,5 @@ strings = {
     "cmd_random": "Ayat acak",
     "cmd_language": "Ganti bahasa",
     "cmd_about": "Sumber & kredit",
+    "quran_name": "Al-Qur'an",
 }

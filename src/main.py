@@ -231,6 +231,11 @@ async def get_translation(lang: str) -> Quran:
     return await asyncio.to_thread(TranslationRegistry.get, lang)
 
 
+def _reference(surah: int, ayah: int, lang: str) -> str:
+    """Human-readable ayah reference ("Qur'an 2:255") in the user's language."""
+    return "%s %d:%d" % (t("quran_name", lang), surah, ayah)
+
+
 def language_keyboard() -> InlineKeyboardMarkup:
     """Inline keyboard of every bundled language (native names), two per row."""
     available = TranslationRegistry.available()
@@ -282,7 +287,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                                 action=telegram.constants.ChatAction.UPLOAD_PHOTO)
             image = file.get_image_filename(surah, ayah)
             await send_file(bot, image, quran_type, chat_id=chat_id,
-                      caption="Quran %d:%d" % (surah, ayah),
+                      caption=_reference(surah, ayah, lang),
                       reply_markup=reply_markup)
         elif quran_type == "audio":
             await bot.send_chat_action(chat_id=chat_id,
@@ -290,7 +295,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             audio = file.get_audio_filename(surah, ayah, performer)
             await send_file(bot, audio, quran_type, chat_id=chat_id,
                       performer="Shaykh Mahmoud Khalil al-Husary",
-                      title="Quran %d:%d" % (surah, ayah),
+                      title=_reference(surah, ayah, lang),
                       reply_markup=reply_markup)
         file.save_user(chat_id, (surah, ayah, quran_type))
 
@@ -441,9 +446,11 @@ def _webhook_base_url() -> str | None:
 
 
 # Telegram's per-language command menu only accepts two-letter ISO-639-1 codes,
-# so we localize it for the languages that have a full UI locale (others inherit
-# the English default menu). "uz-Cyrl" is excluded here for that reason.
-_COMMAND_MENU_LANGS = ("ru", "tr", "uz", "az", "id")
+# so script-qualified and three-letter codes ("uz-Cyrl", "ber") can't be
+# registered — those users see the English default menu while the rest of their
+# UI is still localized.
+_COMMAND_MENU_LANGS = tuple(lang.code for lang in LANGUAGES
+                            if len(lang.code) == 2 and lang.code != DEFAULT_LANG)
 
 
 def _commands_for(lang: str) -> list:
@@ -456,14 +463,26 @@ def _commands_for(lang: str) -> list:
 
 
 async def _set_bot_commands(bot) -> None:
-    """Register the slash-command menu: English default + localized per language."""
+    """Register the slash-command menu: English default + localized per language.
+
+    Each language is registered independently: Telegram rejects language codes it
+    doesn't recognise, and one rejection must not cost the other 45 their menu.
+    """
     try:
         await bot.set_my_commands(_commands_for(DEFAULT_LANG))
-        for code in _COMMAND_MENU_LANGS:
-            await bot.set_my_commands(_commands_for(code), language_code=code)
-        print("Command menu registered for %d languages" % (len(_COMMAND_MENU_LANGS) + 1))
     except Exception as e:
-        print("INIT ERROR (set_my_commands):", type(e).__name__, e)
+        print("INIT ERROR (set_my_commands, default):", type(e).__name__, e)
+        return                      # the API is unhappy; skip the per-language pass
+    registered, rejected = 1, []
+    for code in _COMMAND_MENU_LANGS:
+        try:
+            await bot.set_my_commands(_commands_for(code), language_code=code)
+            registered += 1
+        except Exception as e:
+            rejected.append("%s (%s)" % (code, type(e).__name__))
+    print("Command menu registered for %d languages" % registered)
+    if rejected:
+        print("Command menu not accepted for:", ", ".join(rejected))
 
 
 async def _initialize():

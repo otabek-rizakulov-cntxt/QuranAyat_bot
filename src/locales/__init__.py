@@ -6,27 +6,52 @@
 # language still works everywhere.
 
 from functools import lru_cache
+from importlib import import_module
 
 from .languages import (  # re-exported for callers
     LANGUAGES, LANGUAGES_BY_CODE, DEFAULT_LANG, Language,
     get_language, is_supported, normalize_lang,
 )
-from . import en, ru, tr, uz, uz_cyrl, az, ar, fa, ur, tg
-from . import id as _id  # avoid shadowing the builtin id()
 
-LOCALES: dict[str, dict] = {
-    "en": en.strings,
-    "ru": ru.strings,
-    "tr": tr.strings,
-    "uz": uz.strings,
-    "uz-Cyrl": uz_cyrl.strings,
-    "az": az.strings,
-    "id": _id.strings,
-    "ar": ar.strings,
-    "fa": fa.strings,
-    "ur": ur.strings,
-    "tg": tg.strings,
-}
+
+def _module_name(code: str) -> str:
+    """Locale module basename for a language code: "uz-Cyrl" -> "uz_cyrl"."""
+    return code.replace("-", "_").lower()
+
+
+def _load_locales() -> dict[str, dict]:
+    """Import one string table per catalogued language, keyed by language code.
+
+    Driven by LANGUAGES rather than a hand-written import list, so adding a
+    language to the catalogue is enough. A language whose module is missing is
+    skipped with a warning instead of breaking startup — `t()` then serves it
+    from English. `missing_locales()` reports the gap (the test suite asserts
+    it is empty).
+    """
+    tables: dict[str, dict] = {}
+    for lang in LANGUAGES:
+        try:
+            module = import_module("." + _module_name(lang.code), __name__)
+        except ImportError:
+            print("LOCALE MISSING: %s (%s) falls back to English"
+                  % (lang.code, lang.english))
+            continue
+        tables[lang.code] = module.strings
+    return tables
+
+
+LOCALES: dict[str, dict] = _load_locales()
+
+
+def missing_locales() -> list[str]:
+    """Catalogued languages with no locale table of their own."""
+    return [lang.code for lang in LANGUAGES if lang.code not in LOCALES]
+
+
+def missing_keys(lang: str) -> list[str]:
+    """English keys a locale does not define (each falls back to English)."""
+    table = LOCALES.get(lang, {})
+    return [key for key in LOCALES[DEFAULT_LANG] if key not in table]
 
 
 def t(key: str, lang: str = DEFAULT_LANG) -> str:

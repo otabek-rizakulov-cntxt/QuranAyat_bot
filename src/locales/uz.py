@@ -37,4 +37,5 @@ strings = {
     "cmd_random": "Tasodifiy oyat",
     "cmd_language": "Tilni oʻzgartirish",
     "cmd_about": "Manbalar va minnatdorchilik",
+    "quran_name": "Qur'on",
 }

@@ -37,4 +37,5 @@ strings = {
     "cmd_random": "Təsadüfi ayə",
     "cmd_language": "Dili dəyiş",
     "cmd_about": "Mənbələr və təşəkkürlər",
+    "quran_name": "Quran",
 }

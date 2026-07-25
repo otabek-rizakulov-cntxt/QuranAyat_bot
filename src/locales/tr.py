@@ -37,4 +37,5 @@ strings = {
     "cmd_random": "Rastgele bir ayet",
     "cmd_language": "Dili değiştir",
     "cmd_about": "Kaynaklar ve emeği geçenler",
+    "quran_name": "Kur'an",
 }

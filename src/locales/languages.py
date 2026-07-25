@@ -66,7 +66,9 @@ LANGUAGES: list[Language] = [
     Language("zh",      "中文",               "Chinese",             False, "zh.majian"),
     Language("ja",      "日本語",              "Japanese",            False, "ja.japanese"),
     Language("ko",      "한국어",              "Korean",              False, "ko.korean"),
-    Language("ku",      "Kurdî",             "Kurdish",             False, "ku.asan"),
+    # ku.asan is Sorani in Arabic script, so this entry is RTL and its endonym
+    # is written in that script (not the Latin/Kurmanji "Kurdî").
+    Language("ku",      "کوردی",              "Kurdish (Sorani)",    True,  "ku.asan"),
     Language("ha",      "Hausa",             "Hausa",               False, "ha.gumi"),
     Language("so",      "Soomaali",          "Somali",              False, "so.abduh"),
     Language("sw",      "Kiswahili",         "Swahili",             False, "sw.barwani"),
