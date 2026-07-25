@@ -104,7 +104,14 @@ sequenceDiagram
 4. **Keyboard type words** (`english`/`tafsir`/`audio`/`arabic`) → resend the
    current ayah in that representation.
 5. **`next`/`previous`/`random`** → move position, then resend in current type.
-6. **`surah:ayah` reference** → validate & send with the reply keyboard.
+6. **`surah:ayah` reference** → validate & send as an inline **verse card** (the
+   verse plus an inline keyboard attached to the message).
+7. **Callback tap** (`vc:`/`vr:`/`showlang`/`setlang:`) → for the text views, edit
+   the verse card **in place** (`editMessageText`) so navigation doesn't post a new
+   message; media views (arabic/audio) and text↔media switches send a fresh card.
+   `showlang` opens the language picker; `setlang:` stores the choice. The old
+   persistent reply keyboard is retired (typed type-words in rule 4 still work as a
+   fallback for anyone who still has it).
 
 ---
 
