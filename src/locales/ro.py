@@ -21,8 +21,7 @@ strings = {
         "ediția și traducătorul fiecărei traduceri). Audio este o recitare a "
         "șeicului Mahmoud Khalil al-Husary (everyayah.com). Tafsirul este "
         "Tafsir al-Jalalayn (altafsir.com), disponibil în engleză.\n\n"
-        "Schimbă limba oricând cu /language.\n"
-        "Cod sursă: https://github.com/rahiel/BismillahBot"
+        "Schimbă limba oricând cu /language."
     ),
     "ayah_not_found": "Acest verset nu există!",
     "range_too_large": "Interval prea mare, cere cel mult {n} versete odată.",

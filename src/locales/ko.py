@@ -20,8 +20,7 @@ strings = {
         "ATTRIBUTIONS.md 참조). 음성은 셰이크 마흐무드 칼릴 알후사리의 "
         "낭송입니다(everyayah.com). 타프시르는 타프시르 알잘랄라인"
         "(altafsir.com)이며 영어로 제공됩니다.\n\n"
-        "언어는 언제든지 /language로 변경하세요.\n"
-        "소스 코드: https://github.com/rahiel/BismillahBot"
+        "언어는 언제든지 /language로 변경하세요."
     ),
     "ayah_not_found": "그런 절은 없습니다!",
     "range_too_large": "범위가 너무 넓습니다. 한 번에 최대 {n}절까지 요청하세요.",

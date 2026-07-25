@@ -21,8 +21,7 @@ strings = {
         "लिए ATTRIBUTIONS.md देखें)। ऑडियो शैख़ महमूद ख़लील अल-हुसरी की तिलावत "
         "है (everyayah.com)। तफ़सीर, तफ़सीर अल-जलालैन (altafsir.com) है, जो "
         "अंग्रेज़ी में उपलब्ध है।\n\n"
-        "भाषा किसी भी समय /language से बदलें।\n"
-        "सोर्स कोड: https://github.com/rahiel/BismillahBot"
+        "भाषा किसी भी समय /language से बदलें।"
     ),
     "ayah_not_found": "ऐसी कोई आयत मौजूद नहीं!",
     "range_too_large": "सीमा बहुत बड़ी है, एक बार में अधिकतम {n} आयतें माँगें।",

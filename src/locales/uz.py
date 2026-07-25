@@ -18,8 +18,7 @@ strings = {
         "uchun ATTRIBUTIONS.md ga qarang). Audio — Shayx Mahmud Xalil al-Husariy "
         "tilovati (everyayah.com). Tafsir — Tafsir al-Jalalayn (altafsir.com), "
         "ingliz tilida mavjud.\n\n"
-        "Tilni istalgan vaqtda /language orqali oʻzgartirishingiz mumkin.\n"
-        "Manba kodi: https://github.com/rahiel/BismillahBot"
+        "Tilni istalgan vaqtda /language orqali oʻzgartirishingiz mumkin."
     ),
     "ayah_not_found": "Bunday oyat mavjud emas!",
     "range_too_large": "Oraliq juda katta, bir vaqtda koʻpi bilan {n} ta oyat soʻrang.",

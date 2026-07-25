@@ -19,8 +19,7 @@ strings = {
         "ATTRIBUTIONS.md をご覧ください）。音声はシャイフ・マフムード・ハリール・"
         "アル＝フサリーの朗誦です（everyayah.com）。タフスィールは"
         "『タフスィール・アル＝ジャラーライン』（altafsir.com）で、英語で利用できます。\n\n"
-        "言語はいつでも /language で変更できます。\n"
-        "ソースコード: https://github.com/rahiel/BismillahBot"
+        "言語はいつでも /language で変更できます。"
     ),
     "ayah_not_found": "その節は存在しません！",
     "range_too_large": "範囲が大きすぎます。一度に最大 {n} 節までにしてください。",

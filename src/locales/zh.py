@@ -18,8 +18,7 @@ strings = {
         "譯文來自 tanzil.net（每個譯本的版本與譯者請見 ATTRIBUTIONS.md）。"
         "音頻是謝赫馬哈茂德·哈利勒·胡薩里的誦讀（everyayah.com）。"
         "經注為《哲拉萊尼經注》（altafsir.com），提供英文版。\n\n"
-        "隨時可用 /language 更改語言。\n"
-        "原始碼：https://github.com/rahiel/BismillahBot"
+        "隨時可用 /language 更改語言。"
     ),
     "ayah_not_found": "沒有這節經文！",
     "range_too_large": "範圍太大，每次最多請求 {n} 節經文。",

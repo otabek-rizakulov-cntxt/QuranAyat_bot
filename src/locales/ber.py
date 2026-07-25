@@ -22,8 +22,7 @@ strings = {
         "umsuqel n yal tsuqilt). Ṣṣut d tɣuri n Cix Mahmud Xalil al-Husari "
         "(everyayah.com). Tefsir d Tafsir al-Jalalayn (altafsir.com), yella s "
         "tenglizit.\n\n"
-        "Beddel tutlayt melmi tebɣiḍ s /language.\n"
-        "Tangalt taɣbalut: https://github.com/rahiel/BismillahBot"
+        "Beddel tutlayt melmi tebɣiḍ s /language."
     ),
     "ayah_not_found": "Aya-agi ulac-it!",
     "range_too_large": "Azilal meqqer aṭas, ttxil-k suter ala {n} n tayat i tikkelt.",

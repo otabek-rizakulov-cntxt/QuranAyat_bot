@@ -20,8 +20,7 @@ strings = {
         "editie en vertaler van elke vertaling). De audio is een recitatie van "
         "sjeik Mahmoud Khalil al-Husary (everyayah.com). De tafsir is Tafsir "
         "al-Jalalayn (altafsir.com), beschikbaar in het Engels.\n\n"
-        "Wijzig de taal op elk moment met /language.\n"
-        "Broncode: https://github.com/rahiel/BismillahBot"
+        "Wijzig de taal op elk moment met /language."
     ),
     "ayah_not_found": "Dit vers bestaat niet!",
     "range_too_large": "Bereik te groot, vraag maximaal {n} verzen tegelijk aan.",

@@ -21,8 +21,7 @@ strings = {
         "dhe përkthyesin e çdo përkthimi). Audioja është recitim i shejh Mahmud "
         "Halil el-Husarit (everyayah.com). Tefsiri është Tefsiri i Xhelalejnit "
         "(altafsir.com), i disponueshëm në anglisht.\n\n"
-        "Ndrysho gjuhën në çdo kohë me /language.\n"
-        "Kodi burimor: https://github.com/rahiel/BismillahBot"
+        "Ndrysho gjuhën në çdo kohë me /language."
     ),
     "ayah_not_found": "Ky ajet nuk ekziston!",
     "range_too_large": "Intervali është shumë i madh, kërko më së shumti {n} ajete njëherësh.",

@@ -18,8 +18,7 @@ strings = {
         "üçün ATTRIBUTIONS.md-yə baxın). Audio — Şeyx Mahmud Xəlil əl-Husarinin "
         "qiraətidir (everyayah.com). Təfsir — Təfsir əl-Cəlaleyn (altafsir.com), "
         "İngilis dilində mövcuddur.\n\n"
-        "Dili istənilən vaxt /language ilə dəyişə bilərsiniz.\n"
-        "Mənbə kodu: https://github.com/rahiel/BismillahBot"
+        "Dili istənilən vaxt /language ilə dəyişə bilərsiniz."
     ),
     "ayah_not_found": "Belə bir ayə yoxdur!",
     "range_too_large": "Aralıq çox böyükdür, bir dəfəyə ən çox {n} ayə istəyin.",

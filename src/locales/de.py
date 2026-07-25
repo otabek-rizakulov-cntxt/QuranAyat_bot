@@ -21,8 +21,7 @@ strings = {
         "Ausgabe und Übersetzer jeder Übersetzung). Die Audioaufnahme ist eine "
         "Rezitation von Scheich Mahmud Chalil al-Husari (everyayah.com). Der "
         "Tafsir ist Tafsir al-Dschalalain (altafsir.com), verfügbar auf Englisch.\n\n"
-        "Die Sprache kannst du jederzeit mit /language ändern.\n"
-        "Quellcode: https://github.com/rahiel/BismillahBot"
+        "Die Sprache kannst du jederzeit mit /language ändern."
     ),
     "ayah_not_found": "Dieser Vers existiert nicht!",
     "range_too_large": "Bereich zu groß, bitte höchstens {n} Verse auf einmal anfragen.",

@@ -20,8 +20,7 @@ strings = {
         "překladatele každého překladu). Zvuk je recitace šejcha Mahmúda "
         "Chalíla al-Husarího (everyayah.com). Tafsír je Tafsír al-Džalálajn "
         "(altafsir.com), dostupný v angličtině.\n\n"
-        "Jazyk můžeš kdykoli změnit příkazem /language.\n"
-        "Zdrojový kód: https://github.com/rahiel/BismillahBot"
+        "Jazyk můžeš kdykoli změnit příkazem /language."
     ),
     "ayah_not_found": "Takový verš neexistuje!",
     "range_too_large": "Rozsah je příliš velký, požaduj najednou nejvýše {n} veršů.",

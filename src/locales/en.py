@@ -19,8 +19,7 @@ strings = {
         "translation's edition and translator). The audio is a recitation by "
         "Shaykh Mahmoud Khalil al-Husary (everyayah.com). The tafsir is "
         "Tafsir al-Jalalayn (altafsir.com), available in English.\n\n"
-        "Change language any time with /language.\n"
-        "Source code: https://github.com/rahiel/BismillahBot"
+        "Change language any time with /language."
     ),
     "ayah_not_found": "Ayah does not exist!",
     "range_too_large": "Range too large, please request at most {n} ayahs at a time.",

@@ -21,8 +21,7 @@ strings = {
         "ATTRIBUTIONS.md ڏسو). آڊيو شيخ محمود خليل الحصري جي تلاوت آهي "
         "(everyayah.com). تفسير، تفسير الجلالين (altafsir.com) آهي، جيڪو "
         "انگريزيءَ ۾ موجود آهي.\n\n"
-        "ٻولي ڪنهن به وقت /language سان تبديل ڪريو.\n"
-        "سورس ڪوڊ: https://github.com/rahiel/BismillahBot"
+        "ٻولي ڪنهن به وقت /language سان تبديل ڪريو."
     ),
     "ayah_not_found": "اهڙي ڪا آيت موجود ناهي!",
     "range_too_large": "حد تمام وڏي آهي، مهرباني ڪري هڪ ڀيري ۾ وڌ ۾ وڌ {n} آيتون طلب ڪريو.",

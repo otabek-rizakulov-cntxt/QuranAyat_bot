@@ -21,8 +21,7 @@ strings = {
         "daabacadda iyo turjumaanka tarjumaad kasta). Codku waa akhris Sheekh "
         "Maxamuud Khaliil al-Husari (everyayah.com). Tafsiirka waa Tafsiir "
         "al-Jalaalayn (altafsir.com), oo Ingiriisi lagu heli karo.\n\n"
-        "Luqadda beddel wakhti kasta adigoo isticmaalaya /language.\n"
-        "Koodhka isha: https://github.com/rahiel/BismillahBot"
+        "Luqadda beddel wakhti kasta adigoo isticmaalaya /language."
     ),
     "ayah_not_found": "Aayaddaas ma jirto!",
     "range_too_large": "Xadka aad buu u weyn yahay, fadlan codso ugu badnaan {n} aayad hal mar.",
