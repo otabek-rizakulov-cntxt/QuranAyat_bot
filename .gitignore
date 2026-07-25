@@ -16,6 +16,12 @@ quran-data.xml
 venv
 .DS_Store
 
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
 # Claude Code local settings — machine/user-specific, never commit
 .claude/
 CLAUDE.local.md
