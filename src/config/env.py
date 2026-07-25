@@ -10,7 +10,6 @@ class Environment:
       "token": os.getenv("TOKEN"),
       "redis": os.getenv("REDIS_HOST_URL"),
       "audio_base_url": os.getenv("AUDIO_BASE_URL"),
-      "performers_file_path": os.getenv("RECITATIONS_BASE_URL"),
       "quranic_images_file_path": os.getenv("PHOTO_BASE_URL"),
     }
     if name not in variables:
