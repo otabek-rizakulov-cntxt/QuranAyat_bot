@@ -14,3 +14,13 @@ dump.rdb
 __pycache__/
 *.pyc
 .DS_Store
+
+# Tests & CI — not needed in the runtime image
+tests/
+conftest.py
+pytest.ini
+requirements-dev.txt
+.github/
+.pytest_cache/
+.coverage
+coverage.xml
