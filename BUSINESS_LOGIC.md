@@ -97,8 +97,12 @@ sequenceDiagram
 
 ### Routing rules (in `serve`)
 
-1. **Inline query** → answer with English + Tafsir for a valid `surah:ayah`,
-   else a curated set of default ayahs.
+1. **Inline query** → for a valid `surah:ayah`, answer with the translation, the
+   tafsir and the recitation in the caller's own reciter (an audio result
+   Telegram fetches from `AUDIO_BASE_URL`, so nothing is uploaded); for anything
+   else, a reciter-name search, falling back to a curated set of default ayahs.
+   Both branches are `is_personal` and short-cached — every result is rendered
+   from the caller's settings and must not be served from a shared cache.
 2. **Non-text / group chats** (`chat_id < 0`) → ignored.
 3. **`/command`** → `start`/`help`, `about`, `index`, `random`.
 4. **Keyboard type words** (`english`/`tafsir`/`audio`/`arabic`) → resend the

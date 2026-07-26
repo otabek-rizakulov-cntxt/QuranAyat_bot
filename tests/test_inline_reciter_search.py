@@ -59,14 +59,57 @@ def _inline_callback(tg_bot, cb_data, user_id=556100):
     return telegram.Update.de_json(payload, tg_bot)
 
 
-async def test_ayah_query_still_returns_translation_and_tafsir(fake_bot, data, tg_bot):
+async def test_ayah_query_returns_translation_tafsir_and_audio(fake_bot, data, tg_bot):
     await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556001))
     kwargs = fake_bot.answer_inline_query.await_args.kwargs
     assert [r.title for r in kwargs["results"]] == [main.t("btn_translation", "en"),
-                                                    main.t("btn_tafsir", "en")]
-    # immutable text: the aggressive shared cache must survive this change
-    assert kwargs["cache_time"] == 66 * (60 ** 2 * 24)
-    assert kwargs["is_personal"] is False
+                                                    main.t("btn_tafsir", "en"),
+                                                    main._reference(2, 255, "en")]
+
+
+async def test_ayah_query_is_personal_and_briefly_cached(fake_bot, data, tg_bot):
+    # Text is rendered in the caller's translation language and the audio in
+    # their reciter, so this answer may not go in the shared cache either.
+    await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556010))
+    kwargs = fake_bot.answer_inline_query.await_args.kwargs
+    assert kwargs["cache_time"] == main.INLINE_PERSONAL_CACHE_TIME
+    assert kwargs["is_personal"] is True
+
+
+async def test_ayah_audio_uses_callers_reciter(fake_bot, data, tg_bot):
+    await UserSettings().set_reciter(556011, None, "Alafasy_128kbps")
+
+    await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556011))
+
+    audio = fake_bot.answer_inline_query.await_args.kwargs["results"][-1]
+    assert isinstance(audio, telegram.InlineQueryResultAudio)
+    assert audio.audio_url == "https://cdn.test/audio/Alafasy_128kbps/002255.mp3"
+    assert audio.performer == "Alafasy"
+    # keyed by reciter too, so a pre-change answer can't be replayed after it
+    assert audio.id == "au:2:255:Alafasy_128kbps"
+    assert len(audio.id.encode()) <= 64   # Telegram's hard limit on result ids
+
+
+async def test_ayah_audio_dropped_for_unknown_reciter(fake_bot, data, tg_bot):
+    # A saved reciter that has since left the catalog must not sink the answer.
+    await UserSettings().set_reciter(556012, None, "Retired_Reciter_64kbps")
+
+    await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556012))
+
+    results = fake_bot.answer_inline_query.await_args.kwargs["results"]
+    assert not any(isinstance(r, telegram.InlineQueryResultAudio) for r in results)
+    assert [r.title for r in results] == [main.t("btn_translation", "en"),
+                                          main.t("btn_tafsir", "en")]
+
+
+async def test_ayah_audio_dropped_without_public_base_url(fake_bot, data, tg_bot, monkeypatch):
+    # Telegram fetches audio_url itself; a local path is unreachable to it.
+    monkeypatch.setenv("AUDIO_BASE_URL", "/var/audio")
+
+    await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556013))
+
+    results = fake_bot.answer_inline_query.await_args.kwargs["results"]
+    assert not any(isinstance(r, telegram.InlineQueryResultAudio) for r in results)
 
 
 async def test_reciter_query_returns_setreciter_articles(fake_bot, data, tg_bot):
