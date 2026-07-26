@@ -1,18 +1,16 @@
 # Somali — Soomaali
 
 strings = {
-    "welcome": (
-        "Ii soo dir lambarka suuradda iyo aayadda, tusaale <b>2:255</b>, "
-        "waxaanan kuu soo dirayaa aayaddaas Qur'aanka Kariimka.\n\n"
-        "Waxa kale oo aad soo diri kartaa xadad sida <b>59:22-24</b> si aad u "
-        "hesho akhris cod isku dhafan.\n\n"
-        "Amarro:\n"
-        "/index — liiska dhammaan suuradaha\n"
-        "/random — aayad kala soocan\n"
-        "/language — beddel luqadda\n"
-        "/about — ilaha iyo mahadnaqa\n\n"
-        "Waad iigu isticmaali kartaa sheeko kasta: qor <b>@QuranAyat_bot</b> ka "
-        "dibna lambarka aayadda."
+    "welcome_intro": (
+        "Ii soo dir lambarka suuradda iyo aayadda, tusaale <b>2:255</b>, waxaanan kuu soo "
+        "dirayaa aayaddaas Qur'aanka Kariimka.\n\n"
+        "Waxa kale oo aad soo diri kartaa xadad sida <b>59:22-24</b> si aad u hesho "
+        "akhris cod isku dhafan."
+    ),
+    "welcome_commands_header": "Amarro:",
+    "welcome_inline": (
+        "Waad iigu isticmaali kartaa sheeko kasta: qor <b>@QuranAyat_bot</b> ka dibna "
+        "lambarka aayadda."
     ),
     "about": (
         "Botkan wuxuu kuu suurta geliyaa inaad Telegram ku akhriso Qur'aanka "

@@ -1,18 +1,16 @@
 # Portuguese — Português
 
 strings = {
-    "welcome": (
-        "Envie-me um número de surata e versículo, por exemplo <b>2:255</b>, e "
-        "eu responderei com esse versículo do Sagrado Alcorão.\n\n"
-        "Você também pode enviar um intervalo como <b>59:22-24</b> para receber "
-        "uma recitação em áudio combinada.\n\n"
-        "Comandos:\n"
-        "/index — listar todas as suratas\n"
-        "/random — um versículo aleatório\n"
-        "/language — mudar de idioma\n"
-        "/about — fontes e créditos\n\n"
-        "Você pode me usar em qualquer conversa: digite <b>@QuranAyat_bot</b> "
-        "seguido de uma referência."
+    "welcome_intro": (
+        "Envie-me um número de surata e versículo, por exemplo <b>2:255</b>, e eu "
+        "responderei com esse versículo do Sagrado Alcorão.\n\n"
+        "Você também pode enviar um intervalo como <b>59:22-24</b> para receber uma "
+        "recitação em áudio combinada."
+    ),
+    "welcome_commands_header": "Comandos:",
+    "welcome_inline": (
+        "Você pode me usar em qualquer conversa: digite <b>@QuranAyat_bot</b> seguido de "
+        "uma referência."
     ),
     "about": (
         "Este bot permite explorar o Sagrado Alcorão no Telegram em muitos "

@@ -1,16 +1,14 @@
 # French — Français
 
 strings = {
-    "welcome": (
-        "Envoyez-moi un numéro de sourate et de verset, par exemple <b>2:255</b>, "
-        "et je vous répondrai avec ce verset du Saint Coran.\n\n"
-        "Vous pouvez aussi envoyer une plage comme <b>59:22-24</b> pour une "
-        "récitation audio combinée.\n\n"
-        "Commandes :\n"
-        "/index — la liste de toutes les sourates\n"
-        "/random — un verset au hasard\n"
-        "/language — changer de langue\n"
-        "/about — sources et remerciements\n\n"
+    "welcome_intro": (
+        "Envoyez-moi un numéro de sourate et de verset, par exemple <b>2:255</b>, et je "
+        "vous répondrai avec ce verset du Saint Coran.\n\n"
+        "Vous pouvez aussi envoyer une plage comme <b>59:22-24</b> pour une récitation "
+        "audio combinée."
+    ),
+    "welcome_commands_header": "Commandes :",
+    "welcome_inline": (
         "Vous pouvez m'utiliser dans n'importe quelle discussion : tapez "
         "<b>@QuranAyat_bot</b> suivi d'une référence."
     ),

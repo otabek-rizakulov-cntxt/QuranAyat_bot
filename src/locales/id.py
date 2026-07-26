@@ -1,17 +1,16 @@
 # Indonesian — Bahasa Indonesia
 
 strings = {
-    "welcome": (
-        "Kirimkan nomor surah dan ayat, misalnya <b>2:255</b>, dan saya akan "
-        "membalas dengan ayat itu dari Al-Qur'an.\n\n"
-        "Anda juga dapat mengirim rentang seperti <b>59:22-24</b> untuk mendapatkan "
-        "audio bacaan gabungan.\n\n"
-        "Perintah:\n"
-        "/index — daftar semua surah\n"
-        "/random — ayat acak\n"
-        "/language — ganti bahasa\n"
-        "/about — sumber & kredit\n\n"
-        "Anda dapat menggunakan saya secara inline di obrolan mana pun: ketik <b>@QuranAyat_bot</b> diikuti referensi ayat."
+    "welcome_intro": (
+        "Kirimkan nomor surah dan ayat, misalnya <b>2:255</b>, dan saya akan membalas "
+        "dengan ayat itu dari Al-Qur'an.\n\n"
+        "Anda juga dapat mengirim rentang seperti <b>59:22-24</b> untuk mendapatkan audio "
+        "bacaan gabungan."
+    ),
+    "welcome_commands_header": "Perintah:",
+    "welcome_inline": (
+        "Anda dapat menggunakan saya secara inline di obrolan mana pun: ketik "
+        "<b>@QuranAyat_bot</b> diikuti referensi ayat."
     ),
     "about": (
         "Bot ini memungkinkan Anda menjelajahi Al-Qur'an di Telegram dalam banyak bahasa.\n\n"

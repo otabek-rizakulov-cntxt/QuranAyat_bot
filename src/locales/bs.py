@@ -1,18 +1,15 @@
 # Bosnian — Bosanski
 
 strings = {
-    "welcome": (
-        "Pošalji mi broj sure i ajeta, na primjer <b>2:255</b>, i poslat ću ti "
-        "taj ajet iz Časnog Kur'ana.\n\n"
-        "Možeš poslati i raspon poput <b>59:22-24</b> za objedinjeno audio "
-        "učenje.\n\n"
-        "Naredbe:\n"
-        "/index — popis svih sura\n"
-        "/random — nasumičan ajet\n"
-        "/language — promijeni jezik\n"
-        "/about — izvori i zahvale\n\n"
-        "Možeš me koristiti u bilo kojem chatu: upiši <b>@QuranAyat_bot</b> i "
-        "zatim referencu."
+    "welcome_intro": (
+        "Pošalji mi broj sure i ajeta, na primjer <b>2:255</b>, i poslat ću ti taj ajet "
+        "iz Časnog Kur'ana.\n\n"
+        "Možeš poslati i raspon poput <b>59:22-24</b> za objedinjeno audio učenje."
+    ),
+    "welcome_commands_header": "Naredbe:",
+    "welcome_inline": (
+        "Možeš me koristiti u bilo kojem chatu: upiši <b>@QuranAyat_bot</b> i zatim "
+        "referencu."
     ),
     "about": (
         "Ovaj bot ti omogućava da čitaš Časni Kur'an na Telegramu na mnogim "

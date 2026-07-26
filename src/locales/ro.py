@@ -1,18 +1,16 @@
 # Romanian — Română
 
 strings = {
-    "welcome": (
-        "Trimite-mi un număr de sură și verset, de exemplu <b>2:255</b>, iar eu "
-        "îți voi trimite acel verset din Sfântul Coran.\n\n"
-        "Poți trimite și un interval precum <b>59:22-24</b> pentru o recitare "
-        "audio combinată.\n\n"
-        "Comenzi:\n"
-        "/index — lista tuturor surelor\n"
-        "/random — un verset aleatoriu\n"
-        "/language — schimbă limba\n"
-        "/about — surse și mulțumiri\n\n"
-        "Mă poți folosi în orice conversație: scrie <b>@QuranAyat_bot</b> urmat "
-        "de o referință."
+    "welcome_intro": (
+        "Trimite-mi un număr de sură și verset, de exemplu <b>2:255</b>, iar eu îți voi "
+        "trimite acel verset din Sfântul Coran.\n\n"
+        "Poți trimite și un interval precum <b>59:22-24</b> pentru o recitare audio "
+        "combinată."
+    ),
+    "welcome_commands_header": "Comenzi:",
+    "welcome_inline": (
+        "Mă poți folosi în orice conversație: scrie <b>@QuranAyat_bot</b> urmat de o "
+        "referință."
     ),
     "about": (
         "Acest bot îți permite să citești Sfântul Coran pe Telegram în multe "

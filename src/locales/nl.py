@@ -1,18 +1,16 @@
 # Dutch — Nederlands
 
 strings = {
-    "welcome": (
-        "Stuur me een soera- en aya-nummer, bijvoorbeeld <b>2:255</b>, dan "
-        "stuur ik je dat vers uit de Heilige Koran.\n\n"
-        "Je kunt ook een bereik zoals <b>59:22-24</b> sturen voor een "
-        "gecombineerde audiorecitatie.\n\n"
-        "Commando's:\n"
-        "/index — alle soera's weergeven\n"
-        "/random — een willekeurig vers\n"
-        "/language — taal wijzigen\n"
-        "/about — bronnen en dankwoord\n\n"
-        "Je kunt me in elke chat gebruiken: typ <b>@QuranAyat_bot</b> gevolgd "
-        "door een verwijzing."
+    "welcome_intro": (
+        "Stuur me een soera- en aya-nummer, bijvoorbeeld <b>2:255</b>, dan stuur ik je "
+        "dat vers uit de Heilige Koran.\n\n"
+        "Je kunt ook een bereik zoals <b>59:22-24</b> sturen voor een gecombineerde "
+        "audiorecitatie."
+    ),
+    "welcome_commands_header": "Commando's:",
+    "welcome_inline": (
+        "Je kunt me in elke chat gebruiken: typ <b>@QuranAyat_bot</b> gevolgd door een "
+        "verwijzing."
     ),
     "about": (
         "Met deze bot kun je de Heilige Koran op Telegram in veel talen lezen.\n\n"

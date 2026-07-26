@@ -1,18 +1,14 @@
 # Czech — Čeština
 
 strings = {
-    "welcome": (
-        "Pošli mi číslo súry a verše, například <b>2:255</b>, a já ti odpovím "
-        "tímto veršem Svatého Koránu.\n\n"
-        "Můžeš poslat i rozsah jako <b>59:22-24</b> pro spojenou zvukovou "
-        "recitaci.\n\n"
-        "Příkazy:\n"
-        "/index — seznam všech súr\n"
-        "/random — náhodný verš\n"
-        "/language — změnit jazyk\n"
-        "/about — zdroje a poděkování\n\n"
-        "Můžeš mě použít v jakémkoli chatu: napiš <b>@QuranAyat_bot</b> a za "
-        "tím odkaz."
+    "welcome_intro": (
+        "Pošli mi číslo súry a verše, například <b>2:255</b>, a já ti odpovím tímto "
+        "veršem Svatého Koránu.\n\n"
+        "Můžeš poslat i rozsah jako <b>59:22-24</b> pro spojenou zvukovou recitaci."
+    ),
+    "welcome_commands_header": "Příkazy:",
+    "welcome_inline": (
+        "Můžeš mě použít v jakémkoli chatu: napiš <b>@QuranAyat_bot</b> a za tím odkaz."
     ),
     "about": (
         "Tento bot ti umožňuje číst Svatý Korán na Telegramu v mnoha jazycích.\n\n"

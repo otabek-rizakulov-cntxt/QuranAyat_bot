@@ -1,16 +1,16 @@
 # Turkish — Türkçe
 
 strings = {
-    "welcome": (
-        "Bana bir sure ve ayet numarası gönderin, örneğin <b>2:255</b>, ben de "
-        "size Kur'an-ı Kerim'den o ayeti göndereyim.\n\n"
-        "<b>59:22-24</b> gibi bir aralık göndererek birleşik sesli okuma da alabilirsiniz.\n\n"
-        "Komutlar:\n"
-        "/index — tüm sureleri listele\n"
-        "/random — rastgele bir ayet\n"
-        "/language — dili değiştir\n"
-        "/about — kaynaklar ve emeği geçenler\n\n"
-        "Beni her sohbette satır içi kullanabilirsiniz: <b>@QuranAyat_bot</b> yazıp ardından bir referans girin."
+    "welcome_intro": (
+        "Bana bir sure ve ayet numarası gönderin, örneğin <b>2:255</b>, ben de size "
+        "Kur'an-ı Kerim'den o ayeti göndereyim.\n\n"
+        "<b>59:22-24</b> gibi bir aralık göndererek birleşik sesli okuma da "
+        "alabilirsiniz."
+    ),
+    "welcome_commands_header": "Komutlar:",
+    "welcome_inline": (
+        "Beni her sohbette satır içi kullanabilirsiniz: <b>@QuranAyat_bot</b> yazıp "
+        "ardından bir referans girin."
     ),
     "about": (
         "Bu bot, Kur'an-ı Kerim'i Telegram üzerinde birçok dilde keşfetmenizi sağlar.\n\n"

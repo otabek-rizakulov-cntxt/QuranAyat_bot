@@ -16,8 +16,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 
 from locales import (  # noqa: E402
-    ACTION_BUTTON_KEYS, DEFAULT_LANG, LANGUAGES, LOCALES,
-    button_action, keyboard_rows, missing_keys, missing_locales, t,
+    ACTION_BUTTON_KEYS, BOT_COMMANDS, DEFAULT_LANG, LANGUAGES, LOCALES,
+    button_action, keyboard_rows, missing_keys, missing_locales, t, welcome_text,
 )
 
 PLACEHOLDER = re.compile(r"\{(\w+)\}")
@@ -76,9 +76,17 @@ def main() -> int:
 
         # HTML-parsed messages must not carry unbalanced tags: Telegram rejects
         # the whole send if they don't pair up.
-        for key in ("welcome", "about"):
+        for key in ("welcome_intro", "welcome_inline", "about"):
             if key in table and table[key].count("<b>") != table[key].count("</b>"):
                 problems.append("%s: %r has unbalanced <b> tags" % (code, key))
+
+        # /start must advertise every registered command, in every language.
+        # The list is generated, so a gap here means a locale hard-coded its own.
+        message = welcome_text(code)
+        absent_commands = [c for c, _ in BOT_COMMANDS if "/%s " % c not in message]
+        if absent_commands:
+            problems.append("%s: /start omits: %s"
+                            % (code, ", ".join("/" + c for c in absent_commands)))
 
     print("checked %d languages, %d keys each" % (len(LANGUAGES), len(REQUIRED_KEYS)))
     if problems:

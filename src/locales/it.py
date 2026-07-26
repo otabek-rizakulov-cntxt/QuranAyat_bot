@@ -1,18 +1,16 @@
 # Italian — Italiano
 
 strings = {
-    "welcome": (
-        "Inviami un numero di sura e versetto, ad esempio <b>2:255</b>, e ti "
-        "risponderò con quel versetto del Sacro Corano.\n\n"
-        "Puoi anche inviare un intervallo come <b>59:22-24</b> per una "
-        "recitazione audio combinata.\n\n"
-        "Comandi:\n"
-        "/index — elenco di tutte le sure\n"
-        "/random — un versetto casuale\n"
-        "/language — cambia lingua\n"
-        "/about — fonti e ringraziamenti\n\n"
-        "Puoi usarmi in qualsiasi chat: digita <b>@QuranAyat_bot</b> seguito da "
-        "un riferimento."
+    "welcome_intro": (
+        "Inviami un numero di sura e versetto, ad esempio <b>2:255</b>, e ti risponderò "
+        "con quel versetto del Sacro Corano.\n\n"
+        "Puoi anche inviare un intervallo come <b>59:22-24</b> per una recitazione audio "
+        "combinata."
+    ),
+    "welcome_commands_header": "Comandi:",
+    "welcome_inline": (
+        "Puoi usarmi in qualsiasi chat: digita <b>@QuranAyat_bot</b> seguito da un "
+        "riferimento."
     ),
     "about": (
         "Questo bot ti permette di esplorare il Sacro Corano su Telegram in "

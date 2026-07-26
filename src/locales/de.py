@@ -1,18 +1,16 @@
 # German — Deutsch
 
 strings = {
-    "welcome": (
-        "Sende mir eine Sure und Versnummer, zum Beispiel <b>2:255</b>, und ich "
-        "schicke dir diesen Vers aus dem Heiligen Koran.\n\n"
-        "Du kannst auch einen Bereich wie <b>59:22-24</b> senden, um eine "
-        "zusammengefügte Audio-Rezitation zu erhalten.\n\n"
-        "Befehle:\n"
-        "/index — alle Suren auflisten\n"
-        "/random — ein zufälliger Vers\n"
-        "/language — Sprache ändern\n"
-        "/about — Quellen und Danksagungen\n\n"
-        "Du kannst mich in jedem Chat verwenden: Tippe <b>@QuranAyat_bot</b> "
-        "gefolgt von einer Versangabe."
+    "welcome_intro": (
+        "Sende mir eine Sure und Versnummer, zum Beispiel <b>2:255</b>, und ich schicke "
+        "dir diesen Vers aus dem Heiligen Koran.\n\n"
+        "Du kannst auch einen Bereich wie <b>59:22-24</b> senden, um eine zusammengefügte "
+        "Audio-Rezitation zu erhalten."
+    ),
+    "welcome_commands_header": "Befehle:",
+    "welcome_inline": (
+        "Du kannst mich in jedem Chat verwenden: Tippe <b>@QuranAyat_bot</b> gefolgt von "
+        "einer Versangabe."
     ),
     "about": (
         "Mit diesem Bot kannst du den Heiligen Koran auf Telegram in vielen "

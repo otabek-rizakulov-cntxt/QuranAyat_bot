@@ -1,18 +1,16 @@
 # Polish — Polski
 
 strings = {
-    "welcome": (
-        "Wyślij mi numer sury i wersetu, na przykład <b>2:255</b>, a odeślę ci "
-        "ten werset Świętego Koranu.\n\n"
-        "Możesz też wysłać zakres, np. <b>59:22-24</b>, aby otrzymać połączoną "
-        "recytację audio.\n\n"
-        "Polecenia:\n"
-        "/index — lista wszystkich sur\n"
-        "/random — losowy werset\n"
-        "/language — zmień język\n"
-        "/about — źródła i podziękowania\n\n"
-        "Możesz używać mnie na każdym czacie: wpisz <b>@QuranAyat_bot</b>, a po "
-        "nim odnośnik."
+    "welcome_intro": (
+        "Wyślij mi numer sury i wersetu, na przykład <b>2:255</b>, a odeślę ci ten werset "
+        "Świętego Koranu.\n\n"
+        "Możesz też wysłać zakres, np. <b>59:22-24</b>, aby otrzymać połączoną recytację "
+        "audio."
+    ),
+    "welcome_commands_header": "Polecenia:",
+    "welcome_inline": (
+        "Możesz używać mnie na każdym czacie: wpisz <b>@QuranAyat_bot</b>, a po nim "
+        "odnośnik."
     ),
     "about": (
         "Ten bot pozwala czytać Święty Koran na Telegramie w wielu językach.\n\n"

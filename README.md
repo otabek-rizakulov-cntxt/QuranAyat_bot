@@ -58,8 +58,14 @@ Every one of the 48 languages has a complete UI string table in
 `src/locales/<code>.py` — no language falls back to English for any interface
 text. `python3 scripts/check_locales.py` verifies that: it checks each locale
 defines every key, keeps the same `{placeholders}` as English, balances its
-HTML tags, and that each localized button label still maps back to the right
-action. Telegram's per-language slash-command menu only accepts two-letter
+HTML tags, advertises every slash command in its `/start` message, and that each
+localized button label still maps back to the right action.
+
+The `/start` command list is not part of the translated text: `BOT_COMMANDS` in
+`src/locales/__init__.py` is the single source of truth for both the `/start`
+message and Telegram's command menu, so adding a command surfaces it in all 48
+languages at once — a locale only translates the one-line description
+(`cmd_*`). Telegram's per-language slash-command menu only accepts two-letter
 ISO 639-1 codes, so `uz-Cyrl` and `ber` see the English command menu while the
 rest of their interface is localized.
 

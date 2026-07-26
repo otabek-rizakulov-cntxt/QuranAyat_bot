@@ -1,18 +1,16 @@
 # Swedish — Svenska
 
 strings = {
-    "welcome": (
-        "Skicka mig ett sura- och versnummer, till exempel <b>2:255</b>, så "
-        "skickar jag den versen ur den heliga Koranen.\n\n"
-        "Du kan även skicka ett intervall som <b>59:22-24</b> för en "
-        "sammanslagen ljudrecitation.\n\n"
-        "Kommandon:\n"
-        "/index — lista alla suror\n"
-        "/random — en slumpmässig vers\n"
-        "/language — byt språk\n"
-        "/about — källor och tack\n\n"
-        "Du kan använda mig i vilken chatt som helst: skriv "
-        "<b>@QuranAyat_bot</b> följt av en hänvisning."
+    "welcome_intro": (
+        "Skicka mig ett sura- och versnummer, till exempel <b>2:255</b>, så skickar jag "
+        "den versen ur den heliga Koranen.\n\n"
+        "Du kan även skicka ett intervall som <b>59:22-24</b> för en sammanslagen "
+        "ljudrecitation."
+    ),
+    "welcome_commands_header": "Kommandon:",
+    "welcome_inline": (
+        "Du kan använda mig i vilken chatt som helst: skriv <b>@QuranAyat_bot</b> följt "
+        "av en hänvisning."
     ),
     "about": (
         "Med den här boten kan du läsa den heliga Koranen på Telegram på många "

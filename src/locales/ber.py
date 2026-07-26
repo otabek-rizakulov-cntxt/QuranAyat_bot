@@ -3,18 +3,15 @@
 # Matches the bundled ber.mensur (Kabyle) translation.
 
 strings = {
-    "welcome": (
-        "Azen-iyi uṭṭun n sura d aya, amedya <b>2:255</b>, ad ak-d-azneɣ aya-nni "
-        "n Leqran.\n\n"
-        "Tzemreḍ daɣen ad tazneḍ azilal am <b>59:22-24</b> i tɣuri n ṣṣut "
-        "yeddukklen.\n\n"
-        "Tiludna:\n"
-        "/index — umuɣ n tsura meṛṛa\n"
-        "/random — aya s tuffra\n"
-        "/language — beddel tutlayt\n"
-        "/about — iɣbula d isnemmiren\n\n"
-        "Tzemreḍ ad tesqedceḍ-iyi deg yal adiwenni: aru <b>@QuranAyat_bot</b> "
-        "sakin uṭṭun n aya."
+    "welcome_intro": (
+        "Azen-iyi uṭṭun n sura d aya, amedya <b>2:255</b>, ad ak-d-azneɣ aya-nni n "
+        "Leqran.\n\n"
+        "Tzemreḍ daɣen ad tazneḍ azilal am <b>59:22-24</b> i tɣuri n ṣṣut yeddukklen."
+    ),
+    "welcome_commands_header": "Tiludna:",
+    "welcome_inline": (
+        "Tzemreḍ ad tesqedceḍ-iyi deg yal adiwenni: aru <b>@QuranAyat_bot</b> sakin uṭṭun "
+        "n aya."
     ),
     "about": (
         "Aboṭ-agi ad ak-yeǧǧ aɣ tɣreḍ Leqran deg Telegram s waṭas n tutlayin.\n\n"
