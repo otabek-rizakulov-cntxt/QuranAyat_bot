@@ -28,24 +28,36 @@ os.chdir(ROOT)
 
 os.environ["TOKEN"] = "123456:TEST-abcdefghijklmnopqrstuvwxyz012345"
 os.environ["REDIS_HOST_URL"] = ""          # -> in-memory store, no network
+os.environ["DATABASE_URL"] = ""            # -> in-memory settings store, no network
 os.environ["AUDIO_BASE_URL"] = "https://cdn.test/audio"
 os.environ["PHOTO_BASE_URL"] = "https://cdn.test/images"
+
+import asyncio
 
 import pytest
 
 
 @pytest.fixture(autouse=True)
 def _clean_state_store():
-    """Reset the in-memory Redis stand-in between tests.
+    """Reset the in-memory Redis and Postgres stand-ins between tests.
 
-    The store lives on a process-wide singleton (RedisSingleton), so without this
-    one test's saved user state / language would leak into the next.
+    Both live on process-wide module state, so without this one test's saved
+    user state / language / reciter would leak into the next.
+
+    The Postgres pool's creation lock is recreated alongside the pool: an
+    asyncio.Lock binds to the loop it is first awaited in, and pytest-asyncio
+    gives each test its own loop. Production has a single loop for the process
+    lifetime, so this only matters under test.
     """
     from lib.utils import File
+    import config.postgres as postgres
 
     store = File().redis
     if hasattr(store, "_data"):          # MemoryStore, not a real Redis connection
         store._data.clear()
+    postgres._pool = None
+    postgres._pool_lock = asyncio.Lock()
     yield
     if hasattr(store, "_data"):
         store._data.clear()
+    postgres._pool = None

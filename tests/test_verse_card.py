@@ -98,13 +98,22 @@ class TestVerseKeyboard:
 
 class TestVerseText:
     async def test_has_bold_header_and_reference(self, data):
-        text = await main.build_verse_text(2, 255, "translation", "en", data)
+        text = await main.build_verse_text(2, 255, "translation", "en", "en", data)
         assert text.startswith("<b>")
         assert "(2:255)" in text
 
-    async def test_tafsir_notes_english_only_for_other_languages(self, data):
-        text = await main.build_verse_text(1, 1, "tafsir", "ru", data)
+    async def test_tafsir_note_follows_ui_language_not_translation_language(self, data):
+        # The tafsir corpus is English-only, so the note is bot UI text: it must
+        # follow ui_lang even for a reader whose translations are in English.
+        text = await main.build_verse_text(1, 1, "tafsir", "ru", "en", data)
         assert main.t("tafsir_en_note", "ru") in text
+
+    async def test_translation_body_follows_translation_language(self, data):
+        # The whole point of splitting the settings: a Russian UI can render an
+        # English translation, and the body must come from translation_lang.
+        ru = await main.build_verse_text(1, 2, "translation", "ru", "ru", data)
+        en = await main.build_verse_text(1, 2, "translation", "ru", "en", data)
+        assert ru != en
 
 
 # --- Callback dispatch ------------------------------------------------------

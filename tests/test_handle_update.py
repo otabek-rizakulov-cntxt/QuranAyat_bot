@@ -12,7 +12,7 @@ import pytest
 import telegram
 
 import main
-from lib.utils import File
+from lib.user_settings import UserSettings
 
 
 @pytest.fixture(scope="module")
@@ -42,6 +42,24 @@ def _message(tg_bot, text, chat_id=555000, lang="en"):
             "chat": {"id": chat_id, "type": "private" if chat_id > 0 else "supergroup"},
             "from": {"id": chat_id, "is_bot": False, "first_name": "Tester", "language_code": lang},
             "text": text,
+        },
+    }
+    return telegram.Update.de_json(payload, tg_bot)
+
+
+def _callback(tg_bot, cb_data, chat_id=555000, update_id=2):
+    payload = {
+        "update_id": update_id,
+        "callback_query": {
+            "id": "cbq-%d" % update_id,
+            "from": {"id": chat_id, "is_bot": False, "first_name": "Tester"},
+            "chat_instance": "ci-1",
+            "data": cb_data,
+            "message": {
+                "message_id": 5,
+                "date": 1700000000,
+                "chat": {"id": chat_id, "type": "private"},
+            },
         },
     }
     return telegram.Update.de_json(payload, tg_bot)
@@ -94,24 +112,32 @@ async def test_next_navigates_forward(fake_bot, data, tg_bot):
     assert "(1:2)" in fake_bot.send_message.await_args.kwargs["text"]
 
 
-async def test_setlang_callback_persists_language(fake_bot, data, tg_bot):
-    payload = {
-        "update_id": 2,
-        "callback_query": {
-            "id": "cbq-1",
-            "from": {"id": 555008, "is_bot": False, "first_name": "Tester"},
-            "chat_instance": "ci-1",
-            "data": "setlang:ru",
-            "message": {
-                "message_id": 5,
-                "date": 1700000000,
-                "chat": {"id": 555008, "type": "private"},
-            },
-        },
-    }
-    await main.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
+async def test_setlang_callback_persists_ui_language(fake_bot, data, tg_bot):
+    # The language preference is durable in UserSettings now, not in the old
+    # single Redis `lang:` key — and it is the *UI* language only.
+    await main.handle_update(fake_bot, data, _callback(tg_bot, "setlang:ru", chat_id=555008))
     fake_bot.answer_callback_query.assert_awaited()
-    assert File().get_lang(555008) == "ru"
+    settings = await UserSettings().get(555008, 555008)
+    assert settings.ui_lang == "ru"
+    assert settings.translation_lang == "en"   # untouched by a UI-language change
+
+
+async def test_settranslang_callback_persists_translation_language_only(fake_bot, data, tg_bot):
+    await main.handle_update(fake_bot, data, _callback(tg_bot, "setlang:uz-Cyrl", chat_id=555011))
+    await main.handle_update(fake_bot, data, _callback(tg_bot, "settranslang:en", chat_id=555011))
+    settings = await UserSettings().get(555011, 555011)
+    # The motivating combination: Uzbek Cyrillic UI over an English translation.
+    assert settings.ui_lang == "uz-Cyrl"
+    assert settings.translation_lang == "en"
+
+
+async def test_setreciter_callback_persists_reciter_only(fake_bot, data, tg_bot):
+    await main.handle_update(fake_bot, data, _callback(tg_bot, "setlang:ru", chat_id=555012))
+    await main.handle_update(
+        fake_bot, data, _callback(tg_bot, "setreciter:Alafasy_128kbps", chat_id=555012))
+    settings = await UserSettings().get(555012, 555012)
+    assert settings.reciter == "Alafasy_128kbps"
+    assert settings.ui_lang == "ru"
 
 
 async def test_inline_query_valid_ayah_returns_two_results(fake_bot, data, tg_bot):
