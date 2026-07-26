@@ -31,6 +31,10 @@ class MemoryStore:
     with self._lock:
       self._data[key] = (value, time.time() + ex if ex else None)
 
+  def delete(self, key):
+    with self._lock:
+      self._data.pop(key, None)
+
 
 class RedisSingleton(Environment):
   _instance = None
