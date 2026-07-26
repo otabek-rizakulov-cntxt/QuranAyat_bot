@@ -42,6 +42,7 @@ from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
+    InlineQueryResultAudio,
     InputTextMessageContent,
     ReplyKeyboardRemove,
 )
@@ -224,6 +225,41 @@ async def get_translation(lang: str) -> Quran:
 def _reference(surah: int, ayah: int, ui_lang: str) -> str:
     """Human-readable ayah reference ("Qur'an 2:255") in the user's UI language."""
     return "%s %d:%d" % (t("quran_name", ui_lang), surah, ayah)
+
+
+# Inline answers built from the caller's own settings can't use the long shared
+# cache; this only has to outlive the burst of queries Telegram fires as the user
+# types, and stay short enough that changing a setting is felt straight away.
+INLINE_PERSONAL_CACHE_TIME = 60
+
+
+def _inline_audio_result(surah: int, ayah: int, reciter: str, ui_lang: str, file: File):
+    """The recitation of an ayah as a shareable inline result, or None if it
+    can't be built.
+
+    Telegram fetches `audio_url` itself, so unlike the in-chat audio path this
+    never uploads and never touches the Telegram file_id cache — it just needs
+    the same public URL `send_quran` would have uploaded from.
+    """
+    try:
+        audio_url = file.get_audio_filename(surah, ayah, reciter)
+    except ValueError:
+        # A saved reciter that has since left the catalog. The rest of the
+        # answer is still useful, so drop the audio rather than failing.
+        return None
+    if not audio_url.startswith(("http://", "https://")):
+        # AUDIO_BASE_URL unset or pointing at a local path: Telegram can only
+        # fetch a public URL, so there is nothing to offer here.
+        return None
+    return InlineQueryResultAudio(
+        # Keyed by reciter as well as ayah: the same query answered before and
+        # after a reciter change must not collide in Telegram's result cache.
+        # Bounded by 64 bytes — 3 + 7 + the longest subfolder in the catalog.
+        "au:%d:%d:%s" % (surah, ayah, reciter),
+        audio_url=audio_url,
+        title=_reference(surah, ayah, ui_lang),
+        performer=File.get_performer_name(reciter),
+    )
 
 
 def language_keyboard() -> InlineKeyboardMarkup:
@@ -439,6 +475,12 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             quran = await get_translation(translation_lang)
             translation = quran.get_ayah(surah, ayah)
             tafsir = data["tafsir"].get_ayah(surah, ayah)
+            # Every result here is rendered from the caller's own settings —
+            # translation_lang for the text, reciter for the audio — so this
+            # branch is per-user too, and cannot use a long shared cache. The
+            # short cache_time still absorbs the keystroke-by-keystroke repeats
+            # Telegram sends while the query is being typed.
+            cache_time, is_personal = INLINE_PERSONAL_CACHE_TIME, True
             results.append(InlineQueryResultArticle(
                 ref + "translation", title=t("btn_translation", ui_lang),
                 description=translation[:120],
@@ -449,6 +491,9 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                 description=tafsir[:120],
                 input_message_content=InputTextMessageContent(tafsir))
             )
+            audio = _inline_audio_result(surah, ayah, settings.reciter, ui_lang, file)
+            if audio is not None:
+                results.append(audio)
         else:
             # Not an ayah reference — try it as a reciter name, so the picker is
             # reachable from any chat without opening a DM with the bot first.
