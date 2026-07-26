@@ -140,7 +140,7 @@ async def test_setreciter_callback_persists_reciter_only(fake_bot, data, tg_bot)
     assert settings.ui_lang == "ru"
 
 
-async def test_inline_query_valid_ayah_returns_three_results(fake_bot, data, tg_bot):
+async def test_inline_query_valid_ayah_returns_all_four_views(fake_bot, data, tg_bot):
     payload = {
         "update_id": 3,
         "inline_query": {
@@ -152,8 +152,12 @@ async def test_inline_query_valid_ayah_returns_three_results(fake_bot, data, tg_
     }
     await main.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
     fake_bot.answer_inline_query.assert_awaited()
-    # A valid ayah yields a translation, a tafsir and the recitation.
-    assert len(fake_bot.answer_inline_query.await_args.kwargs["results"]) == 3
+    # A valid ayah yields a translation, a tafsir, the recitation and the Arabic image.
+    results = fake_bot.answer_inline_query.await_args.kwargs["results"]
+    assert [type(r) for r in results] == [telegram.InlineQueryResultArticle,
+                                          telegram.InlineQueryResultArticle,
+                                          telegram.InlineQueryResultAudio,
+                                          telegram.InlineQueryResultPhoto]
 
 
 async def test_textless_message_is_ignored(fake_bot, data, tg_bot):

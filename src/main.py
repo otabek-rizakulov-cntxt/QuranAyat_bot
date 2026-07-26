@@ -35,6 +35,7 @@ import asyncio
 import html
 from io import BytesIO
 from time import time
+from urllib.parse import urlencode
 import httpx
 import telegram
 from telegram import (
@@ -43,6 +44,9 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InlineQueryResultAudio,
+    InlineQueryResultCachedAudio,
+    InlineQueryResultCachedPhoto,
+    InlineQueryResultPhoto,
     InputTextMessageContent,
     ReplyKeyboardRemove,
 )
@@ -61,6 +65,25 @@ from locales import (
 # ---------------------------------------------------------------------------
 # Bot logic
 # ---------------------------------------------------------------------------
+
+def _webhook_base_url() -> str | None:
+    """Public HTTPS base URL this app is reachable at.
+
+    Telegram POSTs updates here, and it is also where Telegram fetches the
+    stitched range recitations from (see RANGE_AUDIO_PATH), so it is needed by
+    the bot logic and not only at startup.
+
+    Prefer an explicit WEBHOOK_URL; otherwise fall back to Railway's auto-injected
+    RAILWAY_PUBLIC_DOMAIN (host only, so we prepend https://).
+    """
+    explicit = os.getenv("WEBHOOK_URL")
+    if explicit:
+        return explicit.rstrip("/")
+    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+    if railway_domain:
+        return "https://" + railway_domain.rstrip("/")
+    return None
+
 
 async def send_file(bot, filename, quran_type, **kwargs):
     """Send a media file, preferring Telegram's cached file_id over a fresh upload.
@@ -125,11 +148,17 @@ async def _download_combined_audio(surah: int, start: int, end: int, performer: 
     return buf
 
 
+def _combined_audio_key(surah: int, start: int, end: int, performer: str) -> str:
+    """Telegram file_id cache key for a stitched range, shared by the in-chat send
+    that produces it and the inline result that replays it."""
+    return "combined:%d:%d-%d:%s" % (surah, start, end, performer)
+
+
 async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: int,
                               performer: str, reply_markup=None) -> None:
     """Send a range of ayahs as a single combined audio file, cached by Telegram file_id."""
     file = File()
-    cache_key = "combined:%d:%d-%d:%s" % (surah, start, end, performer)
+    cache_key = _combined_audio_key(surah, start, end, performer)
     title = "Quran %d:%d-%d" % (surah, start, end)
     kwargs = dict(chat_id=chat_id, title=title,
                   performer=File.get_performer_name(performer),
@@ -150,6 +179,23 @@ async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: in
     result = await bot.send_audio(audio=audio, **kwargs)
     file.save_file(cache_key, result.audio.file_id)
     file.save_user(chat_id, (surah, end, "audio"))
+
+
+# Route (on this very app) that stitches a range of recitations on demand. An
+# inline audio result can only carry a file_id or a URL Telegram fetches itself —
+# never an upload — so a range nobody has sent in a chat yet needs a public place
+# to be fetched from, and this is it.
+RANGE_AUDIO_PATH = "/media/range.mp3"
+
+
+def _range_audio_url(surah: int, start: int, end: int, performer: str) -> str | None:
+    """Public URL of the stitched recitation of `surah:start-end`, or None when we
+    have no public base URL to serve it from (local dev without WEBHOOK_URL)."""
+    base = _webhook_base_url()
+    if not base or not base.startswith("https://"):
+        return None
+    query = urlencode({"surah": surah, "start": start, "end": end, "reciter": performer})
+    return base + RANGE_AUDIO_PATH + "?" + query
 
 
 def get_default_query_results(quran: Quran):
@@ -222,9 +268,20 @@ async def get_translation(lang: str) -> Quran:
     return await asyncio.to_thread(TranslationRegistry.get, lang)
 
 
-def _reference(surah: int, ayah: int, ui_lang: str) -> str:
-    """Human-readable ayah reference ("Qur'an 2:255") in the user's UI language."""
-    return "%s %d:%d" % (t("quran_name", ui_lang), surah, ayah)
+def _reference(surah: int, ayah: int, ui_lang: str, end: int | None = None) -> str:
+    """Human-readable reference in the user's UI language: "Qur'an 2:255", or
+    "Qur'an 59:22-24" when `end` names a later ayah."""
+    name = t("quran_name", ui_lang)
+    if end is not None and end > ayah:
+        return "%s %d:%d-%d" % (name, surah, ayah, end)
+    return "%s %d:%d" % (name, surah, ayah)
+
+
+def _ref_key(surah: int, start: int, end: int) -> str:
+    """Compact ASCII form of a reference, used to build inline result ids."""
+    if end > start:
+        return "%d:%d-%d" % (surah, start, end)
+    return "%d:%d" % (surah, start)
 
 
 # Inline answers built from the caller's own settings can't use the long shared
@@ -233,33 +290,85 @@ def _reference(surah: int, ayah: int, ui_lang: str) -> str:
 INLINE_PERSONAL_CACHE_TIME = 60
 
 
-def _inline_audio_result(surah: int, ayah: int, reciter: str, ui_lang: str, file: File):
-    """The recitation of an ayah as a shareable inline result, or None if it
-    can't be built.
+def _inline_audio_result(surah: int, start: int, end: int, reciter: str,
+                         ui_lang: str, file: File):
+    """The recitation of an ayah — or of a whole range, stitched into one file —
+    as a shareable inline result, or None if it can't be built.
 
-    Telegram fetches `audio_url` itself, so unlike the in-chat audio path this
-    never uploads and never touches the Telegram file_id cache — it just needs
-    the same public URL `send_quran` would have uploaded from.
+    Telegram only ever takes a file_id or a URL it fetches itself here, never an
+    upload. A single ayah already has a public URL on the CDN. A range does not,
+    so it is served either from the file_id an in-chat send of the same range
+    left in the cache, or from our own RANGE_AUDIO_PATH.
     """
     try:
-        audio_url = file.get_audio_filename(surah, ayah, reciter)
+        first_url = file.get_audio_filename(surah, start, reciter)
     except ValueError:
         # A saved reciter that has since left the catalog. The rest of the
         # answer is still useful, so drop the audio rather than failing.
         return None
-    if not audio_url.startswith(("http://", "https://")):
-        # AUDIO_BASE_URL unset or pointing at a local path: Telegram can only
-        # fetch a public URL, so there is nothing to offer here.
+    if not first_url.startswith(("http://", "https://")):
+        # AUDIO_BASE_URL unset or pointing at a local path: neither Telegram nor
+        # our own stitching route can reach it, so there is nothing to offer.
         return None
-    return InlineQueryResultAudio(
+
+    title = _reference(surah, start, ui_lang, end)
+    if end > start:
+        if end - start + 1 > MAX_RANGE_AYAHS:
+            return None                 # same bound the in-chat range send enforces
+        # Bounded by 64 bytes — 4 + 11 + the longest subfolder in the catalog.
+        result_id = "aur:%s:%s" % (_ref_key(surah, start, end), reciter)
+        cached_id = file.get_file(_combined_audio_key(surah, start, end, reciter))
+        if cached_id is not None:
+            # Someone has already asked for this range in a chat: replay that
+            # upload instead of making Telegram fetch and stitch it again.
+            return InlineQueryResultCachedAudio(result_id, audio_file_id=cached_id,
+                                                caption=title)
+        audio_url = _range_audio_url(surah, start, end, reciter)
+        if audio_url is None:
+            return None                 # no public base URL to stitch it from
+    else:
         # Keyed by reciter as well as ayah: the same query answered before and
         # after a reciter change must not collide in Telegram's result cache.
-        # Bounded by 64 bytes — 3 + 7 + the longest subfolder in the catalog.
-        "au:%d:%d:%s" % (surah, ayah, reciter),
-        audio_url=audio_url,
-        title=_reference(surah, ayah, ui_lang),
-        performer=File.get_performer_name(reciter),
-    )
+        result_id = "au:%s:%s" % (_ref_key(surah, start, end), reciter)
+        audio_url = first_url
+    return InlineQueryResultAudio(result_id, audio_url=audio_url, title=title,
+                                  performer=File.get_performer_name(reciter))
+
+
+# A range's Arabic images come back one result per ayah; cap them so a long range
+# can neither pass Telegram's 50-results-per-answer limit nor bury the translation,
+# tafsir and recitation under a wall of thumbnails.
+INLINE_MAX_PHOTOS = 10
+
+
+def _inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: File) -> list:
+    """The rendered Arabic image of each ayah in the reference, as shareable inline
+    photo results.
+
+    Preferring the file_id an in-chat send left in the cache is not just a saved
+    round-trip here: the Bot API documents an inline photo *URL* as having to be
+    JPEG, and our rendered ayahs are PNG, so replaying a file Telegram already
+    holds is also the more dependable of the two. The URL is the fallback for an
+    ayah nobody has viewed yet, and needs PHOTO_BASE_URL to be a public URL; when
+    it points at a local directory, only already-cached ayahs can be offered.
+    """
+    if not file.get_env("quranic_images_file_path"):
+        return []                       # no images configured at all
+    results = []
+    for ayah in range(start, min(end, start + INLINE_MAX_PHOTOS - 1) + 1):
+        result_id = "ph:%d:%d" % (surah, ayah)
+        ref = _reference(surah, ayah, ui_lang)
+        common = dict(title=t("btn_arabic", ui_lang), description=ref, caption=ref)
+        # the same key `send_quran`'s arabic branch caches under
+        source = file.get_image_filename(surah, ayah)
+        cached_id = file.get_file(source)
+        if cached_id is not None:
+            results.append(InlineQueryResultCachedPhoto(
+                result_id, photo_file_id=cached_id, **common))
+        elif source.startswith(("http://", "https://")):
+            results.append(InlineQueryResultPhoto(
+                result_id, photo_url=source, thumbnail_url=source, **common))
+    return results
 
 
 def language_keyboard() -> InlineKeyboardMarkup:
@@ -297,9 +406,18 @@ def translation_language_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(rows)
 
 
-# A curated shortlist of well-known reciters (subfolder keys into performers.json),
-# shown by default instead of the full ~80-entry catalog. The full catalog stays
-# reachable via the search button.
+def _nav_labels(ui_lang: str) -> tuple[str, str]:
+    """(previous, next) button labels. The arrows point in reading order, so they
+    flip for right-to-left scripts."""
+    prev, nxt = t("btn_previous", ui_lang), t("btn_next", ui_lang)
+    if get_language(ui_lang).rtl:
+        return prev + " ›", "‹ " + nxt
+    return "‹ " + prev, nxt + " ›"
+
+
+# A curated shortlist of well-known reciters (subfolder keys into performers.json).
+# These lead the catalog, so the first page of the picker is the ten names most
+# people are looking for and the pager walks through everything else.
 _RECITER_SHORTLIST = (
     "Husary_128kbps",
     "Alafasy_128kbps",
@@ -314,21 +432,77 @@ _RECITER_SHORTLIST = (
 )
 
 
-def reciter_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    """Curated reciter shortlist, two per row, plus a search button for the full
-    catalog in src/common/performers.json."""
-    performers = {p["subfolder"]: p["name"] for p in File._load_performers()}
+# How many reciters one page of the picker shows. Equal to the shortlist length, so
+# page 1 is exactly the shortlist.
+RECITER_PAGE_SIZE = 10
+
+
+def reciter_catalog() -> list:
+    """Every reciter in src/common/performers.json, shortlist first then the rest in
+    catalog order — the order the picker pages through."""
+    performers = File._load_performers()
+    by_subfolder = {p["subfolder"]: p for p in performers}
+    # a shortlist entry the catalog no longer has is skipped, not fatal
+    ordered = [by_subfolder[s] for s in _RECITER_SHORTLIST if s in by_subfolder]
+    shortlisted = set(_RECITER_SHORTLIST)
+    ordered.extend(p for p in performers if p["subfolder"] not in shortlisted)
+    return ordered
+
+
+def reciter_label(performer: dict) -> str:
+    """Button label for a reciter: name plus bitrate.
+
+    The bitrate is what tells two entries of the same reciter apart, and it is
+    also how much phone storage a recitation will cost — so it belongs on the
+    button, not one tap away.
+    """
+    bitrate = performer.get("bitrate", "").replace("Kbps", "kbps")
+    if not bitrate:
+        return performer["name"]
+    return "%s · %s" % (performer["name"], bitrate)
+
+
+def reciter_page_count() -> int:
+    return max(1, -(-len(reciter_catalog()) // RECITER_PAGE_SIZE))
+
+
+def reciter_page_of(subfolder: str) -> int:
+    """The page holding `subfolder`, so /reciter opens where the user already is."""
+    for i, p in enumerate(reciter_catalog()):
+        if p["subfolder"] == subfolder:
+            return i // RECITER_PAGE_SIZE
+    return 0
+
+
+def reciter_keyboard(ui_lang: str, page: int = 0, current: str | None = None) -> InlineKeyboardMarkup:
+    """One page of the reciter catalog, two per row, under a Previous / n-of-m /
+    Next pager and a search button.
+
+    The catalog is ~80 entries, so it is paged rather than dumped in one keyboard:
+    the pager walks the whole list, the search button jumps straight to a name.
+    Pages wrap, so neither arrow is ever a dead button. `current` is marked with a
+    dot, the same way the verse card marks the active view.
+    """
+    catalog = reciter_catalog()
+    pages = reciter_page_count()
+    page %= pages
     rows, row = [], []
-    for subfolder in _RECITER_SHORTLIST:
-        name = performers.get(subfolder)
-        if name is None:
-            continue  # tolerate the catalog changing without crashing the picker
-        row.append(InlineKeyboardButton(name, callback_data="setreciter:" + subfolder))
+    for p in catalog[page * RECITER_PAGE_SIZE:(page + 1) * RECITER_PAGE_SIZE]:
+        label = reciter_label(p)
+        if p["subfolder"] == current:
+            label = "• " + label
+        row.append(InlineKeyboardButton(label, callback_data="setreciter:" + p["subfolder"]))
         if len(row) == 2:
             rows.append(row)
             row = []
     if row:
         rows.append(row)
+    prev_label, next_label = _nav_labels(ui_lang)
+    rows.append([
+        InlineKeyboardButton(prev_label, callback_data="recpage:%d" % ((page - 1) % pages)),
+        InlineKeyboardButton("%d/%d" % (page + 1, pages), callback_data="recpage_noop"),
+        InlineKeyboardButton(next_label, callback_data="recpage:%d" % ((page + 1) % pages)),
+    ])
     rows.append([InlineKeyboardButton("🔍 " + t("btn_search_reciter", ui_lang),
                                        callback_data="reciter_search")])
     return InlineKeyboardMarkup(rows)
@@ -375,12 +549,8 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
     code = CODE_BY_TYPE[quran_type]
     prev_s, prev_a = Quran.get_previous_ayah(surah, ayah)
     next_s, next_a = Quran.get_next_ayah(surah, ayah)
-    prev, nxt, rnd = t("btn_previous", ui_lang), t("btn_next", ui_lang), t("btn_random", ui_lang)
-    # Arrows point in reading order, so they flip for right-to-left scripts.
-    if get_language(ui_lang).rtl:
-        prev_label, next_label = prev + " ›", "‹ " + nxt
-    else:
-        prev_label, next_label = "‹ " + prev, nxt + " ›"
+    rnd = t("btn_random", ui_lang)
+    prev_label, next_label = _nav_labels(ui_lang)
 
     return InlineKeyboardMarkup([
         [mode_button(*mode) for mode in _MODES],
@@ -469,12 +639,19 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         results = []
         cache_time = 66 * (60 ** 2 * 24)
         is_personal = False
-        surah, ayah = parse_ayah(query)
-        if surah is not None and Quran.exists(surah, ayah):
-            ref = "%d:%d" % (surah, ayah)
+        # A range ("59:22-24") is answered as a range in every representation, the
+        # same as in a chat — a single ayah is just the degenerate case start == end.
+        surah, start, end = parse_ayah_range(query)
+        if surah is not None and Quran.exists(surah, start) and Quran.exists(surah, end):
+            ref = _ref_key(surah, start, end)
             quran = await get_translation(translation_lang)
-            translation = quran.get_ayah(surah, ayah)
-            tafsir = data["tafsir"].get_ayah(surah, ayah)
+            if end > start:
+                translation = quran.get_ayahs(surah, start, end)
+                tafsir = "\n\n".join(data["tafsir"].get_ayah(surah, a)
+                                     for a in range(start, end + 1))
+            else:
+                translation = quran.get_ayah(surah, start)
+                tafsir = data["tafsir"].get_ayah(surah, start)
             # Every result here is rendered from the caller's own settings —
             # translation_lang for the text, reciter for the audio — so this
             # branch is per-user too, and cannot use a long shared cache. The
@@ -484,16 +661,18 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             results.append(InlineQueryResultArticle(
                 ref + "translation", title=t("btn_translation", ui_lang),
                 description=translation[:120],
-                input_message_content=InputTextMessageContent(translation))
+                # a long range's text can outgrow Telegram's message limit
+                input_message_content=InputTextMessageContent(translation[:4096]))
             )
             results.append(InlineQueryResultArticle(
                 ref + "tafsir", title=t("btn_tafsir", ui_lang),
                 description=tafsir[:120],
-                input_message_content=InputTextMessageContent(tafsir))
+                input_message_content=InputTextMessageContent(tafsir[:4096]))
             )
-            audio = _inline_audio_result(surah, ayah, settings.reciter, ui_lang, file)
+            audio = _inline_audio_result(surah, start, end, settings.reciter, ui_lang, file)
             if audio is not None:
                 results.append(audio)
+            results.extend(_inline_photo_results(surah, start, end, ui_lang, file))
         else:
             # Not an ayah reference — try it as a reciter name, so the picker is
             # reachable from any chat without opening a DM with the bot first.
@@ -507,7 +686,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                     # the subfolder keys the id: two entries can share a name (same
                     # reciter at different bitrates) and Telegram rejects duplicates
                     results.append(InlineQueryResultArticle(
-                        "reciter:" + p["subfolder"], title=p["name"],
+                        "reciter:" + p["subfolder"], title=reciter_label(p),
                         description=t("reciter_inline_description", ui_lang),
                         input_message_content=InputTextMessageContent(
                             t("reciter_set", ui_lang).format(reciter=p["name"])),
@@ -564,6 +743,20 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             else:
                 await bot.answer_callback_query(cq.id)
                 await bot.send_message(chat_id=chat_id, text=confirm)
+            return
+
+        if cb_data.startswith("recpage:"):      # the pager on the reciter picker
+            page = int(cb_data.split(":", 1)[1])
+            await bot.answer_callback_query(cq.id)
+            if cq.message is None:
+                return                          # no message of ours to turn the page in
+            try:                                # swap the keyboard, don't post a new list
+                await bot.edit_message_reply_markup(
+                    chat_id=chat_id, message_id=cq.message.message_id,
+                    reply_markup=reciter_keyboard(ui_lang, page, current=reciter))
+            except telegram.error.BadRequest as err:
+                if "not modified" not in str(err).lower():
+                    raise
             return
 
         if cb_data == "reciter_search":         # the search button on the reciter picker
@@ -648,7 +841,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             return
         rows, row = [], []
         for p in matches:
-            row.append(InlineKeyboardButton(p["name"], callback_data="setreciter:" + p["subfolder"]))
+            row.append(InlineKeyboardButton(reciter_label(p),
+                                            callback_data="setreciter:" + p["subfolder"]))
             if len(row) == 2:
                 rows.append(row)
                 row = []
@@ -681,8 +875,10 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                             reply_markup=translation_language_keyboard())
             return
         elif command == "reciter":
+            # open on the page the current reciter is on, with it marked
             await bot.send_message(chat_id=chat_id, text=t("choose_reciter", ui_lang),
-                            reply_markup=reciter_keyboard(ui_lang))
+                            reply_markup=reciter_keyboard(ui_lang, reciter_page_of(reciter),
+                                                          current=reciter))
             return
         elif command == "random":
             surah, ayah = Quran.get_random_ayah()
@@ -733,21 +929,6 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 app = FastAPI()
 bot = None  # created during background init (guarded) so a bad/missing TOKEN can't crash import
 data = None  # populated by background init after corpora finish parsing
-
-
-def _webhook_base_url() -> str | None:
-    """Public HTTPS base URL for the webhook.
-
-    Prefer an explicit WEBHOOK_URL; otherwise fall back to Railway's auto-injected
-    RAILWAY_PUBLIC_DOMAIN (host only, so we prepend https://).
-    """
-    explicit = os.getenv("WEBHOOK_URL")
-    if explicit:
-        return explicit.rstrip("/")
-    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
-    if railway_domain:
-        return "https://" + railway_domain.rstrip("/")
-    return None
 
 
 # Telegram's per-language command menu only accepts two-letter ISO-639-1 codes,
@@ -864,6 +1045,33 @@ async def on_shutdown():
 @app.get("/")
 async def health():
     return {"status": "ok"}
+
+
+@app.get(RANGE_AUDIO_PATH)
+async def range_audio(surah: int, start: int, end: int, reciter: str):
+    """Serve a range of ayahs as one mp3, for Telegram to fetch when someone picks
+    the combined recitation from an inline answer (see `_inline_audio_result`).
+
+    Public by necessity — Telegram cannot authenticate — so every parameter is
+    validated and the range is bounded, leaving nothing here but Qur'an audio the
+    bot would have sent anyway.
+    """
+    if not (Quran.exists(surah, start) and Quran.exists(surah, end)):
+        return Response(status_code=404)
+    if start > end or end - start + 1 > MAX_RANGE_AYAHS:
+        return Response(status_code=404)
+    try:
+        audio = await _download_combined_audio(surah, start, end, reciter)
+    except ValueError:                          # reciter is not in the catalog
+        return Response(status_code=404)
+    except httpx.HTTPError as e:                # the recitation CDN is unreachable
+        print("range_audio: upstream fetch failed:", type(e).__name__, e)
+        return Response(status_code=502)
+    return Response(
+        content=audio.getvalue(), media_type="audio/mpeg",
+        headers={"Content-Disposition": 'inline; filename="%s"' % audio.name,
+                 "Cache-Control": "public, max-age=86400"},
+    )
 
 
 # Keep strong references to in-flight background tasks so they aren't garbage-collected.

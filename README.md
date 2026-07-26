@@ -22,12 +22,19 @@ BismillahBot is a bot on Telegram to explore the Holy Qur'an.
 Use the bot by messaging [Bismillahbot][] on [Telegram][]. For every verse the
 bot has an English translation from [Imam Ahmad Raza][], audio recitation
 by [Shaykh Mahmoud Khalil al-Husary][], and exegesis (tafsir)
-from [Tafsir al-Jalalayn][]. The translation, tafsir and audio recitation are
-available anywhere on Telegram via [inline mode][], just start a text with
-`@BismillahBot` (for example, type `@BismillahBot 1:1` in any chat). Typing a
-reciter's name instead of a reference (`@BismillahBot sudais`) offers to switch
-your recitation. A conversation looks like:
+from [Tafsir al-Jalalayn][]. The translation, tafsir, rendered Arabic ayah and
+audio recitation are all available anywhere on Telegram via [inline mode][], just
+start a text with `@BismillahBot` (for example, type `@BismillahBot 1:1` in any
+chat). A range works too — `@BismillahBot 59:22-24` covers all three ayahs, with
+the recitation stitched into a single audio file — as does typing a reciter's name
+instead of a reference (`@BismillahBot sudais`), which offers to switch your
+recitation. A conversation looks like:
 ![example]
+
+Pick your reciter with `/reciter`: the picker pages through the whole ~80-entry
+catalog with Previous/Next, shows each recording's bitrate so you can weigh audio
+quality against how much storage it costs, and has a search button for jumping
+straight to a name (`sudais 192` narrows to one entry).
 
 Also see [AudioQuranBot][], a bot that sends audio files of complete surahs.
 
@@ -105,7 +112,7 @@ cp .env.example .env
 | `REDIS_HOST_URL` | Redis URL for user state + the media file-id cache (falls back to an in-memory store if unset) |
 | `AUDIO_BASE_URL` | Base URL of the recitation mp3s (e.g. an everyayah.com mirror/CDN)  |
 | `PHOTO_BASE_URL` | Base URL of the Arabic ayah images                                 |
-| `WEBHOOK_URL`    | Public HTTPS base URL Telegram POSTs updates to; the webhook is registered as `WEBHOOK_URL` + `/webhook/` + `TOKEN` |
+| `WEBHOOK_URL`    | Public HTTPS base URL Telegram POSTs updates to; the webhook is registered as `WEBHOOK_URL` + `/webhook/` + `TOKEN`. Also where Telegram fetches stitched range recitations from (`/media/range.mp3`), so inline range audio is only offered when it is set |
 
 Media (audio + images) is fetched from the configured CDN base URLs at runtime,
 so no local media download is required. The Qur'an text corpora that ship in the
