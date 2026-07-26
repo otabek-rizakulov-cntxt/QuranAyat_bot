@@ -97,12 +97,26 @@ sequenceDiagram
 
 ### Routing rules (in `serve`)
 
-1. **Inline query** → for a valid `surah:ayah`, answer with the translation, the
-   tafsir and the recitation in the caller's own reciter (an audio result
-   Telegram fetches from `AUDIO_BASE_URL`, so nothing is uploaded); for anything
-   else, a reciter-name search, falling back to a curated set of default ayahs.
-   Both branches are `is_personal` and short-cached — every result is rendered
-   from the caller's settings and must not be served from a shared cache.
+1. **Inline query** → for a valid reference, answer with all four
+   representations: translation, tafsir, recitation, and the rendered Arabic
+   image(s). A **range** (`59:22-24`) is answered as a range in every one of them
+   — joined text, and a single stitched audio file, not just the first ayah. For
+   anything else, a reciter-name search, falling back to a curated set of default
+   ayahs. Both branches are `is_personal` and short-cached — every result is
+   rendered from the caller's settings and must not be served from a shared cache.
+
+   Inline results can only carry a `file_id` or a URL Telegram fetches itself,
+   never an upload, which decides where each medium comes from:
+
+   | Result           | Source                                                        |
+   | ---------------- | ------------------------------------------------------------- |
+   | Single-ayah audio | `AUDIO_BASE_URL` directly — already a public URL              |
+   | Range audio      | the cached `file_id` from an in-chat send, else `/media/range.mp3` on this app, which stitches on demand |
+   | Arabic image     | the cached `file_id` from an in-chat send, else `PHOTO_BASE_URL` (the renders are PNG and the Bot API documents inline photo URLs as JPEG, so the cached path is the dependable one) |
+
+   Each is dropped from the answer rather than offered broken when its source is
+   unavailable (reciter gone from the catalog, base URL pointing at a local path,
+   range past `MAX_RANGE_AYAHS`).
 2. **Non-text / group chats** (`chat_id < 0`) → ignored.
 3. **`/command`** → `start`/`help`, `about`, `index`, `random`.
 4. **Keyboard type words** (`english`/`tafsir`/`audio`/`arabic`) → resend the
@@ -110,10 +124,14 @@ sequenceDiagram
 5. **`next`/`previous`/`random`** → move position, then resend in current type.
 6. **`surah:ayah` reference** → validate & send as an inline **verse card** (the
    verse plus an inline keyboard attached to the message).
-7. **Callback tap** (`vc:`/`vr:`/`showlang`/`setlang:`) → for the text views, edit
+7. **Callback tap** (`vc:`/`vr:`/`showlang`/`setlang:`/`setreciter:`/`recpage:`) →
+   for the text views, edit
    the verse card **in place** (`editMessageText`) so navigation doesn't post a new
    message; media views (arabic/audio) and text↔media switches send a fresh card.
-   `showlang` opens the language picker; `setlang:` stores the choice. The old
+   `showlang` opens the language picker; `setlang:` stores the choice. `recpage:`
+   turns a page of the reciter picker by swapping only its keyboard
+   (`editMessageReplyMarkup`), so paging the ~80-entry catalog never posts a new
+   list. Pages wrap, so neither arrow is ever dead. The old
    persistent reply keyboard is retired (typed type-words in rule 4 still work as a
    fallback for anyone who still has it).
 
@@ -142,13 +160,16 @@ stateDiagram-v2
 
 Two independent Redis-backed caches:
 
-| Cache          | Key                      | Value                   | TTL    |
-| -------------- | ------------------------ | ----------------------- | ------ |
-| User state     | `{chat_id}`              | `[surah, ayah, type]`   | 2 days |
-| Media file-ids | `file:{path-or-url}`     | Telegram `file_id`      | 2 days |
+| Cache          | Key                                    | Value                   | TTL    |
+| -------------- | -------------------------------------- | ----------------------- | ------ |
+| User state     | `{chat_id}`                            | `[surah, ayah, type]`   | 2 days |
+| Media file-ids | `file:{path-or-url}`                   | Telegram `file_id`      | 2 days |
+| Stitched range | `file:combined:{s}:{a}-{b}:{reciter}`  | Telegram `file_id`      | 2 days |
 
 The media cache avoids re-uploading the same photo/audio: after the first send,
-Telegram returns a reusable `file_id` that later sends reference directly.
+Telegram returns a reusable `file_id` that later sends reference directly. Both
+caches are read by the inline path too (see routing rule 1), which is how a range
+already sent in a chat is replayed inline without being stitched again.
 
 ---
 
