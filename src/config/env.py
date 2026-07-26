@@ -9,6 +9,7 @@ class Environment:
     variables = {
       "token": os.getenv("TOKEN"),
       "redis": os.getenv("REDIS_HOST_URL"),
+      "database_url": os.getenv("DATABASE_URL"),
       "audio_base_url": os.getenv("AUDIO_BASE_URL"),
       "quranic_images_file_path": os.getenv("PHOTO_BASE_URL"),
     }

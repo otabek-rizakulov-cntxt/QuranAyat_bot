@@ -26,20 +26,35 @@ class File(Environment):
     return None
 
   def _lang_key(self, chat_id: int) -> str:
+    """Legacy single-value language key, kept only as a migration-on-read source
+    for lib.user_settings.UserSettings (which now holds ui_lang/translation_lang
+    durably in Postgres). New code should not write this key."""
     return self.redis_namespace + "lang:" + str(chat_id)
 
-  def save_lang(self, chat_id: int, code: str):
-    """Persist the user's UI/translation language.
-
-    Stored separately from navigation state and without an expiry, because a
-    language choice is a durable preference while (surah, ayah, type) resets
-    after two days.
-    """
-    self.redis.set(self._lang_key(chat_id), code)
-
   def get_lang(self, chat_id: int):
-    """Return the user's saved language code, or None if they haven't chosen one."""
+    """Return the user's legacy saved language code, or None. Migration-only."""
     return self.redis.get(self._lang_key(chat_id))
+
+  def delete_lang(self, chat_id: int):
+    """Remove the legacy language key once it has been migrated into Postgres."""
+    self.redis.delete(self._lang_key(chat_id))
+
+  def _awaiting_key(self, chat_id: int) -> str:
+    return self.redis_namespace + "awaiting:" + str(chat_id)
+
+  def set_awaiting_input(self, chat_id: int, kind: str):
+    """Flag that the next free-text message from `chat_id` should be interpreted
+    as input for `kind` (e.g. "reciter_search") rather than an ayah reference.
+    Short TTL: this is a live single-turn interaction, not a durable setting."""
+    self.redis.set(self._awaiting_key(chat_id), kind, ex=120)
+
+  def pop_awaiting_input(self, chat_id: int) -> Optional[str]:
+    """Return and clear the pending awaited-input kind for `chat_id`, or None."""
+    key = self._awaiting_key(chat_id)
+    kind = self.redis.get(key)
+    if kind is not None:
+      self.redis.delete(key)
+    return kind
 
   def save_file(self, filename: str, file_id: str):
     """Cache the Telegram file_id for a media file so we can skip re-uploading."""
@@ -75,6 +90,25 @@ class File(Environment):
       s=str(surah).zfill(3),
       a=str(ayah).zfill(3),
     )
+
+  @classmethod
+  def get_performer_name(cls, subfolder: str) -> str:
+    """Human-readable display name for a performer, falling back to Husary's
+    name if `subfolder` is unknown (e.g. a stale saved preference)."""
+    performers = cls._load_performers()
+    match = next((p for p in performers if p["subfolder"] == subfolder), None)
+    if match is None:
+      match = next(p for p in performers if p["subfolder"] == "Husary_128kbps")
+    return match["name"]
+
+  @classmethod
+  def search_performers(cls, query: str, limit: int = 8) -> list:
+    """Case-insensitive substring search over performer names, for the reciter
+    search flow. Returns up to `limit` matches, in catalog order."""
+    q = query.strip().lower()
+    if not q:
+      return []
+    return [p for p in cls._load_performers() if q in p["name"].lower()][:limit]
 
   def get_image_filename(self, s: int, a: int) -> str:
     return self.get_env("quranic_images_file_path") + "/" + str(s) + "_" + str(a) + ".png"

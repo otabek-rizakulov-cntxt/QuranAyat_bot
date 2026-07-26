@@ -34,13 +34,6 @@ class TestStateStore:
     def test_missing_user_state_is_none(self):
         assert File().get_user(900002) is None
 
-    def test_language_round_trips(self):
-        File().save_lang(900003, "ru")
-        assert File().get_lang(900003) == "ru"
-
-    def test_missing_language_is_none(self):
-        assert File().get_lang(900004) is None
-
     def test_file_id_cache_round_trips(self):
         File().save_file("media/x.png", "FILEID-123")
         assert File().get_file("media/x.png") == "FILEID-123"
@@ -48,3 +41,24 @@ class TestStateStore:
     def test_empty_file_id_is_not_cached(self):
         File().save_file("media/y.png", "")
         assert File().get_file("media/y.png") is None
+
+
+class TestLegacyLanguageKey:
+    """Language preferences now live in Postgres (see tests/test_user_settings.py);
+    `File.save_lang` is gone. What survives here is the migration-on-read half of
+    the old key: read whatever an older bot version wrote, then drop it once
+    `UserSettings` has absorbed it."""
+
+    def test_legacy_language_is_readable_then_deletable(self):
+        file = File()
+        file.redis.set(file._lang_key(900003), "ru")   # as the retired save_lang wrote it
+        assert file.get_lang(900003) == "ru"
+        file.delete_lang(900003)
+        assert file.get_lang(900003) is None
+
+    def test_missing_language_is_none(self):
+        assert File().get_lang(900004) is None
+
+    def test_deleting_an_absent_language_is_a_no_op(self):
+        File().delete_lang(900005)   # migration runs unconditionally; must not raise
+        assert File().get_lang(900005) is None
