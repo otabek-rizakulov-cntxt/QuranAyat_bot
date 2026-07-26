@@ -103,12 +103,23 @@ class File(Environment):
 
   @classmethod
   def search_performers(cls, query: str, limit: int = 8) -> list:
-    """Case-insensitive substring search over performer names, for the reciter
-    search flow. Returns up to `limit` matches, in catalog order."""
-    q = query.strip().lower()
-    if not q:
+    """Case-insensitive search over performer names, for the reciter search flow.
+
+    Every whitespace-separated term must appear in the name or the bitrate, so
+    "sudais 192" narrows to the one entry at that quality instead of listing
+    every Sudais recording. Returns up to `limit` matches, in catalog order.
+    """
+    terms = query.strip().lower().split()
+    if not terms:
       return []
-    return [p for p in cls._load_performers() if q in p["name"].lower()][:limit]
+    matches = []
+    for p in cls._load_performers():
+      haystack = (p["name"] + " " + p.get("bitrate", "")).lower()
+      if all(term in haystack for term in terms):
+        matches.append(p)
+        if len(matches) == limit:
+          break
+    return matches
 
   def get_image_filename(self, s: int, a: int) -> str:
     return self.get_env("quranic_images_file_path") + "/" + str(s) + "_" + str(a) + ".png"

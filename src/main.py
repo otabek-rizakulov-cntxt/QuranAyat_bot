@@ -297,9 +297,18 @@ def translation_language_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(rows)
 
 
-# A curated shortlist of well-known reciters (subfolder keys into performers.json),
-# shown by default instead of the full ~80-entry catalog. The full catalog stays
-# reachable via the search button.
+def _nav_labels(ui_lang: str) -> tuple[str, str]:
+    """(previous, next) button labels. The arrows point in reading order, so they
+    flip for right-to-left scripts."""
+    prev, nxt = t("btn_previous", ui_lang), t("btn_next", ui_lang)
+    if get_language(ui_lang).rtl:
+        return prev + " ›", "‹ " + nxt
+    return "‹ " + prev, nxt + " ›"
+
+
+# A curated shortlist of well-known reciters (subfolder keys into performers.json).
+# These lead the catalog, so the first page of the picker is the ten names most
+# people are looking for and the pager walks through everything else.
 _RECITER_SHORTLIST = (
     "Husary_128kbps",
     "Alafasy_128kbps",
@@ -314,21 +323,77 @@ _RECITER_SHORTLIST = (
 )
 
 
-def reciter_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    """Curated reciter shortlist, two per row, plus a search button for the full
-    catalog in src/common/performers.json."""
-    performers = {p["subfolder"]: p["name"] for p in File._load_performers()}
+# How many reciters one page of the picker shows. Equal to the shortlist length, so
+# page 1 is exactly the shortlist.
+RECITER_PAGE_SIZE = 10
+
+
+def reciter_catalog() -> list:
+    """Every reciter in src/common/performers.json, shortlist first then the rest in
+    catalog order — the order the picker pages through."""
+    performers = File._load_performers()
+    by_subfolder = {p["subfolder"]: p for p in performers}
+    # a shortlist entry the catalog no longer has is skipped, not fatal
+    ordered = [by_subfolder[s] for s in _RECITER_SHORTLIST if s in by_subfolder]
+    shortlisted = set(_RECITER_SHORTLIST)
+    ordered.extend(p for p in performers if p["subfolder"] not in shortlisted)
+    return ordered
+
+
+def reciter_label(performer: dict) -> str:
+    """Button label for a reciter: name plus bitrate.
+
+    The bitrate is what tells two entries of the same reciter apart, and it is
+    also how much phone storage a recitation will cost — so it belongs on the
+    button, not one tap away.
+    """
+    bitrate = performer.get("bitrate", "").replace("Kbps", "kbps")
+    if not bitrate:
+        return performer["name"]
+    return "%s · %s" % (performer["name"], bitrate)
+
+
+def reciter_page_count() -> int:
+    return max(1, -(-len(reciter_catalog()) // RECITER_PAGE_SIZE))
+
+
+def reciter_page_of(subfolder: str) -> int:
+    """The page holding `subfolder`, so /reciter opens where the user already is."""
+    for i, p in enumerate(reciter_catalog()):
+        if p["subfolder"] == subfolder:
+            return i // RECITER_PAGE_SIZE
+    return 0
+
+
+def reciter_keyboard(ui_lang: str, page: int = 0, current: str | None = None) -> InlineKeyboardMarkup:
+    """One page of the reciter catalog, two per row, under a Previous / n-of-m /
+    Next pager and a search button.
+
+    The catalog is ~80 entries, so it is paged rather than dumped in one keyboard:
+    the pager walks the whole list, the search button jumps straight to a name.
+    Pages wrap, so neither arrow is ever a dead button. `current` is marked with a
+    dot, the same way the verse card marks the active view.
+    """
+    catalog = reciter_catalog()
+    pages = reciter_page_count()
+    page %= pages
     rows, row = [], []
-    for subfolder in _RECITER_SHORTLIST:
-        name = performers.get(subfolder)
-        if name is None:
-            continue  # tolerate the catalog changing without crashing the picker
-        row.append(InlineKeyboardButton(name, callback_data="setreciter:" + subfolder))
+    for p in catalog[page * RECITER_PAGE_SIZE:(page + 1) * RECITER_PAGE_SIZE]:
+        label = reciter_label(p)
+        if p["subfolder"] == current:
+            label = "• " + label
+        row.append(InlineKeyboardButton(label, callback_data="setreciter:" + p["subfolder"]))
         if len(row) == 2:
             rows.append(row)
             row = []
     if row:
         rows.append(row)
+    prev_label, next_label = _nav_labels(ui_lang)
+    rows.append([
+        InlineKeyboardButton(prev_label, callback_data="recpage:%d" % ((page - 1) % pages)),
+        InlineKeyboardButton("%d/%d" % (page + 1, pages), callback_data="recpage_noop"),
+        InlineKeyboardButton(next_label, callback_data="recpage:%d" % ((page + 1) % pages)),
+    ])
     rows.append([InlineKeyboardButton("🔍 " + t("btn_search_reciter", ui_lang),
                                        callback_data="reciter_search")])
     return InlineKeyboardMarkup(rows)
@@ -375,12 +440,8 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
     code = CODE_BY_TYPE[quran_type]
     prev_s, prev_a = Quran.get_previous_ayah(surah, ayah)
     next_s, next_a = Quran.get_next_ayah(surah, ayah)
-    prev, nxt, rnd = t("btn_previous", ui_lang), t("btn_next", ui_lang), t("btn_random", ui_lang)
-    # Arrows point in reading order, so they flip for right-to-left scripts.
-    if get_language(ui_lang).rtl:
-        prev_label, next_label = prev + " ›", "‹ " + nxt
-    else:
-        prev_label, next_label = "‹ " + prev, nxt + " ›"
+    rnd = t("btn_random", ui_lang)
+    prev_label, next_label = _nav_labels(ui_lang)
 
     return InlineKeyboardMarkup([
         [mode_button(*mode) for mode in _MODES],
@@ -507,7 +568,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                     # the subfolder keys the id: two entries can share a name (same
                     # reciter at different bitrates) and Telegram rejects duplicates
                     results.append(InlineQueryResultArticle(
-                        "reciter:" + p["subfolder"], title=p["name"],
+                        "reciter:" + p["subfolder"], title=reciter_label(p),
                         description=t("reciter_inline_description", ui_lang),
                         input_message_content=InputTextMessageContent(
                             t("reciter_set", ui_lang).format(reciter=p["name"])),
@@ -564,6 +625,20 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             else:
                 await bot.answer_callback_query(cq.id)
                 await bot.send_message(chat_id=chat_id, text=confirm)
+            return
+
+        if cb_data.startswith("recpage:"):      # the pager on the reciter picker
+            page = int(cb_data.split(":", 1)[1])
+            await bot.answer_callback_query(cq.id)
+            if cq.message is None:
+                return                          # no message of ours to turn the page in
+            try:                                # swap the keyboard, don't post a new list
+                await bot.edit_message_reply_markup(
+                    chat_id=chat_id, message_id=cq.message.message_id,
+                    reply_markup=reciter_keyboard(ui_lang, page, current=reciter))
+            except telegram.error.BadRequest as err:
+                if "not modified" not in str(err).lower():
+                    raise
             return
 
         if cb_data == "reciter_search":         # the search button on the reciter picker
@@ -648,7 +723,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             return
         rows, row = [], []
         for p in matches:
-            row.append(InlineKeyboardButton(p["name"], callback_data="setreciter:" + p["subfolder"]))
+            row.append(InlineKeyboardButton(reciter_label(p),
+                                            callback_data="setreciter:" + p["subfolder"]))
             if len(row) == 2:
                 rows.append(row)
                 row = []
@@ -681,8 +757,10 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                             reply_markup=translation_language_keyboard())
             return
         elif command == "reciter":
+            # open on the page the current reciter is on, with it marked
             await bot.send_message(chat_id=chat_id, text=t("choose_reciter", ui_lang),
-                            reply_markup=reciter_keyboard(ui_lang))
+                            reply_markup=reciter_keyboard(ui_lang, reciter_page_of(reciter),
+                                                          current=reciter))
             return
         elif command == "random":
             surah, ayah = Quran.get_random_ayah()
