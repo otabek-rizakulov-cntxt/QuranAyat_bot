@@ -31,6 +31,9 @@ os.environ["REDIS_HOST_URL"] = ""          # -> in-memory store, no network
 os.environ["DATABASE_URL"] = ""            # -> in-memory settings store, no network
 os.environ["AUDIO_BASE_URL"] = "https://cdn.test/audio"
 os.environ["PHOTO_BASE_URL"] = "https://cdn.test/images"
+# Pinned empty so the local .env's real public URL can't leak in: it decides whether
+# inline range recitations are offered, and tests that want it set it themselves.
+os.environ["WEBHOOK_URL"] = ""
 
 import asyncio
 
