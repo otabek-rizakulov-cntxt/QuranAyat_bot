@@ -1,16 +1,14 @@
 # Malay — Bahasa Melayu
 
 strings = {
-    "welcome": (
+    "welcome_intro": (
         "Hantarkan nombor surah dan ayat, contohnya <b>2:255</b>, dan saya akan "
         "menghantar ayat itu daripada al-Qur'an.\n\n"
-        "Anda juga boleh menghantar julat seperti <b>59:22-24</b> untuk bacaan "
-        "audio bergabung.\n\n"
-        "Arahan:\n"
-        "/index — senarai semua surah\n"
-        "/random — ayat rawak\n"
-        "/language — tukar bahasa\n"
-        "/about — sumber dan penghargaan\n\n"
+        "Anda juga boleh menghantar julat seperti <b>59:22-24</b> untuk bacaan audio "
+        "bergabung."
+    ),
+    "welcome_commands_header": "Arahan:",
+    "welcome_inline": (
         "Anda boleh menggunakan saya dalam mana-mana perbualan: taip "
         "<b>@QuranAyat_bot</b> diikuti rujukan ayat."
     ),

@@ -1,18 +1,16 @@
 # Swahili — Kiswahili
 
 strings = {
-    "welcome": (
-        "Nitumie namba ya sura na aya, kwa mfano <b>2:255</b>, nami nitakutumia "
-        "aya hiyo ya Qur'ani Tukufu.\n\n"
+    "welcome_intro": (
+        "Nitumie namba ya sura na aya, kwa mfano <b>2:255</b>, nami nitakutumia aya hiyo "
+        "ya Qur'ani Tukufu.\n\n"
         "Unaweza pia kutuma kipenyo kama <b>59:22-24</b> kupata usomaji wa sauti "
-        "ulioungwa.\n\n"
-        "Amri:\n"
-        "/index — orodha ya sura zote\n"
-        "/random — aya ya bahati nasibu\n"
-        "/language — badilisha lugha\n"
-        "/about — vyanzo na shukrani\n\n"
-        "Unaweza kunitumia katika gumzo lolote: andika <b>@QuranAyat_bot</b> "
-        "kisha namba ya aya."
+        "ulioungwa."
+    ),
+    "welcome_commands_header": "Amri:",
+    "welcome_inline": (
+        "Unaweza kunitumia katika gumzo lolote: andika <b>@QuranAyat_bot</b> kisha namba "
+        "ya aya."
     ),
     "about": (
         "Boti hii inakuwezesha kusoma Qur'ani Tukufu kwenye Telegram katika "

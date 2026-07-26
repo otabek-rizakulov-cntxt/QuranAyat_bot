@@ -57,8 +57,8 @@ from lib.user_settings import UserSettings
 from config import Environment
 from config.postgres import get_pool, close_pool
 from locales import (
-    LANGUAGES, DEFAULT_LANG,
-    t, button_action, normalize_lang, get_language,
+    LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
+    t, button_action, normalize_lang, get_language, welcome_text,
 )
 
 
@@ -857,7 +857,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         if command in ("start", "help"):
             # ReplyKeyboardRemove clears the old persistent keyboard for anyone
             # upgrading from the pre-inline UI; new users never see one.
-            await bot.send_message(chat_id=chat_id, text=t("welcome", ui_lang),
+            await bot.send_message(chat_id=chat_id, text=welcome_text(ui_lang),
                             parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
             return
         elif command == "about":
@@ -940,14 +940,8 @@ _COMMAND_MENU_LANGS = tuple(lang.code for lang in LANGUAGES
 
 
 def _commands_for(lang: str) -> list:
-    return [
-        BotCommand("index", t("cmd_index", lang)),
-        BotCommand("random", t("cmd_random", lang)),
-        BotCommand("language", t("cmd_language", lang)),
-        BotCommand("translation", t("cmd_translation", lang)),
-        BotCommand("reciter", t("cmd_reciter", lang)),
-        BotCommand("about", t("cmd_about", lang)),
-    ]
+    # Same source of truth as the /start message's command list (see BOT_COMMANDS).
+    return [BotCommand(command, t(key, lang)) for command, key in BOT_COMMANDS]
 
 
 async def _set_bot_commands(bot) -> None:

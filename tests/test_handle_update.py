@@ -68,7 +68,7 @@ def _callback(tg_bot, cb_data, chat_id=555000, update_id=2):
 async def test_start_sends_welcome(fake_bot, data, tg_bot):
     await main.handle_update(fake_bot, data, _message(tg_bot, "/start", chat_id=555001))
     fake_bot.send_message.assert_awaited()
-    assert fake_bot.send_message.await_args.kwargs["text"] == main.t("welcome", "en")
+    assert fake_bot.send_message.await_args.kwargs["text"] == main.welcome_text("en")
 
 
 async def test_about_uses_html(fake_bot, data, tg_bot):

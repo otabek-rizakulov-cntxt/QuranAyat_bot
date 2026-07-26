@@ -1,16 +1,15 @@
 # Uzbek (Latin) — Oʻzbekcha (Lotin)
 
 strings = {
-    "welcome": (
-        "Menga sura va oyat raqamini yuboring, masalan <b>2:255</b>, men esa "
-        "sizga Qur'oni Karimdan oʻsha oyatni yuboraman.\n\n"
-        "<b>59:22-24</b> kabi oraliq yuborsangiz, birlashtirilgan audio tilovatni olasiz.\n\n"
-        "Buyruqlar:\n"
-        "/index — barcha suralar roʻyxati\n"
-        "/random — tasodifiy oyat\n"
-        "/language — tilni oʻzgartirish\n"
-        "/about — manbalar va minnatdorchilik\n\n"
-        "Meni istalgan chatda ishlatishingiz mumkin: <b>@QuranAyat_bot</b> deb yozib, soʻng havolani kiriting."
+    "welcome_intro": (
+        "Menga sura va oyat raqamini yuboring, masalan <b>2:255</b>, men esa sizga "
+        "Qur'oni Karimdan oʻsha oyatni yuboraman.\n\n"
+        "<b>59:22-24</b> kabi oraliq yuborsangiz, birlashtirilgan audio tilovatni olasiz."
+    ),
+    "welcome_commands_header": "Buyruqlar:",
+    "welcome_inline": (
+        "Meni istalgan chatda ishlatishingiz mumkin: <b>@QuranAyat_bot</b> deb yozib, "
+        "soʻng havolani kiriting."
     ),
     "about": (
         "Bu bot Qur'oni Karimni Telegramda koʻplab tillarda oʻqish imkonini beradi.\n\n"

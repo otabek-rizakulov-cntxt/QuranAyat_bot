@@ -1,16 +1,16 @@
 # Azerbaijani — Azərbaycan
 
 strings = {
-    "welcome": (
+    "welcome_intro": (
         "Mənə surə və ayə nömrəsini göndərin, məsələn <b>2:255</b>, mən də sizə "
         "Qurani-Kərimdən həmin ayəni göndərim.\n\n"
-        "<b>59:22-24</b> kimi bir aralıq göndərsəniz, birləşdirilmiş audio tilavət alacaqsınız.\n\n"
-        "Əmrlər:\n"
-        "/index — bütün surələrin siyahısı\n"
-        "/random — təsadüfi ayə\n"
-        "/language — dili dəyiş\n"
-        "/about — mənbələr və təşəkkürlər\n\n"
-        "Məni istənilən söhbətdə istifadə edə bilərsiniz: <b>@QuranAyat_bot</b> yazın və sonra istinad daxil edin."
+        "<b>59:22-24</b> kimi bir aralıq göndərsəniz, birləşdirilmiş audio tilavət "
+        "alacaqsınız."
+    ),
+    "welcome_commands_header": "Əmrlər:",
+    "welcome_inline": (
+        "Məni istənilən söhbətdə istifadə edə bilərsiniz: <b>@QuranAyat_bot</b> yazın və "
+        "sonra istinad daxil edin."
     ),
     "about": (
         "Bu bot Qurani-Kərimi Telegram-da bir çox dildə oxumağa imkan verir.\n\n"

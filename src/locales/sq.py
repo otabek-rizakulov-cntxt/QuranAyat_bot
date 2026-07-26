@@ -1,18 +1,16 @@
 # Albanian — Shqip
 
 strings = {
-    "welcome": (
-        "Më dërgo numrin e sures dhe të ajetit, për shembull <b>2:255</b>, dhe "
-        "unë do të të dërgoj atë ajet nga Kurani Famëlartë.\n\n"
-        "Mund të dërgosh edhe një interval si <b>59:22-24</b> për një recitim "
-        "audio të bashkuar.\n\n"
-        "Komandat:\n"
-        "/index — lista e të gjitha sureve\n"
-        "/random — një ajet i rastësishëm\n"
-        "/language — ndrysho gjuhën\n"
-        "/about — burimet dhe falënderimet\n\n"
-        "Mund të më përdorësh në çdo bisedë: shkruaj <b>@QuranAyat_bot</b> e më "
-        "pas referencën."
+    "welcome_intro": (
+        "Më dërgo numrin e sures dhe të ajetit, për shembull <b>2:255</b>, dhe unë do të "
+        "të dërgoj atë ajet nga Kurani Famëlartë.\n\n"
+        "Mund të dërgosh edhe një interval si <b>59:22-24</b> për një recitim audio të "
+        "bashkuar."
+    ),
+    "welcome_commands_header": "Komandat:",
+    "welcome_inline": (
+        "Mund të më përdorësh në çdo bisedë: shkruaj <b>@QuranAyat_bot</b> e më pas "
+        "referencën."
     ),
     "about": (
         "Ky bot të mundëson të lexosh Kuranin Famëlartë në Telegram në shumë "

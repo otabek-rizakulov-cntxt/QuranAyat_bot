@@ -2,18 +2,15 @@
 # per-key, so this table must define every key the bot uses.
 
 strings = {
-    "welcome": (
-        "Send me a surah and ayah number, for example <b>2:255</b>, and I'll "
-        "reply with that verse of the Holy Qur'an.\n\n"
-        "You can also send a range like <b>59:22-24</b> for a combined audio recitation.\n\n"
-        "Commands:\n"
-        "/index — list all surahs\n"
-        "/random — a random verse\n"
-        "/language — change UI language\n"
-        "/translation — change translation language\n"
-        "/reciter — change the reciter\n"
-        "/about — sources & credits\n\n"
-        "You can use me inline in any chat: type <b>@QuranAyat_bot</b> followed by a reference."
+    "welcome_intro": (
+        "Send me a surah and ayah number, for example <b>2:255</b>, and I'll reply with "
+        "that verse of the Holy Qur'an.\n\n"
+        "You can also send a range like <b>59:22-24</b> for a combined audio recitation."
+    ),
+    "welcome_commands_header": "Commands:",
+    "welcome_inline": (
+        "You can use me inline in any chat: type <b>@QuranAyat_bot</b> followed by a "
+        "reference."
     ),
     "about": (
         "This bot lets you explore the Holy Qur'an on Telegram in many languages.\n\n"

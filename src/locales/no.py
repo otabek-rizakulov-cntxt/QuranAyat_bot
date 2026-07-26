@@ -1,18 +1,16 @@
 # Norwegian — Norsk
 
 strings = {
-    "welcome": (
-        "Send meg et sura- og versnummer, for eksempel <b>2:255</b>, og jeg "
-        "sender deg det verset fra den hellige Koranen.\n\n"
+    "welcome_intro": (
+        "Send meg et sura- og versnummer, for eksempel <b>2:255</b>, og jeg sender deg "
+        "det verset fra den hellige Koranen.\n\n"
         "Du kan også sende et intervall som <b>59:22-24</b> for en sammensatt "
-        "lydresitasjon.\n\n"
-        "Kommandoer:\n"
-        "/index — liste over alle suraer\n"
-        "/random — et tilfeldig vers\n"
-        "/language — bytt språk\n"
-        "/about — kilder og takk\n\n"
-        "Du kan bruke meg i alle chatter: skriv <b>@QuranAyat_bot</b> etterfulgt "
-        "av en henvisning."
+        "lydresitasjon."
+    ),
+    "welcome_commands_header": "Kommandoer:",
+    "welcome_inline": (
+        "Du kan bruke meg i alle chatter: skriv <b>@QuranAyat_bot</b> etterfulgt av en "
+        "henvisning."
     ),
     "about": (
         "Med denne boten kan du lese den hellige Koranen på Telegram på mange "

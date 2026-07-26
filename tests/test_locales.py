@@ -10,6 +10,7 @@ import pytest
 
 from locales import (
     ACTION_BUTTON_KEYS,
+    BOT_COMMANDS,
     DEFAULT_LANG,
     LANGUAGES,
     LOCALES,
@@ -21,6 +22,7 @@ from locales import (
     missing_locales,
     normalize_lang,
     t,
+    welcome_text,
 )
 
 _PLACEHOLDER = re.compile(r"\{(\w+)\}")
@@ -67,17 +69,30 @@ class TestLocaleIntegrity:
 
     def test_html_tags_balanced(self, code):
         table = LOCALES[code]
-        for key in ("welcome", "about"):
+        for key in ("welcome_intro", "welcome_inline", "about"):
             value = table.get(key, "")
             assert value.count("<b>") == value.count("</b>"), key
+
+    def test_start_advertises_every_command(self, code):
+        message = welcome_text(code)
+        for command, key in BOT_COMMANDS:
+            assert "/%s — %s" % (command, t(key, code)) in message, command
+
+
+class TestWelcomeText:
+    def test_command_list_is_localized(self):
+        assert t("cmd_index", "ru") in welcome_text("ru")
+
+    def test_unknown_language_falls_back_to_english(self):
+        assert welcome_text("zz") == welcome_text("en")
 
 
 class TestTranslate:
     def test_returns_localized_string(self):
-        assert t("welcome", "en")
+        assert t("welcome_intro", "en")
 
     def test_falls_back_to_english_for_unknown_language(self):
-        assert t("welcome", "zz") == t("welcome", "en")
+        assert t("welcome_intro", "zz") == t("welcome_intro", "en")
 
     def test_unknown_key_returns_the_key_itself(self):
         assert t("no_such_key_xyz", "en") == "no_such_key_xyz"

@@ -1,18 +1,16 @@
 # Hausa — Hausa
 
 strings = {
-    "welcome": (
-        "Aiko mini lambar sura da aya, misali <b>2:255</b>, sai in aiko maka da "
-        "wannan ayar ta Alkur'ani mai girma.\n\n"
-        "Har ila yau kana iya aiko da zango kamar <b>59:22-24</b> don samun "
-        "karatun murya guda ɗaya.\n\n"
-        "Umarni:\n"
-        "/index — jerin dukkan surori\n"
-        "/random — aya bazuwar\n"
-        "/language — canza harshe\n"
-        "/about — maɓuɓɓugai da godiya\n\n"
-        "Za ka iya amfani da ni a kowace tattaunawa: rubuta "
-        "<b>@QuranAyat_bot</b> sannan ka sa lambar aya."
+    "welcome_intro": (
+        "Aiko mini lambar sura da aya, misali <b>2:255</b>, sai in aiko maka da wannan "
+        "ayar ta Alkur'ani mai girma.\n\n"
+        "Har ila yau kana iya aiko da zango kamar <b>59:22-24</b> don samun karatun murya "
+        "guda ɗaya."
+    ),
+    "welcome_commands_header": "Umarni:",
+    "welcome_inline": (
+        "Za ka iya amfani da ni a kowace tattaunawa: rubuta <b>@QuranAyat_bot</b> sannan "
+        "ka sa lambar aya."
     ),
     "about": (
         "Wannan bot yana ba ka damar karanta Alkur'ani mai girma a Telegram da "

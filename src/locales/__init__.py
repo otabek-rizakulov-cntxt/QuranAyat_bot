@@ -62,6 +62,37 @@ def t(key: str, lang: str = DEFAULT_LANG) -> str:
     return LOCALES[DEFAULT_LANG].get(key, key)
 
 
+# --- Commands ------------------------------------------------------------------
+# The bot's slash commands in menu order, each paired with its description key.
+# Both the Telegram command menu and the /start message are generated from this
+# one list, so a command added here shows up in every language at once — locales
+# only translate the descriptions, never the list itself.
+
+BOT_COMMANDS = (
+    ("index", "cmd_index"),
+    ("random", "cmd_random"),
+    ("language", "cmd_language"),
+    ("translation", "cmd_translation"),
+    ("reciter", "cmd_reciter"),
+    ("about", "cmd_about"),
+)
+
+
+def command_lines(lang: str) -> str:
+    """The "/command — description" block, one line per registered command."""
+    return "\n".join("/%s — %s" % (command, t(key, lang))
+                     for command, key in BOT_COMMANDS)
+
+
+def welcome_text(lang: str) -> str:
+    """The /start message: localized prose around a generated command list."""
+    return "\n\n".join((
+        t("welcome_intro", lang),
+        t("welcome_commands_header", lang) + "\n" + command_lines(lang),
+        t("welcome_inline", lang),
+    ))
+
+
 # --- Reply-keyboard localization -----------------------------------------------
 # The reply keyboard shows localized labels, but taps arrive as plain text. We map
 # each incoming label back to a canonical action so navigation stays intact whatever
