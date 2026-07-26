@@ -169,6 +169,85 @@ class TestRangeAudio:
         assert audio.audio_url == "https://cdn.test/audio/Husary_128kbps/002255.mp3"
 
 
+class TestInlineArabicImage:
+
+    async def test_single_ayah_offers_its_rendered_image(self, fake_bot, data, tg_bot):
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "2:255", user_id=557020))
+        photos = _of_type(fake_bot, telegram.InlineQueryResultPhoto)
+        assert len(photos) == 1
+        assert photos[0].photo_url == "https://cdn.test/images/2_255.png"
+        assert photos[0].thumbnail_url == photos[0].photo_url
+        assert photos[0].title == main.t("btn_arabic", "en")
+        assert photos[0].caption == main._reference(2, 255, "en")
+
+    async def test_range_offers_one_image_per_ayah(self, fake_bot, data, tg_bot):
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "59:22-24", user_id=557021))
+        photos = _of_type(fake_bot, telegram.InlineQueryResultPhoto)
+        assert [p.photo_url for p in photos] == [
+            "https://cdn.test/images/59_%d.png" % a for a in (22, 23, 24)]
+        assert len({p.id for p in photos}) == len(photos)  # Telegram rejects duplicate ids
+
+    async def test_long_range_caps_the_images(self, fake_bot, data, tg_bot, public_url):
+        # Telegram accepts at most 50 results per answer, and a wall of thumbnails
+        # would bury the text and audio results anyway.
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "2:1-40", user_id=557022))
+        photos = _of_type(fake_bot, telegram.InlineQueryResultPhoto)
+        assert len(photos) == main.INLINE_MAX_PHOTOS
+        assert len(_results(fake_bot)) <= 50
+
+    async def test_localized_title(self, fake_bot, data, tg_bot):
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "2:255", user_id=557023, lang="ru"))
+        photo = _of_type(fake_bot, telegram.InlineQueryResultPhoto)[0]
+        assert photo.title == main.t("btn_arabic", "ru")
+
+    async def test_replays_the_file_id_an_in_chat_send_left_behind(self, fake_bot, data,
+                                                                   tg_bot):
+        # Our ayah renders are PNG and the Bot API wants a JPEG behind photo_url, so
+        # a file Telegram already holds is both cheaper and more dependable.
+        File().save_file("https://cdn.test/images/2_255.png", "CACHED-PHOTO-ID")
+
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "2:255", user_id=557025))
+
+        cached = _of_type(fake_bot, telegram.InlineQueryResultCachedPhoto)
+        assert len(cached) == 1
+        assert cached[0].photo_file_id == "CACHED-PHOTO-ID"
+        assert cached[0].caption == main._reference(2, 255, "en")
+        assert not _of_type(fake_bot, telegram.InlineQueryResultPhoto)
+
+    async def test_local_images_are_offered_only_once_cached(self, fake_bot, data, tg_bot,
+                                                             monkeypatch):
+        # Telegram fetches photo_url itself; a path on our disk is unreachable to it,
+        # so an uncached ayah has nothing to offer while a cached one still does.
+        monkeypatch.setenv("PHOTO_BASE_URL", "/srv/quranic_images")
+        File().save_file("/srv/quranic_images/2_255.png", "CACHED-PHOTO-ID")
+
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "2:254", user_id=557026))
+        assert not _of_type(fake_bot, telegram.InlineQueryResultPhoto,
+                            telegram.InlineQueryResultCachedPhoto)
+        assert _results(fake_bot)                # the rest of the answer survives
+
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "2:255", user_id=557026))
+        assert _of_type(fake_bot, telegram.InlineQueryResultCachedPhoto)
+
+    async def test_dropped_when_no_images_are_configured(self, fake_bot, data, tg_bot,
+                                                         monkeypatch):
+        monkeypatch.delenv("PHOTO_BASE_URL")
+
+        await main.handle_update(fake_bot, data,
+                                 _inline_query(tg_bot, "2:255", user_id=557027))
+
+        assert not _of_type(fake_bot, telegram.InlineQueryResultPhoto,
+                            telegram.InlineQueryResultCachedPhoto)
+        assert _results(fake_bot)                # the rest of the answer survives
+
+
 class TestRangeAudioRoute:
     """The public endpoint Telegram fetches a stitched range from."""
 

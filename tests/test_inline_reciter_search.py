@@ -59,12 +59,22 @@ def _inline_callback(tg_bot, cb_data, user_id=556100):
     return telegram.Update.de_json(payload, tg_bot)
 
 
-async def test_ayah_query_returns_translation_tafsir_and_audio(fake_bot, data, tg_bot):
+def _audio_result(fake_bot):
+    """The single audio result in the last answer, whatever position it sits in."""
+    results = fake_bot.answer_inline_query.await_args.kwargs["results"]
+    audio = [r for r in results if isinstance(r, (telegram.InlineQueryResultAudio,
+                                                  telegram.InlineQueryResultCachedAudio))]
+    assert len(audio) == 1
+    return audio[0]
+
+
+async def test_ayah_query_returns_translation_tafsir_audio_and_image(fake_bot, data, tg_bot):
     await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556001))
     kwargs = fake_bot.answer_inline_query.await_args.kwargs
     assert [r.title for r in kwargs["results"]] == [main.t("btn_translation", "en"),
                                                     main.t("btn_tafsir", "en"),
-                                                    main._reference(2, 255, "en")]
+                                                    main._reference(2, 255, "en"),
+                                                    main.t("btn_arabic", "en")]
 
 
 async def test_ayah_query_is_personal_and_briefly_cached(fake_bot, data, tg_bot):
@@ -81,7 +91,7 @@ async def test_ayah_audio_uses_callers_reciter(fake_bot, data, tg_bot):
 
     await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556011))
 
-    audio = fake_bot.answer_inline_query.await_args.kwargs["results"][-1]
+    audio = _audio_result(fake_bot)
     assert isinstance(audio, telegram.InlineQueryResultAudio)
     assert audio.audio_url == "https://cdn.test/audio/Alafasy_128kbps/002255.mp3"
     assert audio.performer == "Alafasy"
@@ -99,7 +109,8 @@ async def test_ayah_audio_dropped_for_unknown_reciter(fake_bot, data, tg_bot):
     results = fake_bot.answer_inline_query.await_args.kwargs["results"]
     assert not any(isinstance(r, telegram.InlineQueryResultAudio) for r in results)
     assert [r.title for r in results] == [main.t("btn_translation", "en"),
-                                          main.t("btn_tafsir", "en")]
+                                          main.t("btn_tafsir", "en"),
+                                          main.t("btn_arabic", "en")]
 
 
 async def test_ayah_audio_dropped_without_public_base_url(fake_bot, data, tg_bot, monkeypatch):

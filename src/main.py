@@ -45,6 +45,8 @@ from telegram import (
     InlineQueryResultArticle,
     InlineQueryResultAudio,
     InlineQueryResultCachedAudio,
+    InlineQueryResultCachedPhoto,
+    InlineQueryResultPhoto,
     InputTextMessageContent,
     ReplyKeyboardRemove,
 )
@@ -331,6 +333,42 @@ def _inline_audio_result(surah: int, start: int, end: int, reciter: str,
         audio_url = first_url
     return InlineQueryResultAudio(result_id, audio_url=audio_url, title=title,
                                   performer=File.get_performer_name(reciter))
+
+
+# A range's Arabic images come back one result per ayah; cap them so a long range
+# can neither pass Telegram's 50-results-per-answer limit nor bury the translation,
+# tafsir and recitation under a wall of thumbnails.
+INLINE_MAX_PHOTOS = 10
+
+
+def _inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: File) -> list:
+    """The rendered Arabic image of each ayah in the reference, as shareable inline
+    photo results.
+
+    Preferring the file_id an in-chat send left in the cache is not just a saved
+    round-trip here: the Bot API documents an inline photo *URL* as having to be
+    JPEG, and our rendered ayahs are PNG, so replaying a file Telegram already
+    holds is also the more dependable of the two. The URL is the fallback for an
+    ayah nobody has viewed yet, and needs PHOTO_BASE_URL to be a public URL; when
+    it points at a local directory, only already-cached ayahs can be offered.
+    """
+    if not file.get_env("quranic_images_file_path"):
+        return []                       # no images configured at all
+    results = []
+    for ayah in range(start, min(end, start + INLINE_MAX_PHOTOS - 1) + 1):
+        result_id = "ph:%d:%d" % (surah, ayah)
+        ref = _reference(surah, ayah, ui_lang)
+        common = dict(title=t("btn_arabic", ui_lang), description=ref, caption=ref)
+        # the same key `send_quran`'s arabic branch caches under
+        source = file.get_image_filename(surah, ayah)
+        cached_id = file.get_file(source)
+        if cached_id is not None:
+            results.append(InlineQueryResultCachedPhoto(
+                result_id, photo_file_id=cached_id, **common))
+        elif source.startswith(("http://", "https://")):
+            results.append(InlineQueryResultPhoto(
+                result_id, photo_url=source, thumbnail_url=source, **common))
+    return results
 
 
 def language_keyboard() -> InlineKeyboardMarkup:
@@ -634,6 +672,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             audio = _inline_audio_result(surah, start, end, settings.reciter, ui_lang, file)
             if audio is not None:
                 results.append(audio)
+            results.extend(_inline_photo_results(surah, start, end, ui_lang, file))
         else:
             # Not an ayah reference — try it as a reciter name, so the picker is
             # reachable from any chat without opening a DM with the bot first.
