@@ -201,6 +201,29 @@ appends a warning specific to which of the two it is.
 change which recording is sent; only `/reciter` does. `tests/test_reciter_picker.py`
 asserts this directly.
 
+### Repeat (memorization)
+
+`🔁 Repeat ×3` on a verse card sends the ayah recited `REPEAT_COUNT` times back to
+back, built by handing `_download_stitched_audio` the same `(surah, ayah)` pair
+three times. Cached by `file_id` (`repeat:<n>:<s>:<a>:<reciter>`).
+
+everyayah.com publishes ayah-boundary timing files, and an earlier plan was to use
+them for this. They were rejected after measurement: differencing the offsets
+overstates every ayah by ~250-300 ms and is 2.3× wrong on the first ayah of a surah
+(upstream's own disclaimer says the individual mp3s were re-cut by hand afterwards),
+and the 27 zips cover at best 35 of the 79 catalog entries. Repeating an ayah turns
+out to need no timing data at all, so the feature is exact for every reciter and
+carries no attribution obligation.
+
+### Translation-only catalogue entries
+
+`Language.translation_only` marks entries that are a way to *read* the Qur'an rather
+than a language the interface exists in — currently the Latin transliteration.
+`UI_LANGUAGES` (everything else) is what needs a complete string table, what
+`/language` offers, and what gets a Telegram command menu; `LANGUAGES` is what
+`/translation` offers. `normalize_lang` refuses to return a translation-only code,
+so no user can end up with an interface that has no strings.
+
 ---
 
 ## 5. Caching strategy
