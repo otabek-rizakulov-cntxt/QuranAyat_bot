@@ -70,6 +70,9 @@ def t(key: str, lang: str = DEFAULT_LANG) -> str:
 
 BOT_COMMANDS = (
     ("index", "cmd_index"),
+    ("page", "cmd_page"),
+    ("juz", "cmd_juz"),
+    ("sajda", "cmd_sajda"),
     ("random", "cmd_random"),
     ("language", "cmd_language"),
     ("translation", "cmd_translation"),
