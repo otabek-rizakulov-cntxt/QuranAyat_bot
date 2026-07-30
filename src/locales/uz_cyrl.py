@@ -46,6 +46,7 @@ strings = {
     "juz_out_of_range": "1 ва {total} орасидаги жуз рақамини юборинг, масалан /juz 30.",
     "sajda_list_title": "Сажда оятлари:",
     "btn_ayah_view": "Оят кўриниши",
+    "btn_repeat": "Такрор",
     "reciter_group_recitation": "Қорилар",
     "reciter_group_riwayah": "Ривоят",
     "reciter_group_translation": "Маъно",

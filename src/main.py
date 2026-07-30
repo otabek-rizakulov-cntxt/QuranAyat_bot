@@ -58,8 +58,8 @@ from lib.user_settings import UserSettings
 from config import Environment
 from config.postgres import get_pool, close_pool
 from locales import (
-    LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
-    t, button_action, normalize_lang, get_language, welcome_text,
+    LANGUAGES, UI_LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
+    t, button_action, normalize_lang, get_language, is_ui_language, welcome_text,
 )
 
 
@@ -394,10 +394,16 @@ def _inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: 
 
 
 def language_keyboard() -> InlineKeyboardMarkup:
-    """Inline keyboard of every bundled language (native names), two per row."""
+    """Inline keyboard of every bundled *interface* language (native names), two
+    per row.
+
+    UI_LANGUAGES rather than LANGUAGES: the transliteration is a way to read the
+    Qur'an, not a language the bot's own text exists in, so it belongs in
+    /translation only.
+    """
     available = TranslationRegistry.available()
     rows, row = [], []
-    for lang in LANGUAGES:
+    for lang in UI_LANGUAGES:
         if lang.code not in available:
             continue
         label = (lang.flag + " " + lang.native) if lang.flag else lang.native
@@ -615,6 +621,11 @@ def reciter_set_confirmation(subfolder: str, ui_lang: str) -> str:
 # same message in place (for the text views) rather than posting a new one, so a
 # reading session no longer floods the chat with near-identical bubbles.
 
+# How many times the repeat button plays an ayah back to back. Memorizing works by
+# hearing the same ayah over and over, and three is enough to be useful without
+# making a file so long that sending it is the slow part.
+REPEAT_COUNT = 3
+
 # Short codes keep callback_data tiny (Telegram caps it at 64 bytes).
 TYPE_BY_CODE = {"tr": "translation", "ar": "arabic", "tf": "tafsir", "au": "audio"}
 CODE_BY_TYPE = {v: k for k, v in TYPE_BY_CODE.items()}
@@ -661,6 +672,8 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
             InlineKeyboardButton(next_label, callback_data="vc:%s:%d:%d" % (code, next_s, next_a)),
         ],
         [
+            InlineKeyboardButton("🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
+                                 callback_data="rep:%d:%d" % (surah, ayah)),
             InlineKeyboardButton("🌐 " + get_language(ui_lang).native, callback_data="showlang"),
             InlineKeyboardButton("📤", switch_inline_query="%d:%d" % (surah, ayah)),
         ],
@@ -793,6 +806,39 @@ async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang:
             Quran.ayahs_between((start_s, start_a), (end_s, end_a)), performer,
             "quran_page_%03d.mp3" % page)
     result = await bot.send_audio(audio=source, **kwargs)
+    file.save_file(cache_key, result.audio.file_id)
+
+
+async def send_repeated_audio(bot, surah: int, ayah: int, chat_id: int, performer: str,
+                              ui_lang: str, reply_markup=None) -> None:
+    """Send one ayah recited REPEAT_COUNT times back to back, for memorization.
+
+    No timing data is involved and none is needed: repeating an ayah is the same
+    concatenation an ayah range already does, with the same ayah listed more than
+    once. That also means it is exact for every reciter in the catalog rather than
+    only the ones an upstream timings file happens to cover.
+    """
+    file = File()
+    cache_key = "repeat:%d:%d:%d:%s" % (REPEAT_COUNT, surah, ayah, performer)
+    title = "%s ×%d" % (_reference(surah, ayah, ui_lang), REPEAT_COUNT)
+    kwargs = dict(chat_id=chat_id, title=title,
+                  performer=File.get_performer_name(performer),
+                  reply_markup=reply_markup)
+
+    cached_id = file.get_file(cache_key)
+    if cached_id is not None:
+        try:
+            await bot.send_audio(audio=cached_id, **kwargs)
+            return
+        except telegram.error.TelegramError:
+            pass                        # cached file_id rejected; rebuild below
+
+    await bot.send_chat_action(chat_id=chat_id,
+                               action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    audio = await _download_stitched_audio(
+        [(surah, ayah)] * REPEAT_COUNT, performer,
+        "quran_%d_%d_x%d.mp3" % (surah, ayah, REPEAT_COUNT))
+    result = await bot.send_audio(audio=audio, **kwargs)
     file.save_file(cache_key, result.audio.file_id)
 
 
@@ -943,6 +989,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         ui_lang, translation_lang, reciter = settings.ui_lang, settings.translation_lang, settings.reciter
 
         if cb_data.startswith("setlang:"):     # UI language picked from the /language keyboard
+            # normalize_lang already refuses translation-only codes (there is no
+            # string table to show the interface in), falling back to English.
             code = normalize_lang(cb_data.split(":", 1)[1])
             await user_settings.set_ui_lang(cq.from_user.id, chat_id, code)
             await bot.answer_callback_query(cq.id)
@@ -993,6 +1041,16 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             file.set_awaiting_input(chat_id, "reciter_search")
             await bot.answer_callback_query(cq.id)
             await bot.send_message(chat_id=chat_id, text=t("reciter_search_prompt", ui_lang))
+            return
+
+        if cb_data.startswith("rep:"):          # "🔁 Repeat ×3" on a verse card
+            _, surah_s, ayah_s = cb_data.split(":", 2)
+            surah, ayah = int(surah_s), int(ayah_s)
+            await bot.answer_callback_query(cq.id)
+            if Quran.exists(surah, ayah):
+                await send_repeated_audio(bot, surah, ayah, chat_id, reciter, ui_lang,
+                                          reply_markup=verse_keyboard(surah, ayah,
+                                                                      "audio", ui_lang))
             return
 
         if cb_data.startswith("pg:"):           # the mushaf pager
@@ -1212,7 +1270,7 @@ data = None  # populated by background init after corpora finish parsing
 # so script-qualified and three-letter codes ("uz-Cyrl", "ber") can't be
 # registered — those users see the English default menu while the rest of their
 # UI is still localized.
-_COMMAND_MENU_LANGS = tuple(lang.code for lang in LANGUAGES
+_COMMAND_MENU_LANGS = tuple(lang.code for lang in UI_LANGUAGES
                             if len(lang.code) == 2 and lang.code != DEFAULT_LANG)
 
 
@@ -1253,6 +1311,16 @@ async def _initialize():
     and do this in the background — the server listens right away and answers `/`.
     """
     global data, bot
+
+    if not os.getenv("PAGE_IMAGE_BASE_URL"):
+        # The page stitcher tiles per-ayah images edge to edge, which only works if
+        # every image is the same width. Falling back to PHOTO_BASE_URL is fine when
+        # that points at a uniform set (everyayah's `quranpngs`) and produces ragged
+        # pages when it does not (`images_png` varies 115-700px), so say so rather
+        # than let /page quietly look broken.
+        print("WARNING: PAGE_IMAGE_BASE_URL is not set — /page will tile "
+              "PHOTO_BASE_URL's images, which must be a uniform-width set "
+              "(e.g. everyayah.com/data/quranpngs) or pages will render ragged.")
 
     try:
         bot = Bot.get_instance()

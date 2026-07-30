@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "১ থেকে {total}-এর মধ্যে একটি পারা নম্বর পাঠান, যেমন /juz 30।",
     "sajda_list_title": "সিজদার আয়াতসমূহ:",
     "btn_ayah_view": "আয়াত দেখুন",
+    "btn_repeat": "পুনরাবৃত্তি",
     "reciter_group_recitation": "ক্বারী",
     "reciter_group_riwayah": "রিওয়ায়াত",
     "reciter_group_translation": "অর্থ",

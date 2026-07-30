@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Рақами ҷузъро аз 1 то {total} фиристед, масалан /juz 30.",
     "sajda_list_title": "Оятҳои саҷда:",
     "btn_ayah_view": "Намоиши оят",
+    "btn_repeat": "Такрор",
     "reciter_group_recitation": "Қориён",
     "reciter_group_riwayah": "Ривоят",
     "reciter_group_translation": "Маъно",

@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "د ۱ او {total} ترمنځ د جزء شمېره ولېږئ، بېلګه /juz 30.",
     "sajda_list_title": "د سجدې آیتونه:",
     "btn_ayah_view": "د آیت کتنه",
+    "btn_repeat": "تکرار",
     "reciter_group_recitation": "قاریان",
     "reciter_group_riwayah": "روایت",
     "reciter_group_translation": "معنا",

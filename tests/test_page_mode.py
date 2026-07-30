@@ -213,6 +213,64 @@ class TestPageAudio:
         assert fake_bot.send_audio.await_args.kwargs["audio"] != "audio-file-id"
 
 
+class TestRepeatForMemorization:
+    """Repeating an ayah is the same concatenation a range uses, with the ayah
+    listed more than once — so it needs no timing data and works for every
+    reciter in the catalog, not only the ones upstream published timings for."""
+
+    async def test_it_sends_the_ayah_the_configured_number_of_times(self, fake_bot,
+                                                                    monkeypatch):
+        seen = {}
+
+        async def capture(ayahs, performer, name):
+            seen.update(ayahs=ayahs, name=name, performer=performer)
+            return BytesIO(b"mp3")
+
+        monkeypatch.setattr(main, "_download_stitched_audio", capture)
+        await main.send_repeated_audio(fake_bot, 2, 255, 5001, "Husary_128kbps", "en")
+
+        assert seen["ayahs"] == [(2, 255)] * main.REPEAT_COUNT
+        assert seen["performer"] == "Husary_128kbps"
+
+    async def test_the_title_says_how_many_times(self, fake_bot, monkeypatch):
+        monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
+        await main.send_repeated_audio(fake_bot, 2, 255, 5002, "Husary_128kbps", "en")
+        title = fake_bot.send_audio.await_args.kwargs["title"]
+        assert title == "Qur'an 2:255 ×%d" % main.REPEAT_COUNT
+
+    async def test_it_is_built_once_and_then_replayed_from_cache(self, fake_bot,
+                                                                 monkeypatch):
+        calls = []
+
+        async def counting(ayahs, performer, name):
+            calls.append(name)
+            return BytesIO(b"mp3")
+
+        monkeypatch.setattr(main, "_download_stitched_audio", counting)
+        await main.send_repeated_audio(fake_bot, 2, 255, 5003, "Husary_128kbps", "en")
+        await main.send_repeated_audio(fake_bot, 2, 255, 5004, "Husary_128kbps", "en")
+
+        assert len(calls) == 1
+        assert fake_bot.send_audio.await_args.kwargs["audio"] == "audio-file-id"
+
+    async def test_a_different_reciter_gets_its_own_recording(self, fake_bot,
+                                                              monkeypatch):
+        monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
+        await main.send_repeated_audio(fake_bot, 2, 255, 5005, "Husary_128kbps", "en")
+        fake_bot.reset_mock()
+        fake_bot.send_audio.return_value = telegram.Message(
+            1, None, telegram.Chat(1, "private"), audio=telegram.Audio("other", "u", 1))
+        await main.send_repeated_audio(fake_bot, 2, 255, 5006, "Alafasy_128kbps", "en")
+        assert fake_bot.send_audio.await_args.kwargs["audio"] != "audio-file-id"
+
+    async def test_it_works_for_a_reciter_with_no_upstream_timings(self, fake_bot,
+                                                                   monkeypatch):
+        # the point of dropping the timings files: coverage is the whole catalog
+        monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
+        await main.send_repeated_audio(fake_bot, 36, 1, 5007, "Yaser_Salamah_128kbps", "en")
+        fake_bot.send_audio.assert_awaited()
+
+
 class TestStitchedAudioAcrossSurahs:
 
     async def test_a_range_within_one_surah_keeps_its_filename(self, monkeypatch):
@@ -237,4 +295,12 @@ def _buffer(name="page.jpg"):
 def _stub_stitch():
     async def stub(urls, name="page.jpg"):
         return _buffer(name)
+    return stub
+
+
+def _stub_audio():
+    async def stub(ayahs, performer, name):
+        buf = BytesIO(b"mp3")
+        buf.name = name
+        return buf
     return stub

@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Aika lambar juz'i tsakanin 1 zuwa {total}, misali /juz 30.",
     "sajda_list_title": "Ayoyin sujada:",
     "btn_ayah_view": "Duban aya",
+    "btn_repeat": "Maimaita",
     "reciter_group_recitation": "Makaranta",
     "reciter_group_riwayah": "Riwaya",
     "reciter_group_translation": "Ma'ana",

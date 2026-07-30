@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "Stuur een djuz-nummer tussen 1 en {total}, bijvoorbeeld /juz 30.",
     "sajda_list_title": "Verzen van neerknieling (sadjda):",
     "btn_ayah_view": "Versweergave",
+    "btn_repeat": "Herhalen",
     "reciter_group_recitation": "Reciteurs",
     "reciter_group_riwayah": "Riwāya",
     "reciter_group_translation": "Betekenis",

@@ -46,6 +46,7 @@ strings = {
     "juz_out_of_range": "1 va {total} orasidagi juz raqamini yuboring, masalan /juz 30.",
     "sajda_list_title": "Sajda oyatlari:",
     "btn_ayah_view": "Oyat koʻrinishi",
+    "btn_repeat": "Takror",
     "reciter_group_recitation": "Qorilar",
     "reciter_group_riwayah": "Rivoyat",
     "reciter_group_translation": "Maʼno",

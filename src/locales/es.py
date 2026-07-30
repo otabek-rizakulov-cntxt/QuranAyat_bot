@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Envía un número de yuz entre 1 y {total}, por ejemplo /juz 30.",
     "sajda_list_title": "Aleyas de postración (sayda):",
     "btn_ayah_view": "Vista por aleyas",
+    "btn_repeat": "Repetir",
     "reciter_group_recitation": "Recitadores",
     "reciter_group_riwayah": "Riwāya",
     "reciter_group_translation": "Significado",

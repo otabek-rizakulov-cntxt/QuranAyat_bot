@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Hantar nombor juzuk antara 1 dan {total}, contohnya /juz 30.",
     "sajda_list_title": "Ayat-ayat sujud (sajdah):",
     "btn_ayah_view": "Paparan ayat",
+    "btn_repeat": "Ulang",
     "reciter_group_recitation": "Qari",
     "reciter_group_riwayah": "Riwayat",
     "reciter_group_translation": "Makna",

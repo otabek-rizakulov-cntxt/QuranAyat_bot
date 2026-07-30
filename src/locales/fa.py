@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "شمارهٔ جزئی میان ۱ تا {total} بفرستید، برای مثال /juz 30.",
     "sajda_list_title": "آیات سجده:",
     "btn_ayah_view": "نمای آیه",
+    "btn_repeat": "تکرار",
     "reciter_group_recitation": "قاریان",
     "reciter_group_riwayah": "روایت",
     "reciter_group_translation": "معنا",

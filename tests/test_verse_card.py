@@ -16,6 +16,15 @@ import main
 from locales import LANGUAGES, get_language
 
 
+def _button(markup, predicate):
+    """The one button on `markup` matching `predicate`.
+
+    Found by what a button *does* rather than by its position, so adding a button
+    to a row cannot silently repoint these assertions at a different one.
+    """
+    return next(b for row in markup.inline_keyboard for b in row if predicate(b))
+
+
 @pytest.fixture(scope="module")
 def data():
     return main.build_data()
@@ -85,13 +94,25 @@ class TestVerseKeyboard:
         assert rtl[0].text.endswith("›")      # RTL: mirrored so "next" reads forward
 
     def test_share_uses_inline_mode(self):
-        share = main.verse_keyboard(2, 255, "translation", "en").inline_keyboard[2][1]
+        share = _button(main.verse_keyboard(2, 255, "translation", "en"),
+                        lambda b: b.switch_inline_query is not None)
         assert share.switch_inline_query == "2:255"
 
     def test_language_button_shows_current_language(self):
-        util = main.verse_keyboard(2, 255, "translation", "uz").inline_keyboard[2][0]
-        assert util.callback_data == "showlang"
+        util = _button(main.verse_keyboard(2, 255, "translation", "uz"),
+                       lambda b: b.callback_data == "showlang")
         assert get_language("uz").native in util.text
+
+    def test_repeat_button_replays_this_ayah(self):
+        repeat = _button(main.verse_keyboard(2, 255, "audio", "en"),
+                         lambda b: (b.callback_data or "").startswith("rep:"))
+        assert repeat.callback_data == "rep:2:255"
+        assert "×%d" % main.REPEAT_COUNT in repeat.text
+
+    def test_repeat_label_is_localized(self):
+        repeat = _button(main.verse_keyboard(2, 255, "audio", "ru"),
+                         lambda b: (b.callback_data or "").startswith("rep:"))
+        assert "Повтор" in repeat.text
 
 
 # --- Text rendering ---------------------------------------------------------

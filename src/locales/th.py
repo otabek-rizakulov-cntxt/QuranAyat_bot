@@ -45,6 +45,7 @@ strings = {
     "juz_out_of_range": "ส่งหมายเลขญุซอ์ระหว่าง 1 ถึง {total} ตัวอย่างเช่น /juz 30",
     "sajda_list_title": "อายะฮ์แห่งการสุญูด (สัจญ์ดะฮ์):",
     "btn_ayah_view": "มุมมองรายอายะฮ์",
+    "btn_repeat": "เล่นซ้ำ",
     "reciter_group_recitation": "ผู้อ่าน",
     "reciter_group_riwayah": "ริวายะฮ์",
     "reciter_group_translation": "ความหมาย",

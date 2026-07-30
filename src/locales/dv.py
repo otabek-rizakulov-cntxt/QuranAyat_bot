@@ -50,6 +50,7 @@ strings = {
     "juz_out_of_range": "1 އާއި {total} އާ ދެމެދު ޖުޒުއެއްގެ ނަންބަރު ފޮނުވާ، މިސާލަކަށް /juz 30.",
     "sajda_list_title": "ސަޖިދައިގެ އާޔަތްތައް:",
     "btn_ayah_view": "އާޔަތުގެ ގޮތުގައި",
+    "btn_repeat": "ތަކުރާރު",
     "reciter_group_recitation": "ޤާރީން",
     "reciter_group_riwayah": "ރިވާޔަތް",
     "reciter_group_translation": "މާނަ",

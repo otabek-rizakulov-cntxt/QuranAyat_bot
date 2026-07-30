@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "Изпратете номер на джуз между 1 и {total}, например /juz 30.",
     "sajda_list_title": "Айети на поклон (саджда):",
     "btn_ayah_view": "Изглед по айети",
+    "btn_repeat": "Повтори",
     "reciter_group_recitation": "Четци",
     "reciter_group_riwayah": "Ривая",
     "reciter_group_translation": "Значение",

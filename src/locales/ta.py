@@ -49,6 +49,7 @@ strings = {
     "juz_out_of_range": "1 முதல் {total} வரையிலான ஜுஸ்உ எண்ணை அனுப்புங்கள், எடுத்துக்காட்டு /juz 30.",
     "sajda_list_title": "ஸஜ்தாவின் வசனங்கள்:",
     "btn_ayah_view": "வசனக் காட்சி",
+    "btn_repeat": "மீண்டும்",
     "reciter_group_recitation": "ஓதுநர்கள்",
     "reciter_group_riwayah": "ரிவாயத்",
     "reciter_group_translation": "பொருள்",

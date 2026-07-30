@@ -45,6 +45,7 @@ strings = {
     "juz_out_of_range": "أرسل رقم جزء بين 1 و{total}، مثال ‎/juz 30‎.",
     "sajda_list_title": "آيات السجدة:",
     "btn_ayah_view": "عرض الآيات",
+    "btn_repeat": "تكرار",
     "reciter_group_recitation": "القرّاء",
     "reciter_group_riwayah": "رواية",
     "reciter_group_translation": "المعنى",

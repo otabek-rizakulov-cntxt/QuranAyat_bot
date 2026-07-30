@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "١ ۽ {total} جي وچ ۾ پاري جو نمبر موڪليو، مثال /juz 30.",
     "sajda_list_title": "سجدي جون آيتون:",
     "btn_ayah_view": "آيت جو نظارو",
+    "btn_repeat": "ورجايو",
     "reciter_group_recitation": "قاري",
     "reciter_group_riwayah": "روايت",
     "reciter_group_translation": "معنيٰ",
