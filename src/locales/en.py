@@ -43,7 +43,27 @@ strings = {
     "btn_previous": "Previous",
     "btn_random": "Random",
     "btn_next": "Next",
+    "page_label": "Page {n} of {total}",
+    "page_out_of_range": "Send a page number between 1 and {total}, for example /page 255.",
+    "juz_out_of_range": "Send a juz number between 1 and {total}, for example /juz 30.",
+    "sajda_list_title": "Verses of prostration (sajda):",
+    "btn_ayah_view": "Ayah view",
+    "reciter_group_recitation": "Reciters",
+    "reciter_group_riwayah": "Riwāyah",
+    "reciter_group_translation": "Meaning",
+    "riwayah_warning": (
+        "Note: this is the Warsh riwāyah — a different reading of the Qur'anic text "
+        "from the Ḥafṣ one shown in the Arabic and translations here, so the audio "
+        "will not always match the words on screen."
+    ),
+    "translation_audio_warning": (
+        "Note: this recording is not Qur'an recitation — it is the translated meaning "
+        "read aloud. Choose from the Reciters tab to hear the Arabic recitation."
+    ),
     "cmd_index": "List all surahs",
+    "cmd_page": "Read a mushaf page",
+    "cmd_juz": "Open a juz",
+    "cmd_sajda": "Verses of prostration",
     "cmd_random": "A random verse",
     "cmd_language": "Change UI language",
     "cmd_translation": "Change translation language",

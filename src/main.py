@@ -53,6 +53,7 @@ from telegram import (
 from fastapi import FastAPI, Request, Response
 from modules import Quran, make_index, Bot, TranslationRegistry
 from lib.utils import File
+from lib.page_image import fetch_and_stitch
 from lib.user_settings import UserSettings
 from config import Environment
 from config.postgres import get_pool, close_pool
@@ -125,10 +126,15 @@ MAX_RANGE_AYAHS = 50
 _DOWNLOAD_CONCURRENCY = 4
 
 
-async def _download_combined_audio(surah: int, start: int, end: int, performer: str) -> BytesIO:
-    """Fetch each ayah's mp3 from the CDN (with bounded concurrency) and concatenate."""
+async def _download_stitched_audio(ayahs: list, performer: str, name: str) -> BytesIO:
+    """Fetch each ayah's mp3 from the CDN (with bounded concurrency) and concatenate.
+
+    Takes an explicit list of (surah, ayah) pairs rather than one surah's range,
+    because a mushaf page is also assembled this way and 96 of the 604 pages cross
+    a surah boundary.
+    """
     file = File()
-    urls = [file.get_audio_filename(surah, ayah, performer) for ayah in range(start, end + 1)]
+    urls = [file.get_audio_filename(surah, ayah, performer) for surah, ayah in ayahs]
     semaphore = asyncio.Semaphore(_DOWNLOAD_CONCURRENCY)
 
     async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
@@ -144,8 +150,15 @@ async def _download_combined_audio(surah: int, start: int, end: int, performer: 
     for chunk in chunks:  # gather preserves order, so ayahs stay in sequence
         buf.write(chunk)
     buf.seek(0)
-    buf.name = "quran_%d_%d-%d.mp3" % (surah, start, end)
+    buf.name = name
     return buf
+
+
+async def _download_combined_audio(surah: int, start: int, end: int, performer: str) -> BytesIO:
+    """One surah's ayah range, stitched into a single mp3."""
+    return await _download_stitched_audio(
+        [(surah, ayah) for ayah in range(start, end + 1)], performer,
+        "quran_%d_%d-%d.mp3" % (surah, start, end))
 
 
 def _combined_audio_key(surah: int, start: int, end: int, performer: str) -> str:
@@ -223,6 +236,15 @@ def parse_ayah(message: str):
         return surah, ayah
     else:
         return None, None
+
+
+def _as_int(text: str):
+    """`text` as an int, or None if it isn't one — for command arguments like the
+    "255" in "/page 255", where a non-number is a user error, not a crash."""
+    try:
+        return int(text)
+    except ValueError:
+        return None
 
 
 def parse_ayah_range(message: str):
@@ -437,6 +459,34 @@ _RECITER_SHORTLIST = (
 RECITER_PAGE_SIZE = 10
 
 
+# The catalog holds three genuinely different kinds of recording, and conflating them
+# is a correctness problem, not a cosmetic one: a riwayah is a *different reading of
+# the text* (so the audio stops matching the Arabic on screen), and a "translation"
+# entry is not recitation at all but someone reading the translated meaning aloud.
+# The picker therefore groups by kind and says so on the tab. Recitation leads.
+RECITER_KINDS = ("recitation", "riwayah", "translation")
+DEFAULT_RECITER_KIND = RECITER_KINDS[0]
+
+_KIND_LABEL_KEYS = {
+    "recitation": "reciter_group_recitation",
+    "riwayah": "reciter_group_riwayah",
+    "translation": "reciter_group_translation",
+}
+
+# Icons live here rather than in the locale tables: three tabs share one keyboard
+# row, so the labels have to stay short in every language, and the icon does the
+# disambiguating that a longer word otherwise would.
+_KIND_ICONS = {"recitation": "🎙 ", "riwayah": "📖 ", "translation": "🗣 "}
+
+# What to warn about when the chosen entry is not ordinary Arabic recitation. A
+# riwayah *is* recitation — just a different reading of the text from the one shown
+# on screen — so the two cases cannot share a message.
+_KIND_WARNING_KEYS = {
+    "riwayah": "riwayah_warning",
+    "translation": "translation_audio_warning",
+}
+
+
 def reciter_catalog() -> list:
     """Every reciter in src/common/performers.json, shortlist first then the rest in
     catalog order — the order the picker pages through."""
@@ -447,6 +497,21 @@ def reciter_catalog() -> list:
     shortlisted = set(_RECITER_SHORTLIST)
     ordered.extend(p for p in performers if p["subfolder"] not in shortlisted)
     return ordered
+
+
+def reciter_kind(subfolder: str) -> str:
+    """Which group `subfolder` belongs to, defaulting to plain recitation for an
+    entry with no `kind` (or a stale saved preference no longer in the catalog)."""
+    match = next((p for p in File._load_performers() if p["subfolder"] == subfolder), None)
+    if match is None:
+        return DEFAULT_RECITER_KIND
+    return match.get("kind", DEFAULT_RECITER_KIND)
+
+
+def reciter_group(kind: str) -> list:
+    """The catalog entries of one kind, in the catalog's own order."""
+    return [p for p in reciter_catalog()
+            if p.get("kind", DEFAULT_RECITER_KIND) == kind]
 
 
 def reciter_label(performer: dict) -> str:
@@ -462,32 +527,51 @@ def reciter_label(performer: dict) -> str:
     return "%s · %s" % (performer["name"], bitrate)
 
 
-def reciter_page_count() -> int:
-    return max(1, -(-len(reciter_catalog()) // RECITER_PAGE_SIZE))
+def reciter_page_count(kind: str = DEFAULT_RECITER_KIND) -> int:
+    """How many pages one group needs. Groups are paged independently, so the
+    3-entry riwayah tab is one page while recitation is seven."""
+    return max(1, -(-len(reciter_group(kind)) // RECITER_PAGE_SIZE))
 
 
-def reciter_page_of(subfolder: str) -> int:
-    """The page holding `subfolder`, so /reciter opens where the user already is."""
-    for i, p in enumerate(reciter_catalog()):
+def reciter_page_of(subfolder: str) -> tuple[str, int]:
+    """The (kind, page) holding `subfolder`, so /reciter opens where the user
+    already is — including on the right tab. Falls back to the first page of the
+    recitation tab for a preference no longer in the catalog."""
+    kind = reciter_kind(subfolder)
+    for i, p in enumerate(reciter_group(kind)):
         if p["subfolder"] == subfolder:
-            return i // RECITER_PAGE_SIZE
-    return 0
+            return kind, i // RECITER_PAGE_SIZE
+    return DEFAULT_RECITER_KIND, 0
 
 
-def reciter_keyboard(ui_lang: str, page: int = 0, current: str | None = None) -> InlineKeyboardMarkup:
-    """One page of the reciter catalog, two per row, under a Previous / n-of-m /
-    Next pager and a search button.
+def reciter_keyboard(ui_lang: str, kind: str = DEFAULT_RECITER_KIND, page: int = 0,
+                     current: str | None = None) -> InlineKeyboardMarkup:
+    """One page of one group of the reciter catalog, two per row, under a group-tab
+    row, a Previous / n-of-m / Next pager and a search button.
 
-    The catalog is ~80 entries, so it is paged rather than dumped in one keyboard:
-    the pager walks the whole list, the search button jumps straight to a name.
-    Pages wrap, so neither arrow is ever a dead button. `current` is marked with a
-    dot, the same way the verse card marks the active view.
+    The catalog is ~80 entries across three kinds, so it is grouped *and* paged
+    rather than dumped in one keyboard: the tabs say what kind of recording you are
+    choosing, the pager walks that group, and the search button jumps straight to a
+    name. Pages wrap, so neither arrow is ever a dead button. Both the active tab
+    and the active reciter are marked with a dot, the same way the verse card marks
+    the active view.
     """
-    catalog = reciter_catalog()
-    pages = reciter_page_count()
+    if kind not in RECITER_KINDS:
+        kind = DEFAULT_RECITER_KIND
+    entries = reciter_group(kind)
+    pages = reciter_page_count(kind)
     page %= pages
-    rows, row = [], []
-    for p in catalog[page * RECITER_PAGE_SIZE:(page + 1) * RECITER_PAGE_SIZE]:
+
+    # Tab row first: what kind of recording this list is, before any of the names.
+    rows = [[
+        InlineKeyboardButton(("• " if k == kind else "") + _KIND_ICONS[k]
+                             + t(_KIND_LABEL_KEYS[k], ui_lang),
+                             callback_data="recgrp:%s:0" % k)
+        for k in RECITER_KINDS
+    ]]
+
+    row = []
+    for p in entries[page * RECITER_PAGE_SIZE:(page + 1) * RECITER_PAGE_SIZE]:
         label = reciter_label(p)
         if p["subfolder"] == current:
             label = "• " + label
@@ -497,15 +581,32 @@ def reciter_keyboard(ui_lang: str, page: int = 0, current: str | None = None) ->
             row = []
     if row:
         rows.append(row)
+
     prev_label, next_label = _nav_labels(ui_lang)
     rows.append([
-        InlineKeyboardButton(prev_label, callback_data="recpage:%d" % ((page - 1) % pages)),
+        InlineKeyboardButton(prev_label,
+                             callback_data="recgrp:%s:%d" % (kind, (page - 1) % pages)),
         InlineKeyboardButton("%d/%d" % (page + 1, pages), callback_data="recpage_noop"),
-        InlineKeyboardButton(next_label, callback_data="recpage:%d" % ((page + 1) % pages)),
+        InlineKeyboardButton(next_label,
+                             callback_data="recgrp:%s:%d" % (kind, (page + 1) % pages)),
     ])
     rows.append([InlineKeyboardButton("🔍 " + t("btn_search_reciter", ui_lang),
                                        callback_data="reciter_search")])
     return InlineKeyboardMarkup(rows)
+
+
+def reciter_set_confirmation(subfolder: str, ui_lang: str) -> str:
+    """The "reciter set" message, with a warning appended when the chosen entry is
+    not ordinary Arabic recitation.
+
+    Said at the moment of choosing rather than buried in the picker: this is the
+    point where someone could otherwise silently stop hearing the Qur'an recited.
+    """
+    text = t("reciter_set", ui_lang).format(reciter=File.get_performer_name(subfolder))
+    warning_key = _KIND_WARNING_KEYS.get(reciter_kind(subfolder))
+    if warning_key is not None:
+        text += "\n\n" + t(warning_key, ui_lang)
+    return text
 
 
 # --- Verse reader card -------------------------------------------------------
@@ -564,6 +665,135 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
             InlineKeyboardButton("📤", switch_inline_query="%d:%d" % (surah, ayah)),
         ],
     ])
+
+
+# --- Mushaf page reader ------------------------------------------------------
+# The page, not the ayah, is the unit people actually read and memorize in. A page
+# card is one stitched image of the whole page (see lib/page_image.py) under a
+# 1-604 pager, with its recitation one tap away rather than attached — a page of
+# audio is ~1 MB nobody asked for if they only wanted to read.
+
+
+def _page_caption(page: int, ui_lang: str) -> str:
+    """"Page 255 of 604" over the ayah span it covers, e.g. "Qur'an 13:43 - 14:5"."""
+    start_s, start_a, end_s, end_a = Quran.page_range(page)
+    name = t("quran_name", ui_lang)
+    if start_s == end_s:
+        span = "%s %d:%d-%d" % (name, start_s, start_a, end_a)
+    else:                               # the page crosses into the next surah
+        span = "%s %d:%d - %d:%d" % (name, start_s, start_a, end_s, end_a)
+    return "%s\n%s" % (t("page_label", ui_lang).format(n=page, total=Quran.PAGE_COUNT),
+                       span)
+
+
+def page_keyboard(page: int, ui_lang: str) -> InlineKeyboardMarkup:
+    """Pager over the mushaf, plus this page's recitation and a way back into the
+    per-ayah reader. Pages wrap at both ends, like the reciter picker's."""
+    total = Quran.PAGE_COUNT
+    previous = page - 1 if page > 1 else total
+    following = page + 1 if page < total else 1
+    start_s, start_a, _, _ = Quran.page_range(page)
+    prev_label, next_label = _nav_labels(ui_lang)
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(prev_label, callback_data="pg:%d" % previous),
+            InlineKeyboardButton("%d/%d" % (page, total), callback_data="pgnoop"),
+            InlineKeyboardButton(next_label, callback_data="pg:%d" % following),
+        ],
+        [
+            InlineKeyboardButton("🔊 " + t("btn_audio", ui_lang),
+                                 callback_data="pga:%d" % page),
+            InlineKeyboardButton("📖 " + t("btn_ayah_view", ui_lang),
+                                 callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"],
+                                                                start_s, start_a)),
+        ],
+    ])
+
+
+def sajda_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
+    """The 15 ayahs of prostration, each opening its verse card.
+
+    Labelled with ۩, the mushaf's own sajda sign, so the list needs no translated
+    word for "prostration" beyond its heading.
+    """
+    rows, row = [], []
+    for surah, ayah, _kind in Quran.sajdas:
+        row.append(InlineKeyboardButton(
+            "۩ %s %d:%d" % (Quran.get_surah_name(surah), surah, ayah),
+            callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"], surah, ayah)))
+        if len(row) == 2:
+            rows.append(row)
+            row = []
+    if row:
+        rows.append(row)
+    return InlineKeyboardMarkup(rows)
+
+
+async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
+    """Send mushaf page `page` as one stitched image.
+
+    Stitching is expensive (a few hundred KB of PNGs decoded and re-encoded), so
+    the upload is cached by Telegram file_id exactly like every other media file
+    the bot sends — the CDN and Pillow are touched once per page, not once per
+    reader.
+    """
+    file = File()
+    cache_key = "page:%d" % page
+    caption = _page_caption(page, ui_lang)
+    kwargs = dict(chat_id=chat_id, caption=caption,
+                  reply_markup=page_keyboard(page, ui_lang))
+
+    cached_id = file.get_file(cache_key)
+    if cached_id is not None:
+        try:
+            await bot.send_photo(photo=cached_id, **kwargs)
+            return
+        except telegram.error.TelegramError:
+            pass                        # cached file_id rejected; rebuild below
+
+    await bot.send_chat_action(chat_id=chat_id,
+                               action=telegram.constants.ChatAction.UPLOAD_PHOTO)
+    start_s, start_a, end_s, end_a = Quran.page_range(page)
+    urls = [file.get_page_image_filename(s, a)
+            for s, a in Quran.ayahs_between((start_s, start_a), (end_s, end_a))]
+    image = await fetch_and_stitch(urls, "page_%03d.jpg" % page)
+    result = await bot.send_photo(photo=image, **kwargs)
+    file.save_file(cache_key, result.photo[-1].file_id)
+
+
+async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang: str) -> None:
+    """Send the recitation of one mushaf page.
+
+    Most reciters have a single Page<NNN>.mp3 upstream; 19 of the 79 catalog
+    entries do not, and those are served by stitching the page's ayah recitations
+    together instead (the same machinery an ayah range uses, generalized to cross
+    surah boundaries — which a page routinely does).
+    """
+    file = File()
+    title = _page_caption(page, ui_lang).replace("\n", " · ")
+    kwargs = dict(chat_id=chat_id, title=title,
+                  performer=File.get_performer_name(performer))
+    cache_key = "pageaudio:%d:%s" % (page, performer)
+
+    cached_id = file.get_file(cache_key)
+    if cached_id is not None:
+        try:
+            await bot.send_audio(audio=cached_id, **kwargs)
+            return
+        except telegram.error.TelegramError:
+            pass
+
+    await bot.send_chat_action(chat_id=chat_id,
+                               action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    if File.has_page_audio(performer):
+        source = file.get_page_audio_filename(page, performer)
+    else:
+        start_s, start_a, end_s, end_a = Quran.page_range(page)
+        source = await _download_stitched_audio(
+            Quran.ayahs_between((start_s, start_a), (end_s, end_a)), performer,
+            "quran_page_%03d.mp3" % page)
+    result = await bot.send_audio(audio=source, **kwargs)
+    file.save_file(cache_key, result.audio.file_id)
 
 
 async def build_verse_text(surah: int, ayah: int, quran_type: str,
@@ -735,7 +965,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             subfolder = cb_data.split(":", 1)[1]
             await user_settings.set_reciter(cq.from_user.id, None if from_inline else chat_id,
                                             subfolder)
-            confirm = t("reciter_set", ui_lang).format(reciter=File.get_performer_name(subfolder))
+            confirm = reciter_set_confirmation(subfolder, ui_lang)
             if from_inline:
                 # DMing someone who never started the bot raises Forbidden; the
                 # callback answer reaches them wherever the card was shared instead.
@@ -745,15 +975,15 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                 await bot.send_message(chat_id=chat_id, text=confirm)
             return
 
-        if cb_data.startswith("recpage:"):      # the pager on the reciter picker
-            page = int(cb_data.split(":", 1)[1])
+        if cb_data.startswith("recgrp:"):       # a group tab or the pager on the picker
+            _, kind, page_s = cb_data.split(":", 2)
             await bot.answer_callback_query(cq.id)
             if cq.message is None:
                 return                          # no message of ours to turn the page in
             try:                                # swap the keyboard, don't post a new list
                 await bot.edit_message_reply_markup(
                     chat_id=chat_id, message_id=cq.message.message_id,
-                    reply_markup=reciter_keyboard(ui_lang, page, current=reciter))
+                    reply_markup=reciter_keyboard(ui_lang, kind, int(page_s), current=reciter))
             except telegram.error.BadRequest as err:
                 if "not modified" not in str(err).lower():
                     raise
@@ -763,6 +993,22 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             file.set_awaiting_input(chat_id, "reciter_search")
             await bot.answer_callback_query(cq.id)
             await bot.send_message(chat_id=chat_id, text=t("reciter_search_prompt", ui_lang))
+            return
+
+        if cb_data.startswith("pg:"):           # the mushaf pager
+            page = int(cb_data.split(":", 1)[1])
+            await bot.answer_callback_query(cq.id)
+            if 1 <= page <= Quran.PAGE_COUNT:
+                # a page arrives as an image, so it is a fresh message rather than
+                # an edit of the one that was tapped
+                await send_page(bot, page, chat_id, ui_lang)
+            return
+
+        if cb_data.startswith("pga:"):          # "listen to this page"
+            page = int(cb_data.split(":", 1)[1])
+            await bot.answer_callback_query(cq.id)
+            if 1 <= page <= Quran.PAGE_COUNT:
+                await send_page_audio(bot, page, chat_id, reciter, ui_lang)
             return
 
         if cb_data == "showlang":               # the 🌐 button on a verse card
@@ -854,6 +1100,10 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 
     if message.startswith("/"):
         command = message[1:].split("@", 1)[0]   # tolerate /help@BotName
+        # "/page 255" -> ("page", "255"). A bare reference like "/2:255" leaves an
+        # unmatched command and falls through to the reference parser, as before.
+        command, _, argument = command.partition(" ")
+        argument = argument.strip()
         if command in ("start", "help"):
             # ReplyKeyboardRemove clears the old persistent keyboard for anyone
             # upgrading from the pre-inline UI; new users never see one.
@@ -875,10 +1125,37 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                             reply_markup=translation_language_keyboard())
             return
         elif command == "reciter":
-            # open on the page the current reciter is on, with it marked
+            # open on the tab and page the current reciter is on, with it marked
+            kind, page = reciter_page_of(reciter)
             await bot.send_message(chat_id=chat_id, text=t("choose_reciter", ui_lang),
-                            reply_markup=reciter_keyboard(ui_lang, reciter_page_of(reciter),
+                            reply_markup=reciter_keyboard(ui_lang, kind, page,
                                                           current=reciter))
+            return
+        elif command == "page":
+            # bare /page opens where the reader already is, rather than erroring
+            page = Quran.page_of(surah, ayah) if not argument else _as_int(argument)
+            if page is None or not 1 <= page <= Quran.PAGE_COUNT:
+                await bot.send_message(
+                    chat_id=chat_id,
+                    text=t("page_out_of_range", ui_lang).format(total=Quran.PAGE_COUNT))
+                return
+            await send_page(bot, page, chat_id, ui_lang)
+            return
+        elif command == "juz":
+            juz = Quran.juz_of(surah, ayah) if not argument else _as_int(argument)
+            if juz is None or not 1 <= juz <= Quran.JUZ_COUNT:
+                await bot.send_message(
+                    chat_id=chat_id,
+                    text=t("juz_out_of_range", ui_lang).format(total=Quran.JUZ_COUNT))
+                return
+            # a juz is ~20 pages of reading, so it opens the page reader at its
+            # first page rather than trying to be a single message or audio file
+            start_s, start_a, _, _ = Quran.juz_range(juz)
+            await send_page(bot, Quran.page_of(start_s, start_a), chat_id, ui_lang)
+            return
+        elif command == "sajda":
+            await bot.send_message(chat_id=chat_id, text=t("sajda_list_title", ui_lang),
+                            reply_markup=sajda_keyboard(ui_lang))
             return
         elif command == "random":
             surah, ayah = Quran.get_random_ayah()

@@ -154,6 +154,53 @@ stateDiagram-v2
 - `get_next_ayah` / `get_previous_ayah` wrap around the 114 surahs.
 - `exists()` and `surah_lengths` enforce valid bounds (total 6236 ayahs).
 
+### Structural divisions (page / juz / sajda)
+
+Alongside the ayah reader there is a **page reader**, working in the unit people
+actually read and memorize in. All of it comes from `quran-data.xml`, which the bot
+already shipped: `pages` (604), `juzs` (30), `hizbs` (240), `manzils` (7),
+`rukus` (556), `sajdas` (15). Only `suras` was read before.
+
+- `Quran.page_range(n)` / `juz_range(n)` → `(start_surah, start_ayah, end_surah,
+  end_ayah)`. A division runs to the ayah before the next one's mark; they tile the
+  Qur'an with no gaps or overlaps (asserted in `tests/test_navigation.py`).
+- `Quran.page_of(s, a)` / `juz_of(s, a)` bisect the marks — `(surah, ayah)` tuples
+  sort in mushaf order, so the containing division is the last mark at or before it.
+- **96 of the 604 pages cross a surah boundary**, so page media works on a list of
+  `(surah, ayah)` pairs, not a single surah's `(start, end)`. `_download_stitched_audio`
+  takes that list; `_download_combined_audio` is now a thin surah-scoped wrapper.
+- `/juz N` opens the page reader at that juz's first page rather than trying to be
+  one message or one (~20 minute) audio file.
+- `hizbs`/`manzils`/`rukus` are parsed and exposed but have no commands yet.
+
+### Page images and page audio
+
+everyayah.com serves **no full-page mushaf image** — only per-ayah renderings — so a
+page image is stitched from them (`lib/page_image.py`) using the uniform-width
+`quranpngs` set. It is not a facsimile: inter-ayah margins are uneven. Guards: the
+result is downscaled to Telegram's `width + height ≤ 10000`, re-encoded as JPEG under
+the upload cap, and concurrent stitches are bounded so they cannot exhaust the 512 MB
+instance. The upload is cached by `file_id` (`page:<n>`), so a page is stitched once,
+not once per reader.
+
+Page audio prefers the reciter's single `PageMp3s/Page<NNN>.mp3`. **19 of the 79
+catalog entries have none** (verified by probing the CDN — everyayah's own HTML
+listing overstates availability), and those fall back to stitching the page's ayah
+recitations. No page exceeds `MAX_RANGE_AYAHS`, so the fallback is always in bounds.
+
+### Audio catalog kinds
+
+`performers.json` entries carry a `kind`: `recitation` (68), `riwayah` (3),
+`translation` (8). This is a correctness concern, not cosmetics — a *riwayah* is a
+different reading of the text (Warsh vs the Ḥafṣ shown on screen), and a
+*translation* entry is not recitation at all but the translated meaning read aloud.
+`/reciter` groups by kind under labelled tabs, and choosing a non-`recitation` entry
+appends a warning specific to which of the two it is.
+
+**Audio never follows language.** No code path lets `/language` or `/translation`
+change which recording is sent; only `/reciter` does. `tests/test_reciter_picker.py`
+asserts this directly.
+
 ---
 
 ## 5. Caching strategy
