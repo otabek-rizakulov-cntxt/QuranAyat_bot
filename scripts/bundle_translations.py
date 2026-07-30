@@ -105,7 +105,17 @@ def bundle_one(lang) -> tuple[str, dict]:
 
 def main() -> None:
     os.makedirs(OUT_DIR, exist_ok=True)
-    to_fetch = [l for l in LANGUAGES if l.edition != TRANSLIT_UZ]
+
+    # Optional subset: `bundle_translations.py translit ru` refreshes only those.
+    # Handy for adding one edition without re-downloading (and re-writing) all 48.
+    only = set(sys.argv[1:])
+    if only:
+        unknown = only - {l.code for l in LANGUAGES}
+        if unknown:
+            sys.exit("unknown language code(s): %s" % ", ".join(sorted(unknown)))
+
+    to_fetch = [l for l in LANGUAGES
+                if l.edition != TRANSLIT_UZ and (not only or l.code in only)]
     meta: dict[str, dict] = {}
     failures: dict[str, str] = {}
 
@@ -124,7 +134,9 @@ def main() -> None:
 
     # Derive Uzbek Latin from the bundled Uzbek Cyrillic.
     uz_cyrl_path = os.path.join(OUT_DIR, "uz-Cyrl.txt")
-    if os.path.exists(uz_cyrl_path):
+    if only and "uz" not in only:
+        pass                                    # not part of this subset
+    elif os.path.exists(uz_cyrl_path):
         with open(uz_cyrl_path, encoding="utf-8") as f:
             cyr = f.read()
         write_file("uz", transliterate_uz(cyr))
@@ -133,9 +145,15 @@ def main() -> None:
         failures["uz"] = "uz-Cyrl.txt missing; cannot transliterate"
         print("  FAIL uz -> uz-Cyrl.txt missing; cannot transliterate")
 
-    write_attributions(meta)
+    if only:
+        # A subset run only knows the editions it fetched, so rewriting the table
+        # would blank every other row. The full run regenerates it correctly.
+        print("\n(subset run: ATTRIBUTIONS.md left alone — "
+              "re-run without arguments to regenerate it)")
+    else:
+        write_attributions(meta)
 
-    print("\nDone. %d ok, %d failed." % (len(LANGUAGES) - len(failures), len(failures)))
+    print("\nDone. %d ok, %d failed." % (len(to_fetch) - len(failures), len(failures)))
     if failures:
         print("Failed:", ", ".join(sorted(failures)))
         sys.exit(1)

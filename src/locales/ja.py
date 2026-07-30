@@ -42,6 +42,7 @@ strings = {
     "juz_out_of_range": "1から{total}までのジュズ番号を送ってください。例: /juz 30",
     "sajda_list_title": "サジダ（跪拝）の節：",
     "btn_ayah_view": "節ごとの表示",
+    "btn_repeat": "繰り返す",
     "reciter_group_recitation": "朗誦者",
     "reciter_group_riwayah": "リワーヤ",
     "reciter_group_translation": "意味",

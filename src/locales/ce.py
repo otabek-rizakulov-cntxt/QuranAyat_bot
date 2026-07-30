@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "1 а {total} а юкъара джузан терахь дӀаяхьа, масала /juz 30.",
     "sajda_list_title": "Сужданан аяташ:",
     "btn_ayah_view": "Аятан хьажар",
+    "btn_repeat": "Юха",
     "reciter_group_recitation": "Дешархой",
     "reciter_group_riwayah": "Ривая",
     "reciter_group_translation": "Маьӏна",

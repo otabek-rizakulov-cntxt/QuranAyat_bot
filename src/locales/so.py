@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Soo dir lambar juz oo u dhexeeya 1 iyo {total}, tusaale /juz 30.",
     "sajda_list_title": "Aayadaha sujuudda:",
     "btn_ayah_view": "Muuqaalka aayadaha",
+    "btn_repeat": "Ku celi",
     "reciter_group_recitation": "Akhristayaasha",
     "reciter_group_riwayah": "Riwaayad",
     "reciter_group_translation": "Macnaha",

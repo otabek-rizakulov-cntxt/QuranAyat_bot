@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "1 بىلەن {total} ئارىسىدىكى جۈزئە نومۇرىنى ئەۋەتىڭ، مەسىلەن /juz 30.",
     "sajda_list_title": "سەجدە ئايەتلىرى:",
     "btn_ayah_view": "ئايەت كۆرۈنۈشى",
+    "btn_repeat": "تەكرار",
     "reciter_group_recitation": "قارىلار",
     "reciter_group_riwayah": "رىۋايەت",
     "reciter_group_translation": "مەنە",

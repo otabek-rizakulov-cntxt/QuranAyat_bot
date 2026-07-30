@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "1 සහ {total} අතර ජුස්අ් අංකයක් එවන්න, උදාහරණයක් /juz 30.",
     "sajda_list_title": "සජදා (හිස නැමීමේ) වැකි:",
     "btn_ayah_view": "වැකි දසුන",
+    "btn_repeat": "නැවත",
     "reciter_group_recitation": "පාරායනකරුවන්",
     "reciter_group_riwayah": "රිවායත්",
     "reciter_group_translation": "අර්ථය",

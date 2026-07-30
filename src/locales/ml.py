@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "1 മുതൽ {total} വരെയുള്ള ഒരു ജുസ്അ് നമ്പർ അയയ്ക്കുക, ഉദാഹരണം /juz 30.",
     "sajda_list_title": "സുജൂദിന്റെ ആയത്തുകൾ:",
     "btn_ayah_view": "ആയത്ത് കാഴ്ച",
+    "btn_repeat": "ആവർത്തിക്കുക",
     "reciter_group_recitation": "ഖാരിഉകൾ",
     "reciter_group_riwayah": "രിവായത്ത്",
     "reciter_group_translation": "അർത്ഥം",

@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "1 белән {total} арасында җөзьә номерын җибәрегез, мәсәлән /juz 30.",
     "sajda_list_title": "Сәҗдә аятьләре:",
     "btn_ayah_view": "Аять күренеше",
+    "btn_repeat": "Кабатла",
     "reciter_group_recitation": "Кариләр",
     "reciter_group_riwayah": "Ривая",
     "reciter_group_translation": "Мәгънә",

@@ -49,6 +49,7 @@ strings = {
     "juz_out_of_range": "ژمارەی جوزئێک لە نێوان ١ و {total} بنێرە، بۆ نموونە /juz 30.",
     "sajda_list_title": "ئایەتەکانی سوجدە:",
     "btn_ayah_view": "پیشاندانی ئایەت",
+    "btn_repeat": "دووبارە",
     "reciter_group_recitation": "قورئانخوێنەکان",
     "reciter_group_riwayah": "ڕیوایەت",
     "reciter_group_translation": "واتا",

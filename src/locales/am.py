@@ -44,6 +44,7 @@ strings = {
     "juz_out_of_range": "ከ1 እስከ {total} ያለ የጁዝእ ቁጥር ይላኩ፣ ለምሳሌ /juz 30።",
     "sajda_list_title": "የስግደት አንቀጾች (ሰጅዳ)፦",
     "btn_ayah_view": "የአንቀጽ እይታ",
+    "btn_repeat": "ድገም",
     "reciter_group_recitation": "አንባቢዎች",
     "reciter_group_riwayah": "ሪዋያ",
     "reciter_group_translation": "ትርጉም",

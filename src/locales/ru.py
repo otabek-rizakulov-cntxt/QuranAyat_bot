@@ -46,6 +46,7 @@ strings = {
     "juz_out_of_range": "Отправьте номер джуза от 1 до {total}, например /juz 30.",
     "sajda_list_title": "Аяты земного поклона (саджда):",
     "btn_ayah_view": "По аятам",
+    "btn_repeat": "Повтор",
     "reciter_group_recitation": "Чтецы",
     "reciter_group_riwayah": "Ривая",
     "reciter_group_translation": "Смысл",

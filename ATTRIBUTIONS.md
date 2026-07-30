@@ -14,6 +14,7 @@ Uzbek Cyrillic edition (`uz-Cyrl`, Muhammad Sodiq Muhammad Yusuf).
 |------|----------|---------|------------|
 | `en` | English | `en.ahmedraza` | Ahmed Raza Khan |
 | `ar` | Arabic | `quran-simple` | Simple |
+| `translit` | Transliteration (Latin) | `en.transliteration` | English Transliteration |
 | `ru` | Russian | `ru.kuliev` | Elmir Kuliev |
 | `uz-Cyrl` | Uzbek (Cyrillic) | `uz.sodik` | Muhammad Sodik Muhammad Yusuf |
 | `uz` | Uzbek (Latin) | `(derived from uz-Cyrl)` | Automatic transliteration |

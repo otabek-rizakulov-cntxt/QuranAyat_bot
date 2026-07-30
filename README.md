@@ -55,6 +55,9 @@ weigh audio quality against storage, and the search button jumps straight to a n
 interface and the translation text; only `/reciter` decides what you hear, so the
 Qur'an is always recited in Arabic unless you deliberately pick otherwise.
 
+For memorization, every verse card carries a **🔁 Repeat ×3** button that sends
+that ayah recited three times back to back, in your chosen reciter's voice.
+
 Also see [AudioQuranBot][], a bot that sends audio files of complete surahs.
 
 [BismillahBot]: https://telegram.me/BismillahBot
@@ -72,6 +75,13 @@ The bot is multilingual. Send `/language` to choose from 48 languages; the
 menus, buttons, error messages, and the verse translation then follow that
 choice. On first contact the interface auto-detects your Telegram language
 (falling back to English), and you can change it any time.
+
+`/translation` offers one more option than `/language` does: a **Latin
+transliteration** of the Arabic, for readers who can follow a recitation but
+cannot read the script. It is catalogued as *translation-only* — it is a way of
+reading the Qur'an rather than a language the interface exists in, so it appears
+under `/translation`, is never offered as a UI language, and needs no string
+table of its own (`UI_LANGUAGES` in `src/locales/languages.py` draws that line).
 
 Every one of the 48 languages has a complete UI string table in
 `src/locales/<code>.py` — no language falls back to English for any interface
@@ -136,8 +146,8 @@ cp .env.example .env
 | `TOKEN`          | Telegram bot token from the BotFather                               |
 | `REDIS_HOST_URL` | Redis URL for user state + the media file-id cache (falls back to an in-memory store if unset) |
 | `AUDIO_BASE_URL` | Base URL of the recitation mp3s (e.g. an everyayah.com mirror/CDN)  |
-| `PHOTO_BASE_URL` | Base URL of the Arabic ayah images                                 |
-| `PAGE_IMAGE_BASE_URL` | Base URL of the per-ayah images `/page` tiles into a page. Needs a **uniform-width** set (everyayah's `quranpngs`, all 1500px); falls back to `PHOTO_BASE_URL` |
+| `PHOTO_BASE_URL` | Base URL of the Arabic ayah images. Prefer everyayah's `quranpngs` (1500px, uniform width) over `images_png` (115–700px) |
+| `PAGE_IMAGE_BASE_URL` | Base URL of the per-ayah images `/page` tiles into a page. Needs a **uniform-width** set (everyayah's `quranpngs`, all 1500px); falls back to `PHOTO_BASE_URL`, so it can stay unset if that already points at `quranpngs` |
 | `WEBHOOK_URL`    | Public HTTPS base URL Telegram POSTs updates to; the webhook is registered as `WEBHOOK_URL` + `/webhook/` + `TOKEN`. Also where Telegram fetches stitched range recitations from (`/media/range.mp3`), so inline range audio is only offered when it is set |
 
 Media (audio + images) is fetched from the configured CDN base URLs at runtime,

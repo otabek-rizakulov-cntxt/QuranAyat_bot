@@ -42,6 +42,7 @@ strings = {
     "juz_out_of_range": "1에서 {total} 사이의 주즈 번호를 보내주세요. 예: /juz 30",
     "sajda_list_title": "사즈다(부복)의 구절:",
     "btn_ayah_view": "구절 보기",
+    "btn_repeat": "반복",
     "reciter_group_recitation": "낭송자",
     "reciter_group_riwayah": "리와야",
     "reciter_group_translation": "의미",

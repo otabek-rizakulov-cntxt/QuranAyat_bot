@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "Wyślij numer dżuzu od 1 do {total}, na przykład /juz 30.",
     "sajda_list_title": "Wersety pokłonu (sadżda):",
     "btn_ayah_view": "Widok wersetów",
+    "btn_repeat": "Powtórz",
     "reciter_group_recitation": "Recytatorzy",
     "reciter_group_riwayah": "Riwaja",
     "reciter_group_translation": "Znaczenie",

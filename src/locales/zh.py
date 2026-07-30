@@ -43,6 +43,7 @@ strings = {
     "juz_out_of_range": "請發送 1 至 {total} 之間的部（juz）編號，例如 /juz 30。",
     "sajda_list_title": "叩拜（辛吉達）的經文：",
     "btn_ayah_view": "逐節檢視",
+    "btn_repeat": "重複",
     "reciter_group_recitation": "誦讀者",
     "reciter_group_riwayah": "傳述",
     "reciter_group_translation": "意義",

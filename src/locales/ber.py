@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Azen uṭṭun n ǧuzʔ gar 1 d {total}, amedya /juz 30.",
     "sajda_list_title": "Tifyar n usujed (sajda):",
     "btn_ayah_view": "Askan n tefyirt",
+    "btn_repeat": "Ales",
     "reciter_group_recitation": "Imɣaren",
     "reciter_group_riwayah": "Riwaya",
     "reciter_group_translation": "Anamek",

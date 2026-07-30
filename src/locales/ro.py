@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Trimite un număr de juz între 1 și {total}, de exemplu /juz 30.",
     "sajda_list_title": "Versete de prosternare (sajda):",
     "btn_ayah_view": "Vizualizare pe versete",
+    "btn_repeat": "Repetă",
     "reciter_group_recitation": "Recitatori",
     "reciter_group_riwayah": "Riwāya",
     "reciter_group_translation": "Sens",

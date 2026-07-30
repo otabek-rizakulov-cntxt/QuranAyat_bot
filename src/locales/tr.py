@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "1 ile {total} arasında bir cüz numarası gönderin, örneğin /juz 30.",
     "sajda_list_title": "Secde ayetleri:",
     "btn_ayah_view": "Ayet görünümü",
+    "btn_repeat": "Tekrar",
     "reciter_group_recitation": "Hafızlar",
     "reciter_group_riwayah": "Rivayet",
     "reciter_group_translation": "Meal",

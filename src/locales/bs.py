@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "Pošaljite broj džuza između 1 i {total}, na primjer /juz 30.",
     "sajda_list_title": "Ajeti sedžde:",
     "btn_ayah_view": "Prikaz ajeta",
+    "btn_repeat": "Ponovi",
     "reciter_group_recitation": "Učači",
     "reciter_group_riwayah": "Rivajet",
     "reciter_group_translation": "Značenje",

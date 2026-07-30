@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "1 से {total} के बीच पारा संख्या भेजें, उदाहरण /juz 30।",
     "sajda_list_title": "सजदा की आयतें:",
     "btn_ayah_view": "आयत दृश्य",
+    "btn_repeat": "दोहराएँ",
     "reciter_group_recitation": "क़ारी",
     "reciter_group_riwayah": "रिवायत",
     "reciter_group_translation": "अर्थ",

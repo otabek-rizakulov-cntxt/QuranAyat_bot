@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Sende eine Dschuz-Nummer zwischen 1 und {total}, zum Beispiel /juz 30.",
     "sajda_list_title": "Verse der Niederwerfung (Sadschda):",
     "btn_ayah_view": "Vers-Ansicht",
+    "btn_repeat": "Wiederholen",
     "reciter_group_recitation": "Rezitatoren",
     "reciter_group_riwayah": "Riwāya",
     "reciter_group_translation": "Bedeutung",

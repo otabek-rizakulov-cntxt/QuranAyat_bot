@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "Kirim nomor juz antara 1 dan {total}, misalnya /juz 30.",
     "sajda_list_title": "Ayat-ayat sujud (sajdah):",
     "btn_ayah_view": "Tampilan ayat",
+    "btn_repeat": "Ulangi",
     "reciter_group_recitation": "Qari",
     "reciter_group_riwayah": "Riwayat",
     "reciter_group_translation": "Makna",

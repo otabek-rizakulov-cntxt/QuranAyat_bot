@@ -47,6 +47,7 @@ strings = {
     "juz_out_of_range": "1 اور {total} کے درمیان پارہ نمبر بھیجیں، مثلاً /juz 30۔",
     "sajda_list_title": "سجدے کی آیات:",
     "btn_ayah_view": "آیت کا منظر",
+    "btn_repeat": "دہرائیں",
     "reciter_group_recitation": "قاری",
     "reciter_group_riwayah": "روایت",
     "reciter_group_translation": "معنی",

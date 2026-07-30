@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Tuma nambari ya juzuu kati ya 1 na {total}, kwa mfano /juz 30.",
     "sajda_list_title": "Aya za sijda:",
     "btn_ayah_view": "Mwonekano wa aya",
+    "btn_repeat": "Rudia",
     "reciter_group_recitation": "Wasomaji",
     "reciter_group_riwayah": "Riwaya",
     "reciter_group_translation": "Maana",

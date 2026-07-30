@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Send et juz-nummer mellom 1 og {total}, for eksempel /juz 30.",
     "sajda_list_title": "Vers med nedbøyelse (sajda):",
     "btn_ayah_view": "Versvisning",
+    "btn_repeat": "Gjenta",
     "reciter_group_recitation": "Resitatører",
     "reciter_group_riwayah": "Riwāya",
     "reciter_group_translation": "Betydning",

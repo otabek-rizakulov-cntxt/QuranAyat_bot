@@ -49,6 +49,7 @@ strings = {
     "juz_out_of_range": "၁ မှ {total} အတွင်း ဂျုစ်အ် နံပါတ်ကို ပို့ပါ၊ ဥပမာ /juz 30။",
     "sajda_list_title": "ဆွဂျ်ဒဟ် (ဦးချခြင်း) အာယသ်များ။",
     "btn_ayah_view": "အာယသ်အမြင်",
+    "btn_repeat": "ထပ်ဖွင့်",
     "reciter_group_recitation": "ကာရီများ",
     "reciter_group_riwayah": "ရိဝါယသ်",
     "reciter_group_translation": "အဓိပ္ပာယ်",

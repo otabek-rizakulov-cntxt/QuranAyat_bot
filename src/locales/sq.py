@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Dërgo një numër xhuzi midis 1 dhe {total}, për shembull /juz 30.",
     "sajda_list_title": "Ajetet e sexhdes:",
     "btn_ayah_view": "Pamja sipas ajeteve",
+    "btn_repeat": "Përsërit",
     "reciter_group_recitation": "Recituesit",
     "reciter_group_riwayah": "Rivajet",
     "reciter_group_translation": "Kuptimi",

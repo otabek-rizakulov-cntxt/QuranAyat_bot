@@ -45,6 +45,7 @@ strings = {
     "juz_out_of_range": "Pošlete číslo džuzu mezi 1 a {total}, například /juz 30.",
     "sajda_list_title": "Verše pokleknutí (sadžda):",
     "btn_ayah_view": "Zobrazení veršů",
+    "btn_repeat": "Opakovat",
     "reciter_group_recitation": "Recitátoři",
     "reciter_group_riwayah": "Rivája",
     "reciter_group_translation": "Význam",

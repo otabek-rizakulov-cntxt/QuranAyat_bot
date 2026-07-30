@@ -48,6 +48,7 @@ strings = {
     "juz_out_of_range": "Envie um número de juz entre 1 e {total}, por exemplo /juz 30.",
     "sajda_list_title": "Versículos de prostração (sajda):",
     "btn_ayah_view": "Vista por versículos",
+    "btn_repeat": "Repetir",
     "reciter_group_recitation": "Recitadores",
     "reciter_group_riwayah": "Riwāya",
     "reciter_group_translation": "Significado",
