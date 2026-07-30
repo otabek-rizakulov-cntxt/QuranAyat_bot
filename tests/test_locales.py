@@ -14,9 +14,11 @@ from locales import (
     DEFAULT_LANG,
     LANGUAGES,
     LOCALES,
+    UI_LANGUAGES,
     button_action,
     get_language,
     is_supported,
+    is_ui_language,
     keyboard_rows,
     missing_keys,
     missing_locales,
@@ -26,7 +28,10 @@ from locales import (
 )
 
 _PLACEHOLDER = re.compile(r"\{(\w+)\}")
-_CODES = [lang.code for lang in LANGUAGES]
+# Only interface languages have a string table. Translation-only entries (the
+# transliteration) are a way to read the Qur'an, not a language the bot's own text
+# exists in, so having no table is correct for them rather than a gap.
+_CODES = [lang.code for lang in UI_LANGUAGES]
 _REQUIRED_KEYS = sorted(LOCALES[DEFAULT_LANG])
 
 

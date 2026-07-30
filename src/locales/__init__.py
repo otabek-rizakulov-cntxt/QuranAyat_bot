@@ -9,8 +9,8 @@ from functools import lru_cache
 from importlib import import_module
 
 from .languages import (  # re-exported for callers
-    LANGUAGES, LANGUAGES_BY_CODE, DEFAULT_LANG, Language,
-    get_language, is_supported, normalize_lang,
+    LANGUAGES, LANGUAGES_BY_CODE, UI_LANGUAGES, DEFAULT_LANG, Language,
+    get_language, is_supported, is_ui_language, normalize_lang,
 )
 
 
@@ -22,14 +22,18 @@ def _module_name(code: str) -> str:
 def _load_locales() -> dict[str, dict]:
     """Import one string table per catalogued language, keyed by language code.
 
-    Driven by LANGUAGES rather than a hand-written import list, so adding a
+    Driven by UI_LANGUAGES rather than a hand-written import list, so adding a
     language to the catalogue is enough. A language whose module is missing is
     skipped with a warning instead of breaking startup — `t()` then serves it
     from English. `missing_locales()` reports the gap (the test suite asserts
     it is empty).
+
+    Translation-only entries (the transliteration) are skipped: they are a way to
+    read the Qur'an, not a language the interface exists in, so having no string
+    table is correct rather than a gap.
     """
     tables: dict[str, dict] = {}
-    for lang in LANGUAGES:
+    for lang in UI_LANGUAGES:
         try:
             module = import_module("." + _module_name(lang.code), __name__)
         except ImportError:
@@ -44,8 +48,8 @@ LOCALES: dict[str, dict] = _load_locales()
 
 
 def missing_locales() -> list[str]:
-    """Catalogued languages with no locale table of their own."""
-    return [lang.code for lang in LANGUAGES if lang.code not in LOCALES]
+    """Interface languages with no locale table of their own."""
+    return [lang.code for lang in UI_LANGUAGES if lang.code not in LOCALES]
 
 
 def missing_keys(lang: str) -> list[str]:

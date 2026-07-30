@@ -17,7 +17,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 from locales import (  # noqa: E402
     ACTION_BUTTON_KEYS, BOT_COMMANDS, DEFAULT_LANG, LANGUAGES, LOCALES,
-    button_action, keyboard_rows, missing_keys, missing_locales, t, welcome_text,
+    UI_LANGUAGES, button_action, keyboard_rows, missing_keys, missing_locales,
+    t, welcome_text,
 )
 
 PLACEHOLDER = re.compile(r"\{(\w+)\}")
@@ -37,7 +38,9 @@ def main() -> int:
     if absent:
         problems.append("languages with no locale table: " + ", ".join(absent))
 
-    for lang in LANGUAGES:
+    # Only interface languages need a string table; translation-only entries (the
+    # transliteration) are a reading of the Qur'an, not a language the UI exists in.
+    for lang in UI_LANGUAGES:
         code = lang.code
         table = LOCALES.get(code)
         if table is None:
@@ -88,7 +91,16 @@ def main() -> int:
             problems.append("%s: /start omits: %s"
                             % (code, ", ".join("/" + c for c in absent_commands)))
 
-    print("checked %d languages, %d keys each" % (len(LANGUAGES), len(REQUIRED_KEYS)))
+    # Every bundled translation must actually exist on disk, including the
+    # translation-only ones that have no string table to check.
+    for lang in LANGUAGES:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
+                            "translations", lang.code + ".txt")
+        if not os.path.exists(path):
+            problems.append("%s: translations/%s.txt is missing" % (lang.code, lang.code))
+
+    print("checked %d interface languages (%d keys each) and %d bundled translations"
+          % (len(UI_LANGUAGES), len(REQUIRED_KEYS), len(LANGUAGES)))
     if problems:
         print("\n%d problem(s):" % len(problems))
         for p in problems:

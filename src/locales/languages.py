@@ -28,6 +28,12 @@ class Language:
     rtl: bool          # right-to-left script (Telegram renders it correctly on its own)
     edition: str       # alquran.cloud edition id, or a sentinel above
     flag: str = ""     # representative flag emoji for the /language picker (see note below)
+    # True for entries that are a way to *read the Qur'an* rather than a language
+    # the interface can be shown in — currently the Latin transliteration. They
+    # appear in /translation only: they have no UI string table (and are not
+    # expected to have one), no Telegram command menu, and cannot be set as a UI
+    # language. See UI_LANGUAGES below.
+    translation_only: bool = False
 
 
 # Ordered for the /language picker: English first, then the Central-Asia-focused
@@ -41,6 +47,11 @@ class Language:
 LANGUAGES: list[Language] = [
     Language("en",      "English",           "English",             False, "en.ahmedraza",    "🇬🇧"),
     Language("ar",      "العربية",            "Arabic",              True,  ARABIC_ORIGINAL,   "🇸🇦"),
+    # Not a language: the Arabic sounded out in Latin letters, for the many readers
+    # who can follow the recitation but cannot read the script. Offered under
+    # /translation only — see `translation_only` above.
+    Language("translit", "Transliteration",  "Transliteration (Latin)", False,
+             "en.transliteration", "🔤", translation_only=True),
     Language("ru",      "Русский",           "Russian",             False, "ru.kuliev",       "🇷🇺"),
     Language("uz-Cyrl", "Ўзбекча (Кирилл)",  "Uzbek (Cyrillic)",    False, "uz.sodik",        "🇺🇿"),
     Language("uz",      "Oʻzbekcha (Lotin)", "Uzbek (Latin)",       False, TRANSLIT_UZ,       "🇺🇿"),
@@ -95,6 +106,11 @@ LANGUAGES: list[Language] = [
 LANGUAGES_BY_CODE: dict[str, Language] = {lang.code: lang for lang in LANGUAGES}
 DEFAULT_LANG = "en"
 
+# Languages the *interface* can be shown in — everything except the reading aids.
+# This is the list that must have a complete locale table, and the one /language
+# offers; /translation offers all of LANGUAGES.
+UI_LANGUAGES: list[Language] = [lang for lang in LANGUAGES if not lang.translation_only]
+
 
 def get_language(code: str) -> Language:
     """Return the Language for `code`, or the English default if unknown."""
@@ -103,6 +119,14 @@ def get_language(code: str) -> Language:
 
 def is_supported(code: str) -> bool:
     return code in LANGUAGES_BY_CODE
+
+
+def is_ui_language(code: str) -> bool:
+    """Whether `code` may be used as an interface language (i.e. has a string
+    table). False for reading aids like the transliteration, which are offered
+    as a translation but can never be the UI."""
+    lang = LANGUAGES_BY_CODE.get(code)
+    return lang is not None and not lang.translation_only
 
 
 def normalize_lang(code: str | None) -> str:
@@ -114,7 +138,7 @@ def normalize_lang(code: str | None) -> str:
     """
     if not code:
         return DEFAULT_LANG
-    if code in LANGUAGES_BY_CODE:
+    if is_ui_language(code):
         return code
     primary = code.split("-", 1)[0].lower()
-    return primary if primary in LANGUAGES_BY_CODE else DEFAULT_LANG
+    return primary if is_ui_language(primary) else DEFAULT_LANG
