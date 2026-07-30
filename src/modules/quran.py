@@ -16,6 +16,7 @@
 import os
 import re
 import xml.etree.ElementTree as ET
+from bisect import bisect_right
 from random import randint
 from typing import Tuple
 
@@ -25,6 +26,24 @@ from locales.languages import DEFAULT_LANG
 # Resolve it absolutely from this file so it works regardless of the process cwd.
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TRANSLATIONS_DIR = os.path.join(_REPO_ROOT, "translations")
+
+# tanzil's quran-data.xml, parsed once at import. Resolved absolutely for the same
+# reason TRANSLATIONS_DIR is: the corpus must load whatever the process cwd is.
+_QURAN_DATA = ET.parse(os.path.join(_REPO_ROOT, "quran-data.xml")).getroot()
+
+
+def _division_marks(tag: str) -> tuple:
+    """Start position of every division of one kind, in mushaf order.
+
+    Returns ((sura, aya), ...) — e.g. `_division_marks("pages")` has 604 entries,
+    the first ayah of each page. A division runs from its own mark to the ayah
+    before the next one's, which is what `Quran._division_range` reconstructs.
+
+    (sura, aya) tuples sort in mushaf order, so these are also directly bisectable
+    to answer "which division is this ayah in?".
+    """
+    return tuple((int(e.attrib["sura"]), int(e.attrib["aya"]))
+                 for e in _QURAN_DATA.find(tag))
 
 
 def parse_quran(filename: str):
@@ -114,7 +133,20 @@ class Quran:
     """Interface to get ayahs from the Quran."""
     surah_lengths = (7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6)
 
-    surah_names = [s.attrib["tname"] for s in ET.parse("quran-data.xml").getroot().find("suras")]
+    surah_names = [s.attrib["tname"] for s in _QURAN_DATA.find("suras")]
+
+    # The mushaf's structural divisions, all from the same quran-data.xml the surah
+    # names come from. `pages` and `juzs` back /page and /juz; the other three are
+    # exposed for callers that want them but have no command of their own yet.
+    pages = _division_marks("pages")        # 604
+    juzs = _division_marks("juzs")          # 30
+    hizbs = _division_marks("hizbs")        # 240
+    manzils = _division_marks("manzils")    # 7
+    rukus = _division_marks("rukus")        # 556
+
+    # Ayahs of prostration: (sura, aya, "obligatory" | "recommended").
+    sajdas = tuple((int(s.attrib["sura"]), int(s.attrib["aya"]), s.attrib["type"])
+                   for s in _QURAN_DATA.find("sajdas"))
 
     def __init__(self, text: list) -> None:
         """`text` is a list of surahs, each a list of ayah strings (see parse_quran)."""
@@ -173,6 +205,83 @@ class Quran:
     @staticmethod
     def get_surah_name(surah: int) -> str:
         return Quran.surah_names[surah - 1]
+
+    # --- Structural divisions ---------------------------------------------------
+    # A page or juz is a *range* of ayahs that routinely crosses a surah boundary
+    # (96 of the 604 pages do), so everything here works in (surah, ayah) pairs
+    # rather than the single-surah (surah, start, end) shape the rest of the bot
+    # uses for ayah ranges.
+
+    PAGE_COUNT = len(pages)
+    JUZ_COUNT = len(juzs)
+
+    @staticmethod
+    def _division_range(marks: tuple, n: int):
+        """(start_surah, start_ayah, end_surah, end_ayah) of the n-th division.
+
+        Divisions are contiguous and gapless, so one ends where the next begins:
+        the end is the ayah just before the next mark. The final division has no
+        next mark and runs to the last ayah of the Qur'an. Returns None if `n` is
+        out of range.
+        """
+        if not 1 <= n <= len(marks):
+            return None
+        start_s, start_a = marks[n - 1]
+        if n == len(marks):
+            end_s = 114
+            end_a = Quran.get_surah_length(114)
+        else:
+            # get_previous_ayah wraps 1:1 -> 114:6, but no mark after the first is
+            # ever 1:1, so the step back can never wrap here.
+            end_s, end_a = Quran.get_previous_ayah(*marks[n])
+        return start_s, start_a, end_s, end_a
+
+    @staticmethod
+    def page_range(n: int):
+        """The ayah span of mushaf page `n` (1-604), or None if out of range."""
+        return Quran._division_range(Quran.pages, n)
+
+    @staticmethod
+    def juz_range(n: int):
+        """The ayah span of juz `n` (1-30), or None if out of range."""
+        return Quran._division_range(Quran.juzs, n)
+
+    @staticmethod
+    def _division_of(marks: tuple, s: int, a: int) -> int:
+        """1-based index of the division containing ayah s:a.
+
+        (surah, ayah) tuples sort in mushaf order, so the containing division is
+        simply the last mark at or before this ayah.
+        """
+        return bisect_right(marks, (s, a))
+
+    @staticmethod
+    def page_of(s: int, a: int) -> int:
+        """The mushaf page ayah s:a is on."""
+        return Quran._division_of(Quran.pages, s, a)
+
+    @staticmethod
+    def juz_of(s: int, a: int) -> int:
+        """The juz ayah s:a is in."""
+        return Quran._division_of(Quran.juzs, s, a)
+
+    @staticmethod
+    def ayahs_between(start: tuple, end: tuple) -> list:
+        """Every (surah, ayah) from `start` to `end` inclusive, in mushaf order.
+
+        This is what turns a page or juz into the list of per-ayah media files it
+        is made of. Returns [] if `end` precedes `start`.
+        """
+        if tuple(end) < tuple(start):
+            return []
+        s, a = start
+        last = tuple(end)
+        ayahs = []
+        while True:
+            ayahs.append((s, a))
+            if (s, a) == last:
+                return ayahs
+            s, a = Quran.get_next_ayah(s, a)
 
 
 class TranslationRegistry:
