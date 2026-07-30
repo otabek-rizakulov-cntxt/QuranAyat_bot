@@ -123,3 +123,32 @@ class File(Environment):
 
   def get_image_filename(self, s: int, a: int) -> str:
     return self.get_env("quranic_images_file_path") + "/" + str(s) + "_" + str(a) + ".png"
+
+  def get_page_image_filename(self, s: int, a: int) -> str:
+    """The per-ayah image the page stitcher tiles — same naming as
+    get_image_filename, but from the uniform-width set (see config.env)."""
+    return self.get_env("page_image_base_url") + "/" + str(s) + "_" + str(a) + ".png"
+
+  @classmethod
+  def has_page_audio(cls, subfolder: str) -> bool:
+    """Whether this recording has one-file-per-mushaf-page recitations.
+
+    Recorded per entry in performers.json rather than probed at request time: a
+    dozen entries in the catalog have no PageMp3s directory at all, and the page
+    send needs to know *before* it picks between the single file and stitching the
+    page's ayahs together.
+    """
+    match = next((p for p in cls._load_performers() if p["subfolder"] == subfolder), None)
+    return bool(match and match.get("page_audio"))
+
+  def get_page_audio_filename(self, page: int, performer: str) -> str:
+    """URL of the reciter's single-file recitation of mushaf page `page`.
+
+    Only meaningful when `has_page_audio(performer)`; callers stitch the page's
+    ayah recitations together instead when it is False.
+    """
+    return "{base}/{sub}/PageMp3s/Page{p}.mp3".format(
+      base=self.get_env("audio_base_url"),
+      sub=performer,
+      p=str(page).zfill(3),
+    )
