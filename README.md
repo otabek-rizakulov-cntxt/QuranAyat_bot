@@ -31,10 +31,29 @@ instead of a reference (`@BismillahBot sudais`), which offers to switch your
 recitation. A conversation looks like:
 ![example]
 
-Pick your reciter with `/reciter`: the picker pages through the whole ~80-entry
-catalog with Previous/Next, shows each recording's bitrate so you can weigh audio
-quality against how much storage it costs, and has a search button for jumping
-straight to a name (`sudais 192` narrows to one entry).
+You can also read by the **page of the mushaf** rather than verse by verse. `/page
+255` sends that whole page as one image — assembled from its ayahs, since
+everyayah.com has no full-page image — under a 1–604 pager, with the page's
+recitation one tap away rather than attached. `/juz 30` opens the page reader at the
+start of that juz, and `/sajda` lists the fifteen verses of prostration. A bare
+`/page` or `/juz` opens wherever you already are.
+
+Pick your reciter with `/reciter`. The picker groups the ~80-entry catalog into
+three labelled tabs, because they are not the same kind of recording:
+
+- **Reciters** (68) — ordinary Arabic recitation.
+- **Riwāyah** (3) — the Warsh reading, which *differs from the Ḥafṣ text* shown in
+  the Arabic and translations here, so the audio will not always match the screen.
+- **Meaning** (8) — not recitation at all, but the translated meaning read aloud.
+
+Choosing from either of the last two tells you so at the moment you choose. Each tab
+pages with Previous/Next, every button carries the recording's bitrate so you can
+weigh audio quality against storage, and the search button jumps straight to a name
+(`sudais 192` narrows to one entry).
+
+**Your language never changes your audio.** `/language` and `/translation` set the
+interface and the translation text; only `/reciter` decides what you hear, so the
+Qur'an is always recited in Arabic unless you deliberately pick otherwise.
 
 Also see [AudioQuranBot][], a bot that sends audio files of complete surahs.
 
@@ -118,6 +137,7 @@ cp .env.example .env
 | `REDIS_HOST_URL` | Redis URL for user state + the media file-id cache (falls back to an in-memory store if unset) |
 | `AUDIO_BASE_URL` | Base URL of the recitation mp3s (e.g. an everyayah.com mirror/CDN)  |
 | `PHOTO_BASE_URL` | Base URL of the Arabic ayah images                                 |
+| `PAGE_IMAGE_BASE_URL` | Base URL of the per-ayah images `/page` tiles into a page. Needs a **uniform-width** set (everyayah's `quranpngs`, all 1500px); falls back to `PHOTO_BASE_URL` |
 | `WEBHOOK_URL`    | Public HTTPS base URL Telegram POSTs updates to; the webhook is registered as `WEBHOOK_URL` + `/webhook/` + `TOKEN`. Also where Telegram fetches stitched range recitations from (`/media/range.mp3`), so inline range audio is only offered when it is set |
 
 Media (audio + images) is fetched from the configured CDN base URLs at runtime,
