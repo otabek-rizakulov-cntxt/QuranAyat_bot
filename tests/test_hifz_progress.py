@@ -20,13 +20,17 @@ import pytest
 
 from lib.hifz_progress import (
     TOTAL_AYAHS,
+    TOTAL_PAGES,
     JuzProgress,
+    PageProgress,
     Progress,
     ProgressSummary,
     SurahProgress,
     format_percent,
+    juz_page_progress,
     juz_progress,
     load_summary,
+    quran_page_progress,
     quran_progress,
     round_percent,
     started_juzs,
@@ -444,3 +448,110 @@ class TestInputHandling:
         assert quran_progress(None).done == 0
         assert quran_progress([]).done == 0
         assert summarize(None).is_empty
+
+
+# --- Counting in pages ----------------------------------------------------------
+# The surah figure is quoted in ayahs because that is how a surah is learned; the
+# juz and whole-Qur'an figures are quoted in mushaf pages because that is how a
+# hafiz measures them. A juz is "twenty pages", never "431 ayahs".
+
+class TestPageProgress:
+    def test_a_juz_is_about_twenty_pages(self):
+        """604 pages over 30 juz averages 20.1, and none strays far from it.
+
+        Juz 30 is the real outlier at 23 pages: it is the short surahs, which
+        start a new page far more often than a page of Al-Baqarah does. That is a
+        property of the mushaf, not of this arithmetic, so it is asserted rather
+        than smoothed away.
+        """
+        totals = [juz_page_progress([], j).total_pages for j in range(1, 31)]
+        for juz, total in enumerate(totals, start=1):
+            assert 19 <= total <= 23, (juz, total)
+        assert round(sum(totals) / 30, 1) == 20.1
+        assert totals[29] == max(totals)      # juz 30, the longest in pages
+
+    def test_juz_29_is_exactly_twenty_pages(self):
+        assert juz_page_progress([], 29).total_pages == 20.0
+
+    def test_the_thirty_juz_totals_sum_to_the_whole_mushaf(self):
+        """A page straddling a juz boundary is shared, not double-counted.
+
+        Counting such a page whole in both juz would make the thirty totals add up
+        to more than the mushaf — the arithmetic would be quietly inflating every
+        boundary juz.
+        """
+        total = sum(juz_page_progress([], j).total_pages for j in range(1, 31))
+        assert round(total, 6) == float(TOTAL_PAGES)
+
+    def test_pages_are_fractional_within_a_page(self):
+        """Two thirds of a page is two thirds of a page, not 0 and not 1."""
+        # page 562 is 67:1-12, so eight ayahs is 8/12 of it
+        eight = quran_page_progress([(67, 1, 8)])
+        assert 0.6 < eight.done_pages < 0.7
+        assert eight.is_started
+
+    def test_pages_and_ayahs_disagree_which_is_the_whole_point(self):
+        """Juz 29's ayahs are short and its pages are not."""
+        by_ayah = juz_progress([(67, 1, 8)], 29)
+        by_page = juz_page_progress([(67, 1, 8)], 29)
+        assert by_page.fraction > by_ayah.fraction
+
+    def test_a_finished_juz_reads_one_hundred(self):
+        whole = _whole_quran_spans()
+        assert juz_page_progress(whole, 30).percent == 100.0
+        assert juz_page_progress(whole, 30).is_complete
+
+    def test_a_finished_quran_reads_one_hundred(self):
+        done = quran_page_progress(_whole_quran_spans())
+        assert round(done.done_pages, 6) == float(TOTAL_PAGES)
+        assert done.percent == 100.0
+        assert done.is_complete
+
+    def test_nothing_memorized_is_zero_not_a_division_error(self):
+        blank = quran_page_progress([])
+        assert blank.done_pages == 0.0
+        assert blank.percent == 0.0
+        assert blank.is_started is False
+        assert blank.total_pages == float(TOTAL_PAGES)
+
+    def test_a_started_page_is_never_reported_as_zero_percent(self):
+        """The floor that stops "0%" being shown to someone who has begun."""
+        one_ayah = quran_page_progress([(2, 255, 255)])
+        assert one_ayah.is_started
+        assert one_ayah.percent > 0
+        assert one_ayah.percent_text != "0"
+
+    def test_page_progress_never_exceeds_one_hundred(self):
+        """A row running past the end of its surah must not inflate the total."""
+        assert quran_page_progress([(67, 1, 999)]).percent <= 100.0
+        assert juz_page_progress([(67, 1, 999)], 29).percent <= 100.0
+
+    def test_an_unreal_juz_is_empty_rather_than_an_error(self):
+        for bad in (0, 31, 99):
+            empty = juz_page_progress([(67, 1, 8)], bad)
+            assert empty.total_pages == 0.0
+            assert empty.fraction == 0.0
+
+    def test_pages_text_is_a_bare_token(self):
+        assert quran_page_progress([]).pages_text == "0"
+        assert "%" not in quran_page_progress([(67, 1, 8)]).pages_text
+
+    def test_summary_carries_both_units(self):
+        summary = summarize([(67, 1, 8)])
+        assert summary.focus.done == 8 and summary.focus.total == 30
+        assert summary.focus.percent_text == "27"          # ayahs, per the done-when
+        assert isinstance(summary.quran_pages, PageProgress)
+        assert isinstance(summary.focus_juz_pages, PageProgress)
+        assert summary.focus_juz_pages.total_pages == 20.0  # juz 29
+        # the ayah-based readings survive for the breakdown
+        assert summary.quran.total == TOTAL_AYAHS
+
+    def test_a_blank_summary_still_has_page_figures(self):
+        summary = summarize([])
+        assert summary.is_empty
+        assert summary.quran_pages.percent == 0.0
+        assert summary.focus_juz_pages is None
+
+
+def _whole_quran_spans():
+    return [(s, 1, Quran.get_surah_length(s)) for s in range(1, 115)]

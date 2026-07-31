@@ -84,6 +84,18 @@ class ScheduleStore(abc.ABC):
     """Move a row to 'failed' so the loop never retries it blindly."""
 
   @abc.abstractmethod
+  async def release(self, send_id: int) -> Optional[ScheduledSend]:
+    """Put one claimed row back to 'pending' so the next tick retries it.
+
+    The difference between this and `mark_failed` is the difference between "it
+    did not send" and "it will never send". A malformed payload or a user who has
+    blocked the bot is failed; a timeout or a rate limit is released, because the
+    reminder is still worth delivering a minute from now. Retrying is bounded by
+    `drop_stale`, which deletes the row once it stops being same-day-relevant —
+    so releasing cannot loop forever without an attempts column to stop it.
+    """
+
+  @abc.abstractmethod
   async def release_stale_claims(self, claimed_before: datetime) -> int:
     """Return rows claimed before `claimed_before` to 'pending'; count released.
 
@@ -154,6 +166,14 @@ class InMemoryScheduleStore(ScheduleStore):
 
   async def mark_failed(self, send_id):
     return self._resolve(send_id, STATE_FAILED)
+
+  async def release(self, send_id):
+    row = self._state.scheduled_send.get(send_id)
+    if row is None:
+      return None
+    row.state = STATE_PENDING
+    row.claimed_at = None
+    return self._copy(row)
 
   async def release_stale_claims(self, claimed_before):
     released = 0
@@ -237,6 +257,13 @@ class PostgresScheduleStore(ScheduleStore):
 
   async def mark_failed(self, send_id):
     return await self._resolve(send_id, STATE_FAILED)
+
+  async def release(self, send_id):
+    # claimed_at is cleared alongside the state: a row left 'pending' with a
+    # stale claimed_at would be released a second time by release_stale_claims.
+    return self._row(await self._pool.fetchrow(
+      "UPDATE scheduled_send SET state = $2, claimed_at = NULL, updated_at = now() "
+      "WHERE id = $1 RETURNING " + _COLUMNS, send_id, STATE_PENDING))
 
   async def release_stale_claims(self, claimed_before):
     records = await self._pool.fetch(

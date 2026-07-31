@@ -569,3 +569,108 @@ class TestRegistry:
         assert result.failed == 1
         assert (await store.schedule.get(row.id)).state == "failed"
         bot.send_message.assert_not_awaited()
+
+
+class TestTransientFailuresAreRetried:
+    """A thirty-second network blip at the reminder instant must not cost the user
+    their day's push — and, with no attempts column, must not retry forever either."""
+
+    async def test_a_timeout_puts_the_row_back_on_the_queue(self, store, bot):
+        attempts = []
+
+        @scheduler.send_handler("drill")
+        async def flaky(ctx):
+            attempts.append(ctx.chat_id)
+            if len(attempts) == 1:
+                raise telegram.error.TimedOut()
+
+        row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
+
+        first = await scheduler.tick(bot, {}, now=_at(7), store=store)
+        assert (first.sent, first.failed, first.deferred) == (0, 0, 1)
+        assert (await store.schedule.get(row.id)).state == "pending"
+
+        second = await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
+        assert (second.sent, second.deferred) == (1, 0)
+        assert (await store.schedule.get(row.id)).state == "sent"
+        assert len(attempts) == 2          # delivered on the retry, exactly once
+
+    async def test_rate_limiting_is_transient_too(self, store, bot):
+        @scheduler.send_handler("drill")
+        async def limited(ctx):
+            raise telegram.error.RetryAfter(30)
+
+        row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
+        result = await scheduler.tick(bot, {}, now=_at(7), store=store)
+        assert result.deferred == 1
+        assert (await store.schedule.get(row.id)).state == "pending"
+
+    async def test_a_released_row_clears_its_claim(self, store, bot):
+        """Otherwise release_stale_claims would release an already-pending row."""
+        @scheduler.send_handler("drill")
+        async def flaky(ctx):
+            raise telegram.error.NetworkError("connection reset")
+
+        row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
+        await scheduler.tick(bot, {}, now=_at(7), store=store)
+        stored = await store.schedule.get(row.id)
+        assert stored.state == "pending"
+        assert stored.claimed_at is None
+
+    async def test_a_bad_request_is_permanent_despite_subclassing_network_error(
+            self, store, bot):
+        """The trap this ordering exists to avoid.
+
+        `telegram.error.BadRequest` subclasses `NetworkError` in PTB, so the
+        obvious `except NetworkError: retry` would retry a malformed request every
+        60 s until drop_stale buried it — burning six hours of ticks on a request
+        that can never succeed.
+        """
+        assert issubclass(telegram.error.BadRequest, telegram.error.NetworkError)
+
+        calls = []
+
+        @scheduler.send_handler("drill")
+        async def rejected(ctx):
+            calls.append(ctx)
+            raise telegram.error.BadRequest("chat not found")
+
+        row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
+        result = await scheduler.tick(bot, {}, now=_at(7), store=store)
+
+        assert (result.failed, result.deferred) == (1, 0)
+        assert (await store.schedule.get(row.id)).state == "failed"
+
+        await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
+        assert len(calls) == 1              # terminal: never attempted again
+
+    async def test_a_blocked_user_is_still_terminal(self, store, bot):
+        @scheduler.send_handler("drill")
+        async def blocked(ctx):
+            raise telegram.error.Forbidden("bot was blocked by the user")
+
+        row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
+        result = await scheduler.tick(bot, {}, now=_at(7), store=store)
+        assert (result.failed, result.deferred) == (1, 0)
+        assert (await store.schedule.get(row.id)).state == "failed"
+
+    async def test_retrying_is_bounded_by_the_stale_drop_not_by_luck(self, store, bot):
+        """With no attempts column, time is what stops the loop.
+
+        The row is released each tick, so what must be true is that it eventually
+        stops being retried rather than churning forever.
+        """
+        @scheduler.send_handler("drill")
+        async def never_works(ctx):
+            raise telegram.error.TimedOut()
+
+        row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
+        for minute in range(1, 4):
+            await scheduler.tick(bot, {}, now=_at(7, minute), store=store)
+        assert (await store.schedule.get(row.id)).state == "pending"
+
+        # once it is no longer same-day-relevant, it is dropped unsent
+        late = _at(7) + scheduler.CATCH_UP_WINDOW + timedelta(minutes=1)
+        await scheduler.tick(bot, {}, now=late, store=store)
+        stored = await store.schedule.get(row.id)
+        assert stored is None or stored.state == "failed"

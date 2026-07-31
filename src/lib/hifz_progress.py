@@ -23,19 +23,25 @@ import math
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Sequence, Tuple
 
-from hifz.refs import Ref, contains, juz_ref, surah_ref
+from hifz.refs import Ref, contains, juz_ref, page_ref, surah_ref
 from modules import Quran
 
 __all__ = [
-    "TOTAL_AYAHS", "Progress", "SurahProgress", "JuzProgress", "ProgressSummary",
+    "TOTAL_AYAHS", "TOTAL_PAGES",
+    "Progress", "SurahProgress", "JuzProgress", "PageProgress", "ProgressSummary",
     "round_percent", "format_percent",
     "surah_progress", "juz_progress", "quran_progress",
+    "juz_page_progress", "quran_page_progress",
     "started_surahs", "started_juzs", "summarize", "load_summary",
 ]
 
 # 6236. Summed from the corpus rather than written down, so it can never disagree
 # with the surah lengths the per-surah percentages are computed against.
 TOTAL_AYAHS = sum(Quran.surah_lengths)
+
+# 604 in the standard Madani mushaf, read from the corpus division for the same
+# reason.
+TOTAL_PAGES = Quran.PAGE_COUNT
 
 
 # --- The rounding rule ---------------------------------------------------------
@@ -153,6 +159,58 @@ class JuzProgress(_Ratio):
 
 
 @dataclass(frozen=True)
+class PageProgress:
+    """Progress measured in **mushaf pages**, which is how huffaz actually count.
+
+    A juz is "twenty pages", not "431 ayahs", and the two units disagree sharply:
+    the first eight ayahs of Al-Mulk are 27% of that surah but only about 3% of
+    juz 29 by ayah count — because juz 29's ayahs are short and its pages are not.
+    Counting in pages puts the juz and whole-Qur'an figures on the scale the user
+    already has in their head.
+
+    `done_pages` is fractional on purpose. Someone who has memorized two thirds of
+    a page has memorized two thirds of a page; rounding that to 0 or 1 whole pages
+    would make the number jerk about and, at the bottom end, show 0 to someone who
+    has genuinely started. So a page contributes `memorized ayahs / ayahs on that
+    page`.
+
+    `total_pages` is fractional too, for juz. A mushaf page can straddle a juz
+    boundary, and counting such a page whole in both juz would make the thirty juz
+    sum to more than 604. Each juz gets the share of that page which actually lies
+    inside it, so the thirty totals add back up to the mushaf.
+    """
+
+    done_pages: float
+    total_pages: float
+
+    @property
+    def fraction(self) -> float:
+        return (self.done_pages / self.total_pages) if self.total_pages else 0.0
+
+    @property
+    def percent(self) -> float:
+        return round_percent(self.fraction)
+
+    @property
+    def percent_text(self) -> str:
+        return format_percent(self.fraction)
+
+    @property
+    def is_started(self) -> bool:
+        return self.done_pages > 0
+
+    @property
+    def is_complete(self) -> bool:
+        # Float arithmetic over hundreds of pages does not land on exactly 1.0.
+        return self.total_pages > 0 and self.fraction >= 0.99999
+
+    @property
+    def pages_text(self) -> str:
+        """`done_pages` for a `{pages}` placeholder — "0.7", "12", "604"."""
+        return "%g" % round(self.done_pages, 1)
+
+
+@dataclass(frozen=True)
 class ProgressSummary:
     """Everything `/progress` needs in one read of the interval store.
 
@@ -167,6 +225,13 @@ class ProgressSummary:
     juzs: Tuple[JuzProgress, ...]
     focus: Optional[SurahProgress] = None
     focus_juz: Optional[JuzProgress] = None
+    # The juz and whole-Qur'an figures the one-liner actually shows. The surah is
+    # quoted in ayahs ("8/30") because that is how a surah is learned; the juz and
+    # the Qur'an are quoted in pages because that is how they are measured. The
+    # ayah-based `quran` and `focus_juz` above stay for the breakdown and for
+    # anything that needs an exact ayah count.
+    quran_pages: Optional[PageProgress] = None
+    focus_juz_pages: Optional[PageProgress] = None
 
     @property
     def is_empty(self) -> bool:
@@ -283,6 +348,85 @@ def quran_progress(intervals: Iterable) -> Progress:
     return Progress(done=done, total=TOTAL_AYAHS)
 
 
+# --- Counting in pages ---------------------------------------------------------
+
+def _intersect(a: Ref, b: Ref) -> Optional[Ref]:
+    """The span common to two refs, or None when they do not overlap."""
+    start = max(a.start, b.start)
+    end = min(a.end, b.end)
+    if start > end:
+        return None
+    return Ref(a.kind, start[0], start[1], end[0], end[1])
+
+
+def _pages_of(ref: Ref) -> range:
+    """Every mushaf page `ref` touches, inclusive at both ends."""
+    return range(Quran.page_of(*ref.start), Quran.page_of(*ref.end) + 1)
+
+
+def _page_share(ref: Ref, spans: Sequence[Tuple[int, int, int]],
+                pages: Iterable[int]) -> Tuple[float, float]:
+    """(done_pages, total_pages) for `ref`, counting in fractional pages.
+
+    For each page: the share of it lying inside `ref` counts toward the total, and
+    the share both inside `ref` and memorized counts toward done. Both are divided
+    by the page's own ayah count, so a long page and a short page are each worth
+    exactly one page — which is the entire point of switching units.
+    """
+    done = 0.0
+    total = 0.0
+    for page in pages:
+        span = page_ref(page)
+        if span is None:
+            continue
+        page_ayahs = span.count()
+        if not page_ayahs:
+            continue
+        inside = _intersect(span, ref)
+        if inside is None:
+            continue
+        total += inside.count() / page_ayahs
+        done += _covered(inside, spans) / page_ayahs
+    return done, total
+
+
+def juz_page_progress(intervals: Iterable, juz: int) -> PageProgress:
+    """How much of juz `juz` is memorized, counted in mushaf pages."""
+    ref = juz_ref(juz)
+    if ref is None:
+        return PageProgress(done_pages=0.0, total_pages=0.0)
+    spans = _spans(intervals)
+    done, total = _page_share(ref, spans, _pages_of(ref))
+    return PageProgress(done_pages=done, total_pages=total)
+
+
+def quran_page_progress(intervals: Iterable) -> PageProgress:
+    """How much of the whole Qur'an is memorized, counted in mushaf pages.
+
+    The total is the whole mushaf by definition, so only the pages the user has
+    actually touched need visiting — a few dozen even for a hafiz, rather than all
+    604 every time `/progress` is opened.
+    """
+    spans = _spans(intervals)
+    touched = set()
+    for surah, start, end in spans:
+        ref = surah_ref(surah)
+        if ref is None:
+            continue
+        clipped = _clip(ref, surah, start, end)
+        if clipped is None:
+            continue
+        touched.update(range(Quran.page_of(surah, clipped[0]),
+                             Quran.page_of(surah, clipped[1]) + 1))
+    done = 0.0
+    for page in sorted(touched):
+        span = page_ref(page)
+        if span is None or not span.count():
+            continue
+        done += _covered(span, spans) / span.count()
+    return PageProgress(done_pages=done, total_pages=float(TOTAL_PAGES))
+
+
 def started_surahs(intervals: Iterable) -> List[SurahProgress]:
     """Every surah with at least one memorized ayah, in mushaf order.
 
@@ -365,6 +509,7 @@ def summarize(intervals: Iterable,
         focus_surah = _focus_surah(intervals)
     focus = None
     focus_juz = None
+    focus_juz_pages = None
     if focus_surah is not None and surah_ref(focus_surah) is not None:
         focus = surah_progress(spans, focus_surah)
         # The juz of the *last* ayah marked in that surah: the one the user is
@@ -373,10 +518,14 @@ def summarize(intervals: Iterable,
         if marked:
             last_ayah = min(max(end for _, end in marked),
                             Quran.get_surah_length(focus_surah))
-            focus_juz = juz_progress(spans, Quran.juz_of(focus_surah, last_ayah))
+            juz = Quran.juz_of(focus_surah, last_ayah)
+            focus_juz = juz_progress(spans, juz)
+            focus_juz_pages = juz_page_progress(spans, juz)
 
     return ProgressSummary(quran=quran, surahs=tuple(surahs), juzs=tuple(juzs),
-                           focus=focus, focus_juz=focus_juz)
+                           focus=focus, focus_juz=focus_juz,
+                           quran_pages=quran_page_progress(spans),
+                           focus_juz_pages=focus_juz_pages)
 
 
 async def load_summary(store, user_id: int,

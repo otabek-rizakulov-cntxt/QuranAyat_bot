@@ -105,6 +105,28 @@ CATCH_UP_WINDOW = timedelta(hours=6)
 
 SendHandler = Callable[["SendCtx"], Awaitable[None]]
 
+# Which Telegram failures are worth trying again in a minute, and which are not.
+#
+# The ordering trap: `telegram.error.BadRequest` **subclasses** `NetworkError` in
+# python-telegram-bot, so `except NetworkError: retry` would quietly retry a
+# malformed request every 60 s until `drop_stale` buried it. PERMANENT_ERRORS is
+# therefore caught first, and lists BadRequest explicitly.
+#
+# There is no `attempts` column (the spec's data model has none), so retrying is
+# bounded by time rather than by count: `drop_stale` deletes a row once it stops
+# being same-day-relevant, which caps a transient failure at roughly six hours of
+# 60-second retries and then gives up silently.
+PERMANENT_ERRORS = (
+    telegram.error.BadRequest,      # malformed request — retrying cannot help
+    telegram.error.InvalidToken,
+    telegram.error.ChatMigrated,
+)
+TRANSIENT_ERRORS = (
+    telegram.error.RetryAfter,      # rate limited; not a NetworkError subclass
+    telegram.error.TimedOut,
+    telegram.error.NetworkError,    # must come after BadRequest is excluded
+)
+
 SEND_HANDLERS: Dict[str, SendHandler] = {}
 
 
@@ -246,6 +268,7 @@ class TickResult:
     failed: int = 0
     dropped: int = 0        # too late to be worth delivering
     released: int = 0       # claims recovered from a dead process
+    deferred: int = 0       # transient failure, back on the queue for the next tick
     errors: list = field(default_factory=list)   # (send_id, exception) per failure
 
     def __bool__(self) -> bool:
@@ -388,6 +411,25 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
                   % (row.id, row.kind, row.target_chat_id))
             await _resolve(store, row, sent=False, result=result, error=err)
             continue
+        except PERMANENT_ERRORS as err:
+            # Caught *before* TRANSIENT_ERRORS on purpose: telegram.error.BadRequest
+            # subclasses NetworkError, so the obvious "except NetworkError: retry"
+            # would retry a malformed request every 60 s until drop_stale buried it.
+            print("Scheduler: send #%d (%s -> %d) rejected: %s: %s"
+                  % (row.id, row.kind, row.target_chat_id, type(err).__name__, err))
+            traceback.print_exc()
+            await _resolve(store, row, sent=False, result=result, error=err)
+            continue
+        except TRANSIENT_ERRORS as err:
+            # The reminder is still worth delivering a minute from now, so the row
+            # goes back to 'pending' rather than being failed. A thirty-second
+            # blip at the reminder instant must not cost the user their day.
+            # Bounded by drop_stale: once the row stops being same-day-relevant it
+            # is deleted unsent, which is what stands in for an attempts column.
+            print("Scheduler: send #%d (%s -> %d) deferred: %s: %s — retrying"
+                  % (row.id, row.kind, row.target_chat_id, type(err).__name__, err))
+            await _release(store, row, result=result, error=err)
+            continue
         except Exception as err:
             # F1: one poisoned payload must never stop the queue. Print the
             # traceback, not just the type and message — a bare
@@ -400,6 +442,18 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
         await _resolve(store, row, sent=True, result=result, error=None)
 
     return result
+
+
+async def _release(store, row: ScheduledSend, result: TickResult, error) -> None:
+    """Put a transiently-failed row back on the queue, never raising out of the loop."""
+    try:
+        await store.schedule.release(row.id)
+        result.deferred += 1
+        result.errors.append((row.id, error))
+    except Exception as err:
+        print("Scheduler: could not release #%d: %s: %s — left claimed for the "
+              "next boot to recover" % (row.id, type(err).__name__, err))
+        traceback.print_exc()
 
 
 async def _resolve(store, row: ScheduledSend, sent: bool, result: TickResult,
