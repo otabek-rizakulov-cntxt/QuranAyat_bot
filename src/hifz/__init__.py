@@ -34,6 +34,7 @@
 
 import importlib
 import pkgutil
+import sys
 import traceback
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Dict, Optional
@@ -175,6 +176,20 @@ CALLBACKS: Dict[str, CallbackHandler] = {}
 WIZARDS: Dict[str, WizardHandler] = {}
 
 
+def _same_origin(a, b) -> bool:
+    """Whether two functions are the same declaration, across a module reload.
+
+    Identity is the obvious test and the wrong one: `importlib.reload` re-executes
+    the module body, producing a *new* function object for the same `def`. Under
+    identity that reads as a second module claiming the name and raises, which
+    would make rediscovery impossible. Module plus qualified name is stable across
+    a reload and still distinct between two different features, which is the case
+    the guard actually exists to catch.
+    """
+    return (getattr(a, "__module__", None) == getattr(b, "__module__", None)
+            and getattr(a, "__qualname__", None) == getattr(b, "__qualname__", None))
+
+
 def command(*names: str):
     """Register a slash command. `@command("progress")` claims `/progress`.
 
@@ -186,7 +201,8 @@ def command(*names: str):
         for name in names:
             key = name.lstrip("/").lower()
             existing = COMMANDS.get(key)
-            if existing is not None and existing is not handler:
+            if existing is not None and existing is not handler \
+                    and not _same_origin(existing, handler):
                 raise ValueError("command /%s is already registered by %s"
                                  % (key, getattr(existing, "__module__", "?")))
             COMMANDS[key] = handler
@@ -205,7 +221,8 @@ def callback(*prefixes: str):
     def decorate(handler: CallbackHandler) -> CallbackHandler:
         for prefix in prefixes:
             existing = CALLBACKS.get(prefix)
-            if existing is not None and existing is not handler:
+            if existing is not None and existing is not handler \
+                    and not _same_origin(existing, handler):
                 raise ValueError("callback prefix %r is already registered by %s"
                                  % (prefix, getattr(existing, "__module__", "?")))
             CALLBACKS[prefix] = handler
@@ -223,7 +240,8 @@ def wizard(*kinds: str):
     def decorate(handler: WizardHandler) -> WizardHandler:
         for kind in kinds:
             existing = WIZARDS.get(kind)
-            if existing is not None and existing is not handler:
+            if existing is not None and existing is not handler \
+                    and not _same_origin(existing, handler):
                 raise ValueError("wizard kind %r is already registered by %s"
                                  % (kind, getattr(existing, "__module__", "?")))
             WIZARDS[kind] = handler
@@ -234,6 +252,7 @@ def wizard(*kinds: str):
 # --- Feature discovery ---------------------------------------------------------
 
 _loaded = False
+_snapshot = None     # the first successful discovery, replayed after a test clears
 
 
 def load_features(force: bool = False) -> Dict[str, int]:
@@ -244,20 +263,40 @@ def load_features(force: bool = False) -> Dict[str, int]:
     is reported and skipped: one broken feature must not take the bot down with
     it, and the traceback in the boot log says exactly which one.
     """
-    global _loaded
+    global _loaded, _snapshot
     if _loaded and not force:
         return registered()
     _loaded = True
+
+    # Registration lives in decorators, which run at *import* time, and
+    # `import_module` is a no-op for a module already in sys.modules. So once the
+    # registries have been cleared — which only a test does — re-running discovery
+    # would find every feature already imported and register nothing, silently
+    # emptying the bot. Replaying the first load's result fixes that without
+    # re-executing anything: reloading would also throw away any monkeypatch a
+    # test had applied to a feature module, and handlers resolve their module
+    # globals at call time, so the recorded functions see patches just fine.
+    if _snapshot is not None and not force:
+        COMMANDS.update(_snapshot[0])
+        CALLBACKS.update(_snapshot[1])
+        WIZARDS.update(_snapshot[2])
+        return registered()
+
     command("cancel")(_cancel)          # the seam's own command (see below)
     for info in sorted(pkgutil.iter_modules(__path__), key=lambda m: m.name):
         if info.name.startswith("_"):
             continue
         try:
-            importlib.import_module("." + info.name, __name__)
+            existing = sys.modules.get("%s.%s" % (__name__, info.name))
+            if existing is not None:
+                importlib.reload(existing)
+            else:
+                importlib.import_module("." + info.name, __name__)
         except Exception as e:
             print("HIFZ: feature %r failed to load: %s: %s"
                   % (info.name, type(e).__name__, e))
             traceback.print_exc()
+    _snapshot = (dict(COMMANDS), dict(CALLBACKS), dict(WIZARDS))
     counts = registered()
     print("HIFZ: %d commands, %d callback prefixes, %d wizards registered"
           % (counts["commands"], counts["callbacks"], counts["wizards"]))
@@ -272,11 +311,12 @@ def registered() -> Dict[str, int]:
 
 def reset_for_tests() -> None:
     """Forget every registration and re-run discovery on next dispatch."""
-    global _loaded
+    global _loaded, _snapshot
     COMMANDS.clear()
     CALLBACKS.clear()
     WIZARDS.clear()
     _loaded = False
+    _snapshot = None
 
 
 # --- Cheap gates ---------------------------------------------------------------

@@ -143,6 +143,41 @@ class TestConflictFreeByConstruction:
         second = hifz.load_features()
         assert first == second
 
+    def test_rediscovery_after_the_registries_are_cleared_restores_every_feature(self):
+        """Regression: clearing the registries used to empty the bot permanently.
+
+        `importlib.import_module` is a no-op for a module already in sys.modules,
+        and registration happens in decorators at import time. So the second
+        discovery found every feature "already imported", registered nothing, and
+        left the registries empty — every command silently gone, with no error.
+        Only a test clears them, but the failure mode was invisible and depended
+        on which test ran first.
+        """
+        hifz.load_features()
+        expected = sorted(hifz.COMMANDS)
+        assert "memorize" in expected and "leaderboard" in expected
+
+        hifz.COMMANDS.clear()
+        hifz.CALLBACKS.clear()
+        hifz.WIZARDS.clear()
+        hifz._loaded = False
+
+        hifz.load_features()
+        assert sorted(hifz.COMMANDS) == expected
+        assert hifz.handles("leaderboard") is True
+
+    def test_every_advertised_command_is_actually_registered(self):
+        """BOT_COMMANDS drives Telegram's menu and the /start text alike, so a
+        command listed there with no handler is a menu entry that does nothing."""
+        from locales import BOT_COMMANDS
+        hifz.load_features()
+        import main
+        advertised = {name for name, _ in BOT_COMMANDS}
+        hifz_owned = {"memorize", "progress", "streak", "leaderboard", "profile",
+                      "check", "forgot"}
+        for name in sorted(advertised & hifz_owned):
+            assert hifz.handles(name), name
+
     def test_a_broken_feature_does_not_take_the_bot_down(self, capsys):
         # One feature failing to import must be reported and skipped, not fatal —
         # otherwise a typo in one module costs the whole bot. The probe is named

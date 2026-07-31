@@ -34,12 +34,27 @@ def _at(hour, minute=0, day=1):
 
 @pytest.fixture(autouse=True)
 def _isolate_handlers():
-    """Snapshot and restore the process-wide handler registry.
+    """Give each test an empty handler registry, then put the real one back.
 
     It is module state, so a test registering a dummy kind would otherwise leak
     into every later test — and into the real boot path.
+
+    Clearing matters as much as restoring. `hifz.memorize` registers a real
+    `plan_day` handler at import, and any earlier test that touches
+    `hifz.load_features()` therefore installs it process-wide. Registering a kind
+    twice raises by design — a silent overwrite would be one feature stealing
+    another's sends — so without the clear these tests fail depending on what ran
+    before them, which is exactly the class of bug the registry guard exists to
+    catch. The tests here own the registry; the clear says so.
     """
     saved = dict(scheduler.SEND_HANDLERS)
+    # Keep the kinds this module defines itself (the built-in "message"), drop the
+    # ones feature modules installed. Filtering by defining module rather than by
+    # name means a new feature kind never has to be added to a list here.
+    builtin = {kind: fn for kind, fn in saved.items()
+               if getattr(fn, "__module__", "") == scheduler.__name__}
+    scheduler.SEND_HANDLERS.clear()
+    scheduler.SEND_HANDLERS.update(builtin)
     yield
     scheduler.SEND_HANDLERS.clear()
     scheduler.SEND_HANDLERS.update(saved)

@@ -137,11 +137,26 @@ def register_send_handler(kind: str, handler: SendHandler) -> SendHandler:
     sends, so this fails at import time instead — same rule as `hifz.command`.
     """
     existing = SEND_HANDLERS.get(kind)
-    if existing is not None and existing is not handler:
+    if existing is not None and existing is not handler \
+            and not _same_origin(existing, handler):
         raise ValueError("scheduled kind %r is already handled by %s"
                          % (kind, getattr(existing, "__module__", "?")))
     SEND_HANDLERS[kind] = handler
     return handler
+
+
+def _same_origin(a, b) -> bool:
+    """Whether two functions are the same declaration, across a module reload.
+
+    Identity is the obvious test and the wrong one: `hifz.load_features` reloads
+    already-imported feature modules so their decorators run again, and a reload
+    produces a *new* function object for the same `def`. Under identity that reads
+    as a second module stealing the kind and raises. Module plus qualified name is
+    stable across a reload and still distinct between two real features, which is
+    the collision this guard exists to catch.
+    """
+    return (getattr(a, "__module__", None) == getattr(b, "__module__", None)
+            and getattr(a, "__qualname__", None) == getattr(b, "__qualname__", None))
 
 
 def send_handler(kind: str):
