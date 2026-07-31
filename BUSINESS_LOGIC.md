@@ -235,11 +235,27 @@ Two independent Redis-backed caches:
 | User state     | `{chat_id}`                            | `[surah, ayah, type]`   | 2 days |
 | Media file-ids | `file:{path-or-url}`                   | Telegram `file_id`      | 2 days |
 | Stitched range | `file:combined:{s}:{a}-{b}:{reciter}`  | Telegram `file_id`      | 2 days |
+| Streak graph   | `file:streak_graph_v1_{user}_{date}`   | Telegram `file_id`      | 2 days |
+| Wizard draft   | `wizard:{user_id}`                     | JSON `{kind,step,data}` | 30 min |
 
 The media cache avoids re-uploading the same photo/audio: after the first send,
 Telegram returns a reusable `file_id` that later sends reference directly. Both
 caches are read by the inline path too (see routing rule 1), which is how a range
 already sent in a chat is replayed inline without being stitched again.
+
+The streak graph is a pure function of `(user, local date)`, so keying on exactly
+those two means a user hammering `/streak` renders once a day. The `v1` in the key
+invalidates every cached image at once if the palette or layout changes.
+
+The wizard draft is the one piece of *conversation* state. It is deliberately not
+in Postgres: nothing durable is written until a plan is confirmed, so losing a
+half-finished `/memorize` on restart costs the user one retype. With
+`REDIS_HOST_URL` unset it lives in the in-process `MemoryStore`, which is correct
+for a single-worker deployment.
+
+**Everything else the hifz platform stores is Postgres, not Redis** — profiles,
+memorized intervals, plans, session history and the send queue. That is a
+deliberate split: Redis holds what may be lost, Postgres holds what may not.
 
 ---
 
@@ -293,7 +309,7 @@ flowchart LR
     subgraph Phase 3 — Features
       C1[Multiple translations & reciters]
       C2[Bookmarks / favorites]
-      C3[Daily ayah subscription]
+      C3[Daily ayah subscription ✔]
       C4[Full-text ayah search]
     end
     subgraph Phase 4 — Platform
@@ -314,7 +330,107 @@ flowchart LR
    horizontal scaling.
 3. **Reciter & translation selection** — expose `performers.json` choices and
    multiple translations as user preferences (already partially modeled).
-4. **Daily ayah subscriptions** — scheduled push of an ayah to opted-in users.
+4. ~~**Daily ayah subscriptions** — scheduled push of an ayah to opted-in users.~~
+   **Shipped** as the hifz platform: `/memorize` builds a dated plan and an
+   in-process asyncio loop drains a Postgres due-queue (`scheduled_send`) at each
+   user's own local reminder time, idempotent across restarts. See §9.
 5. **Ayah search** — search translations/tafsir by keyword and return references.
 6. **Observability** — structured logs, per-command metrics, error alerting.
 7. **Config hardening** — validate all required env vars at startup and fail fast.
+
+---
+
+## 9. The hifz platform
+
+Turning the reader into a memorization companion added seven commands, three
+wizards, a background scheduler and a second storage aggregate. The pieces that
+are not obvious from the code:
+
+### The seam (`src/hifz/`)
+
+`handle_update` grew one `elif command == ...` at a time and was 378 lines before
+this work. Adding seven more commands inline would have doubled it. Instead each
+feature is a module under `src/hifz/` that registers itself with decorators:
+
+```python
+@command("progress")          # claims /progress
+@callback("hg:")              # every callback_data starting "hg:"
+@wizard("profile_name")       # free text while that draft is active
+```
+
+Discovery walks the package directory, so there is no shared import list — adding
+a feature touches exactly one new file. `src/main.py` gained three call sites (the
+command chain, the callback chain, a wizard slot) plus a scheduler start.
+
+Two consequences worth knowing. Discovery is **lazy**, running on first dispatch
+rather than at import, which is what lets a feature module `from main import
+send_quran` without a circular import. And because registration happens in
+decorators at import time, rediscovery replays a snapshot of the first load rather
+than re-importing — `importlib.import_module` is a no-op for a module already in
+`sys.modules`, so a naive re-run would silently register nothing and leave the bot
+with no commands at all.
+
+Callback prefixes are allocated centrally in `hifz.PREFIXES` (`hp:` profile, `hg:`
+progress, `hm:` memorize, `hc:` check, `hs:` streak, `hl:` leaderboard) because
+Telegram caps `callback_data` at 64 bytes and the reader already owns `vc:`,
+`rep:`, `pg:` and friends.
+
+### Storage (`src/lib/store/`)
+
+The old `FakePostgresPool` pattern-matched four literal query strings. Phase 1
+needed ~25 shapes, so the abstraction moved up a level: repositories, not faked
+SQL. One module per aggregate, two implementations behind one interface —
+asyncpg when `DATABASE_URL` is set, in-memory otherwise — and no SQL string
+anywhere outside the package. `tests/test_store_contract.py` runs one suite
+against both so they cannot drift.
+
+Six tables: `user_profile`, `hifz_interval`, `plan`, `plan_day`, `session_log`,
+`scheduled_send`.
+
+### What is derived rather than stored
+
+**Memorized ayahs are intervals, and every percentage is arithmetic over them.**
+There is no `memorized_count` column and there never will be: a counter would need
+to stay in step with three writers (marking a drill done, `/forgot`, and the merge
+that absorbs a neighbouring interval), and the first time one missed, the user's
+percentage would be wrong forever with nothing to reconcile against. Marking
+67:1-8 then 67:5-10 yields one 67:1-10 row, so the total cannot double-count.
+
+Surahs are reported in ayahs; juz and the whole Qur'an in **mushaf pages**, since
+a juz is twenty pages rather than 431 ayahs. Pages are fractional at both ends, and
+a page straddling a juz boundary is shared between the two juz so the thirty totals
+sum to exactly 604.
+
+**Plans are generated, not stored day by day.** `lib/plan_builder.build_plan` is
+pure — target, pace, weekdays and a start date in, portions out — which is what
+makes the preview and the saved plan provably identical: they are the same call.
+It also lets the drill unit be re-derived for a stored row, so `plan_day` needs no
+column for it.
+
+### The scheduler (`src/lib/scheduler.py`)
+
+The app only ever woke on webhooks. The daily push needed a clock, so a background
+asyncio task polls `scheduled_send` every 60 s, claims due rows, and dispatches by
+`kind` to a handler registered by a feature module — the loop never learns what a
+plan is.
+
+Ordering is **claim, send, mark**. The reverse turns every crash into a silently
+missed reminder; this way the worst case is one duplicate of today's push, bounded
+by boot recovery that can only release rows still relevant today. Handlers are
+asked to be idempotent, and `claim_plan_day` is a conditional write for exactly
+that reason.
+
+Delivery is exactly-once across a restart because `idempotency_key` is unique per
+`(kind, target, local date)`. The queue is filled by `hifz/memorize.py` — at plan
+save, and again by each push as it fires.
+
+### Local time
+
+Streak boundaries, reminder times and the leaderboard week are all **local to the
+user**, stored as a fixed UTC offset (`"+05:00"`) rather than an IANA zone. No
+`tzdata` in the slim image, no DST branches, and a picker whose labels need no
+translation. The cost is an hour of drift twice a year for users who observe DST.
+
+A streak day ticks when a session *completes* — a drill run through or a recall
+check passed — never for opening the bot. Two sessions in one local day count
+once; 23:59 and 00:01 count twice.

@@ -6,8 +6,8 @@
 > percentage, and rewards consistency with streaks and leaderboards — privately
 > in DM, and as a study circle in a supergroup topic.
 
-**Status:** spec confirmed, implementation not started
-**Last updated:** 2026-07-31
+**Status:** Phase 1 built; locale translation in progress
+**Last updated:** 2026-08-01
 
 ---
 
@@ -53,7 +53,7 @@ is written until Phase 1 ships.
 ### Explicitly out of scope
 
 Phone/OTP auth · voice-verified recitation or ASR · tajweed feedback · payments ·
-web dashboard · rendered PNG contribution graph (emoji grid instead) · tafsir
+web dashboard · tafsir
 inside plans · `/hizb` `/manzil` `/ruku` commands · more than one active plan per
 user · per-day editing of a group plan in v1 · migrating existing user history
 (there is none to migrate).
@@ -82,14 +82,21 @@ implementation detail.
 
 ### Assumptions (flagged — override if wrong)
 
-1. **Activity graph is an emoji grid, not a rendered PNG.** Pillow is already a
-   dependency, but per-user image rendering on a 512 MB instance that also
-   stitches mushaf pages is a real memory risk. PNG is a later nice-to-have.
+1. ~~**Activity graph is an emoji grid, not a rendered PNG.**~~ **Overridden
+   2026-07-31: the PNG was chosen.** The memory argument turned out to be much
+   weaker than assumed — a 12-week grid is a 201×144 px canvas, an order of
+   magnitude smaller than the mushaf page stitching the same instance already
+   does, and it is bounded by the same semaphore and cached by `file_id` for a
+   day. See G2.
 2. **No "top 2% of users" line until there is a real distribution.** With a small
    user base that number is meaningless or embarrassing. Fixed milestone copy
    (7 / 30 / 100 / 365 days) until ≥200 users have a streak, then the real
    percentile computed weekly.
-3. **One active plan per user.** Multi-plan concurrency is a v2 concern.
+3. **One active plan per user.** Multi-plan concurrency is a v2 concern. **Note
+   as built:** this is enforced by `/memorize` retiring the previous plan, not by
+   a database constraint. A partial unique index was considered and rejected —
+   pause-then-create would race into a user-visible violation, and both storage
+   implementations would then have to agree on an exception type.
 4. **Group posts use one admin-chosen translation language**, not per-member — a
    group message can only be in one language.
 5. **Recall-check distractors** are drawn from the same surah where possible,
@@ -104,15 +111,15 @@ implementation detail.
 
 | Workstream | Tasks | Done | Status |
 |---|---|---|---|
-| A — Storage foundation | 4 | 0 | ⬜ not started |
-| B — Profile & registration (item 1) | 3 | 0 | ⬜ not started |
-| C — Hifz progress (item 4a) | 3 | 0 | ⬜ not started |
-| D — Plans & drills (item 4b) | 5 | 0 | ⬜ not started |
-| E — Recall check (item 4c) | 3 | 0 | ⬜ not started |
-| F — Scheduler | 3 | 0 | ⬜ not started |
-| G — Streaks & graph (item 2) | 3 | 0 | ⬜ not started |
-| H — Leaderboard (item 3) | 2 | 0 | ⬜ not started |
-| I — i18n & commands | 3 | 0 | ⬜ not started |
+| A — Storage foundation | 4 | 4 | ✅ done |
+| B — Profile & registration (item 1) | 3 | 3 | ✅ done |
+| C — Hifz progress (item 4a) | 3 | 3 | ✅ done |
+| D — Plans & drills (item 4b) | 5 | 5 | ✅ done |
+| E — Recall check (item 4c) | 3 | 3 | ✅ done |
+| F — Scheduler | 3 | 3 | ✅ done |
+| G — Streaks & graph (item 2) | 3 | 3 | ✅ done |
+| H — Leaderboard (item 3) | 2 | 2 | ✅ done |
+| I — i18n & commands | 3 | 2 | 🟨 I2 (47 locales) in progress |
 | J — Group cluster (items 5–7) | 6 | 0 | ⬜ Phase 2 |
 
 Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
@@ -128,7 +135,7 @@ hard-coded query strings and raises `ValueError` on anything else. Phase 1 adds
 roughly 25 query shapes. Growing that fake is untenable, so the abstraction moves
 up a level: repositories, not faked SQL.
 
-- [ ] **A1 — Introduce a repository layer.**
+- [x] **A1 — Introduce a repository layer.**
   Create `src/lib/store/` with one module per aggregate (`profiles.py`,
   `hifz.py`, `plans.py`, `sessions.py`, `schedule.py`). Each exposes async
   methods, never raw SQL, to callers. Provide two implementations behind the same
@@ -136,7 +143,7 @@ up a level: repositories, not faked SQL.
   *Files:* `src/lib/store/*`, `src/config/postgres.py`
   *Done when:* no caller outside `src/lib/store/` contains a SQL string.
 
-- [ ] **A2 — Retire the SQL-shaped fake.**
+- [x] **A2 — Retire the SQL-shaped fake.**
   Replace `FakePostgresPool` with the in-memory repository implementation, chosen
   when `DATABASE_URL` is unset — same dev/test convenience, no SQL pretence. Keep
   the existing startup warning.
@@ -144,14 +151,14 @@ up a level: repositories, not faked SQL.
   *Done when:* `pytest` passes with `DATABASE_URL` unset and no query-string
   matching remains.
 
-- [ ] **A3 — Move `UserSettings` behind the repository.**
+- [x] **A3 — Move `UserSettings` behind the repository.**
   Behaviour-preserving refactor: `src/lib/user_settings.py` keeps its public
   surface (`get`, `set_ui_lang`, `set_translation_lang`, `set_reciter`) including
   the legacy-Redis migration in `_ensure_row`.
   *Files:* `src/lib/user_settings.py`, `src/lib/store/profiles.py`
   *Done when:* `tests/test_user_settings.py` passes unmodified.
 
-- [ ] **A4 — Extend the schema.**
+- [x] **A4 — Extend the schema.**
   Append the new tables to `src/common/schema.sql`, still `CREATE TABLE IF NOT
   EXISTS`, still applied idempotently at boot from `_initialize()`. No migration
   framework — consistent with what is there.
@@ -232,13 +239,13 @@ already happens implicitly: `UserSettings._ensure_row` creates a row keyed on
 `telegram_user_id` at first contact. What is new is **identity for the
 leaderboard**.
 
-- [ ] **B1 — `/profile` command.**
+- [x] **B1 — `/profile` command.**
   Shows display name, leaderboard status, timezone, reminder time, current plan.
   Inline buttons to change each.
   *Files:* `src/main.py`, `src/locales/*`
   *Done when:* `/profile` renders for a user who has never used any other feature.
 
-- [ ] **B2 — Leaderboard opt-in flow.**
+- [x] **B2 — Leaderboard opt-in flow.**
   Default **off**. On opt-in: if the user has a Telegram `@username`, adopt it as
   the display name; if not, prompt for one (2–32 chars, HTML-escaped via the
   existing `html.escape` path, uniqueness not required). Opt-out removes them
@@ -247,7 +254,7 @@ leaderboard**.
   *Done when:* a user with no username can opt in, and an opted-out user never
   appears in any board query.
 
-- [ ] **B3 — Timezone & reminder time capture.**
+- [x] **B3 — Timezone & reminder time capture.**
   Asked **once**, during first plan setup (workstream D), not as a separate
   onboarding wall. Short UTC-offset picker; stored on `user_profile`. `/profile`
   can change it later.
@@ -258,23 +265,27 @@ leaderboard**.
 
 ### Workstream C — Hifz progress (item 4a)
 
-- [ ] **C1 — Interval store with merge-on-insert.**
+- [x] **C1 — Interval store with merge-on-insert.**
   Marking 67:1–8 then 67:5–10 must yield a single 67:1–10 interval, never two
   overlapping rows. Adjacent intervals coalesce.
   *Files:* `src/lib/store/hifz.py`
   *Done when:* the merge is covered by unit tests including adjacency,
   containment, and partial overlap.
 
-- [ ] **C2 — Derived percentages.**
+- [x] **C2 — Derived percentages.**
   Surah %, juz %, and whole-Qur'an % computed from intervals against
   `Quran.surah_lengths` and `Quran.juz_range` — both already exist in
   `src/modules/quran.py`. Nothing is stored as a counter.
   *Files:* `src/lib/hifz_progress.py`
   *Done when:* 67:1–8 reports Al-Mulk 27%, and re-marking 67:5–10 reports 33%.
 
-- [ ] **C3 — `/progress` and `/forgot`.**
-  `/progress` renders the motivation line ("Al-Mulk 8/30 · 27% · juz 29 4% ·
-  Qur'an 0.4%"). `/forgot <ref>` unmarks a range, splitting intervals as needed.
+- [x] **C3 — `/progress` and `/forgot`.**
+  `/progress` renders the motivation line. **Surahs are counted in ayahs, juz and
+  the whole Qur'an in mushaf pages** (decided 2026-08-01, see §9): a juz is twenty
+  pages, not 431 ayahs, and the ayah count badly understates a juz of short surahs.
+  Pages are fractional at both ends, and a page straddling a juz boundary is shared
+  between the two juz so the thirty totals still sum to 604. `/forgot <ref>` unmarks
+  a range, splitting intervals as needed.
   *Files:* `src/main.py`, `src/locales/*`
   *Done when:* `/forgot 67:5-6` splits 67:1–10 into 67:1–4 and 67:7–10.
 
@@ -285,14 +296,14 @@ leaderboard**.
 The progression you described — repeat a **range**, then the **page**, then the
 **whole surah** — is the plan generator's job, not the user's.
 
-- [ ] **D1 — `/memorize` setup wizard.**
+- [x] **D1 — `/memorize` setup wizard.**
   Target (surah / juz / range) → pace (auto or explicit ayahs-per-day) → days of
   week → reminder time + timezone (B3). Ends with a **preview calendar** before
   anything is saved.
   *Files:* `src/main.py`, `src/lib/store/plans.py`, `src/locales/*`
   *Done when:* the preview matches what is later pushed, day for day.
 
-- [ ] **D2 — Plan generator.**
+- [x] **D2 — Plan generator.**
   Splits the target across the chosen days, respecting ayah boundaries and never
   splitting mid-ayah. Widens the drill unit as portions are marked known: range →
   mushaf page (`Quran.page_range`) → whole surah.
@@ -300,20 +311,20 @@ The progression you described — repeat a **range**, then the **page**, then th
   *Done when:* Al-Mulk over weekdays produces 15 days ending exactly at 67:30,
   with a consolidation day at each page and surah boundary.
 
-- [ ] **D3 — Drill delivery.**
+- [x] **D3 — Drill delivery.**
   A pushed or manually started portion sends the Arabic image, the audio, the
   translation, and the drill controls. Reuses `send_quran`, `send_combined_audio`
   and the existing `🔁 Repeat ×3` button in `verse_keyboard`.
   *Files:* `src/main.py`
   *Done when:* a multi-ayah portion sends one stitched audio, not N files.
 
-- [ ] **D4 — `✅ I know this by heart`.**
+- [x] **D4 — `✅ I know this by heart`.**
   Ends the drill; writes the interval (C1) and logs a `drill` session (G1) in one
   transaction so a streak can never tick without progress being recorded.
   *Files:* `src/main.py`, `src/lib/store/sessions.py`
   *Done when:* tapping it twice on the same portion does not double-log.
 
-- [ ] **D5 — Plan lifecycle.**
+- [x] **D5 — Plan lifecycle.**
   Pause, resume, abandon, and completion. Completing the final day sends a
   completion message and marks the plan `complete`.
   *Files:* `src/main.py`, `src/lib/store/plans.py`
@@ -331,7 +342,7 @@ mushaf**. It tests hifz, not app usage.
 bundled and loadable through the existing `TranslationRegistry` — no new corpus
 is needed.
 
-- [ ] **E1 — Question builder.**
+- [x] **E1 — Question builder.**
   Given an ayah, show its opening and offer four continuations: the correct one
   plus three distractors drawn from the same surah where possible, falling back
   to neighbouring ayahs, filtered to a similar length so option length is not a
@@ -341,13 +352,13 @@ is needed.
   *Done when:* no generated question has a correct option that is the longest or
   shortest by a wide margin, asserted over a sample of all 114 surahs.
 
-- [ ] **E2 — Quiz delivery and scoring.**
+- [x] **E2 — Quiz delivery and scoring.**
   Inline-keyboard answer, immediate feedback, at most one earned session per day
   from recall checks. A pass logs a `recall_check` session.
   *Files:* `src/main.py`, `src/lib/store/sessions.py`
   *Done when:* a user with no plan at all can pass a check and earn the day.
 
-- [ ] **E3 — `/check` entry point.**
+- [x] **E3 — `/check` entry point.**
   Lets a book learner test themselves on any surah or range on demand, not only
   on a plan portion.
   *Files:* `src/main.py`, `src/locales/*`
@@ -360,20 +371,20 @@ is needed.
 The app currently only wakes on webhooks. Everything timed depends on this, so it
 lands before G and H.
 
-- [ ] **F1 — Due-queue loop.**
+- [x] **F1 — Due-queue loop.**
   A background asyncio task started from `_initialize()` in `src/main.py`,
   alongside the existing corpora load. Polls `scheduled_send` every 60 s and
   claims due rows with `SELECT … FOR UPDATE SKIP LOCKED`.
   *Files:* `src/lib/scheduler.py`, `src/main.py`
   *Done when:* the loop survives an exception in one send without dying.
 
-- [ ] **F2 — Idempotent enqueue.**
+- [x] **F2 — Idempotent enqueue.**
   Unique `idempotency_key` per `(kind, target, local_date)` so a restart, a
   double boot, or a retry cannot double-send.
   *Files:* `src/lib/store/schedule.py`
   *Done when:* enqueuing the same key twice inserts one row and raises nothing.
 
-- [ ] **F3 — Catch-up on boot.**
+- [x] **F3 — Catch-up on boot.**
   A window missed while the instance was restarting fires on next boot if it is
   still same-day-relevant; stale rows are dropped rather than delivered at 3 a.m.
   *Files:* `src/lib/scheduler.py`
@@ -384,7 +395,7 @@ lands before G and H.
 
 ### Workstream G — Streaks & activity graph (item 2)
 
-- [ ] **G1 — Session logging + streak computation.**
+- [x] **G1 — Session logging + streak computation.**
   Streak = consecutive distinct `local_date` values in `session_log`. Recomputed
   on each session; `current_streak` / `longest_streak` denormalized onto
   `user_profile` for cheap reads.
@@ -392,13 +403,17 @@ lands before G and H.
   *Done when:* two sessions on the same local date tick the streak once, and a
   session at 23:59 followed by one at 00:01 local ticks it twice.
 
-- [ ] **G2 — `/streak` with a 12-week grid.**
-  Emoji grid (⬜🟩🟩⬛), which every Telegram client renders identically at zero
-  render cost (assumption 1). Shows current streak, longest, and milestone copy.
+- [x] **G2 — `/streak` with a 12-week grid.**
+  **Built as a rendered PNG contribution graph, not the emoji grid** — assumption 1
+  was overridden on 2026-07-31 (see §9). 201×144 px, drawn with Pillow off the event
+  loop behind the same bounded semaphore `lib/page_image.py` uses, and cached by
+  Telegram `file_id` per (user, local date) so it renders once a day. No font file is
+  referenced: the slim image ships none. Shows current streak, longest, and milestone
+  copy.
   *Files:* `src/main.py`, `src/lib/streaks.py`, `src/locales/*`
   *Done when:* the grid aligns in a monospace block on both mobile and desktop.
 
-- [ ] **G3 — Motivation copy.**
+- [x] **G3 — Motivation copy.**
   Fixed milestones at 7 / 30 / 100 / 365 days. The "top X% of users" line stays
   dark until ≥200 users have a streak, then uses the real distribution computed
   weekly (assumption 2).
@@ -409,14 +424,14 @@ lands before G and H.
 
 ### Workstream H — Leaderboard (item 3)
 
-- [ ] **H1 — Weekly aggregation.**
+- [x] **H1 — Weekly aggregation.**
   Sessions completed Mon 00:00 → Sun 23:59 **in the user's timezone**, ties
   broken by streak length. Opted-in users only.
   *Files:* `src/lib/leaderboard.py`, `src/lib/store/sessions.py`
   *Done when:* an opted-out user is absent from the query result, not merely
   hidden in rendering.
 
-- [ ] **H2 — `/leaderboard` in DM.**
+- [x] **H2 — `/leaderboard` in DM.**
   Global board, the user's own rank always shown even when outside the top N.
   *Files:* `src/main.py`, `src/locales/*`
   *Done when:* a user ranked 400th sees rows 1–10 plus their own row.
@@ -425,7 +440,7 @@ lands before G and H.
 
 ### Workstream I — i18n & commands
 
-- [ ] **I1 — New commands registered.**
+- [x] **I1 — New commands registered.**
   `/memorize`, `/progress`, `/streak`, `/leaderboard`, `/profile`, `/check`,
   `/forgot` added to `BOT_COMMANDS` in `src/locales/__init__.py` — the single
   source of truth for both the `/start` message and Telegram's command menu, so
@@ -439,7 +454,7 @@ lands before G and H.
   *Files:* `src/locales/*.py`
   *Done when:* `python3 scripts/check_locales.py` passes.
 
-- [ ] **I3 — Docs.**
+- [x] **I3 — Docs.**
   Update `README.md` (user-facing feature description) and `BUSINESS_LOGIC.md`
   (§4 navigation model, §5 caching, and the roadmap in §8, which already lists
   "daily ayah subscriptions" as backlog item 4).
@@ -475,7 +490,7 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 
 | Risk | Mitigation |
 |---|---|
-| 512 MB free Koyeb instance already stitches mushaf pages; adding a scheduler and per-user renders could OOM | Emoji grid instead of PNG (assumption 1); scheduler holds no corpus state; bounded concurrency as `lib/page_image.py` already does |
+| 512 MB free Koyeb instance already stitches mushaf pages; adding a scheduler and per-user renders could OOM | The streak PNG is 201×144 px and cached by `file_id` for a day; scheduler holds no corpus state; bounded concurrency as `lib/page_image.py` already does |
 | `translations/ar.txt` orthography may not match the rendered ayah images exactly | Recall check quotes the text file consistently for both prompt and options, so any mismatch is invisible within a question |
 | ~2,500 machine-translated strings across 48 locales, in languages neither of us reads | `scripts/check_locales.py` validates placeholders, HTML balance and button round-trip; nuance remains a known limitation |
 | Self-marked hifz is honour-system even though the leaderboard is not | Progress % and the board are deliberately decoupled — the board ranks sessions, never claimed ayahs |
@@ -506,10 +521,28 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 
 ## 8. Open questions
 
-- [ ] Confirm **assumption 1** — emoji activity grid rather than a rendered PNG
-  contribution graph.
-- [ ] Confirm **assumption 2** — hold back the "top 2% of users" line until there
-  are ≥200 users with a streak.
+- [x] **Assumption 1 — resolved 2026-07-31: build the rendered PNG**, not the
+  emoji grid. See G2 and §9.
+- [x] **Assumption 2 — confirmed 2026-07-31: hold the percentile back** until ≥200
+  users have a streak. Enforced structurally rather than by convention:
+  `percentile_band` returns `None` unless a population of ≥200 *streaked* users is
+  passed, and no caller passes one. A source-level test asserts that no module
+  under `src/hifz/` so much as names the machinery.
+
+### Raised during the build, still open
+
+- [ ] **The asyncpg storage leg has never executed.** CI has no Postgres and
+  `conftest.py` pins `DATABASE_URL=""`, so `tests/test_store_contract.py` runs its
+  in-memory leg only; the SQL leg is syntax-checked and skipped. Adding a postgres
+  service to the workflow is a small, worthwhile follow-up.
+- [ ] **Transient-send retries are bounded by time, not by count.** With no
+  `attempts` column, a `RetryAfter`/`TimedOut`/`NetworkError` row is released back
+  to the queue and retried each minute until `drop_stale` deletes it (~6 h), then
+  gives up silently. Adding `attempts INT` would make that observable.
+- [ ] **~5,200 machine-translated strings** across 47 locales, in languages nobody
+  on this project reads. `scripts/check_locales.py` validates structure, never
+  nuance. Each translating agent was asked to name the keys it was unsure of; that
+  list is the starting point for a native-speaker review.
 
 ---
 
@@ -518,3 +551,11 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 | Date | Change |
 |---|---|
 | 2026-07-31 | Document created; spec settled across three rounds of grilling. Phase 1 = items 1–4, Phase 2 = items 5–7. |
+| 2026-07-31 | **Router seam instead of inline handlers.** `handle_update` is a 378-line `if/elif` chain and `send_quran` was a closure inside it, which the scheduler cannot call. Features now live in `src/hifz/`, one module each, discovered by walking the package directory so no shared import list exists to conflict over. `src/main.py` gained ~15 lines at three call sites. This amends the "*Files: src/main.py*" line on B1, C3, D1, D3–D5, E2, E3, G2 and H2. |
+| 2026-07-31 | **Time model narrowed to a fixed UTC offset** stored as TEXT (`"+05:00"`), never an IANA zone. No `tzdata` in the slim image, no DST branches, and a 34-entry picker whose labels need no translation. Cost: a DST-observing user drifts an hour twice a year and re-picks. The column is TEXT, so a zone name can be stored later without a migration. |
+| 2026-07-31 | **Assumption 1 overridden — the contribution graph is a rendered PNG**, not an emoji grid. The memory objection did not survive contact with the numbers. |
+| 2026-07-31 | **Assumption 2 confirmed** — no percentile line below 200 streaked users, enforced structurally. |
+| 2026-08-01 | **Progress is measured in two units.** Surahs in ayahs, juz and the whole Qur'an in mushaf pages, because that is how a hafiz counts them. The spec's own example line ("juz 29 4% · Qur'an 0.4%") was not arithmetically consistent with ayah counting; pages are what make a figure of that order come out. |
+| 2026-08-01 | **Transient sends are retried.** `RetryAfter`/`TimedOut`/`NetworkError` release the row back to `pending` instead of failing it, bounded by `drop_stale`. Note `telegram.error.BadRequest` *subclasses* `NetworkError`, so permanent errors are matched first — the naive ordering would retry a malformed request for six hours. |
+| 2026-08-01 | **The enqueue chain was missing.** Workstream F built only the drain side; nothing filled the queue, so the daily push would have failed silently in production while every scheduler test passed. `hifz/memorize.py` now queues at plan save and after each fire, and pause/resume stop and restart it. |
+| 2026-08-01 | Phase 1 code complete; `tests/test_acceptance.py` executes §7 end to end. I2 (47 locale tables) is the remaining task. |
