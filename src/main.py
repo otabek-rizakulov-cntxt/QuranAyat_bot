@@ -1406,15 +1406,20 @@ async def _initialize():
         print("INIT ERROR (hifz features):", type(e).__name__, e)
 
     # --- SCHEDULER SLOT (Wave 1D) ---------------------------------------------
-    # The due-queue loop starts here, following the idiom in on_startup() below:
+    # The due-queue loop. It goes last because it needs `bot` and `data`
+    # populated and the schema applied — and after hifz.load_features(), because
+    # that import is what registers the per-kind send handlers it dispatches to.
     #
-    #     from lib.scheduler import run_scheduler
-    #     task = asyncio.create_task(run_scheduler(bot, data))
-    #     _background_tasks.add(task)          # strong ref: tasks are GC'd otherwise
-    #     task.add_done_callback(_background_tasks.discard)
-    #
-    # It goes last because it needs `bot` and `data` populated, and the schema
-    # applied. Nothing else in Wave 0b starts a background task.
+    # The loop owns its own error handling (a failing tick is logged and the loop
+    # continues), so the only thing that can land here is a failure to *start* it.
+    # It is stopped by cancellation when uvicorn tears the event loop down.
+    try:
+        from lib.scheduler import run_scheduler
+        task = asyncio.create_task(run_scheduler(bot, data))
+        _background_tasks.add(task)          # strong ref: tasks are GC'd otherwise
+        task.add_done_callback(_background_tasks.discard)
+    except Exception as e:
+        print("INIT ERROR (scheduler):", type(e).__name__, e)
 
 
 @app.on_event("startup")

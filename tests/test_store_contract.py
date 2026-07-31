@@ -577,3 +577,66 @@ class TestSchedule:
         await store.schedule.mark_sent(row.id)
         assert await store.schedule.drop_stale(self.NOW) == 0
         assert (await store.schedule.get_by_key("old")).state == STATE_SENT
+
+
+class TestHifzIntervalEdges:
+    """C1 hardening, appended: the merge/split behaviours both legs must share.
+
+    `TestHifzIntervals` above pins the shapes; these pin the things a divergence
+    between the asyncpg and in-memory legs would hide — which timestamps and ids
+    survive a write, and where removal deliberately stops short of the merge's
+    reach. The arithmetic itself is proved exhaustively in
+    tests/test_hifz_intervals.py, which only runs against the in-memory leg
+    because the helpers it exercises are shared module-level functions.
+    """
+
+    async def test_containment_preserves_the_marked_at_as_well_as_the_id(self, store):
+        original = await store.hifz.add_interval(1, 67, 1, 10)
+        again = await store.hifz.add_interval(1, 67, 5, 6)
+        assert (again.id, again.marked_at) == (original.id, original.marked_at)
+
+    async def test_a_split_carries_the_original_marked_at_onto_both_halves(self, store):
+        """Forgetting the middle of a page does not re-date the edges.
+
+        The halves were memorized when the whole was; stamping them "now" would
+        make a `/forgot` register as fresh progress to anything reading marked_at.
+        """
+        original = await store.hifz.add_interval(1, 67, 1, 10)
+        halves = await store.hifz.remove_range(1, 67, 5, 6)
+        assert [h.marked_at for h in halves] == [original.marked_at,
+                                                 original.marked_at]
+
+    async def test_removal_stops_at_an_abutting_neighbour_that_a_mark_would_absorb(self, store):
+        """The one asymmetry between marking and unmarking, pinned for both legs."""
+        await store.hifz.add_interval(1, 67, 1, 4)
+        await store.hifz.add_interval(1, 67, 7, 10)
+        await store.hifz.remove_range(1, 67, 5, 6)
+        assert _spans(await store.hifz.list_intervals(1)) == [(67, 1, 4), (67, 7, 10)]
+        await store.hifz.add_interval(1, 67, 5, 6)
+        assert _spans(await store.hifz.list_intervals(1)) == [(67, 1, 10)]
+
+    async def test_a_mark_bridging_a_one_ayah_gap_merges_but_a_two_ayah_gap_does_not(self, store):
+        await store.hifz.add_interval(1, 67, 1, 4)
+        await store.hifz.add_interval(1, 67, 6, 8)
+        assert _spans(await store.hifz.list_intervals(1)) == [(67, 1, 4), (67, 6, 8)]
+        await store.hifz.add_interval(1, 67, 5, 5)
+        assert _spans(await store.hifz.list_intervals(1)) == [(67, 1, 8)]
+
+    async def test_ayah_zero_is_rejected_by_both_writers(self, store):
+        with pytest.raises(ValueError):
+            await store.hifz.add_interval(1, 67, 0, 5)
+        with pytest.raises(ValueError):
+            await store.hifz.remove_range(1, 67, 0, 5)
+        assert await store.hifz.list_intervals(1) == []
+
+    async def test_the_interval_returned_by_a_mark_always_covers_what_was_asked(self, store):
+        for start, end in ((5, 8), (1, 3), (10, 12), (2, 11), (20, 20)):
+            marked = await store.hifz.add_interval(1, 67, start, end)
+            assert marked.start_ayah <= start and marked.end_ayah >= end
+
+    async def test_removing_the_whole_of_one_surah_leaves_the_others(self, store):
+        await store.hifz.add_interval(1, 67, 1, 30)
+        await store.hifz.add_interval(1, 36, 1, 20)
+        await store.hifz.remove_range(1, 67, 1, 30)
+        assert _spans(await store.hifz.list_intervals(1)) == [(36, 1, 20)]
+        assert await store.hifz.count_ayahs(1) == 20
