@@ -73,11 +73,23 @@ def t(key: str, lang: str = DEFAULT_LANG) -> str:
 # only translate the descriptions, never the list itself.
 
 BOT_COMMANDS = (
+    # Reading the Qur'an
     ("index", "cmd_index"),
     ("page", "cmd_page"),
     ("juz", "cmd_juz"),
     ("sajda", "cmd_sajda"),
     ("random", "cmd_random"),
+    # Memorizing it — the hifz platform, in the order a user meets them:
+    # commit to a plan, see how far you are, test yourself, correct a mistake,
+    # then the two motivation surfaces.
+    ("memorize", "cmd_memorize"),
+    ("progress", "cmd_progress"),
+    ("check", "cmd_check"),
+    ("forgot", "cmd_forgot"),
+    ("streak", "cmd_streak"),
+    ("leaderboard", "cmd_leaderboard"),
+    # Settings
+    ("profile", "cmd_profile"),
     ("language", "cmd_language"),
     ("translation", "cmd_translation"),
     ("reciter", "cmd_reciter"),

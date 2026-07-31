@@ -169,6 +169,20 @@ class Quran:
         """Get range of Ayahs."""
         return " ".join(self.text[surah - 1][a - 1:b]) + " (%d:%d-%d)" % (surah, a, b)
 
+    def get_ayah_text(self, surah: int, ayah: int) -> str:
+        """The ayah alone, with no "(surah:ayah)" suffix.
+
+        `get_ayah` appends the reference because a verse card is read on its own
+        and needs to say where it came from. The recall check must not: it shows
+        an opening and four continuations, and a reference on the correct one
+        would be the answer written next to the question.
+        """
+        return self.text[surah - 1][ayah - 1]
+
+    def get_ayahs_text(self, surah: int, a: int, b: int) -> str:
+        """A range of ayahs joined, with no reference suffix — see get_ayah_text."""
+        return " ".join(self.text[surah - 1][a - 1:b])
+
     @staticmethod
     def get_random_ayah() -> Tuple[int, int]:
         surah = randint(1, 114)

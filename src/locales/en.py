@@ -71,4 +71,154 @@ strings = {
     "cmd_reciter": "Change reciter",
     "cmd_about": "Sources & credits",
     "quran_name": "Qur'an",
+
+    # --- Hifz platform ---------------------------------------------------------
+    # Frozen key set for the memorization features. Every key here is documented
+    # in docs/HIFZ_STRINGS.md — placeholder names and all — because 47 other
+    # locales are translated from that manifest rather than from this file.
+    #
+    # Two house rules for anything added below:
+    #   * no HTML tags. Only welcome_intro / welcome_inline / about are checked
+    #     for balanced <b>, and an unbalanced tag makes Telegram reject the whole
+    #     message. Plain text cannot fail that way in 48 languages.
+    #   * as few placeholders as possible, and never a positional one — every
+    #     placeholder is multiplied by 47 translators.
+
+    # Command descriptions (the Telegram menu and the /start list)
+    "cmd_memorize": "Start a memorization plan",
+    "cmd_progress": "What you have memorized",
+    "cmd_check": "Test your recall",
+    "cmd_forgot": "Unmark a memorized range",
+    "cmd_streak": "Your daily streak",
+    "cmd_leaderboard": "This week's top memorizers",
+    "cmd_profile": "Your profile and settings",
+
+    # Shared wizard controls
+    "wizard_cancelled": "Cancelled.",
+    "wizard_nothing_to_cancel": "There is nothing to cancel.",
+    "wizard_invalid_input": "I didn't understand that. Try again, or send /cancel.",
+    "ref_invalid": "That isn't a reference I recognise. Try something like 67, 67:1-8 or juz 30.",
+    "btn_cancel": "Cancel",
+    "btn_back": "Back",
+    "btn_confirm": "Confirm",
+
+    # Days of the week — the plan's day picker, and the streak grid's header
+    "day_mon": "Mon",
+    "day_tue": "Tue",
+    "day_wed": "Wed",
+    "day_thu": "Thu",
+    "day_fri": "Fri",
+    "day_sat": "Sat",
+    "day_sun": "Sun",
+
+    # Profile (B1-B3)
+    "profile_title": "Your profile",
+    "profile_name_set": "Name: {name}",
+    "profile_name_unset": "Name: not set",
+    "profile_leaderboard_on": "Leaderboard: you are listed",
+    "profile_leaderboard_off": "Leaderboard: you are hidden",
+    "profile_timezone_set": "Time zone: UTC{offset}",
+    "profile_timezone_unset": "Time zone: not set",
+    "profile_reminder_set": "Daily reminder: {time}",
+    "profile_reminder_unset": "Daily reminder: off",
+    "profile_plan_active": "Plan: {target} — day {day} of {total}",
+    "profile_plan_none": "Plan: none yet. Start one with /memorize.",
+    "btn_edit_name": "Change name",
+    "btn_join_board": "Join the leaderboard",
+    "btn_leave_board": "Leave the leaderboard",
+    "btn_edit_timezone": "Change time zone",
+    "btn_edit_reminder": "Change reminder time",
+    "name_prompt": "Send the name you would like to appear under on the leaderboard.",
+    "name_invalid": "Use between {min} and {max} characters.",
+    "name_saved": "You will appear as {name}.",
+    "board_joined": "You are on the leaderboard now.",
+    "board_left": "You have been removed from the leaderboard.",
+    "timezone_prompt": (
+        "Pick your UTC offset. It decides when your day starts for streaks and "
+        "when your daily portion arrives."
+    ),
+    "timezone_saved": "Time zone set to UTC{offset}.",
+    "reminder_prompt": "Send the time you want your daily portion, in 24-hour form, e.g. 07:30.",
+    "reminder_invalid": "Send a time in 24-hour form, e.g. 07:30.",
+    "reminder_saved": "Daily reminder set for {time}.",
+    "btn_reminder_off": "Turn reminders off",
+    "reminder_off": "Daily reminders are off.",
+
+    # Progress and /forgot (C3)
+    "progress_title": "What you have memorized",
+    "progress_surah_line": "{name}: {done}/{total} ayahs — {pct}%",
+    "progress_juz_line": "Juz {n}: {pct}%",
+    "progress_quran_line": "Whole Qur'an: {pct}%",
+    "progress_empty": (
+        "Nothing marked yet. Finish a portion and tap \"I know this by heart\", "
+        "or start a plan with /memorize."
+    ),
+    "forgot_usage": "Send what to unmark, for example /forgot 67:5-6.",
+    "forgot_done": "Unmarked {ref}.",
+    "forgot_nothing": "You had not marked that as memorized.",
+
+    # Memorization plans and drills (D1, D3-D5)
+    "memorize_choose_target": "What would you like to memorize?",
+    "btn_target_surah": "A surah",
+    "btn_target_juz": "A juz",
+    "btn_target_range": "A range",
+    "memorize_surah_prompt": "Send the surah number, for example 67.",
+    "memorize_juz_prompt": "Send the juz number, from 1 to 30.",
+    "memorize_range_prompt": "Send the range, for example 67:1-68:5.",
+    "memorize_choose_pace": "How much would you like to do each day?",
+    "btn_pace_auto": "Choose for me",
+    "memorize_pace_prompt": "Send how many ayahs a day.",
+    "memorize_pace_invalid": "Send a number between {min} and {max}.",
+    "memorize_choose_days": "Which days would you like to study?",
+    "btn_days_daily": "Every day",
+    "btn_days_weekdays": "Weekdays",
+    "btn_days_custom": "Pick days",
+    "memorize_days_prompt": "Tap the days you want, then confirm.",
+    "memorize_preview_title": "{days} days, {start} to {end}:",
+    "memorize_preview_row": "{date} — {ref}",
+    "btn_confirm_plan": "Start this plan",
+    "plan_saved": "Your plan is set. The first portion arrives on {first_date}.",
+    "plan_exists": "You already have a plan running. Pause or abandon it first.",
+    "btn_pause_plan": "Pause plan",
+    "btn_resume_plan": "Resume plan",
+    "btn_abandon_plan": "Abandon plan",
+    "plan_paused": "Plan paused. Resume it any time from /profile.",
+    "plan_resumed": "Plan resumed.",
+    "plan_abandoned": "Plan abandoned.",
+    "plan_complete": "You have finished {target}. May Allah accept it from you.",
+    "drill_title": "{ref} — day {day} of {total}",
+    "drill_none_today": "Nothing is scheduled for today.",
+    "btn_start_drill": "Start today's portion",
+    "btn_know_by_heart": "✅ I know this by heart",
+    "know_confirmed": "{ref} marked as memorized. You are at {pct}%.",
+    "know_already": "You had already marked that one.",
+
+    # Recall check (E2, E3)
+    "check_question": "How does this continue?",
+    "check_usage": "Send what to test, for example /check 67.",
+    "check_correct": "Correct.",
+    "check_wrong": "Not quite. It continues: {correct}",
+    "check_already_today": (
+        "You have already earned today's session from a recall check — test "
+        "yourself as often as you like, it just will not count twice."
+    ),
+    "btn_check_start": "Test me",
+
+    # Streaks (G2, G3)
+    "streak_title": "Your streak",
+    "streak_current": "Current streak: {n} days",
+    "streak_longest": "Longest streak: {n} days",
+    "streak_none": "No streak yet. Finish a portion or pass a recall check today to start one.",
+    "streak_graph_caption": "The last 12 weeks",
+    "streak_milestone_7": "A full week. This is where the habit starts.",
+    "streak_milestone_30": "Thirty days. Consistency is now on your side.",
+    "streak_milestone_100": "A hundred days. Very few people get this far.",
+    "streak_milestone_365": "A whole year, every single day. May Allah preserve what you have learned.",
+
+    # Leaderboard (H1, H2)
+    "leaderboard_title": "This week's leaderboard",
+    "leaderboard_row": "{rank}. {name} — {sessions}",
+    "leaderboard_you_row": "You: {rank}. — {sessions}",
+    "leaderboard_empty": "Nobody has completed a session this week yet. Be the first.",
+    "leaderboard_not_opted_in": "You are not on the leaderboard. Join it from /profile.",
 }
