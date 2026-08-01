@@ -150,7 +150,11 @@ class InMemoryScheduleStore(ScheduleStore):
     claimed = []
     for row in due[:limit]:
       row.state = STATE_CLAIMED
-      row.claimed_at = datetime.now(timezone.utc)
+      # Stamp with the caller's `now`, not the wall clock: the scheduler passes a
+      # single consistent `now` through claim -> release_stale_claims, and mixing
+      # in real time here would make the staleness comparison depend on how long
+      # the tick took (and, under test, on today's real date).
+      row.claimed_at = now
       claimed.append(self._copy(row))
     return claimed
 

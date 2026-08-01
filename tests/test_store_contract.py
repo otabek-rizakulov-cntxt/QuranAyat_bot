@@ -554,7 +554,7 @@ class TestSchedule:
         await store.schedule.enqueue("plan_day", 1, self.NOW - timedelta(hours=2), "a")
         await store.schedule.claim_due(self.NOW)
         assert await store.schedule.release_stale_claims(
-            datetime.now(UTC) + timedelta(minutes=1)) == 1
+            self.NOW + timedelta(minutes=1)) == 1
         assert (await store.schedule.get_by_key("a")).state == STATE_PENDING
         assert len(await store.schedule.claim_due(self.NOW)) == 1
 
@@ -562,7 +562,7 @@ class TestSchedule:
         await store.schedule.enqueue("plan_day", 1, self.NOW - timedelta(hours=2), "a")
         await store.schedule.claim_due(self.NOW)
         assert await store.schedule.release_stale_claims(
-            datetime.now(UTC) - timedelta(hours=1)) == 0
+            self.NOW - timedelta(hours=1)) == 0
         assert (await store.schedule.get_by_key("a")).state == STATE_CLAIMED
 
     async def test_drop_stale_removes_windows_that_are_no_longer_relevant(self, store):
