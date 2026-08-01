@@ -26,6 +26,11 @@ class MemoryState:
   plan_day: Dict[int, object] = field(default_factory=dict)        # id -> PlanDayRow
   session_log: List[object] = field(default_factory=list)          # SessionRow
   scheduled_send: Dict[int, object] = field(default_factory=dict)  # id -> ScheduledSend
+  # Phase 2 — the group cluster.
+  group_config: Dict[int, object] = field(default_factory=dict)    # chat_id -> GroupConfig
+  group_plan: Dict[int, object] = field(default_factory=dict)      # id -> GroupPlanRow
+  group_plan_day: Dict[int, object] = field(default_factory=dict)  # id -> GroupPlanDayRow
+  group_member_link: List[object] = field(default_factory=list)    # GroupMemberLink
   sequence: int = 0
 
   def next_id(self) -> int:
@@ -47,4 +52,8 @@ class MemoryState:
     self.plan_day.clear()
     self.session_log.clear()
     self.scheduled_send.clear()
+    self.group_config.clear()
+    self.group_plan.clear()
+    self.group_plan_day.clear()
+    self.group_member_link.clear()
     self.sequence = 0

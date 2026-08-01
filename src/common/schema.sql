@@ -135,3 +135,67 @@ CREATE UNIQUE INDEX IF NOT EXISTS scheduled_send_idempotency_key_idx
     ON scheduled_send (idempotency_key);
 -- The claim query: pending rows already due, oldest first.
 CREATE INDEX IF NOT EXISTS scheduled_send_state_due_idx ON scheduled_send (state, due_at);
+
+-- ---------------------------------------------------------------------------
+-- Phase 2 — the group cluster (items 5-7). A supergroup runs one study circle:
+-- the bot posts a daily portion into a forum topic it created itself, and keeps
+-- a weekly board of the members who opted in. All of it is keyed by chat_id.
+-- ---------------------------------------------------------------------------
+
+-- One row per configured group. The bot ignores every group without a row here
+-- (that is how the Phase-1 blanket ban becomes a selective one). thread_id is
+-- the forum topic the bot created via createForumTopic and therefore owns.
+CREATE TABLE IF NOT EXISTS group_config (
+    chat_id           BIGINT PRIMARY KEY,
+    thread_id         INT,
+    admin_user_id     BIGINT NOT NULL,
+    translation_lang  TEXT NOT NULL DEFAULT 'en',
+    reciter           TEXT NOT NULL DEFAULT 'Husary_128kbps',
+    timezone          TEXT,                       -- fixed UTC offset, e.g. '+05:00'
+    post_time         TIME,                       -- local to the group
+    days_of_week      SMALLINT[] NOT NULL DEFAULT '{}',
+    content_flags     JSONB NOT NULL DEFAULT '{}'::jsonb,   -- {image,audio,translation}
+    status            TEXT NOT NULL DEFAULT 'setup',        -- 'setup'|'active'|'paused'
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- The group's memorization plan. Same shape as `plan`, keyed by chat_id — one
+-- active plan per group, the same convention as one per user.
+CREATE TABLE IF NOT EXISTS group_plan (
+    id                BIGSERIAL PRIMARY KEY,
+    chat_id           BIGINT NOT NULL,
+    target_kind       TEXT NOT NULL,
+    start_surah       INT NOT NULL,
+    start_ayah        INT NOT NULL,
+    end_surah         INT NOT NULL,
+    end_ayah          INT NOT NULL,
+    pace              INT NOT NULL DEFAULT 0,
+    days_of_week      SMALLINT[] NOT NULL DEFAULT '{}',
+    status            TEXT NOT NULL DEFAULT 'active',
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS group_plan_chat_status_idx ON group_plan (chat_id, status);
+
+-- Materialized daily portions of a group plan. Same shape as `plan_day`.
+CREATE TABLE IF NOT EXISTS group_plan_day (
+    id                BIGSERIAL PRIMARY KEY,
+    group_plan_id     BIGINT NOT NULL,
+    scheduled_date    DATE NOT NULL,
+    surah             INT NOT NULL,
+    start_ayah        INT NOT NULL,
+    end_ayah          INT NOT NULL,
+    state             TEXT NOT NULL DEFAULT 'pending'
+);
+CREATE INDEX IF NOT EXISTS group_plan_day_plan_date_idx
+    ON group_plan_day (group_plan_id, scheduled_date);
+
+-- A member's consent to appear on that group's board. Established by a
+-- ?start=g<chat_id> deep link; membership is re-verified with getChatMember at
+-- render time, so a link alone never leaks someone onto a board they left.
+CREATE TABLE IF NOT EXISTS group_member_link (
+    user_id           BIGINT NOT NULL,
+    chat_id           BIGINT NOT NULL,
+    linked_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, chat_id)
+);

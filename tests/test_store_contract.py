@@ -32,7 +32,8 @@ from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
 
 # Child-first, so the plan_day -> plan foreign key never blocks the truncate.
 _TABLES = ("scheduled_send", "session_log", "plan_day", "plan", "hifz_interval",
-           "user_profile", "user_settings")
+           "user_profile", "user_settings",
+           "group_plan_day", "group_plan", "group_member_link", "group_config")
 
 UTC = timezone.utc
 
@@ -640,3 +641,95 @@ class TestHifzIntervalEdges:
         await store.hifz.remove_range(1, 67, 1, 30)
         assert _spans(await store.hifz.list_intervals(1)) == [(36, 1, 20)]
         assert await store.hifz.count_ayahs(1) == 20
+
+
+class TestGroups:
+    """The group cluster's storage (Phase 2). Same both-legs contract."""
+
+    async def test_unknown_group_has_no_config(self, store):
+        assert await store.groups.get_config(-100) is None
+
+    async def test_ensure_config_creates_then_preserves(self, store):
+        row = await store.groups.ensure_config(-100, admin_user_id=7)
+        assert row.chat_id == -100 and row.admin_user_id == 7
+        assert row.status == "setup" and row.thread_id is None
+        # adopting the bot again must not reset the admin
+        again = await store.groups.ensure_config(-100, admin_user_id=999)
+        assert again.admin_user_id == 7
+
+    async def test_update_config_sets_fields(self, store):
+        await store.groups.ensure_config(-100, admin_user_id=7)
+        row = await store.groups.update_config(
+            -100, thread_id=42, translation_lang="ru", timezone="+05:00",
+            post_time=time(7, 0), days_of_week=[1, 3, 5],
+            content_flags={"image": True, "audio": False}, status="active")
+        assert row.thread_id == 42 and row.translation_lang == "ru"
+        assert row.post_time == time(7, 0) and row.days_of_week == [1, 3, 5]
+        assert row.content_flags == {"image": True, "audio": False}
+        assert row.status == "active"
+
+    async def test_update_missing_config_returns_none(self, store):
+        assert await store.groups.update_config(-100, status="active") is None
+
+    async def test_list_active_configs_needs_status_and_post_time(self, store):
+        await store.groups.ensure_config(-1, admin_user_id=1)          # setup, no time
+        await store.groups.ensure_config(-2, admin_user_id=1)
+        await store.groups.update_config(-2, status="active")          # active, no time
+        await store.groups.ensure_config(-3, admin_user_id=1)
+        await store.groups.update_config(-3, status="active", post_time=time(6, 0))
+        active = await store.groups.list_active_configs()
+        assert [c.chat_id for c in active] == [-3]
+
+    async def test_delete_config(self, store):
+        await store.groups.ensure_config(-100, admin_user_id=7)
+        await store.groups.delete_config(-100)
+        assert await store.groups.get_config(-100) is None
+
+    async def test_create_plan_and_days(self, store):
+        plan = await store.groups.create_plan(
+            -100, "surah", 67, 1, 67, 30, 2, [1, 2, 3],
+            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2),
+                  PlanDaySpec(date(2026, 8, 4), 67, 3, 4)])
+        assert plan.chat_id == -100 and plan.status == "active"
+        days = await store.groups.list_plan_days(plan.id)
+        assert [(d.surah, d.start_ayah, d.end_ayah) for d in days] == [
+            (67, 1, 2), (67, 3, 4)]
+
+    async def test_get_active_plan_is_newest(self, store):
+        await store.groups.create_plan(-100, "surah", 67, 1, 67, 30, 2, [1],
+                                       days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)])
+        p2 = await store.groups.create_plan(-100, "surah", 36, 1, 36, 83, 2, [1],
+                                            days=[PlanDaySpec(date(2026, 8, 3), 36, 1, 2)])
+        assert (await store.groups.get_active_plan(-100)).id == p2.id
+
+    async def test_claim_plan_day_is_once(self, store):
+        plan = await store.groups.create_plan(
+            -100, "surah", 67, 1, 67, 30, 2, [1],
+            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)])
+        day = (await store.groups.list_plan_days(plan.id))[0]
+        assert (await store.groups.claim_plan_day(day.id)).state == "sent"
+        assert await store.groups.claim_plan_day(day.id) is None
+
+    async def test_set_plan_status(self, store):
+        plan = await store.groups.create_plan(
+            -100, "surah", 67, 1, 67, 30, 2, [1],
+            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)])
+        await store.groups.set_plan_status(plan.id, "paused")
+        assert await store.groups.get_active_plan(-100) is None
+
+    async def test_member_links(self, store):
+        assert await store.groups.is_linked(5, -100) is False
+        await store.groups.link_member(5, -100)
+        await store.groups.link_member(6, -100)
+        await store.groups.link_member(5, -100)          # idempotent
+        assert await store.groups.is_linked(5, -100) is True
+        assert await store.groups.list_linked(-100) == [5, 6]
+        await store.groups.unlink_member(5, -100)
+        assert await store.groups.is_linked(5, -100) is False
+        assert await store.groups.list_linked(-100) == [6]
+
+    async def test_links_are_per_group(self, store):
+        await store.groups.link_member(5, -100)
+        await store.groups.link_member(5, -200)
+        await store.groups.unlink_member(5, -100)
+        assert await store.groups.list_linked(-200) == [5]

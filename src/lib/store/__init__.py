@@ -20,11 +20,13 @@ from .plans import InMemoryPlanStore, PlanStore, PostgresPlanStore
 from .profiles import InMemoryProfileStore, PostgresProfileStore, ProfileStore
 from .schedule import InMemoryScheduleStore, PostgresScheduleStore, ScheduleStore
 from .sessions import InMemorySessionStore, PostgresSessionStore, SessionStore
+from .groups import GroupStore, InMemoryGroupStore, PostgresGroupStore
 
 __all__ = [
   "Store", "InMemoryStore", "PostgresStore",
   "get_store", "apply_schema", "reset_for_tests",
   "HifzStore", "PlanStore", "ProfileStore", "ScheduleStore", "SessionStore",
+  "GroupStore",
 ]
 
 # src/lib/store/__init__.py -> src/lib/store -> src/lib -> src
@@ -45,6 +47,7 @@ class Store:
   plans: PlanStore
   sessions: SessionStore
   schedule: ScheduleStore
+  groups: GroupStore
 
   async def apply_schema(self) -> None:
     """Create any missing tables and indexes. Idempotent."""
@@ -65,6 +68,7 @@ class InMemoryStore(Store):
     self.plans = InMemoryPlanStore(self.state)
     self.sessions = InMemorySessionStore(self.state)
     self.schedule = InMemoryScheduleStore(self.state)
+    self.groups = InMemoryGroupStore(self.state)
 
   async def apply_schema(self) -> None:
     """No-op: there is no schema to apply to a dict."""
@@ -84,6 +88,7 @@ class PostgresStore(Store):
     self.plans = PostgresPlanStore(pool)
     self.sessions = PostgresSessionStore(pool)
     self.schedule = PostgresScheduleStore(pool)
+    self.groups = PostgresGroupStore(pool)
 
   async def apply_schema(self) -> None:
     """Apply `src/common/schema.sql` in one multi-statement execute.

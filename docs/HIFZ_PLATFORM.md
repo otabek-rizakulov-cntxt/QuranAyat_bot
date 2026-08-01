@@ -6,7 +6,7 @@
 > percentage, and rewards consistency with streaks and leaderboards — privately
 > in DM, and as a study circle in a supergroup topic.
 
-**Status:** Phase 1 built; 40/48 locales translated (8 fall back to English)
+**Status:** Phase 1 built; Phase 2 (group cluster) in progress
 **Last updated:** 2026-08-01
 
 ---
@@ -120,7 +120,7 @@ implementation detail.
 | G — Streaks & graph (item 2) | 3 | 3 | ✅ done |
 | H — Leaderboard (item 3) | 2 | 2 | ✅ done |
 | I — i18n & commands | 3 | 2.5 | 🟨 I2: 40/48 locales; 8 fall back to English |
-| J — Group cluster (items 5–7) | 6 | 0 | ⬜ Phase 2 |
+| J — Group cluster (items 5–7) | 6 | 1 | 🟨 storage + selective ban done |
 
 Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
 
@@ -465,6 +465,15 @@ lands before G and H.
 
 ## 5. Phase 2 — group cluster (items 5–7)
 
+> **Translation policy for Phase 2 (decided 2026-08-01).** New group-feature UI
+> strings are provided in **English, Russian, Uzbek Latin and Uzbek Cyrillic
+> only**. Every other language is **not implemented** for these keys and falls
+> back to English through `t()` — the bot still works in them, it is just not
+> localized for the group flow yet. This keeps Phase 2 moving without another
+> 5,000-string translation pass; the remaining 44 locales are a later batch.
+> Phase-2 keys carry a `# phase2` marker in `en.py` so that batch can find them.
+
+
 Designed, not built. Listed so the Phase 1 data model stays honest.
 
 - [ ] **J1 — Lift the group ban selectively.** `src/main.py:1136` currently
@@ -561,3 +570,4 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 | 2026-08-01 | Phase 1 code complete; `tests/test_acceptance.py` executes §7 end to end. I2 (47 locale tables) is the remaining task. |
 | 2026-08-01 | 40 of 48 interface locales translated. The 8 not done — **ja, ko, sd, ps, dv, si, ce, ber** — fall back to English per-key via `t()`, so the bot works in them; `scripts/check_locales.py` and `tests/test_locales.py` stay red until they land. Translation-agent quota was exhausted; these are the remaining batch. |
 | 2026-08-01 | Fixed a date-dependent scheduler bug: `claim_due` stamped `claimed_at` with the wall clock instead of the caller's `now`, which time-bombed three tests when the real date crossed their fixture date. |
+| 2026-08-01 | **Phase 2 started.** Storage foundation landed: the four group tables (`group_config`, `group_plan`, `group_plan_day`, `group_member_link`) in `schema.sql`, a `groups` repository with both legs, and its contract tests. Translation for the group flow is en/ru/uz/uz-Cyrl only; the other 44 languages are marked not-implemented and fall back to English (see the note in §5). |
