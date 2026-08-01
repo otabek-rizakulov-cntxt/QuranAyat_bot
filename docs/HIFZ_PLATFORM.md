@@ -6,8 +6,9 @@
 > percentage, and rewards consistency with streaks and leaderboards — privately
 > in DM, and as a study circle in a supergroup topic.
 
-**Status:** Phase 1 and Phase 2 built; group flow localized in en/ru/uz/uz-Cyrl
-**Last updated:** 2026-08-01
+**Status:** Phase 1 and Phase 2 built; all 48 locales complete for Phase 1 keys;
+group flow localized in en/ru/uz/uz-Cyrl only (by design, §5)
+**Last updated:** 2026-08-02
 
 ---
 
@@ -119,7 +120,7 @@ implementation detail.
 | F — Scheduler | 3 | 3 | ✅ done |
 | G — Streaks & graph (item 2) | 3 | 3 | ✅ done |
 | H — Leaderboard (item 3) | 2 | 2 | ✅ done |
-| I — i18n & commands | 3 | 2.5 | 🟨 I2: 40/48 locales; 8 fall back to English |
+| I — i18n & commands | 3 | 3 | ✅ done |
 | J — Group cluster (items 5–7) | 6 | 6 | ✅ built (en/ru/uz/uz-Cyrl only) |
 
 Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
@@ -448,11 +449,14 @@ lands before G and H.
   *Files:* `src/locales/__init__.py`
   *Done when:* `/start` lists every new command in every locale.
 
-- [ ] **I2 — String tables for 48 locales.**
-  Roughly 40–60 new keys across `src/locales/*.py`. No locale falls back to
-  English — the property the README advertises.
+- [x] **I2 — String tables for 48 locales.**
+  111 new keys across `src/locales/*.py`. No locale falls back to English for
+  the Phase 1 hifz keys — the property the README advertises. (The 25 Phase 2
+  `group_*` keys remain en/ru/uz/uz-Cyrl only by deliberate scope, §5.)
   *Files:* `src/locales/*.py`
-  *Done when:* `python3 scripts/check_locales.py` passes.
+  *Done when:* `python3 scripts/check_locales.py` passes for all Phase 1 keys
+  in all 48 locales — it does; the only remaining problems are the 44 locales'
+  intentionally-out-of-scope `group_*` gap.
 
 - [x] **I3 — Docs.**
   Update `README.md` (user-facing feature description) and `BUSINESS_LOGIC.md`
@@ -524,7 +528,9 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
   and appears on the board.
 - `pytest` passes, including new tests for interval merging, streak boundary at
   local midnight, scheduler idempotency, and quiz-distractor selection.
-- `python3 scripts/check_locales.py` passes with all 48 locales complete.
+- `python3 scripts/check_locales.py` passes for all 48 locales on every Phase 1
+  key — it does, as of 2026-08-02. (The script still reports 44 locales missing
+  the 25 Phase 2 `group_*` keys; that gap is in scope for §5, not Phase 1.)
 
 ---
 
@@ -548,10 +554,12 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
   `attempts` column, a `RetryAfter`/`TimedOut`/`NetworkError` row is released back
   to the queue and retried each minute until `drop_stale` deletes it (~6 h), then
   gives up silently. Adding `attempts INT` would make that observable.
-- [ ] **~5,200 machine-translated strings** across 47 locales, in languages nobody
-  on this project reads. `scripts/check_locales.py` validates structure, never
-  nuance. Each translating agent was asked to name the keys it was unsure of; that
-  list is the starting point for a native-speaker review.
+- [ ] **~5,200 machine-translated strings** across all 47 non-English locales
+  (now including the last 8 — ja, ko, sd, ps, dv, si, ce, ber — landed
+  2026-08-02), in languages nobody on this project reads. `scripts/check_locales.py`
+  validates structure, never nuance. Each translating agent was asked to name the
+  keys it was unsure of; that list is the starting point for a native-speaker
+  review.
 
 ---
 
@@ -572,3 +580,4 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 | 2026-08-01 | Fixed a date-dependent scheduler bug: `claim_due` stamped `claimed_at` with the wall clock instead of the caller's `now`, which time-bombed three tests when the real date crossed their fixture date. |
 | 2026-08-01 | **Phase 2 started.** Storage foundation landed: the four group tables (`group_config`, `group_plan`, `group_plan_day`, `group_member_link`) in `schema.sql`, a `groups` repository with both legs, and its contract tests. Translation for the group flow is en/ru/uz/uz-Cyrl only; the other 44 languages are marked not-implemented and fall back to English (see the note in §5). |
 | 2026-08-02 | **Phase 2 complete (J4-J6).** Group plan wizard reuses lib.plan_builder against group_plan; the daily post rides the Phase 1 scheduler into the bound forum topic (image+audio+translation, honoring content_flags), re-arming its own chain; the weekly board aggregates linked members' sessions in the group's week window, membership re-verified with getChatMember at render. Both chains are enqueued at plan save. Group-flow strings are en/ru/uz/uz-Cyrl only. |
+| 2026-08-02 | **I2 complete — the last 8 locales translated.** ja, ko, sd, ps, dv, si, ce, ber each got the 111 Phase 1 hifz keys (translation-agent quota that blocked them on 2026-08-01 was no longer an issue). `python3 scripts/check_locales.py` now passes on every Phase 1 key across all 48 locales — placeholders, HTML balance, button round-trips, `/start` command coverage. The 44-locale `group_*` gap in the checker's output is unrelated: those 25 Phase 2 keys are en/ru/uz/uz-Cyrl only by the §5 decision, not a translation gap. Workstream I is now fully done. |
