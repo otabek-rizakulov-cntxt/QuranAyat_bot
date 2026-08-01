@@ -6,7 +6,7 @@
 > percentage, and rewards consistency with streaks and leaderboards — privately
 > in DM, and as a study circle in a supergroup topic.
 
-**Status:** Phase 1 built; locale translation in progress
+**Status:** Phase 1 built; 40/48 locales translated (8 fall back to English)
 **Last updated:** 2026-08-01
 
 ---
@@ -119,7 +119,7 @@ implementation detail.
 | F — Scheduler | 3 | 3 | ✅ done |
 | G — Streaks & graph (item 2) | 3 | 3 | ✅ done |
 | H — Leaderboard (item 3) | 2 | 2 | ✅ done |
-| I — i18n & commands | 3 | 2 | 🟨 I2 (47 locales) in progress |
+| I — i18n & commands | 3 | 2.5 | 🟨 I2: 40/48 locales; 8 fall back to English |
 | J — Group cluster (items 5–7) | 6 | 0 | ⬜ Phase 2 |
 
 Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
@@ -559,3 +559,5 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 | 2026-08-01 | **Transient sends are retried.** `RetryAfter`/`TimedOut`/`NetworkError` release the row back to `pending` instead of failing it, bounded by `drop_stale`. Note `telegram.error.BadRequest` *subclasses* `NetworkError`, so permanent errors are matched first — the naive ordering would retry a malformed request for six hours. |
 | 2026-08-01 | **The enqueue chain was missing.** Workstream F built only the drain side; nothing filled the queue, so the daily push would have failed silently in production while every scheduler test passed. `hifz/memorize.py` now queues at plan save and after each fire, and pause/resume stop and restart it. |
 | 2026-08-01 | Phase 1 code complete; `tests/test_acceptance.py` executes §7 end to end. I2 (47 locale tables) is the remaining task. |
+| 2026-08-01 | 40 of 48 interface locales translated. The 8 not done — **ja, ko, sd, ps, dv, si, ce, ber** — fall back to English per-key via `t()`, so the bot works in them; `scripts/check_locales.py` and `tests/test_locales.py` stay red until they land. Translation-agent quota was exhausted; these are the remaining batch. |
+| 2026-08-01 | Fixed a date-dependent scheduler bug: `claim_due` stamped `claimed_at` with the wall clock instead of the caller's `now`, which time-bombed three tests when the real date crossed their fixture date. |
