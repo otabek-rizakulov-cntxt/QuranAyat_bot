@@ -170,14 +170,21 @@ def _combined_audio_key(surah: int, start: int, end: int, performer: str) -> str
 
 
 async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: int,
-                              performer: str, reply_markup=None) -> None:
-    """Send a range of ayahs as a single combined audio file, cached by Telegram file_id."""
+                              performer: str, reply_markup=None,
+                              message_thread_id=None) -> None:
+    """Send a range of ayahs as a single combined audio file, cached by Telegram file_id.
+
+    `message_thread_id` targets a forum topic (the group cluster's daily post);
+    left None it posts to the chat as before.
+    """
     file = File()
     cache_key = _combined_audio_key(surah, start, end, performer)
     title = "Quran %d:%d-%d" % (surah, start, end)
     kwargs = dict(chat_id=chat_id, title=title,
                   performer=File.get_performer_name(performer),
                   reply_markup=reply_markup)
+    if message_thread_id is not None:
+        kwargs["message_thread_id"] = message_thread_id
 
     cached_id = file.get_file(cache_key)
     if cached_id is not None:

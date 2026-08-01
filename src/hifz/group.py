@@ -27,6 +27,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram
 
 from hifz import Ctx, callback, wizard
+from lib.scheduler import send_handler
 from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED, CONFIG_SETUP
 from locales import t
 
@@ -149,16 +150,29 @@ async def _begin_setup(ctx: Ctx, chat_id: Optional[int]) -> None:
 
 @wizard(WIZARD_KIND)
 async def setup_step(ctx: Ctx, text: str) -> None:
-  """The one typed step: the forum-topic name."""
+  """The typed steps of setup: the topic name, the target, and the post time.
+
+  Button steps (translation, pace, days, timezone) arrive as `gr:` callbacks;
+  this handles only the free-text ones, routed by the draft's `step`.
+  """
   draft = ctx.wiz.get(ctx.user_id)
-  if draft is None or draft.get("step") != "topic":
+  if draft is None:
     return
+  step = draft.get("step")
+  if step == "topic":
+    await _step_topic(ctx, draft, text)
+  elif step == "target":
+    await _step_target(ctx, draft, text)
+  elif step == "post_time":
+    await _step_post_time(ctx, draft, text)
+
+
+async def _step_topic(ctx: Ctx, draft, text: str) -> None:
   chat_id = draft["data"].get("chat_id")
   name = text.strip()[:128]
   if not name:
     await ctx.reply(ctx.tr("group_topic_prompt"))
     return
-
   thread_id = await _create_topic(ctx.bot, chat_id, name)
   await ctx.store.groups.update_config(chat_id, thread_id=thread_id)
   if thread_id is None:
@@ -168,10 +182,171 @@ async def setup_step(ctx: Ctx, text: str) -> None:
   else:
     await ctx.reply(ctx.tr("group_topic_created").format(name=html.escape(name)),
                     parse_mode="HTML")
-
   ctx.wiz.update(ctx.user_id, step="translation")
-  await ctx.reply(ctx.tr("group_translation_prompt"),
-                  reply_markup=_lang_keyboard())
+  await ctx.reply(ctx.tr("group_translation_prompt"), reply_markup=_lang_keyboard())
+
+
+async def _step_target(ctx: Ctx, draft, text: str) -> None:
+  from hifz.refs import parse_reference, KIND_RANGE, KIND_SURAH, KIND_JUZ
+  ref = parse_reference(text)
+  if ref is None:
+    await ctx.reply(ctx.tr("group_target_invalid"))
+    return
+  ctx.wiz.update(ctx.user_id, step="pace",
+                 target=[ref.kind, ref.start_surah, ref.start_ayah,
+                         ref.end_surah, ref.end_ayah])
+  await ctx.reply(ctx.tr("group_pace_prompt"), reply_markup=_pace_keyboard())
+
+
+async def _step_post_time(ctx: Ctx, draft, text: str) -> None:
+  from hifz.profile import parse_reminder_time
+  post_time = parse_reminder_time(text)
+  if post_time is None:
+    await ctx.reply(ctx.tr("group_post_time_invalid"))
+    return
+  await _save_group_plan(ctx, draft["data"], post_time)
+
+
+async def _save_group_plan(ctx: Ctx, data: dict, post_time) -> None:
+  """Build the plan (same pure generator as the personal plan) and queue day one."""
+  from datetime import date
+  from hifz.refs import Ref
+  from lib.plan_builder import build_plan, to_day_specs, advancing
+  from lib.localtime import local_date, normalize_offset
+
+  chat_id = data.get("chat_id")
+  kind, s_s, s_a, e_s, e_a = data["target"]
+  ref = Ref(kind, s_s, s_a, e_s, e_a)
+  pace = int(data.get("pace") or 0)
+  days = data.get("days") or list(range(1, 8))
+  offset = normalize_offset(data.get("offset") or DEFAULT_OFFSET)
+
+  # Retire any previous plan (one active per group, the same convention as users).
+  old = await ctx.store.groups.get_active_plan(chat_id)
+  if old is not None:
+    await ctx.store.groups.set_plan_status(old.id, "complete")
+
+  from datetime import datetime, timezone
+  start = local_date(datetime.now(timezone.utc), offset)
+  portions = build_plan(ref, pace, days, start)
+  plan = await ctx.store.groups.create_plan(
+      chat_id, kind, ref.start_surah, ref.start_ayah, ref.end_surah, ref.end_ayah,
+      pace, days, to_day_specs(portions))
+
+  await ctx.store.groups.update_config(
+      chat_id, timezone=offset, post_time=post_time, days_of_week=days,
+      status=CONFIG_ACTIVE)
+  ctx.wiz.clear(ctx.user_id)
+
+  await _enqueue_next_group(ctx.store, chat_id, plan)
+  username = await bot_username(ctx.bot)
+  board = _deep_link(username, BOARD_PREFIX + str(chat_id))
+  await ctx.reply(ctx.tr("group_setup_done").format(
+      board_link=board, days=len(advancing(portions)), total=len(portions)))
+
+
+# --- J5: the daily group post through the Phase 1 scheduler ---------------------
+
+SEND_KIND = "group_plan_day"
+
+
+async def _enqueue_next_group(store, chat_id: int, plan, now=None):
+  """Queue the next pending portion's post. None if none, or the plan is inactive.
+
+  Mirrors `hifz.memorize._enqueue_next`: `enqueue` answers None on a key clash
+  rather than raising, so re-arming the chain more often than needed is a no-op.
+  """
+  from datetime import datetime, timezone
+  from lib.localtime import to_utc, next_due_utc, local_date, normalize_offset, parse_offset
+  from lib.scheduler import enqueue
+  from lib.store.groups import GPLAN_ACTIVE, GDAY_PENDING
+
+  if plan is None or plan.status != GPLAN_ACTIVE:
+    return None
+  config = await store.groups.get_config(chat_id)
+  if config is None or config.post_time is None or not config.timezone:
+    return None
+  offset = normalize_offset(config.timezone)
+
+  pending = await store.groups.list_plan_days(plan.id, state=GDAY_PENDING)
+  if not pending:
+    return None
+  day = pending[0]
+
+  now = now or datetime.now(timezone.utc)
+  from datetime import datetime as _dt
+  due_at = to_utc(_dt.combine(day.scheduled_date, config.post_time), offset)
+  if due_at <= now:
+    due_at = next_due_utc(config.post_time, offset, now)
+
+  return await enqueue(store, SEND_KIND, chat_id, due_at,
+                       local_day=local_date(due_at, offset),
+                       thread_id=config.thread_id,
+                       payload={"group_plan_day_id": day.id, "group_plan_id": plan.id,
+                                "chat_id": chat_id})
+
+
+@send_handler(SEND_KIND)
+async def push_group_day(ctx) -> None:
+  """Deliver one group portion to the topic, then re-arm the chain.
+
+  Returning marks the queued row 'sent'; raising marks it 'failed'. A paused
+  group, a torn-down plan, or an already-delivered day all *return* — none is a
+  failure to retry.
+  """
+  payload = ctx.payload or {}
+  day_id = payload.get("group_plan_day_id")
+  chat_id = payload.get("chat_id")
+  if day_id is None or chat_id is None:
+    raise ValueError("group_plan_day payload incomplete (send #%d)" % ctx.send.id)
+
+  config = await ctx.store.groups.get_config(chat_id)
+  plan = await ctx.store.groups.get_active_plan(chat_id)
+  if config is None or config.status != CONFIG_ACTIVE or plan is None:
+    return
+  day = await ctx.store.groups.get_plan_day(int(day_id))
+  if day is None:
+    return
+  claimed = await ctx.store.groups.claim_plan_day(day.id)
+  if claimed is None:
+    return                      # already delivered (restart between claim and mark)
+
+  await _post_portion(ctx.bot, config, claimed)
+  await _enqueue_next_group(ctx.store, chat_id, plan)
+
+
+async def _post_portion(bot, config, day) -> None:
+  """Post one portion to the group's topic: image, audio, translation, per flags."""
+  from main import send_combined_audio, get_translation
+  from lib.utils import File
+  from lib.page_image import fetch_and_stitch
+
+  flags = config.content_flags or {}
+  thread = config.thread_id
+  chat_id = config.chat_id
+  file = File()
+  base = dict(chat_id=chat_id)
+  if thread is not None:
+    base["message_thread_id"] = thread
+
+  if flags.get("image", True):
+    urls = [file.get_image_filename(day.surah, a)
+            for a in range(day.start_ayah, day.end_ayah + 1)]
+    try:
+      image = await fetch_and_stitch(urls, name="portion.jpg")
+      await bot.send_photo(photo=image, **base)
+    except Exception as e:                       # a CDN hiccup must not sink audio+text
+      print("HIFZ group: image post failed for %d: %s: %s"
+            % (chat_id, type(e).__name__, e))
+
+  if flags.get("translation", True):
+    quran = await get_translation(config.translation_lang)
+    text = quran.get_ayahs(day.surah, day.start_ayah, day.end_ayah)
+    await bot.send_message(text=text[:4096], **base)
+
+  if flags.get("audio", True):
+    await send_combined_audio(bot, day.surah, day.start_ayah, day.end_ayah,
+                              chat_id, config.reciter, message_thread_id=thread)
 
 
 async def _create_topic(bot, chat_id: int, name: str) -> Optional[int]:
@@ -201,17 +376,52 @@ async def on_group_tap(ctx: Ctx, cb_data: str) -> None:
   """Every `gr:` button. Parsed defensively; unknown shapes are acknowledged."""
   action, _, arg = cb_data[len("gr:"):].partition(":")
   draft = ctx.wiz.get(ctx.user_id)
-  if action == "tl" and draft is not None:
-    chat_id = draft["data"].get("chat_id")
-    await ctx.store.groups.update_config(chat_id, translation_lang=arg or "en")
-    await ctx.store.groups.update_config(chat_id, status=CONFIG_ACTIVE)
-    ctx.wiz.clear(ctx.user_id)
-    await ctx.answer()
-    username = await bot_username(ctx.bot)
-    board = _deep_link(username, BOARD_PREFIX + str(chat_id))
-    await ctx.edit(ctx.tr("group_setup_done").format(board_link=board))
-  else:
-    await ctx.answer()
+  await ctx.answer()
+  if draft is None:
+    return
+  if action == "tl":                                   # translation chosen
+    await ctx.store.groups.update_config(
+        draft["data"].get("chat_id"), translation_lang=arg or "en")
+    ctx.wiz.update(ctx.user_id, step="target")
+    await ctx.edit(ctx.tr("group_target_prompt"))
+  elif action == "pace":                               # 0 = auto, else ayahs/day
+    ctx.wiz.update(ctx.user_id, pace=int(arg) if arg.isdigit() else 0, step="days")
+    await ctx.edit(ctx.tr("group_days_prompt"), reply_markup=_days_keyboard())
+  elif action == "d":                                  # daily | weekdays
+    days = list(range(1, 8)) if arg == "all" else [1, 2, 3, 4, 5]
+    ctx.wiz.update(ctx.user_id, days=days, step="timezone")
+    await ctx.edit(ctx.tr("group_timezone_prompt"), reply_markup=_offset_keyboard())
+  elif action == "tz":                                 # utc offset chosen
+    ctx.wiz.update(ctx.user_id, offset=arg or DEFAULT_OFFSET, step="post_time")
+    await ctx.edit(ctx.tr("group_post_time_prompt"))
+
+
+# --- J4: the group plan wizard (typed steps land in setup_step) ----------------
+
+def _pace_keyboard() -> InlineKeyboardMarkup:
+  row = [InlineKeyboardButton(t("group_btn_pace_auto", "en"), callback_data="gr:pace:0")]
+  presets = [InlineKeyboardButton(str(n), callback_data="gr:pace:%d" % n)
+             for n in (3, 5, 10)]
+  return InlineKeyboardMarkup([row, presets])
+
+
+def _days_keyboard() -> InlineKeyboardMarkup:
+  return InlineKeyboardMarkup([[
+      InlineKeyboardButton(t("group_btn_daily", "en"), callback_data="gr:d:all"),
+      InlineKeyboardButton(t("group_btn_weekdays", "en"), callback_data="gr:d:wk")]])
+
+
+def _offset_keyboard() -> InlineKeyboardMarkup:
+  from lib.localtime import offset_options
+  opts = offset_options()
+  rows, row = [], []
+  for off in opts:
+    row.append(InlineKeyboardButton(off, callback_data="gr:tz:" + off))
+    if len(row) == 4:
+      rows.append(row); row = []
+  if row:
+    rows.append(row)
+  return InlineKeyboardMarkup(rows)
 
 
 # --- J6 (entry only): a member joins the board via deep link -------------------
