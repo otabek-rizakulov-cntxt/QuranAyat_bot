@@ -63,4 +63,145 @@ strings = {
     "cmd_reciter": "ഖാരിയെ മാറ്റുക",
     "cmd_about": "സ്രോതസ്സുകളും കൃതജ്ഞതയും",
     "quran_name": "ഖുർആൻ",
+
+    # --- Hifz platform ---------------------------------------------------------
+
+    # Command descriptions (the Telegram menu and the /start list)
+    "cmd_memorize": "ഹിഫ്ദ് പദ്ധതി തുടങ്ങുക",
+    "cmd_progress": "നിങ്ങൾ മനഃപാഠമാക്കിയത്",
+    "cmd_check": "നിങ്ങളുടെ മനഃപാഠം പരിശോധിക്കുക",
+    "cmd_forgot": "മനഃപാഠ അടയാളം നീക്കുക",
+    "cmd_streak": "നിങ്ങളുടെ ദിവസേനയുള്ള തുടർച്ച",
+    "cmd_leaderboard": "ഈ ആഴ്ച ഏറ്റവും കൂടുതൽ മനഃപാഠമാക്കിയവർ",
+    "cmd_profile": "നിങ്ങളുടെ പ്രൊഫൈലും ക്രമീകരണങ്ങളും",
+
+    # Shared wizard controls
+    "wizard_cancelled": "റദ്ദാക്കി.",
+    "wizard_nothing_to_cancel": "റദ്ദാക്കാൻ ഒന്നുമില്ല.",
+    "wizard_invalid_input": "എനിക്ക് മനസ്സിലായില്ല. വീണ്ടും ശ്രമിക്കുക, അല്ലെങ്കിൽ /cancel അയയ്ക്കുക.",
+    "ref_invalid": "ഇത് എനിക്ക് അറിയാവുന്ന ഒരു റഫറൻസ് അല്ല. 67, 67:1-8 അല്ലെങ്കിൽ juz 30 പോലെ ശ്രമിക്കുക.",
+    "btn_cancel": "റദ്ദാക്കുക",
+    "btn_back": "പിന്നോട്ട്",
+    "btn_confirm": "ഉറപ്പിക്കുക",
+
+    # Days of the week — the plan's day picker, and the streak grid's header
+    "day_mon": "തിങ്ക",
+    "day_tue": "ചൊവ്വ",
+    "day_wed": "ബുധ",
+    "day_thu": "വ്യാഴ",
+    "day_fri": "വെള്ളി",
+    "day_sat": "ശനി",
+    "day_sun": "ഞായർ",
+
+    # Profile
+    "profile_title": "നിങ്ങളുടെ പ്രൊഫൈൽ",
+    "profile_name_set": "പേര്: {name}",
+    "profile_name_unset": "പേര്: സജ്ജമാക്കിയിട്ടില്ല",
+    "profile_leaderboard_on": "ലീഡർബോർഡ്: നിങ്ങൾ പട്ടികയിലുണ്ട്",
+    "profile_leaderboard_off": "ലീഡർബോർഡ്: നിങ്ങൾ മറഞ്ഞിരിക്കുന്നു",
+    "profile_timezone_set": "സമയ മേഖല: UTC{offset}",
+    "profile_timezone_unset": "സമയ മേഖല: സജ്ജമാക്കിയിട്ടില്ല",
+    "profile_reminder_set": "ദിവസേനയുള്ള ഓർമ്മപ്പെടുത്തൽ: {time}",
+    "profile_reminder_unset": "ദിവസേനയുള്ള ഓർമ്മപ്പെടുത്തൽ: ഓഫ്",
+    "profile_plan_active": "പദ്ധതി: {target} — {total} ദിവസത്തിൽ {day}-ാം ദിവസം",
+    "profile_plan_none": "പദ്ധതി: ഇതുവരെയില്ല. /memorize ഉപയോഗിച്ച് ഒന്ന് തുടങ്ങുക.",
+    "btn_edit_name": "പേര് മാറ്റുക",
+    "btn_join_board": "ലീഡർബോർഡിൽ ചേരുക",
+    "btn_leave_board": "ലീഡർബോർഡ് വിടുക",
+    "btn_edit_timezone": "സമയ മേഖല മാറ്റുക",
+    "btn_edit_reminder": "ഓർമ്മപ്പെടുത്തൽ സമയം മാറ്റുക",
+    "name_prompt": "ലീഡർബോർഡിൽ കാണിക്കേണ്ട പേര് അയയ്ക്കുക.",
+    "name_invalid": "{min} മുതൽ {max} വരെ അക്ഷരങ്ങൾ ഉപയോഗിക്കുക.",
+    "name_saved": "നിങ്ങൾ {name} എന്ന പേരിൽ കാണപ്പെടും.",
+    "board_joined": "നിങ്ങൾ ഇപ്പോൾ ലീഡർബോർഡിലുണ്ട്.",
+    "board_left": "നിങ്ങളെ ലീഡർബോർഡിൽ നിന്ന് നീക്കി.",
+    "timezone_prompt": (
+        "നിങ്ങളുടെ UTC വ്യത്യാസം തിരഞ്ഞെടുക്കുക. തുടർച്ചയ്ക്കായി നിങ്ങളുടെ ദിവസം എപ്പോൾ "
+        "തുടങ്ങുന്നു എന്നും ദിവസേനയുള്ള ഭാഗം എപ്പോൾ എത്തുന്നു എന്നും ഇത് നിശ്ചയിക്കുന്നു."
+    ),
+    "timezone_saved": "സമയ മേഖല UTC{offset} ആയി സജ്ജമാക്കി.",
+    "reminder_prompt": "ദിവസേനയുള്ള ഭാഗം വേണ്ട സമയം 24-മണിക്കൂർ രൂപത്തിൽ അയയ്ക്കുക, ഉദാ. 07:30.",
+    "reminder_invalid": "സമയം 24-മണിക്കൂർ രൂപത്തിൽ അയയ്ക്കുക, ഉദാ. 07:30.",
+    "reminder_saved": "ദിവസേനയുള്ള ഓർമ്മപ്പെടുത്തൽ {time} ന് സജ്ജമാക്കി.",
+    "btn_reminder_off": "ഓർമ്മപ്പെടുത്തൽ ഓഫാക്കുക",
+    "reminder_off": "ദിവസേനയുള്ള ഓർമ്മപ്പെടുത്തലുകൾ ഓഫാണ്.",
+
+    # Progress and /forgot
+    "progress_title": "നിങ്ങൾ മനഃപാഠമാക്കിയത്",
+    "progress_surah_line": "{name}: {done}/{total} ആയത്തുകൾ — {pct}%",
+    "progress_juz_line": "ജുസ്അ് {n}: {pct}%",
+    "progress_quran_line": "മുഴുവൻ ഖുർആൻ: {pct}%",
+    "progress_empty": (
+        "ഇതുവരെ ഒന്നും അടയാളപ്പെടുത്തിയിട്ടില്ല. ഒരു ഭാഗം പൂർത്തിയാക്കി «ഇത് എനിക്ക് "
+        "മനഃപാഠമായി» എന്നത് ടാപ്പ് ചെയ്യുക, അല്ലെങ്കിൽ /memorize ഉപയോഗിച്ച് ഒരു പദ്ധതി "
+        "തുടങ്ങുക."
+    ),
+    "forgot_usage": "എന്ത് നീക്കണമെന്ന് അയയ്ക്കുക, ഉദാഹരണം /forgot 67:5-6.",
+    "forgot_done": "{ref} ന്റെ അടയാളം നീക്കി.",
+    "forgot_nothing": "അത് നിങ്ങൾ മനഃപാഠമായി അടയാളപ്പെടുത്തിയിരുന്നില്ല.",
+
+    # Memorization plans and drills
+    "memorize_choose_target": "എന്താണ് മനഃപാഠമാക്കാൻ ആഗ്രഹിക്കുന്നത്?",
+    "btn_target_surah": "ഒരു സൂറ",
+    "btn_target_juz": "ഒരു ജുസ്അ്",
+    "btn_target_range": "ഒരു ശ്രേണി",
+    "memorize_surah_prompt": "സൂറയുടെ നമ്പർ അയയ്ക്കുക, ഉദാഹരണം 67.",
+    "memorize_juz_prompt": "1 മുതൽ 30 വരെയുള്ള ജുസ്അ് നമ്പർ അയയ്ക്കുക.",
+    "memorize_range_prompt": "ശ്രേണി അയയ്ക്കുക, ഉദാഹരണം 67:1-68:5.",
+    "memorize_choose_pace": "ഓരോ ദിവസവും എത്ര ചെയ്യാൻ ആഗ്രഹിക്കുന്നു?",
+    "btn_pace_auto": "എനിക്കായി തിരഞ്ഞെടുക്കൂ",
+    "memorize_pace_prompt": "ഒരു ദിവസം എത്ര ആയത്തുകൾ എന്ന് അയയ്ക്കുക.",
+    "memorize_pace_invalid": "{min} നും {max} നും ഇടയിലുള്ള ഒരു സംഖ്യ അയയ്ക്കുക.",
+    "memorize_choose_days": "ഏതൊക്കെ ദിവസങ്ങളിൽ പഠിക്കാൻ ആഗ്രഹിക്കുന്നു?",
+    "btn_days_daily": "എല്ലാ ദിവസവും",
+    "btn_days_weekdays": "പ്രവൃത്തി ദിവസങ്ങൾ",
+    "btn_days_custom": "ദിവസം തിരഞ്ഞെടുക്കുക",
+    "memorize_days_prompt": "വേണ്ട ദിവസങ്ങൾ ടാപ്പ് ചെയ്ത ശേഷം ഉറപ്പിക്കുക.",
+    "memorize_preview_title": "{days} ദിവസം, {start} മുതൽ {end} വരെ:",
+    "memorize_preview_row": "{date} — {ref}",
+    "btn_confirm_plan": "ഈ പദ്ധതി തുടങ്ങുക",
+    "plan_saved": "നിങ്ങളുടെ പദ്ധതി സജ്ജമായി. ആദ്യ ഭാഗം {first_date} ന് എത്തും.",
+    "plan_exists": "ഒരു പദ്ധതി ഇപ്പോൾ തന്നെ നടക്കുന്നുണ്ട്. ആദ്യം അത് താൽക്കാലികമായി നിർത്തുകയോ ഉപേക്ഷിക്കുകയോ ചെയ്യുക.",
+    "btn_pause_plan": "പദ്ധതി നിർത്തുക",
+    "btn_resume_plan": "പദ്ധതി തുടരുക",
+    "btn_abandon_plan": "പദ്ധതി ഉപേക്ഷിക്കുക",
+    "plan_paused": "പദ്ധതി താൽക്കാലികമായി നിർത്തി. /profile ൽ നിന്ന് എപ്പോൾ വേണമെങ്കിലും തുടരാം.",
+    "plan_resumed": "പദ്ധതി വീണ്ടും തുടങ്ങി.",
+    "plan_abandoned": "പദ്ധതി ഉപേക്ഷിച്ചു.",
+    "plan_complete": "നിങ്ങൾ {target} പൂർത്തിയാക്കി. അല്ലാഹു അത് നിങ്ങളിൽ നിന്ന് സ്വീകരിക്കട്ടെ.",
+    "drill_title": "{ref} — {total} ദിവസത്തിൽ {day}-ാം ദിവസം",
+    "drill_none_today": "ഇന്നത്തേക്ക് ഒന്നും നിശ്ചയിച്ചിട്ടില്ല.",
+    "btn_start_drill": "ഇന്നത്തെ ഭാഗം തുടങ്ങുക",
+    "btn_know_by_heart": "✅ ഇത് എനിക്ക് മനഃപാഠമായി",
+    "know_confirmed": "{ref} മനഃപാഠമായി അടയാളപ്പെടുത്തി. നിങ്ങൾ {pct}% ൽ എത്തി.",
+    "know_already": "അത് നിങ്ങൾ നേരത്തെ തന്നെ അടയാളപ്പെടുത്തിയിരുന്നു.",
+
+    # Recall check
+    "check_question": "ഇത് എങ്ങനെ തുടരുന്നു?",
+    "check_usage": "എന്ത് പരിശോധിക്കണമെന്ന് അയയ്ക്കുക, ഉദാഹരണം /check 67.",
+    "check_correct": "ശരി.",
+    "check_wrong": "ശരിയായില്ല. ഇത് ഇങ്ങനെ തുടരുന്നു: {correct}",
+    "check_already_today": (
+        "ഇന്നത്തെ സെഷൻ ഒരു ഓർമ്മപരിശോധനയിലൂടെ നിങ്ങൾ നേടിക്കഴിഞ്ഞു — ഇഷ്ടമുള്ളത്ര തവണ "
+        "സ്വയം പരീക്ഷിക്കാം, പക്ഷേ അത് രണ്ടാമതും കണക്കാക്കില്ല."
+    ),
+    "btn_check_start": "എന്നെ പരീക്ഷിക്കൂ",
+
+    # Streaks
+    "streak_title": "നിങ്ങളുടെ തുടർച്ച",
+    "streak_current": "നിലവിലെ തുടർച്ച: {n} ദിവസം",
+    "streak_longest": "ഏറ്റവും നീണ്ട തുടർച്ച: {n} ദിവസം",
+    "streak_none": "ഇതുവരെ തുടർച്ചയില്ല. ഇന്ന് ഒരു ഭാഗം പൂർത്തിയാക്കുകയോ ഒരു ഓർമ്മപരിശോധന വിജയിക്കുകയോ ചെയ്ത് ഒന്ന് തുടങ്ങുക.",
+    "streak_graph_caption": "കഴിഞ്ഞ 12 ആഴ്ചകൾ",
+    "streak_milestone_7": "ഒരു മുഴുവൻ ആഴ്ച. ശീലം തുടങ്ങുന്നത് ഇവിടെ നിന്നാണ്.",
+    "streak_milestone_30": "മുപ്പത് ദിവസം. സ്ഥിരത ഇപ്പോൾ നിങ്ങളുടെ കൂടെയുണ്ട്.",
+    "streak_milestone_100": "നൂറ് ദിവസം. ഇത്രയും ദൂരം എത്തുന്നവർ വളരെ കുറവാണ്.",
+    "streak_milestone_365": "ഒരു വർഷം മുഴുവൻ, ഓരോ ദിവസവും. നിങ്ങൾ പഠിച്ചത് അല്ലാഹു കാത്തുസൂക്ഷിക്കട്ടെ.",
+
+    # Leaderboard
+    "leaderboard_title": "ഈ ആഴ്ചയിലെ ലീഡർബോർഡ്",
+    "leaderboard_row": "{rank}. {name} — {sessions}",
+    "leaderboard_you_row": "നിങ്ങൾ: {rank}. — {sessions}",
+    "leaderboard_empty": "ഈ ആഴ്ച ഇതുവരെ ആരും ഒരു സെഷൻ പൂർത്തിയാക്കിയിട്ടില്ല. നിങ്ങൾ ആദ്യത്തെയാളാകൂ.",
+    "leaderboard_not_opted_in": "നിങ്ങൾ ലീഡർബോർഡിൽ ഇല്ല. /profile ൽ നിന്ന് ചേരുക.",
 }
