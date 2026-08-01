@@ -210,4 +210,8 @@ strings = {
     'group_post_time_prompt': 'Har kuni qaysi mahalliy vaqtda joylayin? (masalan 07:00)',
     'group_post_time_invalid': '07:00 kabi vaqt yuboring.',
     'group_setup_done': 'Tayyor — {total} kun ichida {days} qism. Aʼzolar haftalik jadvalga shu yerda qoʻshilishlari mumkin: {board_link}',
+    # --- Phase 2 J6 board ---  # phase2
+    'group_board_title': '📿 Bu haftadagi doira',
+    'group_board_row': '{rank}. {name} — {sessions}',
+    'group_board_empty': 'Bu hafta hali hech kim mashgʻulotni tugatmadi. Birinchi boʻling!',
 }

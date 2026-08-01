@@ -249,10 +249,10 @@ class TestPlanWizard:
         config = await store.groups.get_config(CHAT)
         assert config.status == "active" and config.timezone == "+05:00"
         assert config.days_of_week == [1, 2, 3, 4, 5, 6, 7]
-        # a post is queued
-        rows = [r for r in store.schedule._state.scheduled_send.values()]
-        assert len(rows) == 1 and rows[0].kind == G.SEND_KIND
-        assert rows[0].thread_id == 77
+        # a daily post is queued into the topic (a weekly board too, see TestBoard)
+        posts = [r for r in store.schedule._state.scheduled_send.values()
+                 if r.kind == G.SEND_KIND]
+        assert len(posts) == 1 and posts[0].thread_id == 77
 
     async def test_a_bad_target_is_rejected_without_advancing(self):
         store = await get_store()
@@ -346,3 +346,98 @@ class TestDailyPost:
             bot=bot, data={}, file=None, store=store, send=row))
         bot.send_message.assert_not_awaited()
         assert (await store.groups.get_plan_day(day.id)).state == "pending"
+
+
+# --- J6: the weekly board ------------------------------------------------------
+
+class TestBoard:
+    async def _group(self, store, offset="+05:00"):
+        from datetime import time as _time
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        await store.groups.update_config(
+            CHAT, thread_id=77, translation_lang="en", timezone=offset,
+            post_time=_time(20, 0), status="active")
+
+    async def test_board_ranks_linked_members_by_sessions(self, monkeypatch):
+        from datetime import datetime, timezone, date
+        from lib.store.sessions import KIND_DRILL
+        store = await get_store()
+        await self._group(store)
+        now = datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)   # a Wednesday
+        today = date(2026, 8, 5)
+
+        for uid, name, n in [(1, "Aisha", 3), (2, "Bilal", 5), (3, "Zayd", 1)]:
+            await store.groups.link_member(uid, CHAT)
+            await store.profiles.set_display_name(uid, name)
+            for i in range(n):
+                await store.sessions.log_session(uid, today, KIND_DRILL,
+                                                 surah=67, start_ayah=i + 1, end_ayah=i + 1)
+
+        bot = _bot(get_chat_member=_member("member"))
+        entries = await G.group_board_entries(store, bot, CHAT, utc_now=now)
+        assert [(e[1], e[2]) for e in entries] == [("Bilal", 5), ("Aisha", 3), ("Zayd", 1)]
+
+    async def test_a_member_who_left_is_dropped(self, monkeypatch):
+        from datetime import datetime, timezone, date
+        from lib.store.sessions import KIND_DRILL
+        store = await get_store()
+        await self._group(store)
+        now = datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)
+        await store.groups.link_member(1, CHAT)
+        await store.sessions.log_session(1, date(2026, 8, 5), KIND_DRILL,
+                                         surah=67, start_ayah=1, end_ayah=1)
+
+        bot = AsyncMock()
+        bot.get_chat_member.return_value = _member("left")   # consented, then left
+        entries = await G.group_board_entries(store, bot, CHAT, utc_now=now)
+        assert entries == []
+
+    async def test_someone_with_no_sessions_is_absent(self):
+        from datetime import datetime, timezone
+        store = await get_store()
+        await self._group(store)
+        await store.groups.link_member(1, CHAT)
+        bot = _bot(get_chat_member=_member("member"))
+        entries = await G.group_board_entries(
+            store, bot, CHAT, utc_now=datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc))
+        assert entries == []
+
+    async def test_post_board_writes_into_the_topic(self):
+        store = await get_store()
+        await self._group(store)
+        bot = _bot(get_chat_member=_member("member"))
+        await G.post_board(bot, store, CHAT)
+        assert bot.send_message.await_args.kwargs["message_thread_id"] == 77
+
+    async def test_saving_a_plan_queues_a_board(self):
+        # the board chain is armed at setup alongside the daily-post chain
+        store = await get_store()
+        bot = _bot(get_chat_member=_member("administrator"),
+                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        await _run_setup_to_plan(store, bot)
+        await hifz.dispatch_wizard(await _ctx(bot), "67")
+
+        async def tap(cb):
+            c = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN,
+                                _Settings(),
+                                callback_query=SimpleNamespace(id="cq", message=None))
+            await hifz.dispatch_callback(c, cb)
+        await tap("gr:pace:0"); await tap("gr:d:all"); await tap("gr:tz:+05:00")
+        await hifz.dispatch_wizard(await _ctx(bot), "07:00")
+
+        kinds = {r.kind for r in store.schedule._state.scheduled_send.values()}
+        assert G.SEND_KIND in kinds and G.BOARD_KIND in kinds
+
+    async def test_board_send_handler_reposts_weekly(self):
+        from lib import scheduler
+        from lib.scheduler import SendCtx
+        store = await get_store()
+        await self._group(store)
+        bot = _bot(get_chat_member=_member("member"))
+        row = SimpleNamespace(id=1, kind=G.BOARD_KIND, target_chat_id=CHAT,
+                              thread_id=77, payload={"chat_id": CHAT})
+        await scheduler.SEND_HANDLERS[G.BOARD_KIND](
+            SendCtx(bot=bot, data={}, file=None, store=store, send=row))
+        bot.send_message.assert_awaited()                # board posted
+        assert any(r.kind == G.BOARD_KIND for r in
+                   store.schedule._state.scheduled_send.values())   # next queued

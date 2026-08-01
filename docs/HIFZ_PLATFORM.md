@@ -6,7 +6,7 @@
 > percentage, and rewards consistency with streaks and leaderboards — privately
 > in DM, and as a study circle in a supergroup topic.
 
-**Status:** Phase 1 built; Phase 2 (group cluster) in progress
+**Status:** Phase 1 and Phase 2 built; group flow localized in en/ru/uz/uz-Cyrl
 **Last updated:** 2026-08-01
 
 ---
@@ -120,7 +120,7 @@ implementation detail.
 | G — Streaks & graph (item 2) | 3 | 3 | ✅ done |
 | H — Leaderboard (item 3) | 2 | 2 | ✅ done |
 | I — i18n & commands | 3 | 2.5 | 🟨 I2: 40/48 locales; 8 fall back to English |
-| J — Group cluster (items 5–7) | 6 | 1 | 🟨 storage + selective ban done |
+| J — Group cluster (items 5–7) | 6 | 6 | ✅ built (en/ru/uz/uz-Cyrl only) |
 
 Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
 
@@ -476,20 +476,20 @@ lands before G and H.
 
 Designed, not built. Listed so the Phase 1 data model stays honest.
 
-- [ ] **J1 — Lift the group ban selectively.** `src/main.py:1136` currently
+- [x] **J1 — Lift the group ban selectively.** `src/main.py:1136` currently
   returns on `chat_id < 0`. It becomes a check against configured chats, so the
   bot still ignores every group it was not deliberately set up in.
-- [ ] **J2 — Admin onboarding in DM.** Admin adds the bot; a `my_chat_member`
+- [x] **J2 — Admin onboarding in DM.** Admin adds the bot; a `my_chat_member`
   update tells us who added it; the bot DMs them the wizard.
-- [ ] **J3 — Bot-created topic.** The admin names a topic in DM and the bot calls
+- [x] **J3 — Bot-created topic.** The admin names a topic in DM and the bot calls
   `createForumTopic`, so we own the `message_thread_id` outright — bots cannot
   list forum topics, and forwarding a message out of one strips the thread id.
-- [ ] **J4 — Group plan wizard.** Range + pace + days + post time, with a preview
+- [x] **J4 — Group plan wizard.** Range + pace + days + post time, with a preview
   calendar, reusing the Phase 1 plan generator against `group_plan`.
-- [ ] **J5 — Daily group post (item 6).** Image + audio + translation in the
+- [x] **J5 — Daily group post (item 6).** Image + audio + translation in the
   group's admin-chosen language (assumption 4), posted to the bound topic through
   the Phase 1 scheduler.
-- [ ] **J6 — Group weekly board.** Same aggregation as H1, scoped to members who
+- [x] **J6 — Group weekly board.** Same aggregation as H1, scoped to members who
   opted in and linked via a `?start=g<chat_id>` deep link, with membership
   verified by `getChatMember` at render time.
 
@@ -571,3 +571,4 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 | 2026-08-01 | 40 of 48 interface locales translated. The 8 not done — **ja, ko, sd, ps, dv, si, ce, ber** — fall back to English per-key via `t()`, so the bot works in them; `scripts/check_locales.py` and `tests/test_locales.py` stay red until they land. Translation-agent quota was exhausted; these are the remaining batch. |
 | 2026-08-01 | Fixed a date-dependent scheduler bug: `claim_due` stamped `claimed_at` with the wall clock instead of the caller's `now`, which time-bombed three tests when the real date crossed their fixture date. |
 | 2026-08-01 | **Phase 2 started.** Storage foundation landed: the four group tables (`group_config`, `group_plan`, `group_plan_day`, `group_member_link`) in `schema.sql`, a `groups` repository with both legs, and its contract tests. Translation for the group flow is en/ru/uz/uz-Cyrl only; the other 44 languages are marked not-implemented and fall back to English (see the note in §5). |
+| 2026-08-02 | **Phase 2 complete (J4-J6).** Group plan wizard reuses lib.plan_builder against group_plan; the daily post rides the Phase 1 scheduler into the bound forum topic (image+audio+translation, honoring content_flags), re-arming its own chain; the weekly board aggregates linked members' sessions in the group's week window, membership re-verified with getChatMember at render. Both chains are enqueued at plan save. Group-flow strings are en/ru/uz/uz-Cyrl only. |

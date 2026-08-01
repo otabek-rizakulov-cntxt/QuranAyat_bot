@@ -210,4 +210,8 @@ strings = {
     'group_post_time_prompt': 'Ҳар куни қайси маҳаллий вақтда жойлайин? (масалан 07:00)',
     'group_post_time_invalid': '07:00 каби вақт юборинг.',
     'group_setup_done': 'Тайёр — {total} кун ичида {days} қисм. Аъзолар ҳафталик жадвалга шу ерда қўшилишлари мумкин: {board_link}',
+    # --- Phase 2 J6 board ---  # phase2
+    'group_board_title': '📿 Бу ҳафтадаги доира',
+    'group_board_row': '{rank}. {name} — {sessions}',
+    'group_board_empty': 'Бу ҳафта ҳали ҳеч ким машғулотни тугатмади. Биринчи бўлинг!',
 }

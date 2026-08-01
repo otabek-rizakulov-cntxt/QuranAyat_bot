@@ -227,4 +227,8 @@ strings = {
     'group_post_time_prompt': 'В какое местное время публиковать каждый день? (напр. 07:00)',
     'group_post_time_invalid': 'Пришлите время в формате 07:00.',
     'group_setup_done': 'Готово — {days} частей за {total} дней. Участники могут присоединиться к таблице здесь: {board_link}',
+    # --- Phase 2 J6 board ---  # phase2
+    'group_board_title': '📿 Кружок на этой неделе',
+    'group_board_row': '{rank}. {name} — {sessions}',
+    'group_board_empty': 'На этой неделе ещё никто не завершил занятие. Будьте первым!',
 }

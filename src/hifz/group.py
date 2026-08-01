@@ -239,6 +239,7 @@ async def _save_group_plan(ctx: Ctx, data: dict, post_time) -> None:
   ctx.wiz.clear(ctx.user_id)
 
   await _enqueue_next_group(ctx.store, chat_id, plan)
+  await _enqueue_next_board(ctx.store, chat_id)
   username = await bot_username(ctx.bot)
   board = _deep_link(username, BOARD_PREFIX + str(chat_id))
   await ctx.reply(ctx.tr("group_setup_done").format(
@@ -347,6 +348,112 @@ async def _post_portion(bot, config, day) -> None:
   if flags.get("audio", True):
     await send_combined_audio(bot, day.surah, day.start_ayah, day.end_ayah,
                               chat_id, config.reciter, message_thread_id=thread)
+
+
+# --- J6: the group weekly board ------------------------------------------------
+
+BOARD_KIND = "group_board"
+
+
+async def group_board_entries(store, bot, chat_id: int, utc_now=None):
+  """Ranked (user_id, name, sessions, streak) for this group's board, this week.
+
+  Scoped to members who consented via the deep link *and* are still in the group:
+  membership is re-checked with getChatMember at render time, so someone who left
+  drops off the board without any explicit un-link. Sessions are counted in the
+  group's own week window, ties broken by streak — the same rule as the personal
+  board (H1).
+  """
+  from datetime import datetime, timezone
+  from lib.leaderboard import week_window
+  from lib.localtime import normalize_offset, DEFAULT_OFFSET
+
+  config = await store.groups.get_config(chat_id)
+  if config is None:
+    return []
+  offset = normalize_offset(config.timezone or DEFAULT_OFFSET)
+  now = utc_now or datetime.now(timezone.utc)
+  start, end = week_window(now, offset)
+
+  entries = []
+  for user_id in await store.groups.list_linked(chat_id):
+    try:
+      member = await bot.get_chat_member(chat_id, user_id)
+      if getattr(member, "status", None) in ("left", "kicked", None):
+        continue
+    except telegram.error.TelegramError:
+      continue                       # can't confirm membership -> leave them off
+    sessions = await store.sessions.count_sessions(user_id, start, end)
+    if sessions == 0:
+      continue
+    profile = await store.profiles.get_profile(user_id)
+    name = getattr(profile, "display_name", None) or str(user_id)
+    streak = getattr(profile, "current_streak", 0)
+    entries.append((user_id, name, sessions, streak))
+
+  entries.sort(key=lambda e: (-e[2], -e[3], e[0]))
+  return entries
+
+
+async def post_board(bot, store, chat_id: int, utc_now=None) -> None:
+  """Render and post the weekly board into the group's topic."""
+  config = await store.groups.get_config(chat_id)
+  if config is None:
+    return
+  entries = await group_board_entries(store, bot, chat_id, utc_now)
+  lines = [t("group_board_title", config.translation_lang)]
+  if not entries:
+    lines.append(t("group_board_empty", config.translation_lang))
+  else:
+    for rank, (_uid, name, sessions, _streak) in enumerate(entries[:10], start=1):
+      lines.append(t("group_board_row", config.translation_lang).format(
+          rank=rank, name=html.escape(name), sessions=sessions))
+  base = dict(chat_id=chat_id, text="\n".join(lines))
+  if config.thread_id is not None:
+    base["message_thread_id"] = config.thread_id
+  await bot.send_message(**base)
+
+
+@send_handler(BOARD_KIND)
+async def push_board(ctx) -> None:
+  """Post the weekly board, then queue next week's."""
+  chat_id = (ctx.payload or {}).get("chat_id")
+  if chat_id is None:
+    raise ValueError("group_board payload has no chat_id (send #%d)" % ctx.send.id)
+  config = await ctx.store.groups.get_config(chat_id)
+  if config is None or config.status != CONFIG_ACTIVE:
+    return
+  await post_board(ctx.bot, ctx.store, chat_id)
+  await _enqueue_next_board(ctx.store, chat_id)
+
+
+async def _enqueue_next_board(store, chat_id: int, now=None):
+  """Queue the board for the end of the current group-local week at post time.
+
+  Keyed by the week's Sunday so a restart cannot double-post it; `enqueue`
+  answers None on a clash rather than raising.
+  """
+  from datetime import datetime, timezone, timedelta
+  from lib.leaderboard import week_window
+  from lib.localtime import to_utc, normalize_offset, DEFAULT_OFFSET
+  from lib.scheduler import enqueue
+  from lib.store.groups import CONFIG_ACTIVE as _ACTIVE
+  from datetime import datetime as _dt, time as _time
+
+  config = await store.groups.get_config(chat_id)
+  if config is None or config.status != _ACTIVE:
+    return None
+  offset = normalize_offset(config.timezone or DEFAULT_OFFSET)
+  post_time = config.post_time or _time(20, 0)
+  now = now or datetime.now(timezone.utc)
+  _start, end = week_window(now, offset)          # end = Sunday, local
+  due_at = to_utc(_dt.combine(end, post_time), offset)
+  if due_at <= now:                               # this week's slot has passed
+    _start2, end2 = week_window(now + timedelta(days=7), offset)
+    due_at = to_utc(_dt.combine(end2, post_time), offset)
+    end = end2
+  return await enqueue(store, BOARD_KIND, chat_id, due_at, local_day=end,
+                       thread_id=config.thread_id, payload={"chat_id": chat_id})
 
 
 async def _create_topic(bot, chat_id: int, name: str) -> Optional[int]:

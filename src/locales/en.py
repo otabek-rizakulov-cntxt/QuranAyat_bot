@@ -246,4 +246,8 @@ strings = {
     'group_post_time_prompt': 'What local time should I post each day? (e.g. 07:00)',
     'group_post_time_invalid': 'Please send a time like 07:00.',
     'group_setup_done': 'All set — {days} portions over {total} days. Members can join the weekly board here: {board_link}',
+    # --- Phase 2 J6 board ---  # phase2
+    'group_board_title': "📿 This week's circle",
+    'group_board_row': '{rank}. {name} — {sessions}',
+    'group_board_empty': 'No one has completed a session yet this week. Be the first!',
 }
