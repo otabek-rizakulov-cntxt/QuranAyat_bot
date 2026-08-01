@@ -185,4 +185,18 @@ strings = {
     "leaderboard_you_row": "Siz: {rank}. — {sessions}",
     "leaderboard_empty": "Bu hafta hali hech kim mashgʻulotni tugatmadi. Birinchi boʻling.",
     "leaderboard_not_opted_in": "Siz reytingda emassiz. /profile orqali qoʻshiling.",
+
+    # --- Phase 2: group cluster (en/ru/uz/uz-Cyrl only) ---  # phase2
+    'group_added': 'Assalomu alaykum! Bu guruhda har kunlik yod olish doirasini yurita olaman. Administrator, sozlash uchun quyidagini bosing.',
+    'group_btn_setup': '⚙️ Doirani sozlash',
+    'group_setup_unknown': 'Bu guruhni bilmayman. Avval meni unga qoʻshing, keyin oʻsha yerdagi sozlash havolasini bosing.',
+    'group_setup_not_admin': 'Meni faqat shu guruh administratori sozlay oladi.',
+    'group_topic_prompt': 'Kunlik mavzuni qanday nomlay? Nom yuboring.',
+    'group_topic_created': '<b>{name}</b> mavzusi yaratildi. Har kuni oʻsha yerda joylayman.',
+    'group_topic_fallback': 'Bu guruhda Mavzular yoʻq, shuning uchun asosiy chatda joylayman.',
+    'group_translation_prompt': 'Kunlik joylamalarda qaysi tarjima ishlatilsin?',
+    'group_setup_done': 'Tayyor! Aʼzolar haftalik jadvalga shu yerda qoʻshilishlari mumkin: {board_link}',
+    'group_board_unknown': 'Bu doira endi mavjud emas.',
+    'group_board_not_member': 'Jadvalga qoʻshilish uchun shu guruh aʼzosi boʻlishingiz kerak.',
+    'group_board_joined': 'Endi guruhning haftalik jadvalidasiz.',
 }

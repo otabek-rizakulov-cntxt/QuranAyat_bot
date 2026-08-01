@@ -67,6 +67,7 @@ PREFIXES: Dict[str, str] = {
     "check":       "hc:",   # hc:a:<option>  hc:start
     "streak":      "hs:",   # hs:grid
     "leaderboard": "hl:",   # hl:me  hl:join
+    "group":       "gr:",   # gr:tl:ru  gr:rc:...  gr:ok — Phase 2 group setup
     "shared":      "hx:",   # hx:cancel  hx:back — the seam's own controls
 }
 

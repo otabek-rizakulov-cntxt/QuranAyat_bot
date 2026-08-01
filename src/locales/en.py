@@ -221,4 +221,18 @@ strings = {
     "leaderboard_you_row": "You: {rank}. — {sessions}",
     "leaderboard_empty": "Nobody has completed a session this week yet. Be the first.",
     "leaderboard_not_opted_in": "You are not on the leaderboard. Join it from /profile.",
+
+    # --- Phase 2: group cluster (en/ru/uz/uz-Cyrl only) ---  # phase2
+    'group_added': 'As-salamu alaykum! I can run a daily memorization circle in this group. An admin, tap below to set me up.',
+    'group_btn_setup': '⚙️ Set up the circle',
+    'group_setup_unknown': "I don't know this group. Add me to it first, then tap the setup link there.",
+    'group_setup_not_admin': 'Only an admin of that group can set me up.',
+    'group_topic_prompt': 'What should I name the daily topic? Send me a name.',
+    'group_topic_created': "Topic <b>{name}</b> created. I'll post there each day.",
+    'group_topic_fallback': "This group has no Topics, so I'll post in the main chat instead.",
+    'group_translation_prompt': 'Which translation should the daily posts use?',
+    'group_setup_done': 'All set! Members can join the weekly board here: {board_link}',
+    'group_board_unknown': 'That study circle no longer exists.',
+    'group_board_not_member': 'You need to be a member of that group to join its board.',
+    'group_board_joined': "You're on the group's weekly board now.",
 }

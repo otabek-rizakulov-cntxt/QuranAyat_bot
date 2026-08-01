@@ -916,6 +916,15 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     file = File()
     user_settings = UserSettings()
 
+    if update.my_chat_member:  # the bot was added to or removed from a chat
+        from lib.store import get_store
+        from hifz import group as hifz_group
+        try:
+            await hifz_group.on_my_chat_member(bot, await get_store(), update)
+        except telegram.error.Forbidden:
+            pass                # no permission to post in that group; nothing to do
+        return
+
     if update.inline_query:
         query_id = update.inline_query.id
         query = update.inline_query.query
@@ -1151,7 +1160,11 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     print("%d:%.3f:%s" % (chat_id, time(), message.replace("\n", " ")))
 
     if chat_id < 0:
-        return              # bot should not be in a group
+        # Group *text* is still ignored: the group cluster is driven entirely from
+        # DM (admin setup, board join) and the scheduler (the daily post), never by
+        # reading group chatter. Being added or removed is a my_chat_member update,
+        # handled at the top of this function before we ever get here.
+        return
 
     if message.startswith("/"):
         command = message[1:].split("@", 1)[0]   # tolerate /help@BotName
@@ -1164,6 +1177,14 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         # awaited a reciter name was swallowed as the name, with no way out.
         file.pop_awaiting_input(chat_id)
         if command in ("start", "help"):
+            # A /start deep link (t.me/bot?start=gs_-100…) carries a group payload
+            # the group feature owns — admin setup, or a member joining the board.
+            if command == "start" and argument:
+                from hifz import group as hifz_group
+                ctx = await hifz.Ctx.build(bot, data, file, chat_id,
+                                           update.message.from_user.id, settings)
+                if await hifz_group.handle_start_payload(ctx, argument):
+                    return
             # ReplyKeyboardRemove clears the old persistent keyboard for anyone
             # upgrading from the pre-inline UI; new users never see one.
             await bot.send_message(chat_id=chat_id, text=welcome_text(ui_lang),
