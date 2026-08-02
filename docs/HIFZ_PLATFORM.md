@@ -7,7 +7,9 @@
 > in DM, and as a study circle in a supergroup topic.
 
 **Status:** Phase 1 and Phase 2 built; all 48 locales complete for Phase 1 keys;
-group flow localized in en/ru/uz/uz-Cyrl only (by design, §5)
+group flow localized in en/ru/uz/uz-Cyrl only (by design, §5). Both build-time
+follow-ups closed (CI Postgres leg, `attempts` observability); native-speaker
+translation review remains open and unstaffed (see `docs/TRANSLATION_REVIEW.md`).
 **Last updated:** 2026-08-02
 
 ---
@@ -222,6 +224,7 @@ scheduled_send                           -- the due-queue
   state TEXT                             -- 'pending' | 'claimed' | 'sent' | 'failed'
   idempotency_key TEXT UNIQUE            -- (kind, target, local_date)
   claimed_at TIMESTAMPTZ NULL
+  attempts INT DEFAULT 0                 -- release() count; observability, not a retry cap
 
 -- Phase 2
 group_config      chat_id PK, thread_id, admin_user_id, translation_lang,
@@ -546,20 +549,30 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 
 ### Raised during the build, still open
 
-- [ ] **The asyncpg storage leg has never executed.** CI has no Postgres and
-  `conftest.py` pins `DATABASE_URL=""`, so `tests/test_store_contract.py` runs its
-  in-memory leg only; the SQL leg is syntax-checked and skipped. Adding a postgres
-  service to the workflow is a small, worthwhile follow-up.
-- [ ] **Transient-send retries are bounded by time, not by count.** With no
-  `attempts` column, a `RetryAfter`/`TimedOut`/`NetworkError` row is released back
-  to the queue and retried each minute until `drop_stale` deletes it (~6 h), then
-  gives up silently. Adding `attempts INT` would make that observable.
+- [x] **The asyncpg storage leg has never executed — fixed 2026-08-02.** CI now
+  runs a `postgres:16` service container and sets `TEST_DATABASE_URL` for the
+  `test` job (`.github/workflows/blue-green-ci.yml`), so
+  `tests/test_store_contract.py`'s SQL leg executes on every push/PR instead of
+  skipping. Verified locally first (Docker Postgres 16, then the local Postgres
+  14 install) — both legs pass, 200/200. Running it for real immediately found a
+  live bug the skip had been hiding: see the change log entry below.
+- [x] **Transient-send retries are bounded by time, not by count — observability
+  added 2026-08-02.** `scheduled_send.attempts` (`INT NOT NULL DEFAULT 0`)
+  increments on every `release()` in both storage legs and is logged on each
+  deferred send. The retry cutoff itself is unchanged — still `drop_stale` /
+  `CATCH_UP_WINDOW`, not a count — this only makes a row retried unusually often
+  visible instead of only present in scrolled-past logs.
 - [ ] **~5,200 machine-translated strings** across all 47 non-English locales
   (now including the last 8 — ja, ko, sd, ps, dv, si, ce, ber — landed
   2026-08-02), in languages nobody on this project reads. `scripts/check_locales.py`
-  validates structure, never nuance. Each translating agent was asked to name the
-  keys it was unsure of; that list is the starting point for a native-speaker
-  review.
+  validates structure, never nuance. **Correction:** no list of per-key
+  uncertainty from the translating agents actually exists in git history (checked
+  every `i18n`/`feat(locale)` commit) — see `docs/TRANSLATION_REVIEW.md`, which
+  replaces that assumption with an honest process: a first-pass review of all 111
+  keys per locale, a locale-by-locale tracking table, and what a review should
+  check that `scripts/check_locales.py` cannot (meaning, register, plural
+  handling under bare `str.format`, RTL rendering). Still unstaffed — the doc is
+  the process, not the review.
 
 ---
 
@@ -581,3 +594,4 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 | 2026-08-01 | **Phase 2 started.** Storage foundation landed: the four group tables (`group_config`, `group_plan`, `group_plan_day`, `group_member_link`) in `schema.sql`, a `groups` repository with both legs, and its contract tests. Translation for the group flow is en/ru/uz/uz-Cyrl only; the other 44 languages are marked not-implemented and fall back to English (see the note in §5). |
 | 2026-08-02 | **Phase 2 complete (J4-J6).** Group plan wizard reuses lib.plan_builder against group_plan; the daily post rides the Phase 1 scheduler into the bound forum topic (image+audio+translation, honoring content_flags), re-arming its own chain; the weekly board aggregates linked members' sessions in the group's week window, membership re-verified with getChatMember at render. Both chains are enqueued at plan save. Group-flow strings are en/ru/uz/uz-Cyrl only. |
 | 2026-08-02 | **I2 complete — the last 8 locales translated.** ja, ko, sd, ps, dv, si, ce, ber each got the 111 Phase 1 hifz keys (translation-agent quota that blocked them on 2026-08-01 was no longer an issue). `python3 scripts/check_locales.py` now passes on every Phase 1 key across all 48 locales — placeholders, HTML balance, button round-trips, `/start` command coverage. The 44-locale `group_*` gap in the checker's output is unrelated: those 25 Phase 2 keys are en/ru/uz/uz-Cyrl only by the §5 decision, not a translation gap. Workstream I is now fully done. |
+| 2026-08-02 | **The three items in §8 "raised during the build" were closed out** (two engineering, one process). CI now runs `tests/test_store_contract.py`'s SQL leg against a real `postgres:16` service instead of skipping it — and doing so immediately surfaced a real bug the skip had been hiding: `PostgresScheduleStore.claim_due` was stamping `claimed_at` with the SQL server's `now()` instead of the caller-supplied `now`, which is exactly the divergence commit `cd5246b` (2026-08-01) fixed on the in-memory leg only, because the SQL leg never ran to catch that it hadn't also been fixed there. Fixed to `claimed_at = $1`. Separately, `scheduled_send.attempts` was added (increments on `release()`, both legs) so a row retried unusually often is visible in the scheduler's log line — the retry cutoff itself is unchanged, still time-bounded via `drop_stale`. The translation-review item cannot be closed by engineering work; `docs/TRANSLATION_REVIEW.md` replaces the doc's (incorrect — see the entry above it in §8) claim of a pre-existing "unsure keys" list with an honest, unstaffed first-pass review process and a locale-by-locale tracking table. |

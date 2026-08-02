@@ -112,10 +112,11 @@ SendHandler = Callable[["SendCtx"], Awaitable[None]]
 # malformed request every 60 s until `drop_stale` buried it. PERMANENT_ERRORS is
 # therefore caught first, and lists BadRequest explicitly.
 #
-# There is no `attempts` column (the spec's data model has none), so retrying is
-# bounded by time rather than by count: `drop_stale` deletes a row once it stops
-# being same-day-relevant, which caps a transient failure at roughly six hours of
-# 60-second retries and then gives up silently.
+# Retrying is bounded by time, not by count: `drop_stale` deletes a row once it
+# stops being same-day-relevant, which caps a transient failure at roughly six
+# hours of 60-second retries and then gives up silently. `attempts` on the row
+# does not change that cap — it exists purely so a row retried unusually often
+# is observable instead of only visible in scrolled-past logs.
 PERMANENT_ERRORS = (
     telegram.error.BadRequest,      # malformed request — retrying cannot help
     telegram.error.InvalidToken,
@@ -440,9 +441,11 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
             # goes back to 'pending' rather than being failed. A thirty-second
             # blip at the reminder instant must not cost the user their day.
             # Bounded by drop_stale: once the row stops being same-day-relevant it
-            # is deleted unsent, which is what stands in for an attempts column.
-            print("Scheduler: send #%d (%s -> %d) deferred: %s: %s — retrying"
-                  % (row.id, row.kind, row.target_chat_id, type(err).__name__, err))
+            # is deleted unsent. `attempts` does not cap the retrying — it only
+            # makes a row retried unusually often visible in this log line.
+            print("Scheduler: send #%d (%s -> %d) deferred (attempt %d): %s: %s — retrying"
+                  % (row.id, row.kind, row.target_chat_id, row.attempts + 1,
+                     type(err).__name__, err))
             await _release(store, row, result=result, error=err)
             continue
         except Exception as err:

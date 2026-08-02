@@ -588,7 +588,7 @@ class TestRegistry:
 
 class TestTransientFailuresAreRetried:
     """A thirty-second network blip at the reminder instant must not cost the user
-    their day's push — and, with no attempts column, must not retry forever either."""
+    their day's push — and time, not a retry cap, must be what eventually stops it."""
 
     async def test_a_timeout_puts_the_row_back_on_the_queue(self, store, bot):
         attempts = []
@@ -600,15 +600,19 @@ class TestTransientFailuresAreRetried:
                 raise telegram.error.TimedOut()
 
         row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
+        assert row.attempts == 0
 
         first = await scheduler.tick(bot, {}, now=_at(7), store=store)
         assert (first.sent, first.failed, first.deferred) == (0, 0, 1)
         assert (await store.schedule.get(row.id)).state == "pending"
+        assert (await store.schedule.get(row.id)).attempts == 1
 
         second = await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
         assert (second.sent, second.deferred) == (1, 0)
         assert (await store.schedule.get(row.id)).state == "sent"
         assert len(attempts) == 2          # delivered on the retry, exactly once
+        # the successful send does not bump attempts further — only a release does
+        assert (await store.schedule.get(row.id)).attempts == 1
 
     async def test_rate_limiting_is_transient_too(self, store, bot):
         @scheduler.send_handler("drill")
@@ -669,11 +673,13 @@ class TestTransientFailuresAreRetried:
         assert (result.failed, result.deferred) == (1, 0)
         assert (await store.schedule.get(row.id)).state == "failed"
 
-    async def test_retrying_is_bounded_by_the_stale_drop_not_by_luck(self, store, bot):
-        """With no attempts column, time is what stops the loop.
+    async def test_retrying_is_bounded_by_the_stale_drop_not_by_attempts(self, store, bot):
+        """Time is what stops the loop, not the `attempts` count.
 
-        The row is released each tick, so what must be true is that it eventually
-        stops being retried rather than churning forever.
+        The row is released each tick — `attempts` climbs right along with it,
+        purely for observability — so what must be true is that delivery
+        eventually stops because the window closed, not because attempts hit
+        some cap (there is none).
         """
         @scheduler.send_handler("drill")
         async def never_works(ctx):
@@ -682,7 +688,9 @@ class TestTransientFailuresAreRetried:
         row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
         for minute in range(1, 4):
             await scheduler.tick(bot, {}, now=_at(7, minute), store=store)
-        assert (await store.schedule.get(row.id)).state == "pending"
+        stored = await store.schedule.get(row.id)
+        assert stored.state == "pending"
+        assert stored.attempts == 3
 
         # once it is no longer same-day-relevant, it is dropped unsent
         late = _at(7) + scheduler.CATCH_UP_WINDOW + timedelta(minutes=1)

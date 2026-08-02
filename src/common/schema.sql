@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS scheduled_send (
     state             TEXT NOT NULL DEFAULT 'pending',
     idempotency_key   TEXT NOT NULL,
     claimed_at        TIMESTAMPTZ,
+    attempts          INT NOT NULL DEFAULT 0,  -- transient-failure releases; observability only, not a retry cap (see release())
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );

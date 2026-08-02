@@ -540,6 +540,20 @@ class TestSchedule:
         assert len(await store.schedule.claim_due(self.NOW)) == 1
         assert await store.schedule.claim_due(self.NOW) == []
 
+    async def test_release_increments_attempts_but_mark_sent_does_not(self, store):
+        row = await store.schedule.enqueue("plan_day", 1, self.NOW, "a")
+        assert row.attempts == 0
+        await store.schedule.claim_due(self.NOW)
+        released = await store.schedule.release(row.id)
+        assert released.attempts == 1
+        await store.schedule.claim_due(self.NOW)
+        released_again = await store.schedule.release(row.id)
+        assert released_again.attempts == 2
+        assert (await store.schedule.get(row.id)).attempts == 2
+        await store.schedule.claim_due(self.NOW)
+        sent = await store.schedule.mark_sent(row.id)
+        assert sent.attempts == 2
+
     async def test_mark_sent_and_mark_failed(self, store):
         row = await store.schedule.enqueue("plan_day", 1, self.NOW, "a")
         assert (await store.schedule.mark_sent(row.id)).state == STATE_SENT

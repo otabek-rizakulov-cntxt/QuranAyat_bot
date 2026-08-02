@@ -40,10 +40,11 @@ class ScheduledSend:
   thread_id: Optional[int] = None
   state: str = STATE_PENDING
   claimed_at: Optional[datetime] = None
+  attempts: int = 0
 
 
 _COLUMNS = ("id, kind, target_chat_id, thread_id, due_at, payload, state, "
-            "idempotency_key, claimed_at")
+            "idempotency_key, claimed_at, attempts")
 
 
 class ScheduleStore(abc.ABC):
@@ -90,9 +91,11 @@ class ScheduleStore(abc.ABC):
     The difference between this and `mark_failed` is the difference between "it
     did not send" and "it will never send". A malformed payload or a user who has
     blocked the bot is failed; a timeout or a rate limit is released, because the
-    reminder is still worth delivering a minute from now. Retrying is bounded by
-    `drop_stale`, which deletes the row once it stops being same-day-relevant —
-    so releasing cannot loop forever without an attempts column to stop it.
+    reminder is still worth delivering a minute from now. Retrying is still bounded
+    by `drop_stale`, which deletes the row once it stops being same-day-relevant,
+    not by `attempts` — that column is observability only (how many times a row
+    has been released), so a row retried unusually often is visible in a query
+    instead of only in scrolled-past logs.
     """
 
   @abc.abstractmethod
@@ -177,6 +180,7 @@ class InMemoryScheduleStore(ScheduleStore):
       return None
     row.state = STATE_PENDING
     row.claimed_at = None
+    row.attempts += 1
     return self._copy(row)
 
   async def release_stale_claims(self, claimed_before):
@@ -213,7 +217,7 @@ class PostgresScheduleStore(ScheduleStore):
       due_at=record["due_at"], idempotency_key=record["idempotency_key"],
       payload=json.loads(payload) if isinstance(payload, str) else (payload or {}),
       thread_id=record["thread_id"], state=record["state"],
-      claimed_at=record["claimed_at"])
+      claimed_at=record["claimed_at"], attempts=record["attempts"])
 
   async def enqueue(self, kind, target_chat_id, due_at, idempotency_key, payload=None,
                     thread_id=None):
@@ -242,10 +246,10 @@ class PostgresScheduleStore(ScheduleStore):
           "WITH due AS ("
           "  SELECT id FROM scheduled_send WHERE state = $2 AND due_at <= $1"
           "   ORDER BY due_at, id LIMIT $3 FOR UPDATE SKIP LOCKED"
-          ") UPDATE scheduled_send s SET state = $4, claimed_at = now(), "
+          ") UPDATE scheduled_send s SET state = $4, claimed_at = $1, "
           "updated_at = now() FROM due WHERE s.id = due.id "
           "RETURNING s.id, s.kind, s.target_chat_id, s.thread_id, s.due_at, s.payload, "
-          "s.state, s.idempotency_key, s.claimed_at",
+          "s.state, s.idempotency_key, s.claimed_at, s.attempts",
           now, STATE_PENDING, limit, STATE_CLAIMED)
         rows = [self._row(r) for r in records]
         rows.sort(key=lambda r: (r.due_at, r.id))
@@ -266,8 +270,8 @@ class PostgresScheduleStore(ScheduleStore):
     # claimed_at is cleared alongside the state: a row left 'pending' with a
     # stale claimed_at would be released a second time by release_stale_claims.
     return self._row(await self._pool.fetchrow(
-      "UPDATE scheduled_send SET state = $2, claimed_at = NULL, updated_at = now() "
-      "WHERE id = $1 RETURNING " + _COLUMNS, send_id, STATE_PENDING))
+      "UPDATE scheduled_send SET state = $2, claimed_at = NULL, attempts = attempts + 1, "
+      "updated_at = now() WHERE id = $1 RETURNING " + _COLUMNS, send_id, STATE_PENDING))
 
   async def release_stale_claims(self, claimed_before):
     records = await self._pool.fetch(
