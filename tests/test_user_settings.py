@@ -1,6 +1,6 @@
 """Durable per-user settings (`lib.user_settings.UserSettings`).
 
-Exercised against the in-process FakePostgresPool + MemoryStore stand-ins that
+Exercised against the in-process in-memory store + MemoryStore stand-ins that
 conftest pins via empty DATABASE_URL / REDIS_HOST_URL, so nothing here touches a
 network. The three settings — UI language, translation language and reciter —
 are independent by design; that independence and the one-shot migration of the

@@ -35,32 +35,30 @@ os.environ["PHOTO_BASE_URL"] = "https://cdn.test/images"
 # inline range recitations are offered, and tests that want it set it themselves.
 os.environ["WEBHOOK_URL"] = ""
 
-import asyncio
-
 import pytest
 
 
 @pytest.fixture(autouse=True)
 def _clean_state_store():
-    """Reset the in-memory Redis and Postgres stand-ins between tests.
+    """Reset the in-memory Redis and the repository layer between tests.
 
     Both live on process-wide module state, so without this one test's saved
     user state / language / reciter would leak into the next.
 
-    The Postgres pool's creation lock is recreated alongside the pool: an
-    asyncio.Lock binds to the loop it is first awaited in, and pytest-asyncio
-    gives each test its own loop. Production has a single loop for the process
-    lifetime, so this only matters under test.
+    `lib.store.reset_for_tests()` drops the store singleton, every in-memory row
+    and the creation locks. The locks matter because an asyncio.Lock binds to the
+    loop it is first awaited in and pytest-asyncio gives each test its own loop;
+    production has a single loop for the process lifetime, so this only bites
+    under test.
     """
     from lib.utils import File
-    import config.postgres as postgres
+    from lib.store import reset_for_tests
 
-    store = File().redis
-    if hasattr(store, "_data"):          # MemoryStore, not a real Redis connection
-        store._data.clear()
-    postgres._pool = None
-    postgres._pool_lock = asyncio.Lock()
+    redis = File().redis
+    if hasattr(redis, "_data"):          # MemoryStore, not a real Redis connection
+        redis._data.clear()
+    reset_for_tests()
     yield
-    if hasattr(store, "_data"):
-        store._data.clear()
-    postgres._pool = None
+    if hasattr(redis, "_data"):
+        redis._data.clear()
+    reset_for_tests()

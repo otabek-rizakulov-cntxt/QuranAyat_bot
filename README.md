@@ -60,6 +60,48 @@ that ayah recited three times back to back, in your chosen reciter's voice.
 
 Also see [AudioQuranBot][], a bot that sends audio files of complete surahs.
 
+# Memorizing (hifz)
+
+Beyond reading, the bot is a **memorization companion**: you commit to a target,
+it pushes you a portion every day, tests whether you actually remember it, and
+keeps score.
+
+`/memorize` sets up a plan. Pick a surah, a juz or a range; pick a pace or let the
+bot choose one; pick which days of the week you want to work; give it your UTC
+offset and a reminder time. It then shows you the **whole calendar, day by day,
+before anything is saved** — so you agree to the schedule rather than discover it.
+Al-Mulk on weekdays, for instance, comes out as 15 portions over 18 days: the
+three extra days are review, because the plan widens as you go — first the new
+range, then the whole mushaf page it sat on, then the whole surah.
+
+At your local reminder time the bot sends that day's portion unprompted: the
+Arabic, one stitched recitation of the whole portion, and the translation. When
+you have it, tap **✅ I know this by heart**. That records the ayahs and closes
+the day.
+
+`/check` is the other way in, and the reason the leaderboard is fair. It shows you
+the opening of an ayah and four possible continuations, drawn from the same surah
+and matched for length so the answer is not obvious from its shape. It needs no
+plan and no drill — someone memorizing from a physical mushaf can pass a check
+and earn their day exactly like anyone else. The bot is testing your hifz, not
+your use of the bot.
+
+`/progress` reports what you know. Surahs are counted in ayahs, because that is
+how a surah is learned; juz and the whole Qur'an are counted in **mushaf pages**,
+because that is how a hafiz measures them — a juz is twenty pages, not 431 ayahs.
+Every figure is derived from what you have marked, never from a stored counter, so
+it cannot drift. `/forgot 67:5-6` gives ground back honestly.
+
+`/streak` shows how many days in a row you have completed a session, your longest
+run ever, and a twelve-week contribution graph. A day counts when you finish a
+drill or pass a recall check — never for merely opening the bot — and it is
+counted against *your* local midnight, not the server's. `/leaderboard` ranks the
+week by sessions completed, ties broken by streak.
+
+Boards are **opt-in and off by default**. `/profile` is where you join or leave,
+set a display name, and change your timezone or reminder time; leaving removes you
+from every board immediately.
+
 [BismillahBot]: https://telegram.me/BismillahBot
 [Telegram]: https://telegram.org/
 [Imam Ahmad Raza]: https://en.wikipedia.org/wiki/Ahmed_Raza_Khan_Barelvi

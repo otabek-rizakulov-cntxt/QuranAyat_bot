@@ -1,0 +1,67 @@
+# Local stand-in for the Koyeb free-tier instance (512 MB / ~0.1 vCPU), used to
+# produce docs/KOYEB_CAPACITY_REPORT.md. Not a deployment artifact — throwaway,
+# disposable, never intended to run alongside the real app.
+#
+# `app` is resource-capped to match Koyeb's free tier and runs
+# scripts/stress/run_app.py instead of the Procfile's uvicorn line, so every
+# outbound Telegram API call is faked out (see that file's docstring) — nothing
+# here ever reaches api.telegram.org or a real chat.
+#
+# `db` is a throwaway Postgres and is deliberately NOT resource-capped: in
+# production this app talks to Neon, a separately-provisioned managed service
+# that does not share the app instance's 512 MB/0.1 vCPU, so constraining it
+# here would measure the wrong bottleneck.
+#
+# Usage:
+#   docker compose -f docker-compose.stress.yml up --build -d
+#   python3 scripts/stress/load_test.py
+#   docker compose -f docker-compose.stress.yml down -v
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      # No password: this container is local-only, disposable, torn down by
+      # `down -v` after every run, and never holds anything but synthetic
+      # stress-test data — a hardcoded password here buys no real protection,
+      # and is exactly what secret scanners (rightly) flag on sight.
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: quranayat_stress
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quranayat-stress-app
+    command: ["python", "scripts/stress/run_app.py"]
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      # Picks up AUDIO_BASE_URL / PHOTO_BASE_URL from the real local .env (public
+      # Qur'an CDN endpoints — not secrets) so image/audio fetch-and-stitch is
+      # exercised with real fidelity. Everything below overrides whatever .env
+      # sets for the stress-relevant vars, so a real token or Neon URL in .env
+      # is never touched by this container.
+      - .env
+    environment:
+      TOKEN: stress-test-token
+      DATABASE_URL: postgresql://postgres@db:5432/quranayat_stress
+      REDIS_HOST_URL: ""
+      WEBHOOK_URL: ""
+      PORT: "8000"
+    ports:
+      - "8091:8000"
+    # Koyeb free tier: 512 MB RAM, ~0.1 vCPU. mem_swappiness=0 so a memory spike
+    # OOM-kills the container instead of silently swapping — swap would hide the
+    # exact failure mode we're trying to observe.
+    mem_limit: "512m"
+    memswap_limit: "512m"
+    mem_swappiness: 0
+    cpus: 0.1

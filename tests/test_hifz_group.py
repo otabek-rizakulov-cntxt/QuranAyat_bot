@@ -1,0 +1,443 @@
+"""The group cluster's onboarding, topic creation and board join (J1-J3, J6 entry).
+
+Driven with an AsyncMock bot. The bot's group-facing calls — get_me,
+create_forum_topic, get_chat_member — are stubbed per test, because that is where
+the interesting branches are: is the caller an admin, is the group a forum, is the
+tapper actually a member.
+"""
+
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
+
+import pytest
+import telegram
+
+import hifz
+from hifz import Ctx
+from hifz import group as G
+from lib.store import get_store
+
+ADMIN = 500
+CHAT = -100200300
+
+
+class _Settings:
+    ui_lang = "en"
+    translation_lang = "en"
+    reciter = "Husary_128kbps"
+
+
+@pytest.fixture(autouse=True)
+def _isolate_registries():
+    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), hifz._loaded)
+    G._bot_username = None
+    yield
+    hifz.COMMANDS.clear(); hifz.COMMANDS.update(saved[0])
+    hifz.CALLBACKS.clear(); hifz.CALLBACKS.update(saved[1])
+    hifz.WIZARDS.clear(); hifz.WIZARDS.update(saved[2])
+    hifz._loaded = saved[3]
+    G._bot_username = None
+
+
+def _bot(**kw):
+    bot = AsyncMock()
+    bot.get_me.return_value = SimpleNamespace(username="BismillahBot")
+    for k, v in kw.items():
+        getattr(bot, k).return_value = v
+    return bot
+
+
+async def _ctx(bot, user=ADMIN, chat=ADMIN):
+    from lib.utils import File
+    return await Ctx.build(bot, {}, File(), chat, user, _Settings())
+
+
+def _member(status):
+    return SimpleNamespace(status=status)
+
+
+def _added_update(status="member", adder=ADMIN, chat_type="supergroup"):
+    return SimpleNamespace(my_chat_member=SimpleNamespace(
+        chat=SimpleNamespace(id=CHAT, type=chat_type),
+        from_user=SimpleNamespace(id=adder),
+        new_chat_member=SimpleNamespace(status=status)))
+
+
+# --- J2: the bot is added ------------------------------------------------------
+
+class TestAdded:
+    async def test_adding_creates_config_and_posts_a_setup_link(self):
+        store = await get_store()
+        bot = _bot()
+        await G.on_my_chat_member(bot, store, _added_update())
+
+        config = await store.groups.get_config(CHAT)
+        assert config is not None and config.admin_user_id == ADMIN
+        assert config.status == "setup"
+        bot.send_message.assert_awaited_once()
+        markup = bot.send_message.await_args.kwargs["reply_markup"]
+        url = markup.inline_keyboard[0][0].url
+        assert url.endswith("?start=gs_%d" % CHAT)
+
+    async def test_a_private_chat_is_ignored(self):
+        store = await get_store()
+        bot = _bot()
+        await G.on_my_chat_member(bot, store, _added_update(chat_type="private"))
+        assert await store.groups.get_config(CHAT) is None
+        bot.send_message.assert_not_awaited()
+
+    async def test_removal_pauses_the_config_but_keeps_it(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        await store.groups.update_config(CHAT, status="active")
+        await G.on_my_chat_member(_bot(), store, _added_update(status="kicked"))
+        config = await store.groups.get_config(CHAT)
+        assert config is not None and config.status == "paused"
+
+
+# --- J2/J3: admin setup --------------------------------------------------------
+
+class TestSetup:
+    async def test_non_admin_is_refused(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot(get_chat_member=_member("member"))
+        ctx = await _ctx(bot, user=999)
+        assert await G.handle_start_payload(ctx, "gs_%d" % CHAT) is True
+        assert G.WIZARD_KIND not in [ctx.wiz.kind(999) or ""]
+        assert bot.send_message.await_args.kwargs["text"]  # a refusal message
+
+    async def test_unknown_group_is_refused(self):
+        bot = _bot(get_chat_member=_member("administrator"))
+        ctx = await _ctx(bot)
+        assert await G.handle_start_payload(ctx, "gs_-999") is True
+        assert ctx.wiz.is_active(ADMIN) is False
+
+    async def test_admin_enters_the_topic_step(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot(get_chat_member=_member("creator"))
+        ctx = await _ctx(bot)
+        await G.handle_start_payload(ctx, "gs_%d" % CHAT)
+        assert ctx.wiz.kind(ADMIN) == G.WIZARD_KIND
+        assert ctx.wiz.get(ADMIN)["data"]["chat_id"] == CHAT
+
+    async def test_topic_name_creates_a_forum_topic(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot(get_chat_member=_member("administrator"),
+                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        ctx = await _ctx(bot)
+        await G.handle_start_payload(ctx, "gs_%d" % CHAT)
+        await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")
+
+        assert (await store.groups.get_config(CHAT)).thread_id == 77
+        bot.create_forum_topic.assert_awaited_once()
+
+    async def test_a_non_forum_group_falls_back_to_no_topic(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot(get_chat_member=_member("administrator"))
+        bot.create_forum_topic.side_effect = telegram.error.BadRequest(
+            "the group is not a forum")
+        ctx = await _ctx(bot)
+        await G.handle_start_payload(ctx, "gs_%d" % CHAT)
+        await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")
+
+        assert (await store.groups.get_config(CHAT)).thread_id is None  # fallback
+
+    async def test_choosing_a_language_advances_to_the_target_step(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot(get_chat_member=_member("administrator"),
+                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        await G.handle_start_payload(await _ctx(bot), "gs_%d" % CHAT)
+        await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")
+
+        # the language pick is a gr: callback; it sets the language and moves the
+        # wizard on to the plan target rather than finishing setup.
+        ctx = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN, _Settings(),
+                              callback_query=SimpleNamespace(id="cq", message=None))
+        await hifz.dispatch_callback(ctx, "gr:tl:ru")
+
+        config = await store.groups.get_config(CHAT)
+        assert config.translation_lang == "ru"
+        assert (await _ctx(bot)).wiz.get(ADMIN)["step"] == "target"
+
+
+# --- J6 entry: a member joins the board ----------------------------------------
+
+class TestBoardJoin:
+    async def test_a_member_is_linked(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot(get_chat_member=_member("member"))
+        ctx = await _ctx(bot, user=42)
+        assert await G.handle_start_payload(ctx, "gb_%d" % CHAT) is True
+        assert await store.groups.is_linked(42, CHAT) is True
+
+    async def test_a_non_member_is_refused(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot(get_chat_member=_member("left"))
+        ctx = await _ctx(bot, user=42)
+        await G.handle_start_payload(ctx, "gb_%d" % CHAT)
+        assert await store.groups.is_linked(42, CHAT) is False
+
+    async def test_get_chat_member_error_is_treated_as_not_a_member(self):
+        store = await get_store()
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        bot = _bot()
+        bot.get_chat_member.side_effect = telegram.error.BadRequest("user not found")
+        ctx = await _ctx(bot, user=42)
+        await G.handle_start_payload(ctx, "gb_%d" % CHAT)
+        assert await store.groups.is_linked(42, CHAT) is False
+
+    async def test_a_non_group_payload_is_not_claimed(self):
+        ctx = await _ctx(_bot())
+        assert await G.handle_start_payload(ctx, "somethingelse") is False
+
+
+class TestRegistration:
+    def test_group_prefix_is_allocated_and_distinct(self):
+        assert hifz.PREFIXES["group"] == "gr:"
+        vals = list(hifz.PREFIXES.values())
+        assert len(set(vals)) == len(vals)
+
+    def test_the_callback_and_wizard_register(self):
+        hifz.load_features()
+        assert "gr:" in hifz.CALLBACKS
+        assert G.WIZARD_KIND in hifz.WIZARDS
+
+
+# --- J4: the plan wizard -------------------------------------------------------
+
+async def _run_setup_to_plan(store, bot):
+    """Drive setup through language, leaving the wizard at the target step."""
+    await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+    await G.handle_start_payload(await _ctx(bot), "gs_%d" % CHAT)
+    await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")       # topic
+    ctx = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN, _Settings(),
+                          callback_query=SimpleNamespace(id="cq", message=None))
+    await hifz.dispatch_callback(ctx, "gr:tl:en")                   # -> target step
+
+
+class TestPlanWizard:
+    async def test_full_wizard_saves_a_group_plan_and_queues_a_post(self):
+        store = await get_store()
+        bot = _bot(get_chat_member=_member("administrator"),
+                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        await _run_setup_to_plan(store, bot)
+
+        await hifz.dispatch_wizard(await _ctx(bot), "67")           # target: Al-Mulk
+
+        def tap(cb):
+            ctx = None
+            async def _do():
+                c = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN,
+                                    _Settings(),
+                                    callback_query=SimpleNamespace(id="cq", message=None))
+                await hifz.dispatch_callback(c, cb)
+            return _do()
+        await tap("gr:pace:0")                                      # auto
+        await tap("gr:d:all")                                       # daily
+        await tap("gr:tz:+05:00")
+        await hifz.dispatch_wizard(await _ctx(bot), "07:00")        # post time -> save
+
+        plan = await store.groups.get_active_plan(CHAT)
+        assert plan is not None and plan.start_surah == 67
+        config = await store.groups.get_config(CHAT)
+        assert config.status == "active" and config.timezone == "+05:00"
+        assert config.days_of_week == [1, 2, 3, 4, 5, 6, 7]
+        # a daily post is queued into the topic (a weekly board too, see TestBoard)
+        posts = [r for r in store.schedule._state.scheduled_send.values()
+                 if r.kind == G.SEND_KIND]
+        assert len(posts) == 1 and posts[0].thread_id == 77
+
+    async def test_a_bad_target_is_rejected_without_advancing(self):
+        store = await get_store()
+        bot = _bot(get_chat_member=_member("administrator"),
+                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        await _run_setup_to_plan(store, bot)
+        await hifz.dispatch_wizard(await _ctx(bot), "not a surah")
+        assert G.WIZARD_KIND == (await _ctx(bot)).wiz.kind(ADMIN)
+        assert (await _ctx(bot)).wiz.get(ADMIN)["step"] == "target"
+
+
+# --- J5: the daily post --------------------------------------------------------
+
+class TestDailyPost:
+    async def _saved_plan(self, store):
+        from lib.store.plans import PlanDaySpec
+        from datetime import date
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        from datetime import time as _time
+        await store.groups.update_config(
+            CHAT, thread_id=77, translation_lang="en", timezone="+05:00",
+            post_time=_time(7, 0), status="active",
+            content_flags={"image": False, "audio": True, "translation": True})
+        return await store.groups.create_plan(
+            CHAT, "surah", 67, 1, 67, 30, 2, [1, 2, 3, 4, 5, 6, 7],
+            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2),
+                  PlanDaySpec(date(2026, 8, 4), 67, 3, 4)])
+
+    async def test_a_post_delivers_to_the_topic_and_queues_the_next(self, monkeypatch):
+        from lib import scheduler
+        from lib.scheduler import SendCtx
+        store = await get_store()
+        plan = await self._saved_plan(store)
+        day = (await store.groups.list_plan_days(plan.id))[0]
+
+        posted = {}
+        async def fake_audio(bot, s, a, b, chat_id, performer, reply_markup=None,
+                             message_thread_id=None):
+            posted["audio"] = (s, a, b, chat_id, message_thread_id)
+        monkeypatch.setattr("main.send_combined_audio", fake_audio)
+
+        bot = AsyncMock()
+        row = SimpleNamespace(id=1, kind=G.SEND_KIND, target_chat_id=CHAT,
+                              thread_id=77,
+                              payload={"group_plan_day_id": day.id,
+                                       "group_plan_id": plan.id, "chat_id": CHAT})
+        ctx = SendCtx(bot=bot, data={}, file=None, store=store, send=row)
+        await scheduler.SEND_HANDLERS[G.SEND_KIND](ctx)
+
+        # translation posted into the thread
+        assert bot.send_message.await_args.kwargs["message_thread_id"] == 77
+        assert posted["audio"][4] == 77                    # audio into the thread
+        # the day is claimed and the next is queued
+        assert (await store.groups.get_plan_day(day.id)).state == "sent"
+        pending = [r for r in store.schedule._state.scheduled_send.values()
+                   if r.state == "pending"]
+        assert pending, "next portion queued"
+
+    async def test_a_second_delivery_of_the_same_day_is_a_no_op(self, monkeypatch):
+        from lib import scheduler
+        from lib.scheduler import SendCtx
+        store = await get_store()
+        plan = await self._saved_plan(store)
+        day = (await store.groups.list_plan_days(plan.id))[0]
+        await store.groups.claim_plan_day(day.id)          # already sent
+
+        monkeypatch.setattr("main.send_combined_audio", AsyncMock())
+        bot = AsyncMock()
+        row = SimpleNamespace(id=1, kind=G.SEND_KIND, target_chat_id=CHAT,
+                              thread_id=77,
+                              payload={"group_plan_day_id": day.id,
+                                       "group_plan_id": plan.id, "chat_id": CHAT})
+        await scheduler.SEND_HANDLERS[G.SEND_KIND](SendCtx(
+            bot=bot, data={}, file=None, store=store, send=row))
+        bot.send_message.assert_not_awaited()              # nothing re-posted
+
+    async def test_a_paused_group_posts_nothing(self, monkeypatch):
+        from lib import scheduler
+        from lib.scheduler import SendCtx
+        store = await get_store()
+        plan = await self._saved_plan(store)
+        day = (await store.groups.list_plan_days(plan.id))[0]
+        await store.groups.update_config(CHAT, status="paused")
+
+        bot = AsyncMock()
+        row = SimpleNamespace(id=1, kind=G.SEND_KIND, target_chat_id=CHAT,
+                              thread_id=77,
+                              payload={"group_plan_day_id": day.id,
+                                       "group_plan_id": plan.id, "chat_id": CHAT})
+        await scheduler.SEND_HANDLERS[G.SEND_KIND](SendCtx(
+            bot=bot, data={}, file=None, store=store, send=row))
+        bot.send_message.assert_not_awaited()
+        assert (await store.groups.get_plan_day(day.id)).state == "pending"
+
+
+# --- J6: the weekly board ------------------------------------------------------
+
+class TestBoard:
+    async def _group(self, store, offset="+05:00"):
+        from datetime import time as _time
+        await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
+        await store.groups.update_config(
+            CHAT, thread_id=77, translation_lang="en", timezone=offset,
+            post_time=_time(20, 0), status="active")
+
+    async def test_board_ranks_linked_members_by_sessions(self, monkeypatch):
+        from datetime import datetime, timezone, date
+        from lib.store.sessions import KIND_DRILL
+        store = await get_store()
+        await self._group(store)
+        now = datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)   # a Wednesday
+        today = date(2026, 8, 5)
+
+        for uid, name, n in [(1, "Aisha", 3), (2, "Bilal", 5), (3, "Zayd", 1)]:
+            await store.groups.link_member(uid, CHAT)
+            await store.profiles.set_display_name(uid, name)
+            for i in range(n):
+                await store.sessions.log_session(uid, today, KIND_DRILL,
+                                                 surah=67, start_ayah=i + 1, end_ayah=i + 1)
+
+        bot = _bot(get_chat_member=_member("member"))
+        entries = await G.group_board_entries(store, bot, CHAT, utc_now=now)
+        assert [(e[1], e[2]) for e in entries] == [("Bilal", 5), ("Aisha", 3), ("Zayd", 1)]
+
+    async def test_a_member_who_left_is_dropped(self, monkeypatch):
+        from datetime import datetime, timezone, date
+        from lib.store.sessions import KIND_DRILL
+        store = await get_store()
+        await self._group(store)
+        now = datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)
+        await store.groups.link_member(1, CHAT)
+        await store.sessions.log_session(1, date(2026, 8, 5), KIND_DRILL,
+                                         surah=67, start_ayah=1, end_ayah=1)
+
+        bot = AsyncMock()
+        bot.get_chat_member.return_value = _member("left")   # consented, then left
+        entries = await G.group_board_entries(store, bot, CHAT, utc_now=now)
+        assert entries == []
+
+    async def test_someone_with_no_sessions_is_absent(self):
+        from datetime import datetime, timezone
+        store = await get_store()
+        await self._group(store)
+        await store.groups.link_member(1, CHAT)
+        bot = _bot(get_chat_member=_member("member"))
+        entries = await G.group_board_entries(
+            store, bot, CHAT, utc_now=datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc))
+        assert entries == []
+
+    async def test_post_board_writes_into_the_topic(self):
+        store = await get_store()
+        await self._group(store)
+        bot = _bot(get_chat_member=_member("member"))
+        await G.post_board(bot, store, CHAT)
+        assert bot.send_message.await_args.kwargs["message_thread_id"] == 77
+
+    async def test_saving_a_plan_queues_a_board(self):
+        # the board chain is armed at setup alongside the daily-post chain
+        store = await get_store()
+        bot = _bot(get_chat_member=_member("administrator"),
+                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        await _run_setup_to_plan(store, bot)
+        await hifz.dispatch_wizard(await _ctx(bot), "67")
+
+        async def tap(cb):
+            c = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN,
+                                _Settings(),
+                                callback_query=SimpleNamespace(id="cq", message=None))
+            await hifz.dispatch_callback(c, cb)
+        await tap("gr:pace:0"); await tap("gr:d:all"); await tap("gr:tz:+05:00")
+        await hifz.dispatch_wizard(await _ctx(bot), "07:00")
+
+        kinds = {r.kind for r in store.schedule._state.scheduled_send.values()}
+        assert G.SEND_KIND in kinds and G.BOARD_KIND in kinds
+
+    async def test_board_send_handler_reposts_weekly(self):
+        from lib import scheduler
+        from lib.scheduler import SendCtx
+        store = await get_store()
+        await self._group(store)
+        bot = _bot(get_chat_member=_member("member"))
+        row = SimpleNamespace(id=1, kind=G.BOARD_KIND, target_chat_id=CHAT,
+                              thread_id=77, payload={"chat_id": CHAT})
+        await scheduler.SEND_HANDLERS[G.BOARD_KIND](
+            SendCtx(bot=bot, data={}, file=None, store=store, send=row))
+        bot.send_message.assert_awaited()                # board posted
+        assert any(r.kind == G.BOARD_KIND for r in
+                   store.schedule._state.scheduled_send.values())   # next queued

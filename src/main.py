@@ -52,11 +52,13 @@ from telegram import (
 )
 from fastapi import FastAPI, Request, Response
 from modules import Quran, make_index, Bot, TranslationRegistry
+import hifz
 from lib.utils import File
 from lib.page_image import fetch_and_stitch
+from lib.store import apply_schema
 from lib.user_settings import UserSettings
 from config import Environment
-from config.postgres import get_pool, close_pool
+from config.postgres import close_pool
 from locales import (
     LANGUAGES, UI_LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
     t, button_action, normalize_lang, get_language, is_ui_language, welcome_text,
@@ -168,14 +170,21 @@ def _combined_audio_key(surah: int, start: int, end: int, performer: str) -> str
 
 
 async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: int,
-                              performer: str, reply_markup=None) -> None:
-    """Send a range of ayahs as a single combined audio file, cached by Telegram file_id."""
+                              performer: str, reply_markup=None,
+                              message_thread_id=None) -> None:
+    """Send a range of ayahs as a single combined audio file, cached by Telegram file_id.
+
+    `message_thread_id` targets a forum topic (the group cluster's daily post);
+    left None it posts to the chat as before.
+    """
     file = File()
     cache_key = _combined_audio_key(surah, start, end, performer)
     title = "Quran %d:%d-%d" % (surah, start, end)
     kwargs = dict(chat_id=chat_id, title=title,
                   performer=File.get_performer_name(performer),
                   reply_markup=reply_markup)
+    if message_thread_id is not None:
+        kwargs["message_thread_id"] = message_thread_id
 
     cached_id = file.get_file(cache_key)
     if cached_id is not None:
@@ -877,33 +886,51 @@ async def _resolve_settings(user_settings: UserSettings, chat_id, tg_user):
     return await user_settings.get(user_id, chat_id, default_ui_lang=default_ui_lang)
 
 
+async def send_quran(bot, data: dict, file, surah: int, ayah: int, quran_type: str,
+                     chat_id: int, performer: str, ui_lang: str, translation_lang: str,
+                     reply_markup=None) -> None:
+    """Send one ayah in one representation, and remember it as the reader's position.
+
+    Module level rather than a closure inside `handle_update`: the scheduler
+    pushes a plan's daily portion outside any update, and the hifz drill reuses
+    this same send — neither has a `handle_update` frame to close over. `bot`,
+    `data` and `file` are therefore explicit leading parameters.
+    """
+    if quran_type in ("translation", "tafsir"):
+        text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
+        await bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML",
+                        reply_markup=reply_markup)
+    elif quran_type == "arabic":
+        await bot.send_chat_action(chat_id=chat_id,
+                            action=telegram.constants.ChatAction.UPLOAD_PHOTO)
+        image = file.get_image_filename(surah, ayah)
+        await send_file(bot, image, quran_type, chat_id=chat_id,
+                  caption=_reference(surah, ayah, ui_lang),
+                  reply_markup=reply_markup)
+    elif quran_type == "audio":
+        await bot.send_chat_action(chat_id=chat_id,
+                            action=telegram.constants.ChatAction.UPLOAD_VOICE)
+        audio = file.get_audio_filename(surah, ayah, performer)
+        await send_file(bot, audio, quran_type, chat_id=chat_id,
+                  performer=File.get_performer_name(performer),
+                  title=_reference(surah, ayah, ui_lang),
+                  reply_markup=reply_markup)
+    file.save_user(chat_id, (surah, ayah, quran_type))
+
+
 async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     """Process a single Telegram update pushed to the webhook."""
     file = File()
     user_settings = UserSettings()
 
-    async def send_quran(surah: int, ayah: int, quran_type: str, chat_id: int,
-                         performer: str, ui_lang: str, translation_lang: str, reply_markup=None):
-        if quran_type in ("translation", "tafsir"):
-            text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
-            await bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML",
-                            reply_markup=reply_markup)
-        elif quran_type == "arabic":
-            await bot.send_chat_action(chat_id=chat_id,
-                                action=telegram.constants.ChatAction.UPLOAD_PHOTO)
-            image = file.get_image_filename(surah, ayah)
-            await send_file(bot, image, quran_type, chat_id=chat_id,
-                      caption=_reference(surah, ayah, ui_lang),
-                      reply_markup=reply_markup)
-        elif quran_type == "audio":
-            await bot.send_chat_action(chat_id=chat_id,
-                                action=telegram.constants.ChatAction.UPLOAD_VOICE)
-            audio = file.get_audio_filename(surah, ayah, performer)
-            await send_file(bot, audio, quran_type, chat_id=chat_id,
-                      performer=File.get_performer_name(performer),
-                      title=_reference(surah, ayah, ui_lang),
-                      reply_markup=reply_markup)
-        file.save_user(chat_id, (surah, ayah, quran_type))
+    if update.my_chat_member:  # the bot was added to or removed from a chat
+        from lib.store import get_store
+        from hifz import group as hifz_group
+        try:
+            await hifz_group.on_my_chat_member(bot, await get_store(), update)
+        except telegram.error.Forbidden:
+            pass                # no permission to post in that group; nothing to do
+        return
 
     if update.inline_query:
         query_id = update.inline_query.id
@@ -1106,9 +1133,15 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                             raise
                 file.save_user(chat_id, (surah, ayah, quran_type))
             else:                               # arabic/audio arrive as fresh media messages
-                await send_quran(surah, ayah, quran_type, chat_id, reciter, ui_lang, translation_lang,
-                                 reply_markup=markup)
+                await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
+                                 ui_lang, translation_lang, reply_markup=markup)
             await bot.answer_callback_query(cq.id)
+            return
+
+        # hifz features (src/hifz) claim their own callback prefixes — see hifz.PREFIXES.
+        ctx = await hifz.Ctx.build(bot, data, file, chat_id, cq.from_user.id, settings,
+                                   callback_query=cq)
+        if await hifz.dispatch_callback(ctx, cb_data):
             return
 
         await bot.answer_callback_query(cq.id)  # unknown callback: acknowledge and ignore
@@ -1134,26 +1167,10 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     print("%d:%.3f:%s" % (chat_id, time(), message.replace("\n", " ")))
 
     if chat_id < 0:
-        return              # bot should not be in a group
-
-    if file.pop_awaiting_input(chat_id) == "reciter_search":
-        # a name typed after tapping "🔍 Search reciter" — not an ayah reference
-        matches = File.search_performers(raw_message)
-        if not matches:
-            await bot.send_message(chat_id=chat_id, text=t("reciter_search_no_matches", ui_lang))
-            file.set_awaiting_input(chat_id, "reciter_search")  # allow one retry
-            return
-        rows, row = [], []
-        for p in matches:
-            row.append(InlineKeyboardButton(reciter_label(p),
-                                            callback_data="setreciter:" + p["subfolder"]))
-            if len(row) == 2:
-                rows.append(row)
-                row = []
-        if row:
-            rows.append(row)
-        await bot.send_message(chat_id=chat_id, text=t("reciter_search_results", ui_lang),
-                        reply_markup=InlineKeyboardMarkup(rows))
+        # Group *text* is still ignored: the group cluster is driven entirely from
+        # DM (admin setup, board join) and the scheduler (the daily post), never by
+        # reading group chatter. Being added or removed is a my_chat_member update,
+        # handled at the top of this function before we ever get here.
         return
 
     if message.startswith("/"):
@@ -1162,7 +1179,19 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         # unmatched command and falls through to the reference parser, as before.
         command, _, argument = command.partition(" ")
         argument = argument.strip()
+        # A command always wins over a pending free-text prompt. The awaited-input
+        # check used to run *before* this chain, so a typed /start while the bot
+        # awaited a reciter name was swallowed as the name, with no way out.
+        file.pop_awaiting_input(chat_id)
         if command in ("start", "help"):
+            # A /start deep link (t.me/bot?start=gs_-100…) carries a group payload
+            # the group feature owns — admin setup, or a member joining the board.
+            if command == "start" and argument:
+                from hifz import group as hifz_group
+                ctx = await hifz.Ctx.build(bot, data, file, chat_id,
+                                           update.message.from_user.id, settings)
+                if await hifz_group.handle_start_payload(ctx, argument):
+                    return
             # ReplyKeyboardRemove clears the old persistent keyboard for anyone
             # upgrading from the pre-inline UI; new users never see one.
             await bot.send_message(chat_id=chat_id, text=welcome_text(ui_lang),
@@ -1217,14 +1246,51 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             return
         elif command == "random":
             surah, ayah = Quran.get_random_ayah()
-            await send_quran(surah, ayah, quran_type, chat_id, reciter, ui_lang, translation_lang,
+            await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
+                             ui_lang, translation_lang,
                              reply_markup=verse_keyboard(surah, ayah, quran_type, ui_lang))
+            return
+        # hifz features (src/hifz) register their own commands; they are looked up
+        # here so a command escapes any wizard in progress rather than feeding it.
+        if hifz.handles(command):
+            ctx = await hifz.Ctx.build(bot, data, file, chat_id, update.message.from_user.id,
+                                       settings, argument=argument, message=update.message)
+            await hifz.dispatch_command(ctx, command)
             return
         # unknown command: fall through (ignored, as before)
 
+    if file.pop_awaiting_input(chat_id) == "reciter_search":
+        # a name typed after tapping "🔍 Search reciter" — not an ayah reference
+        matches = File.search_performers(raw_message)
+        if not matches:
+            await bot.send_message(chat_id=chat_id, text=t("reciter_search_no_matches", ui_lang))
+            file.set_awaiting_input(chat_id, "reciter_search")  # allow one retry
+            return
+        rows, row = [], []
+        for p in matches:
+            row.append(InlineKeyboardButton(reciter_label(p),
+                                            callback_data="setreciter:" + p["subfolder"]))
+            if len(row) == 2:
+                rows.append(row)
+                row = []
+        if row:
+            rows.append(row)
+        await bot.send_message(chat_id=chat_id, text=t("reciter_search_results", ui_lang),
+                        reply_markup=InlineKeyboardMarkup(rows))
+        return
+
+    # A hifz wizard in progress consumes free text — but only after the command
+    # chain above, so /cancel and every other command remain an escape hatch.
+    if hifz.has_wizard(update.message.from_user.id):
+        ctx = await hifz.Ctx.build(bot, data, file, chat_id, update.message.from_user.id,
+                                   settings, message=update.message)
+        if await hifz.dispatch_wizard(ctx, raw_message):
+            return
+
     action = button_action(message, ui_lang)
     if action in ("arabic", "audio", "translation", "tafsir"):
-        await send_quran(surah, ayah, action, chat_id, reciter, ui_lang, translation_lang,
+        await send_quran(bot, data, file, surah, ayah, action, chat_id, reciter,
+                         ui_lang, translation_lang,
                          reply_markup=verse_keyboard(surah, ayah, action, ui_lang))
         return
     elif action in ("next", "previous", "random"):
@@ -1234,7 +1300,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             surah, ayah = Quran.get_previous_ayah(surah, ayah)
         else:
             surah, ayah = Quran.get_random_ayah()
-        await send_quran(surah, ayah, quran_type, chat_id, reciter, ui_lang, translation_lang,
+        await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
+                         ui_lang, translation_lang,
                          reply_markup=verse_keyboard(surah, ayah, quran_type, ui_lang))
         return
 
@@ -1251,7 +1318,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                 await send_combined_audio(bot, surah, start, end, chat_id, reciter,
                                           reply_markup=verse_keyboard(surah, end, "audio", ui_lang))
         elif Quran.exists(surah, start):
-            await send_quran(surah, start, quran_type, chat_id, reciter, ui_lang, translation_lang,
+            await send_quran(bot, data, file, surah, start, quran_type, chat_id, reciter,
+                             ui_lang, translation_lang,
                              reply_markup=verse_keyboard(surah, start, quran_type, ui_lang))
         else:
             await bot.send_message(chat_id=chat_id, text=t("ayah_not_found", ui_lang))
@@ -1328,10 +1396,11 @@ async def _initialize():
         print("INIT ERROR (bot — check TOKEN):", type(e).__name__, e)
 
     try:
-        pool = await get_pool()
-        schema_path = os.path.join(os.path.dirname(__file__), "common", "schema.sql")
-        with open(schema_path, "r", encoding="utf-8") as fp:
-            await pool.execute(fp.read())
+        # Through the repository layer: it owns the schema file and knows that the
+        # in-memory store has no schema to apply. Reaching for the pool directly
+        # here raised AttributeError on every boot without DATABASE_URL, because
+        # get_pool() answers None in that case.
+        await apply_schema()
         print("Postgres settings store ready")
     except Exception as e:
         print("INIT ERROR (postgres):", type(e).__name__, e)
@@ -1356,6 +1425,29 @@ async def _initialize():
 
     if bot:
         await _set_bot_commands(bot)
+
+    # Register the hifz features (src/hifz/*.py) — imported here, once the rest of
+    # main is loaded, so a feature module may import from main without a cycle.
+    try:
+        hifz.load_features()
+    except Exception as e:
+        print("INIT ERROR (hifz features):", type(e).__name__, e)
+
+    # --- SCHEDULER SLOT (Wave 1D) ---------------------------------------------
+    # The due-queue loop. It goes last because it needs `bot` and `data`
+    # populated and the schema applied — and after hifz.load_features(), because
+    # that import is what registers the per-kind send handlers it dispatches to.
+    #
+    # The loop owns its own error handling (a failing tick is logged and the loop
+    # continues), so the only thing that can land here is a failure to *start* it.
+    # It is stopped by cancellation when uvicorn tears the event loop down.
+    try:
+        from lib.scheduler import run_scheduler
+        task = asyncio.create_task(run_scheduler(bot, data))
+        _background_tasks.add(task)          # strong ref: tasks are GC'd otherwise
+        task.add_done_callback(_background_tasks.discard)
+    except Exception as e:
+        print("INIT ERROR (scheduler):", type(e).__name__, e)
 
 
 @app.on_event("startup")

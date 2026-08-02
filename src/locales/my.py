@@ -65,4 +65,144 @@ strings = {
     "cmd_reciter": "ရွတ်ဖတ်သူ ပြောင်းရန်",
     "cmd_about": "အရင်းအမြစ်နှင့် ကျေးဇူးတင်လွှာ",
     "quran_name": "ကုရ်အာန်",
+
+    # Command descriptions (the Telegram menu and the /start list)
+    "cmd_memorize": "အလွတ်ကျက်မှတ်ရေး အစီအစဉ် စတင်ရန်",
+    "cmd_progress": "သင် အလွတ်ရပြီးသည်များ",
+    "cmd_check": "သင့်မှတ်ဉာဏ်ကို စမ်းသပ်ရန်",
+    "cmd_forgot": "အလွတ်ရပြီးအမှတ်အသားကို ဖယ်ရှားရန်",
+    "cmd_streak": "သင့်နေ့စဉ် ဆက်တိုက်ရက်များ",
+    "cmd_leaderboard": "ဤအပတ်၏ ထိပ်တန်း အလွတ်ကျက်သူများ",
+    "cmd_profile": "သင့်ပရိုဖိုင်နှင့် ဆက်တင်များ",
+
+    # Shared wizard controls
+    "wizard_cancelled": "ပယ်ဖျက်လိုက်ပါပြီ။",
+    "wizard_nothing_to_cancel": "ပယ်ဖျက်စရာ မရှိပါ။",
+    "wizard_invalid_input": "ကျွန်ုပ် နားမလည်ပါ။ ထပ်စမ်းကြည့်ပါ၊ သို့မဟုတ် /cancel ကို ပို့ပါ။",
+    "ref_invalid": "ဤအညွှန်းကို ကျွန်ုပ် မသိပါ။ 67၊ 67:1-8 သို့မဟုတ် juz 30 ကဲ့သို့ စမ်းကြည့်ပါ။",
+    "btn_cancel": "ပယ်ဖျက်",
+    "btn_back": "နောက်သို့",
+    "btn_confirm": "အတည်ပြု",
+
+    # Days of the week — the plan's day picker, and the streak grid's header
+    "day_mon": "လာ",
+    "day_tue": "ဂါ",
+    "day_wed": "ဟူး",
+    "day_thu": "ကြာ",
+    "day_fri": "သော",
+    "day_sat": "နေ",
+    "day_sun": "နွေ",
+
+    # Profile (B1-B3)
+    "profile_title": "သင့်ပရိုဖိုင်",
+    "profile_name_set": "အမည်: {name}",
+    "profile_name_unset": "အမည်: သတ်မှတ်ထားခြင်း မရှိပါ",
+    "profile_leaderboard_on": "ဦးဆောင်ဇယား: သင့်အမည် ဖော်ပြထားသည်",
+    "profile_leaderboard_off": "ဦးဆောင်ဇယား: သင့်အမည် ဖျောက်ထားသည်",
+    "profile_timezone_set": "အချိန်ဇုန်: UTC{offset}",
+    "profile_timezone_unset": "အချိန်ဇုန်: သတ်မှတ်ထားခြင်း မရှိပါ",
+    "profile_reminder_set": "နေ့စဉ် သတိပေးချက်: {time}",
+    "profile_reminder_unset": "နေ့စဉ် သတိပေးချက်: ပိတ်ထားသည်",
+    "profile_plan_active": "အစီအစဉ်: {target} — {total} ရက်အနက် {day} ရက်မြောက်",
+    "profile_plan_none": "အစီအစဉ်: မရှိသေးပါ။ /memorize ဖြင့် စတင်ပါ။",
+    "btn_edit_name": "အမည် ပြောင်းရန်",
+    "btn_join_board": "ဦးဆောင်ဇယားသို့ ဝင်ရန်",
+    "btn_leave_board": "ဦးဆောင်ဇယားမှ ထွက်ရန်",
+    "btn_edit_timezone": "အချိန်ဇုန် ပြောင်းရန်",
+    "btn_edit_reminder": "သတိပေးချိန် ပြောင်းရန်",
+    "name_prompt": "ဦးဆောင်ဇယားတွင် ဖော်ပြလိုသော အမည်ကို ပို့ပါ။",
+    "name_invalid": "စာလုံး {min} လုံးမှ {max} လုံးအတွင်း အသုံးပြုပါ။",
+    "name_saved": "သင့်အား {name} အဖြစ် ဖော်ပြပါမည်။",
+    "board_joined": "သင် ယခု ဦးဆောင်ဇယားတွင် ပါဝင်ပါပြီ။",
+    "board_left": "သင့်ကို ဦးဆောင်ဇယားမှ ဖယ်ရှားလိုက်ပါပြီ။",
+    "timezone_prompt": (
+        "သင့် UTC အချိန်ကွာခြားချက်ကို ရွေးပါ။ ၎င်းသည် ဆက်တိုက်ရက်များအတွက် "
+        "သင့်နေ့ မည်သည့်အချိန် စတင်မည်နှင့် နေ့စဉ်အပိုင်း မည်သည့်အချိန် "
+        "ရောက်မည်ကို ဆုံးဖြတ်သည်။"
+    ),
+    "timezone_saved": "အချိန်ဇုန်ကို UTC{offset} အဖြစ် သတ်မှတ်လိုက်ပါပြီ။",
+    "reminder_prompt": "နေ့စဉ်အပိုင်းကို လိုချင်သည့်အချိန်ကို ၂၄ နာရီပုံစံဖြင့် ပို့ပါ၊ ဥပမာ 07:30။",
+    "reminder_invalid": "အချိန်ကို ၂၄ နာရီပုံစံဖြင့် ပို့ပါ၊ ဥပမာ 07:30။",
+    "reminder_saved": "နေ့စဉ် သတိပေးချက်ကို {time} တွင် သတ်မှတ်လိုက်ပါပြီ။",
+    "btn_reminder_off": "သတိပေးချက် ပိတ်ရန်",
+    "reminder_off": "နေ့စဉ် သတိပေးချက်များ ပိတ်ထားပါသည်။",
+
+    # Progress and /forgot (C3)
+    "progress_title": "သင် အလွတ်ရပြီးသည်များ",
+    "progress_surah_line": "{name}: အာယသ် {done}/{total} — {pct}%",
+    "progress_juz_line": "ဂျုစ်အ် {n}: {pct}%",
+    "progress_quran_line": "ကုရ်အာန်တစ်စောင်လုံး: {pct}%",
+    "progress_empty": (
+        "မည်သည့်အမှတ်အသားမျှ မရှိသေးပါ။ အပိုင်းတစ်ခု ပြီးအောင်လုပ်ပြီး "
+        "«ဤအပိုင်းကို အလွတ်ရပါပြီ» ကို တို့ပါ၊ သို့မဟုတ် /memorize ဖြင့် "
+        "အစီအစဉ်တစ်ခု စတင်ပါ။"
+    ),
+    "forgot_usage": "ဖယ်ရှားလိုသည့် အပိုင်းကို ပို့ပါ၊ ဥပမာ /forgot 67:5-6။",
+    "forgot_done": "{ref} ၏ အမှတ်အသားကို ဖယ်ရှားလိုက်ပါပြီ။",
+    "forgot_nothing": "ထိုအပိုင်းကို အလွတ်ရပြီးဟု သင် အမှတ်အသား မပြုထားပါ။",
+
+    # Memorization plans and drills (D1, D3-D5)
+    "memorize_choose_target": "ဘာကို အလွတ်ကျက်လိုပါသလဲ။",
+    "btn_target_surah": "စူရာတစ်ခု",
+    "btn_target_juz": "ဂျုစ်အ်တစ်ခု",
+    "btn_target_range": "အပိုင်းအခြားတစ်ခု",
+    "memorize_surah_prompt": "စူရာနံပါတ်ကို ပို့ပါ၊ ဥပမာ 67။",
+    "memorize_juz_prompt": "ဂျုစ်အ်နံပါတ်ကို ၁ မှ ၃၀ အတွင်း ပို့ပါ။",
+    "memorize_range_prompt": "အပိုင်းအခြားကို ပို့ပါ၊ ဥပမာ 67:1-68:5။",
+    "memorize_choose_pace": "တစ်နေ့လျှင် ဘယ်လောက် လုပ်လိုပါသလဲ။",
+    "btn_pace_auto": "ကျွန်ုပ်အတွက် ရွေးပေးပါ",
+    "memorize_pace_prompt": "တစ်နေ့လျှင် အာယသ် မည်မျှဖြစ်ကြောင်း ပို့ပါ။",
+    "memorize_pace_invalid": "{min} နှင့် {max} အကြား ဂဏန်းတစ်ခု ပို့ပါ။",
+    "memorize_choose_days": "မည်သည့်ရက်များတွင် လေ့လာလိုပါသလဲ။",
+    "btn_days_daily": "နေ့တိုင်း",
+    "btn_days_weekdays": "အလုပ်ရက်များ",
+    "btn_days_custom": "ရက်ရွေးရန်",
+    "memorize_days_prompt": "လိုချင်သောရက်များကို တို့ပြီး အတည်ပြုပါ။",
+    "memorize_preview_title": "{days} ရက်၊ {start} မှ {end} အထိ:",
+    "memorize_preview_row": "{date} — {ref}",
+    "btn_confirm_plan": "ဤအစီအစဉ် စတင်ရန်",
+    "plan_saved": "သင့်အစီအစဉ် ပြင်ဆင်ပြီးပါပြီ။ ပထမအပိုင်းသည် {first_date} တွင် ရောက်ပါမည်။",
+    "plan_exists": "သင့်တွင် လည်ပတ်နေသော အစီအစဉ်တစ်ခု ရှိပြီးဖြစ်သည်။ ၎င်းကို ဦးစွာ ခေတ္တရပ်ပါ သို့မဟုတ် စွန့်လွှတ်ပါ။",
+    "btn_pause_plan": "အစီအစဉ် ခေတ္တရပ်ရန်",
+    "btn_resume_plan": "အစီအစဉ် ပြန်စရန်",
+    "btn_abandon_plan": "အစီအစဉ် စွန့်လွှတ်ရန်",
+    "plan_paused": "အစီအစဉ်ကို ခေတ္တရပ်လိုက်ပါပြီ။ /profile မှ အချိန်မရွေး ပြန်စနိုင်သည်။",
+    "plan_resumed": "အစီအစဉ်ကို ပြန်စလိုက်ပါပြီ။",
+    "plan_abandoned": "အစီအစဉ်ကို စွန့်လွှတ်လိုက်ပါပြီ။",
+    "plan_complete": "{target} ကို ပြီးမြောက်အောင် လုပ်ဆောင်နိုင်ပါပြီ။ အလ္လာဟ်အရှင်မြတ် သင့်ထံမှ လက်ခံတော်မူပါစေ။",
+    "drill_title": "{ref} — {total} ရက်အနက် {day} ရက်မြောက်",
+    "drill_none_today": "ယနေ့အတွက် စီစဉ်ထားခြင်း မရှိပါ။",
+    "btn_start_drill": "ယနေ့အပိုင်း စတင်ရန်",
+    "btn_know_by_heart": "✅ ဤအပိုင်းကို အလွတ်ရပါပြီ",
+    "know_confirmed": "{ref} ကို အလွတ်ရပြီးဟု အမှတ်အသားပြုလိုက်ပါပြီ။ သင် ယခု {pct}% ရောက်ရှိပါပြီ။",
+    "know_already": "ထိုအပိုင်းကို သင် အမှတ်အသားပြုပြီးဖြစ်သည်။",
+
+    # Recall check (E2, E3)
+    "check_question": "ဤအပိုဒ် မည်သို့ ဆက်သွားပါသလဲ။",
+    "check_usage": "စမ်းသပ်လိုသည့် အပိုင်းကို ပို့ပါ၊ ဥပမာ /check 67။",
+    "check_correct": "မှန်ပါသည်။",
+    "check_wrong": "မမှန်သေးပါ။ ဤသို့ ဆက်သွားသည်: {correct}",
+    "check_already_today": (
+        "ယနေ့အတွက် ရမှတ်ကို မှတ်ဉာဏ်စမ်းသပ်မှုဖြင့် ရရှိပြီးဖြစ်သည် — "
+        "လိုသလောက် ထပ်စမ်းနိုင်သည်၊ သို့သော် နှစ်ကြိမ် ရေတွက်မည် မဟုတ်ပါ။"
+    ),
+    "btn_check_start": "ကျွန်ုပ်ကို စမ်းသပ်ပါ",
+
+    # Streaks (G2, G3)
+    "streak_title": "သင့်ဆက်တိုက်ရက်များ",
+    "streak_current": "လက်ရှိ ဆက်တိုက်: {n} ရက်",
+    "streak_longest": "အရှည်ဆုံး ဆက်တိုက်: {n} ရက်",
+    "streak_none": "ဆက်တိုက်ရက် မရှိသေးပါ။ ယနေ့ အပိုင်းတစ်ခု ပြီးအောင်လုပ်ပါ သို့မဟုတ် မှတ်ဉာဏ်စမ်းသပ်မှု အောင်မြင်ပါက စတင်ပါမည်။",
+    "streak_graph_caption": "နောက်ဆုံး ၁၂ ပတ်",
+    "streak_milestone_7": "တစ်ပတ်ပြည့်ပါပြီ။ အလေ့အထသည် ဤနေရာမှ စတင်သည်။",
+    "streak_milestone_30": "ရက်ပေါင်း သုံးဆယ်။ ယခု ဇွဲသည် သင့်ဘက်တွင် ရှိနေပါပြီ။",
+    "streak_milestone_100": "ရက်ပေါင်း တစ်ရာ။ ဤအထိ ရောက်သူ အလွန်နည်းပါသည်။",
+    "streak_milestone_365": "တစ်နှစ်ပြည့်၊ တစ်ရက်မှ မလွတ်ပါ။ သင်သင်ယူထားသည်များကို အလ္လာဟ်အရှင်မြတ် ထိန်းသိမ်းပေးတော်မူပါစေ။",
+
+    # Leaderboard (H1, H2)
+    "leaderboard_title": "ဤအပတ်၏ ဦးဆောင်ဇယား",
+    "leaderboard_row": "{rank}. {name} — {sessions}",
+    "leaderboard_you_row": "သင်: {rank}. — {sessions}",
+    "leaderboard_empty": "ဤအပတ်တွင် မည်သူမျှ တစ်ကြိမ်မျှ မပြီးမြောက်သေးပါ။ ပထမဆုံး ဖြစ်ပါစေ။",
+    "leaderboard_not_opted_in": "သင် ဦးဆောင်ဇယားတွင် မပါဝင်ပါ။ /profile မှ ဝင်ရောက်ပါ။",
 }
