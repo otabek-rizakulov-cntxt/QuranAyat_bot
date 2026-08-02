@@ -12,6 +12,7 @@ from locales import (
     ACTION_BUTTON_KEYS,
     BOT_COMMANDS,
     DEFAULT_LANG,
+    GROUP_LOCALES,
     LANGUAGES,
     LOCALES,
     UI_LANGUAGES,
@@ -42,6 +43,38 @@ def _placeholders(text):
 class TestCatalogue:
     def test_every_language_has_a_locale_table(self):
         assert missing_locales() == []
+
+
+class TestGroupLocaleExemption:
+    """Phase 2's group_* keys are en/ru/uz/uz-Cyrl only (HIFZ_PLATFORM.md §5) —
+    pinned directly so a regression can't quietly bring back the CI failure
+    that went unnoticed from Phase 2's landing (2026-08-01) until it was fixed
+    (2026-08-02): missing_keys() flagging group_* for all 44 other locales."""
+
+    def test_group_locales_is_exactly_the_four(self):
+        assert GROUP_LOCALES == {"en", "ru", "uz", "uz-Cyrl"}
+
+    @pytest.mark.parametrize("code", sorted(GROUP_LOCALES))
+    def test_group_locales_have_every_group_key(self, code):
+        assert missing_keys(code) == []
+
+    def test_other_locales_are_not_penalized_for_missing_group_keys(self):
+        non_group = [lang.code for lang in UI_LANGUAGES if lang.code not in GROUP_LOCALES]
+        assert non_group  # sanity: the exemption actually applies to locales
+        for code in non_group:
+            assert missing_keys(code) == [], code
+
+    def test_a_real_gap_is_still_caught_for_a_non_group_locale(self):
+        # missing_keys must still flag an actual (non-group_*) absent key —
+        # the exemption is scoped to the group_ prefix, not a blanket pass.
+        original = dict(LOCALES["fr"])
+        mutated = dict(original)
+        del mutated["welcome_intro"]
+        LOCALES["fr"] = mutated
+        try:
+            assert missing_keys("fr") == ["welcome_intro"]
+        finally:
+            LOCALES["fr"] = original
 
 
 @pytest.mark.parametrize("code", _CODES)

@@ -458,8 +458,10 @@ lands before G and H.
   `group_*` keys remain en/ru/uz/uz-Cyrl only by deliberate scope, §5.)
   *Files:* `src/locales/*.py`
   *Done when:* `python3 scripts/check_locales.py` passes for all Phase 1 keys
-  in all 48 locales — it does; the only remaining problems are the 44 locales'
-  intentionally-out-of-scope `group_*` gap.
+  in all 48 locales — it does, cleanly (see 2026-08-02 change log entry:
+  `missing_keys()` now excludes `group_*` for locales outside
+  `locales.GROUP_LOCALES`, so the intentionally-out-of-scope gap no longer
+  reports as a problem or fails the build).
 
 - [x] **I3 — Docs.**
   Update `README.md` (user-facing feature description) and `BUSINESS_LOGIC.md`
@@ -531,9 +533,11 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
   and appears on the board.
 - `pytest` passes, including new tests for interval merging, streak boundary at
   local midnight, scheduler idempotency, and quiz-distractor selection.
-- `python3 scripts/check_locales.py` passes for all 48 locales on every Phase 1
-  key — it does, as of 2026-08-02. (The script still reports 44 locales missing
-  the 25 Phase 2 `group_*` keys; that gap is in scope for §5, not Phase 1.)
+- `python3 scripts/check_locales.py` passes cleanly for all 48 locales — it
+  does, as of 2026-08-02. (The 44-locale `group_*` gap is in scope for §5, not
+  Phase 1, and — since the same day — is coded into `missing_keys()` as an
+  intentional exclusion rather than something the checker flags and the build
+  tolerates.)
 
 ---
 
@@ -594,4 +598,5 @@ Designed, not built. Listed so the Phase 1 data model stays honest.
 | 2026-08-01 | **Phase 2 started.** Storage foundation landed: the four group tables (`group_config`, `group_plan`, `group_plan_day`, `group_member_link`) in `schema.sql`, a `groups` repository with both legs, and its contract tests. Translation for the group flow is en/ru/uz/uz-Cyrl only; the other 44 languages are marked not-implemented and fall back to English (see the note in §5). |
 | 2026-08-02 | **Phase 2 complete (J4-J6).** Group plan wizard reuses lib.plan_builder against group_plan; the daily post rides the Phase 1 scheduler into the bound forum topic (image+audio+translation, honoring content_flags), re-arming its own chain; the weekly board aggregates linked members' sessions in the group's week window, membership re-verified with getChatMember at render. Both chains are enqueued at plan save. Group-flow strings are en/ru/uz/uz-Cyrl only. |
 | 2026-08-02 | **I2 complete — the last 8 locales translated.** ja, ko, sd, ps, dv, si, ce, ber each got the 111 Phase 1 hifz keys (translation-agent quota that blocked them on 2026-08-01 was no longer an issue). `python3 scripts/check_locales.py` now passes on every Phase 1 key across all 48 locales — placeholders, HTML balance, button round-trips, `/start` command coverage. The 44-locale `group_*` gap in the checker's output is unrelated: those 25 Phase 2 keys are en/ru/uz/uz-Cyrl only by the §5 decision, not a translation gap. Workstream I is now fully done. |
+| 2026-08-02 | **The 44-locale `group_*` gap was a live, unhandled CI failure, not just noise in the checker's output.** `missing_keys()` (`src/locales/__init__.py`) had no knowledge of the §5 scope decision — it flagged a `group_*` key as missing for *every* locale that lacked one, which is all 44 outside en/ru/uz/uz-Cyrl by design, and `scripts/check_locales.py` / `tests/test_locales.py::TestLocaleIntegrity::test_no_missing_keys` both exit non-zero on any flagged gap. That has been failing the "Locale integrity check" CI step (and therefore the `test` job) since Phase 2 landed on 2026-08-01, despite this document's own entries describing the gap as expected — the enforcement never actually matched the policy. Fixed: `missing_keys()` now excludes `group_*` for any locale outside the new `locales.GROUP_LOCALES` constant, so the 44 are no longer flagged while en/ru/uz/uz-Cyrl are still checked for full completeness (including `group_*`) exactly as before. `python3 scripts/check_locales.py` now prints "all locales complete and consistent" with zero problems, and the full suite is 1764 passed / 0 failed. |
 | 2026-08-02 | **The three items in §8 "raised during the build" were closed out** (two engineering, one process). CI now runs `tests/test_store_contract.py`'s SQL leg against a real `postgres:16` service instead of skipping it — and doing so immediately surfaced a real bug the skip had been hiding: `PostgresScheduleStore.claim_due` was stamping `claimed_at` with the SQL server's `now()` instead of the caller-supplied `now`, which is exactly the divergence commit `cd5246b` (2026-08-01) fixed on the in-memory leg only, because the SQL leg never ran to catch that it hadn't also been fixed there. Fixed to `claimed_at = $1`. Separately, `scheduled_send.attempts` was added (increments on `release()`, both legs) so a row retried unusually often is visible in the scheduler's log line — the retry cutoff itself is unchanged, still time-bounded via `drop_stale`. The translation-review item cannot be closed by engineering work; `docs/TRANSLATION_REVIEW.md` replaces the doc's (incorrect — see the entry above it in §8) claim of a pre-existing "unsure keys" list with an honest, unstaffed first-pass review process and a locale-by-locale tracking table. |

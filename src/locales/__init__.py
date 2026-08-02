@@ -52,10 +52,29 @@ def missing_locales() -> list[str]:
     return [lang.code for lang in UI_LANGUAGES if lang.code not in LOCALES]
 
 
+# Phase 2 (docs/HIFZ_PLATFORM.md §5): group-cluster UI strings (`group_*`) are
+# translated for these locales only, by deliberate scope decision — every other
+# UI locale is *expected* to be missing them and falls back to English through
+# t(). `missing_keys` below treats that as the intended shape, not a gap to
+# report, so the 44-locale group_* absence does not fail `check_locales.py` or
+# `tests/test_locales.py`. (Coincides with, but is independent of, the
+# `_GROUP_LANGS` translation-language picker in `hifz/group.py` — same policy,
+# different concern, and importing across that boundary would invert the
+# dependency direction between `locales` and `hifz`.)
+GROUP_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
+
+
 def missing_keys(lang: str) -> list[str]:
-    """English keys a locale does not define (each falls back to English)."""
+    """English keys a locale does not define (each falls back to English).
+
+    Excludes `group_*` keys for locales outside `GROUP_LOCALES` — those are
+    supposed to be absent there, not a translation gap.
+    """
     table = LOCALES.get(lang, {})
-    return [key for key in LOCALES[DEFAULT_LANG] if key not in table]
+    gaps = [key for key in LOCALES[DEFAULT_LANG] if key not in table]
+    if lang not in GROUP_LOCALES:
+        gaps = [key for key in gaps if not key.startswith("group_")]
+    return gaps
 
 
 def t(key: str, lang: str = DEFAULT_LANG) -> str:
