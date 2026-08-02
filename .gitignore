@@ -22,6 +22,9 @@ venv
 coverage.xml
 htmlcov/
 
+# Local stress-test output — regenerated per run, not a build artifact
+scripts/stress/results.json
+
 # Claude Code local settings — machine/user-specific, never commit
 .claude/
 CLAUDE.local.md
