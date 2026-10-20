@@ -51,6 +51,7 @@ from telegram import (
     ReplyKeyboardRemove,
 )
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from modules import Quran, make_index, Bot, TranslationRegistry
 import hifz
 from lib.utils import File
@@ -58,6 +59,7 @@ from lib.page_image import fetch_and_stitch
 from lib.store import apply_schema
 from lib.user_settings import UserSettings
 from config import Environment
+from api import router as api_router
 from config.postgres import close_pool
 from locales import (
     LANGUAGES, UI_LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
@@ -1330,6 +1332,18 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 # ---------------------------------------------------------------------------
 
 app = FastAPI()
+app.include_router(api_router)
+
+# The Mini App is served from its own origin (docs/MINI_APP_PLAN.md §4.3), so the
+# browser needs CORS to reach /api/v1. Allow-list only, bearer header only — no
+# cookies. With no origins configured the middleware is not installed at all.
+_miniapp_origins = [o.strip() for o in (Environment.get_env("miniapp_origins") or "").split(",")
+                    if o.strip()]
+if _miniapp_origins:
+    app.add_middleware(CORSMiddleware, allow_origins=_miniapp_origins,
+                       allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+                       allow_headers=["Authorization", "Content-Type"],
+                       allow_credentials=False, max_age=600)
 bot = None  # created during background init (guarded) so a bad/missing TOKEN can't crash import
 data = None  # populated by background init after corpora finish parsing
 

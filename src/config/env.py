@@ -17,6 +17,10 @@ class Environment:
       # variable-width set that cannot be tiled, so this is configured separately
       # and only falls back to it when unset.
       "page_image_base_url": os.getenv("PAGE_IMAGE_BASE_URL") or os.getenv("PHOTO_BASE_URL"),
+      # Mini App API (src/api): HS256 signing key for its access tokens, and the
+      # comma-separated browser origins CORS lets call it.
+      "miniapp_jwt_secret": os.getenv("MINIAPP_JWT_SECRET"),
+      "miniapp_origins": os.getenv("MINIAPP_ORIGINS"),
     }
     if name not in variables:
       raise KeyError(f"Unknown environment variable requested: {name}")
