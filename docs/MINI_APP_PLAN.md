@@ -258,7 +258,10 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
 
 ### Phase 0 — Foundations
 
-- [ ] **P0.1 — Create `quranayat-miniapp` repo.** Next.js + TypeScript +
+- [ ] 🟨 **P0.1 — Create `quranayat-miniapp` repo.** Built 2026-10-20 (Next 16.4,
+  `@telegram-apps/sdk-react` 3.3.9, `next-intl` 4.14.9, Node 24); verified in a
+  browser against a local API with signed initData + mocked bridge (dark theme,
+  first name, ar → RTL). Real-device check from a BotFather test Mini App pending. Next.js + TypeScript +
   ESLint, `@telegram-apps/sdk-react`, `next-intl`, CI (typecheck, lint, build).
   *Done when:* an empty app opened from a BotFather test Mini App shows the
   user's Telegram theme colours and first name.
@@ -272,7 +275,10 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
   router), `.env.example`, `tests/test_api_auth.py`
   *Done when:* tests pass for valid / tampered / wrong-token / expired
   `initData`, and a `/me` call without a token returns 401.
-- [ ] **P0.3 — OpenAPI → TS client pipeline.** Script in the frontend repo
+- [x] **P0.3 — OpenAPI → TS client pipeline.** ✅ 2026-10-20 —
+  `scripts/export_openapi.py` here (only `/api/v1`); frontend commits
+  `api/openapi.json`, generates `lib/api/schema.d.ts`, CI `api:check`; live drift
+  check runs when the `OPENAPI_URL` repo variable is set. Script in the frontend repo
   pulls `/openapi.json` and generates types; CI fails on drift.
   *Done when:* changing a response field in Python breaks the frontend build.
 - [x] **P0.4 — Static content build.** ✅ 2026-10-20 — Python exporter
@@ -411,6 +417,7 @@ worker) · sharing cards · login outside Telegram (Telegram Login Widget).
 | Date | Change |
 |---|---|
 | 2026-10-20 | Document created. |
+| 2026-10-20 | Real initData carries `signature` (Bot API 8.0); the SDK rejects launch params without it. Test vectors include it. |
 | 2026-10-20 | §11 resolved: separate repo, Vercel, 4 launch locales, text+font, reader first. P0.2 done; P0.6 (rate limiting) split out. |
 
 ---

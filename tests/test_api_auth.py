@@ -33,7 +33,10 @@ def _jwt_secret(monkeypatch):
 
 
 def _fields(**overrides) -> dict:
+    # `signature` is the Ed25519 third-party signature Telegram has sent since
+    # Bot API 8.0; we don't verify it, but it is part of the HMAC'd string.
     fields = {"auth_date": str(int(time.time())), "query_id": "AAH-test",
+              "signature": "dGVzdC1zaWduYXR1cmU",
               "user": json.dumps(USER, separators=(",", ":"))}
     fields.update(overrides)
     return fields
