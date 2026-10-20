@@ -231,4 +231,15 @@ strings = {
     'group_board_title': '📿 Кружок на этой неделе',
     'group_board_row': '{rank}. {name} — {sessions}',
     'group_board_empty': 'На этой неделе ещё никто не завершил занятие. Будьте первым!',
+    # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
+    "web_loading": "Загрузка…",
+    "web_open_in_telegram": "Откройте это приложение из Telegram, чтобы продолжить.",
+    "web_auth_failed": "Не удалось войти. Попробуйте ещё раз.",
+    "web_retry": "Повторить",
+    "web_greeting": "Ассаляму алейкум, {name}",
+    "web_tab_home": "Главная",
+    "web_tab_read": "Чтение",
+    "web_tab_plan": "План",
+    "web_tab_progress": "Прогресс",
+    "web_tab_profile": "Профиль",
 }

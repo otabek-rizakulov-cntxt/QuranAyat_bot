@@ -214,4 +214,15 @@ strings = {
     'group_board_title': '📿 Bu haftadagi doira',
     'group_board_row': '{rank}. {name} — {sessions}',
     'group_board_empty': 'Bu hafta hali hech kim mashgʻulotni tugatmadi. Birinchi boʻling!',
+    # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
+    "web_loading": "Yuklanmoqda…",
+    "web_open_in_telegram": "Davom etish uchun ilovani Telegram orqali oching.",
+    "web_auth_failed": "Kirib boʻlmadi. Qaytadan urinib koʻring.",
+    "web_retry": "Qayta urinish",
+    "web_greeting": "Assalomu alaykum, {name}",
+    "web_tab_home": "Bosh sahifa",
+    "web_tab_read": "Oʻqish",
+    "web_tab_plan": "Reja",
+    "web_tab_progress": "Yodlaganlar",
+    "web_tab_profile": "Profil",
 }

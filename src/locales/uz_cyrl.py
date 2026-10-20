@@ -214,4 +214,15 @@ strings = {
     'group_board_title': '📿 Бу ҳафтадаги доира',
     'group_board_row': '{rank}. {name} — {sessions}',
     'group_board_empty': 'Бу ҳафта ҳали ҳеч ким машғулотни тугатмади. Биринчи бўлинг!',
+    # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
+    "web_loading": "Юкланмоқда…",
+    "web_open_in_telegram": "Давом этиш учун иловани Telegram орқали очинг.",
+    "web_auth_failed": "Кириб бўлмади. Қайтадан уриниб кўринг.",
+    "web_retry": "Қайта уриниш",
+    "web_greeting": "Ассалому алайкум, {name}",
+    "web_tab_home": "Бош саҳифа",
+    "web_tab_read": "Ўқиш",
+    "web_tab_plan": "Режа",
+    "web_tab_progress": "Ёдлаганлар",
+    "web_tab_profile": "Профил",
 }

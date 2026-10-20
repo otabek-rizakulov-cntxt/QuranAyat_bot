@@ -28,3 +28,6 @@ scripts/stress/results.json
 # Claude Code local settings — machine/user-specific, never commit
 .claude/
 CLAUDE.local.md
+
+# Generated Mini App content (scripts/export_web_content.py) — rebuilt, not committed
+build/

@@ -250,4 +250,15 @@ strings = {
     'group_board_title': "📿 This week's circle",
     'group_board_row': '{rank}. {name} — {sessions}',
     'group_board_empty': 'No one has completed a session yet this week. Be the first!',
+    # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
+    "web_loading": "Loading…",
+    "web_open_in_telegram": "Open this app from Telegram to continue.",
+    "web_auth_failed": "Couldn't sign you in. Please try again.",
+    "web_retry": "Try again",
+    "web_greeting": "Assalamu alaikum, {name}",
+    "web_tab_home": "Home",
+    "web_tab_read": "Read",
+    "web_tab_plan": "Plan",
+    "web_tab_progress": "Progress",
+    "web_tab_profile": "Profile",
 }

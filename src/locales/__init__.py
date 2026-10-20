@@ -63,18 +63,26 @@ def missing_locales() -> list[str]:
 # dependency direction between `locales` and `hifz`.)
 GROUP_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
 
+# Mini App strings (`web_*`, docs/MINI_APP_PLAN.md §11.3): same policy, same four
+# locales at launch; the other 44 fall back to English in the app.
+WEB_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
+
+# Key prefix -> the locales expected to translate it. Anywhere else, a key with
+# that prefix is an intended English fallback, not a gap.
+PARTIAL_KEY_PREFIXES = {"group_": GROUP_LOCALES, "web_": WEB_LOCALES}
+
 
 def missing_keys(lang: str) -> list[str]:
     """English keys a locale does not define (each falls back to English).
 
-    Excludes `group_*` keys for locales outside `GROUP_LOCALES` — those are
-    supposed to be absent there, not a translation gap.
+    Excludes keys under a `PARTIAL_KEY_PREFIXES` prefix for locales outside that
+    prefix's set — those are supposed to be absent there, not a translation gap.
     """
     table = LOCALES.get(lang, {})
-    gaps = [key for key in LOCALES[DEFAULT_LANG] if key not in table]
-    if lang not in GROUP_LOCALES:
-        gaps = [key for key in gaps if not key.startswith("group_")]
-    return gaps
+    excused = tuple(prefix for prefix, langs in PARTIAL_KEY_PREFIXES.items()
+                    if lang not in langs)
+    return [key for key in LOCALES[DEFAULT_LANG]
+            if key not in table and not (excused and key.startswith(excused))]
 
 
 def t(key: str, lang: str = DEFAULT_LANG) -> str:

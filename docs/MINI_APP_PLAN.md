@@ -275,13 +275,19 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done · ⛔ blocked
 - [ ] **P0.3 — OpenAPI → TS client pipeline.** Script in the frontend repo
   pulls `/openapi.json` and generates types; CI fails on drift.
   *Done when:* changing a response field in Python breaks the frontend build.
-- [ ] **P0.4 — Static content build.** `scripts/build-content.ts` (or a Python
+- [x] **P0.4 — Static content build.** ✅ 2026-10-20 — Python exporter
+  `scripts/export_web_content.py` → `build/web-content/` (gitignored, ~85 MB
+  raw); basmalah lifted into a `bismillah` flag; ko 40:81 and ku 108:3 are blank
+  in the source corpus (pinned in the test). `scripts/build-content.ts` (or a Python
   exporter in this repo, `scripts/export_web_content.py`) produces per-surah
   JSON for Arabic, all bundled translations, tafsir, plus `meta.json` (surah
   names/lengths, juz/page/sajda boundaries from `quran-data.xml`).
   *Done when:* 6236 ayahs present per language and page boundaries match
   `Quran.page_range` for all 604 pages (asserted in a test).
-- [ ] **P0.5 — Locale export.** `scripts/export_locales_json.py` dumps
+- [ ] 🟨 **P0.5 — Locale export.** Backend half done 2026-10-20:
+  `scripts/export_locales_json.py` (tables pre-resolved like `t()`, plus
+  `languages.json` with `rtl`); first 10 `web_*` keys in en/ru/uz/uz-Cyrl,
+  excused elsewhere via `locales.PARTIAL_KEY_PREFIXES`. Render check waits on P0.1. `scripts/export_locales_json.py` dumps
   `src/locales/*.py` to JSON; `web_*` keys added to `en.py` with the same
   `check_locales.py` validation.
   *Done when:* the app renders in uz, uz-Cyrl, ru, ar (RTL) with zero English
