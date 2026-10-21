@@ -56,6 +56,7 @@ from modules import Quran, make_index, Bot, TranslationRegistry
 import hifz
 from lib.utils import File
 from lib.page_image import fetch_and_stitch
+from lib.miniapp import app_row, set_menu_button
 from lib.store import apply_schema
 from lib.user_settings import UserSettings
 from config import Environment
@@ -594,7 +595,8 @@ _MODES = (
 )
 
 
-def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> InlineKeyboardMarkup:
+def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str,
+                   app: bool = True) -> InlineKeyboardMarkup:
     """The inline keyboard attached to a verse card — localized and RTL-aware.
 
     Three rows: choose a view (Translation / Arabic / Tafsir / Audio, the active
@@ -604,6 +606,9 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
 
     `ui_lang` only: this keyboard's labels are bot UI text, independent of the
     user's chosen translation language.
+
+    With the Mini App configured, a fourth row opens this ayah in it — except on
+    an inline-mode message (`app=False`), where Telegram rejects web_app buttons.
     """
     def mode_button(mode: str, key: str, icon: str) -> InlineKeyboardButton:
         label = icon + t(key, ui_lang)
@@ -631,7 +636,8 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
             InlineKeyboardButton("🌐 " + get_language(ui_lang).native, callback_data="showlang"),
             InlineKeyboardButton("📤", switch_inline_query="%d:%d" % (surah, ayah)),
         ],
-    ])
+    ] + (app_row("📱 " + t("web_btn_open_app", ui_lang), "/read/%d?a=%d" % (surah, ayah))
+         if app else []))
 
 
 # --- Mushaf page reader ------------------------------------------------------
@@ -674,7 +680,7 @@ def page_keyboard(page: int, ui_lang: str) -> InlineKeyboardMarkup:
                                  callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"],
                                                                 start_s, start_a)),
         ],
-    ])
+    ] + app_row("📱 " + t("web_btn_open_app", ui_lang), "/mushaf/%d" % page))
 
 
 def sajda_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
@@ -1058,7 +1064,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             if not Quran.exists(surah, ayah):
                 await bot.answer_callback_query(cq.id)
                 return
-            markup = verse_keyboard(surah, ayah, quran_type, ui_lang)
+            markup = verse_keyboard(surah, ayah, quran_type, ui_lang, app=not from_inline)
             msg = cq.message
             on_media = bool(msg and (msg.photo or msg.audio))
             if quran_type in ("translation", "tafsir"):
@@ -1141,6 +1147,13 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             # upgrading from the pre-inline UI; new users never see one.
             await bot.send_message(chat_id=chat_id, text=welcome_text(ui_lang),
                             parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
+            return
+        elif command == "app":
+            row = app_row("📱 " + t("web_btn_open_app", ui_lang), "/")
+            await bot.send_message(chat_id=chat_id,
+                                   text=t("web_app_intro" if row else "web_app_unavailable",
+                                          ui_lang),
+                                   reply_markup=InlineKeyboardMarkup(row) if row else None)
             return
         elif command == "about":
             await bot.send_message(chat_id=chat_id, text=t("about", ui_lang), parse_mode="HTML")
@@ -1382,6 +1395,11 @@ async def _initialize():
 
     if bot:
         await _set_bot_commands(bot)
+        try:
+            if await set_menu_button(bot):
+                print("Menu button opens the Mini App")
+        except Exception as e:
+            print("INIT ERROR (set_chat_menu_button):", type(e).__name__, e)
 
     # Register the hifz features (src/hifz/*.py) — imported here, once the rest of
     # main is loaded, so a feature module may import from main without a cycle.

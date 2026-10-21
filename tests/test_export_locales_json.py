@@ -34,8 +34,9 @@ def test_launch_locales_have_their_own_web_strings():
     assert WEB_KEYS
     for code in WEB_LOCALES - {DEFAULT_LANG}:
         for key in WEB_KEYS:
+            # Present in the locale's own table — not served by the English
+            # fallback. (Equal text is fine: "{start} – {end}", "Mushaf".)
             assert key in LOCALES[code], (code, key)
-            assert LOCALES[code][key] != LOCALES[DEFAULT_LANG][key], (code, key)
 
 
 def test_languages_catalogue_carries_rtl(tmp_path):

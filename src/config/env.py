@@ -21,6 +21,9 @@ class Environment:
       # comma-separated browser origins CORS lets call it.
       "miniapp_jwt_secret": os.getenv("MINIAPP_JWT_SECRET"),
       "miniapp_origins": os.getenv("MINIAPP_ORIGINS"),
+      # Public URL of the Mini App; turns on the bot's "Open in app" buttons,
+      # /app and the menu button (src/lib/miniapp.py).
+      "miniapp_url": os.getenv("MINIAPP_URL"),
     }
     if name not in variables:
       raise KeyError(f"Unknown environment variable requested: {name}")

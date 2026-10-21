@@ -55,6 +55,7 @@ from hifz import Ctx, callback, command, wizard
 from hifz.profile import format_reminder_time, offset_from_callback, offset_keyboard, \
     parse_reminder_time, reminder_keyboard, save_reminder_time, save_timezone
 from hifz.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
+from lib.miniapp import app_row
 from lib.localtime import DEFAULT_OFFSET, OFFSET_CHOICES, is_valid_offset, \
     local_date, normalize_offset
 from lib.plan_builder import AUTO_PACE, Portion, build_plan
@@ -271,7 +272,7 @@ def _drill_keyboard(plan_day_id: int, surah: int, ayah: int,
         [InlineKeyboardButton("🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
                               callback_data="rep:%d:%d" % (surah, ayah))],
         [InlineKeyboardButton(t("btn_pause_plan", ui_lang), callback_data="hm:ps")],
-    ])
+    ] + app_row("📱 " + t("web_btn_open_app", ui_lang), "/drill"))
 
 
 # --- The wizard ----------------------------------------------------------------

@@ -100,6 +100,10 @@ def t(key: str, lang: str = DEFAULT_LANG) -> str:
 # only translate the descriptions, never the list itself.
 
 BOT_COMMANDS = (
+    # The Mini App: everything below, in one screen (docs/MINI_APP_PLAN.md §7).
+    # Its description is a `web_*` key, so like the rest of the app's strings it
+    # is translated for the launch locales and falls back to English elsewhere.
+    ("app", "web_cmd_app"),
     # Reading the Qur'an
     ("index", "cmd_index"),
     ("page", "cmd_page"),
