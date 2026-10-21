@@ -46,7 +46,7 @@
 # conditional write on top of that.
 
 import html
-from datetime import date, datetime, time, timezone
+from datetime import date, time
 from typing import Optional, Sequence
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -54,17 +54,15 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from hifz import Ctx, callback, command, wizard
 from hifz.profile import format_reminder_time, offset_from_callback, offset_keyboard, \
     parse_reminder_time, reminder_keyboard, save_reminder_time, save_timezone
-from hifz.refs import KIND_JUZ, KIND_RANGE, KIND_SURAH, Ref, format_ref, juz_ref, \
-    parse_reference, surah_ref
-from lib.hifz_progress import load_summary
+from hifz.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
 from lib.localtime import DEFAULT_OFFSET, OFFSET_CHOICES, is_valid_offset, \
-    local_date, next_due_utc, normalize_offset, to_utc
-from lib.plan_builder import AUTO_PACE, Portion, advancing, build_plan, to_day_specs
-from lib.scheduler import SendCtx, enqueue, send_handler
-from lib.store.plans import DAY_COMPLETED, DAY_PENDING, PLAN_ACTIVE, PLAN_COMPLETE, \
-    PLAN_PAUSED
-from lib.store.sessions import KIND_DRILL
-from lib.streaks import record_session
+    local_date, normalize_offset
+from lib.plan_builder import AUTO_PACE, Portion, build_plan
+from lib.scheduler import SendCtx, send_handler
+from lib.store.plans import PLAN_ACTIVE, PLAN_PAUSED
+import services.plans as plans_service
+from services.plans import SEND_KIND
+from services.profile import as_time
 from lib.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
 from locales import t
 from main import MAX_RANGE_AYAHS, REPEAT_COUNT, get_translation, send_combined_audio, \
@@ -72,6 +70,17 @@ from main import MAX_RANGE_AYAHS, REPEAT_COUNT, get_translation, send_combined_a
 from modules import Quran
 
 __all__ = ["memorize", "on_tap", "plan_step", "push_plan_day", "SEND_KIND", "WIZARD_KIND"]
+
+# The plan operations live in services/plans.py, shared with the Mini App API;
+# these names are what the handlers below (and the tests) know them by.
+_as_time = as_time
+_plan_ref = plans_service.plan_ref
+_target_kind = plans_service.target_kind
+_target_label = plans_service.target_label
+_utcnow = plans_service.utcnow
+_enqueue_next = plans_service.enqueue_next
+_portion_for = plans_service.portion_for
+_day_position = plans_service.day_position
 
 
 # --- Knobs ---------------------------------------------------------------------
@@ -83,7 +92,6 @@ __all__ = ["memorize", "on_tap", "plan_step", "push_plan_day", "SEND_KIND", "WIZ
 WIZARD_KIND = "plan_setup"
 
 # The scheduled-send kind. `lib.scheduler` dispatches on it; nothing else uses it.
-SEND_KIND = "plan_day"
 
 STEP_TARGET = "target"          # which kind of target (buttons)
 STEP_TARGET_TEXT = "target_text"  # the surah / juz / range itself (typed)
@@ -125,16 +133,6 @@ REVIEW_MARK = "🔁 "
 
 # --- Small conversions ---------------------------------------------------------
 
-def _as_time(value) -> Optional[time]:
-    """A stored reminder time as a `datetime.time`, whatever shape it arrived in.
-
-    Postgres hands back a `time`; the draft carries the same value as "07:30"
-    text, because a draft is JSON.
-    """
-    if value is None or isinstance(value, time):
-        return value
-    return parse_reminder_time(str(value))
-
 
 def _ref_to_draft(ref: Ref) -> list:
     """A `Ref` as JSON the draft can hold (ujson has no dataclasses)."""
@@ -150,41 +148,6 @@ def _ref_from_draft(data: dict) -> Optional[Ref]:
                    None if n is None else int(n))
     except (TypeError, ValueError):
         return None
-
-
-def _plan_ref(plan) -> Ref:
-    """A stored plan's span as a `Ref`, for `build_plan` and `format_ref`.
-
-    This is what makes "re-derive the calendar from the plan's own columns" work:
-    the generator is pure, so the same target, pace, weekday set and start date
-    always produce the same portions — which is how a `plan_day` row is known to
-    be a consolidation day even though the table has no column for it.
-    """
-    kind = plan.target_kind if plan.target_kind in (KIND_SURAH, KIND_JUZ, KIND_RANGE) \
-        else KIND_RANGE
-    return Ref(kind, plan.start_surah, plan.start_ayah, plan.end_surah, plan.end_ayah)
-
-
-def _target_kind(ref: Ref) -> str:
-    """`plan.target_kind` for a parsed target — the column takes three values."""
-    return ref.kind if ref.kind in (KIND_SURAH, KIND_JUZ, KIND_RANGE) else KIND_RANGE
-
-
-def _target_label(plan) -> str:
-    """What `{target}` is filled with: "Al-Mulk", "Juz 30", or "67:1-68:5"."""
-    ref = _plan_ref(plan)
-    if plan.target_kind == KIND_SURAH and ref.is_single_surah():
-        return Quran.get_surah_name(plan.start_surah)
-    if plan.target_kind == KIND_JUZ:
-        for n in range(1, 31):
-            juz = juz_ref(n)
-            if juz is not None and juz.as_tuple() == ref.as_tuple():
-                return "Juz %d" % n
-    return format_ref(ref)
-
-
-def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
 
 
 # --- Keyboards -----------------------------------------------------------------
@@ -692,79 +655,17 @@ async def _save_plan(ctx: Ctx) -> None:
         await _expired(ctx)
         return
 
-    pace = int(data.get("pace") or AUTO_PACE)
-    portions = build_plan(ref, pace, days, date.fromisoformat(start))
-    offset = normalize_offset(data.get("offset") or DEFAULT_OFFSET)
-    reminder = parse_reminder_time(data.get("time") or "") or time(7, 0)
-
-    # "One active plan per user" is a convention, so the old one is retired here
-    # rather than by a constraint that would make pause-then-create a crash.
-    for plan in await ctx.store.plans.list_plans(ctx.user_id):
-        if plan.status != PLAN_COMPLETE:
-            await ctx.store.plans.set_plan_status(plan.id, PLAN_COMPLETE)
-
-    plan = await ctx.store.plans.create_plan(
-        ctx.user_id, _target_kind(ref), ref.start_surah, ref.start_ayah,
-        ref.end_surah, ref.end_ayah, pace, days, to_day_specs(portions))
-
-    await ctx.store.profiles.set_timezone(ctx.user_id, offset)
-    await ctx.store.profiles.set_reminder_time(ctx.user_id, reminder)
+    saved = await plans_service.save_plan(
+        ctx.store, ctx.user_id, ctx.chat_id, ref, int(data.get("pace") or AUTO_PACE), days,
+        date.fromisoformat(start), data.get("offset") or DEFAULT_OFFSET,
+        parse_reminder_time(data.get("time") or "") or time(7, 0))
+    plan, first = saved.plan, saved.first_date
     ctx.wiz.clear(ctx.user_id)
-
-    queued = await _enqueue_next(ctx.store, ctx.user_id, ctx.chat_id, plan)
-    first = local_date(queued.due_at, offset) if queued is not None \
-        else portions[0].scheduled_date
-    print("HIFZ: plan #%d saved for %d — %d portion(s) over %d day(s), first push %s"
-          % (plan.id, ctx.user_id, len(advancing(portions)), len(portions), first))
     await ctx.reply(ctx.tr("plan_saved").format(first_date=first.isoformat()),
                     reply_markup=_plan_keyboard(plan, ctx.ui_lang))
 
 
 # --- The enqueue chain ----------------------------------------------------------
-
-async def _enqueue_next(store, user_id: int, chat_id: int, plan,
-                        now: Optional[datetime] = None):
-    """Queue the push for the plan's next pending portion. None if there is none.
-
-    Called when a plan is saved, when a push fires, when a plan is resumed, and
-    (harmlessly) when a portion is marked known. `enqueue` answers None on a key
-    clash rather than raising, so calling it more often than strictly necessary
-    is a no-op — which is what makes the chain self-healing instead of a single
-    point of failure.
-
-    The due instant is the portion's own `scheduled_date` at the user's local
-    reminder time; a portion whose date has already passed (the plan was paused
-    for a week, or set up after today's reminder) is pushed at the next reminder
-    instead, so a backlog is delivered one portion a day rather than dropped by
-    the scheduler's staleness window.
-    """
-    if plan is None or plan.status != PLAN_ACTIVE:
-        return None
-
-    profile = await store.profiles.get_profile(user_id)
-    reminder = _as_time(profile.reminder_time) if profile is not None else None
-    if reminder is None:
-        print("HIFZ: plan #%d has no reminder time; nothing queued" % plan.id)
-        return None
-    offset = profile.timezone if profile is not None and profile.timezone else DEFAULT_OFFSET
-    if not is_valid_offset(offset):
-        offset = DEFAULT_OFFSET
-    offset = normalize_offset(offset)
-
-    pending = await store.plans.list_plan_days(plan.id, state=DAY_PENDING)
-    if not pending:
-        return None
-    day = pending[0]
-
-    now = now or _utcnow()
-    due_at = to_utc(datetime.combine(day.scheduled_date, reminder), offset)
-    if due_at <= now:
-        due_at = next_due_utc(reminder, offset, now)
-
-    return await enqueue(store, SEND_KIND, chat_id, due_at,
-                         local_day=local_date(due_at, offset),
-                         payload={"plan_day_id": day.id, "plan_id": plan.id,
-                                  "user_id": user_id, "offset": offset})
 
 
 @send_handler(SEND_KIND)
@@ -812,38 +713,6 @@ async def push_plan_day(ctx: SendCtx) -> None:
 
 
 # --- Drill delivery (D3) --------------------------------------------------------
-
-async def _portion_for(store, plan, day) -> Optional[Portion]:
-    """The generated `Portion` a stored `plan_day` row came from, or None.
-
-    `plan_day` has no column for `drill` or `unit`, and it does not need one:
-    the generator is pure, so re-running it over the plan's own columns and its
-    own first date reproduces the identical calendar, and the row is matched by
-    (date, surah, span).
-    """
-    days = await store.plans.list_plan_days(plan.id)
-    if not days:
-        return None
-    try:
-        portions = build_plan(_plan_ref(plan), plan.pace, plan.days_of_week,
-                              days[0].scheduled_date)
-    except ValueError as err:                   # a plan with no weekdays cannot exist
-        print("HIFZ: cannot re-derive plan #%d: %s" % (plan.id, err))
-        return None
-    for portion in portions:
-        if (portion.scheduled_date, portion.surah, portion.start_ayah, portion.end_ayah) \
-                == (day.scheduled_date, day.surah, day.start_ayah, day.end_ayah):
-            return portion
-    return None
-
-
-async def _day_position(store, plan, day) -> tuple:
-    """(which day this is, how many days the plan has) — the `drill_title` counters."""
-    days = await store.plans.list_plan_days(plan.id)
-    for index, row in enumerate(days, start=1):
-        if row.id == day.id:
-            return index, len(days)
-    return 1, len(days) or 1
 
 
 async def _translation_text(surah: int, start: int, end: int, translation_lang: str) -> str:
@@ -919,14 +788,7 @@ async def _start_drill(ctx: Ctx) -> None:
             await ctx.reply(ctx.tr("drill_none_today"))
         return
 
-    profile = await ctx.store.profiles.get_profile(ctx.user_id)
-    offset = profile.timezone if profile is not None and profile.timezone else DEFAULT_OFFSET
-    if not is_valid_offset(offset):
-        offset = DEFAULT_OFFSET
-    today = local_date(_utcnow(), offset)
-
-    due = [d for d in await ctx.store.plans.list_plan_days(plan.id, on_or_before=today)
-           if d.state != DAY_COMPLETED]
+    due = await plans_service.due_days(ctx.store, ctx.user_id, plan)
     if not due:
         await ctx.reply(ctx.tr("drill_none_today"))
         return
@@ -954,39 +816,19 @@ async def _know_by_heart(ctx: Ctx, arg: str) -> None:
         return
     plan_day_id = int(arg)
 
-    day = await ctx.store.plans.get_plan_day(plan_day_id)
-    if day is None:
-        await ctx.answer(ctx.tr("know_already"))
-        return
-
-    completed = await ctx.store.plans.complete_plan_day(plan_day_id)
-    if completed is None:
+    result = await plans_service.complete_day(ctx.store, ctx.user_id, ctx.chat_id,
+                                              plan_day_id)
+    if result.status != plans_service.DONE:
         await ctx.answer(ctx.tr("know_already"))
         return
     await ctx.answer()
 
-    await ctx.store.hifz.add_interval(ctx.user_id, day.surah, day.start_ayah, day.end_ayah)
-    await record_session(ctx.user_id, KIND_DRILL, surah=day.surah,
-                         start_ayah=day.start_ayah, end_ayah=day.end_ayah)
-
-    summary = await load_summary(ctx.store, ctx.user_id, focus_surah=day.surah)
-    pct = summary.focus.percent_text if summary.focus is not None \
-        else summary.quran.percent_text
+    day = result.day
     ref = Ref(KIND_RANGE, day.surah, day.start_ayah, day.surah, day.end_ayah)
-    await ctx.reply(ctx.tr("know_confirmed").format(ref=format_ref(ref), pct=pct))
-
-    plan = await ctx.store.plans.get_plan(day.plan_id)
-    if plan is None:
-        return
-    remaining = await ctx.store.plans.count_plan_days(plan.id) \
-        - await ctx.store.plans.count_plan_days(plan.id, DAY_COMPLETED)
-    if remaining <= 0:
-        await ctx.store.plans.set_plan_status(plan.id, PLAN_COMPLETE)
-        await ctx.reply(ctx.tr("plan_complete").format(target=_target_label(plan)))
-        return
-    # Belt and braces: the push that delivered this portion already queued the
-    # next one, so this is normally a key clash answering None.
-    await _enqueue_next(ctx.store, ctx.user_id, ctx.chat_id, plan)
+    await ctx.reply(ctx.tr("know_confirmed").format(ref=format_ref(ref),
+                                                    pct=result.percent_text))
+    if result.plan_completed:
+        await ctx.reply(ctx.tr("plan_complete").format(target=_target_label(result.plan)))
 
 
 # --- Lifecycle (D5) -------------------------------------------------------------
@@ -1005,23 +847,16 @@ async def _lifecycle(ctx: Ctx, action: str) -> None:
     so what was already memorized is still counted.
     """
     await ctx.answer()
-    plan = await ctx.store.plans.get_active_plan(ctx.user_id)
-    if plan is None:
-        paused = await ctx.store.plans.list_plans(ctx.user_id, PLAN_PAUSED)
-        plan = paused[0] if paused else None
+    action = {"ps": plans_service.PAUSE, "rs": plans_service.RESUME}.get(
+        action, plans_service.ABANDON)
+    plan = await plans_service.change_status(ctx.store, ctx.user_id, ctx.chat_id, action)
     if plan is None:
         await ctx.reply(ctx.tr("drill_none_today"))
         return
 
-    if action == "ps":
-        updated = await ctx.store.plans.set_plan_status(plan.id, PLAN_PAUSED)
-        await ctx.reply(ctx.tr("plan_paused"),
-                        reply_markup=_plan_keyboard(updated or plan, ctx.ui_lang))
-    elif action == "rs":
-        updated = await ctx.store.plans.set_plan_status(plan.id, PLAN_ACTIVE)
-        await ctx.reply(ctx.tr("plan_resumed"),
-                        reply_markup=_plan_keyboard(updated or plan, ctx.ui_lang))
-        await _enqueue_next(ctx.store, ctx.user_id, ctx.chat_id, updated or plan)
+    if action == plans_service.PAUSE:
+        await ctx.reply(ctx.tr("plan_paused"), reply_markup=_plan_keyboard(plan, ctx.ui_lang))
+    elif action == plans_service.RESUME:
+        await ctx.reply(ctx.tr("plan_resumed"), reply_markup=_plan_keyboard(plan, ctx.ui_lang))
     else:
-        await ctx.store.plans.set_plan_status(plan.id, PLAN_COMPLETE)
         await ctx.reply(ctx.tr("plan_abandoned"))
