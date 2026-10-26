@@ -1,5 +1,5 @@
-"""File helper: media URL construction and the Redis-backed state store
-(exercised here against the in-memory fallback)."""
+"""File helper: media URL construction, the durable reader position and the
+Redis-backed media cache (exercised here against the in-memory fallbacks)."""
 
 import pytest
 
@@ -26,13 +26,34 @@ class TestImageFilename:
 
 
 class TestStateStore:
-    def test_user_state_round_trips(self):
-        File().save_user(900001, (2, 255, "translation"))
-        # JSON round-trip turns the stored tuple into a list.
-        assert File().get_user(900001) == [2, 255, "translation"]
+    async def test_user_state_round_trips(self):
+        await File().save_user(900001, (2, 255, "translation"))
+        assert await File().get_user(900001) == [2, 255, "translation"]
 
-    def test_missing_user_state_is_none(self):
-        assert File().get_user(900002) is None
+    async def test_missing_user_state_is_none(self):
+        assert await File().get_user(900002) is None
+
+    async def test_reader_position_has_no_expiry(self, monkeypatch):
+        # The old Redis key expired after two days; the store keeps it until it
+        # is overwritten, so a reader who pauses for weeks resumes where they were.
+        import time as time_module
+        await File().save_user(900003, (36, 12, "arabic"))
+        real = time_module.time()
+        monkeypatch.setattr(time_module, "time", lambda: real + 60 * 60 * 24 * 30)
+        assert await File().get_user(900003) == [36, 12, "arabic"]
+
+    async def test_legacy_redis_position_is_still_read(self):
+        import ujson as json
+        file = File()
+        file.redis.set(file.redis_namespace + "900004", json.dumps([18, 10, "translation"]))
+        assert await file.get_user(900004) == [18, 10, "translation"]
+
+    async def test_store_position_wins_over_legacy_redis(self):
+        import ujson as json
+        file = File()
+        file.redis.set(file.redis_namespace + "900005", json.dumps([1, 1, "translation"]))
+        await file.save_user(900005, (2, 5, "audio"))
+        assert await file.get_user(900005) == [2, 5, "audio"]
 
     def test_file_id_cache_round_trips(self):
         File().save_file("media/x.png", "FILEID-123")

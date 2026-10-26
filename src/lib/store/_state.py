@@ -21,6 +21,7 @@ class MemoryState:
 
   user_settings: Dict[int, object] = field(default_factory=dict)   # user_id -> UserSettingsRow
   user_profile: Dict[int, object] = field(default_factory=dict)    # user_id -> ProfileRow
+  reader_position: Dict[int, tuple] = field(default_factory=dict)  # user_id -> (surah, ayah, view)
   hifz_interval: List[object] = field(default_factory=list)        # HifzInterval
   plan: Dict[int, object] = field(default_factory=dict)            # plan_id -> PlanRow
   plan_day: Dict[int, object] = field(default_factory=dict)        # id -> PlanDayRow
@@ -47,6 +48,7 @@ class MemoryState:
     """Drop every row and reset the sequence (used by `reset_for_tests`)."""
     self.user_settings.clear()
     self.user_profile.clear()
+    self.reader_position.clear()
     self.hifz_interval.clear()
     self.plan.clear()
     self.plan_day.clear()

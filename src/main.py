@@ -190,7 +190,7 @@ async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: in
     if cached_id is not None:
         try:
             await bot.send_audio(audio=cached_id, **kwargs)
-            file.save_user(chat_id, (surah, end, "audio"))
+            await file.save_user(chat_id, (surah, end, "audio"))
             return
         except telegram.error.TelegramError:
             pass  # cached file_id rejected; rebuild below
@@ -200,7 +200,7 @@ async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: in
     audio = await _download_combined_audio(surah, start, end, performer)
     result = await bot.send_audio(audio=audio, **kwargs)
     file.save_file(cache_key, result.audio.file_id)
-    file.save_user(chat_id, (surah, end, "audio"))
+    await file.save_user(chat_id, (surah, end, "audio"))
 
 
 # Route (on this very app) that stitches a range of recitations on demand. An
@@ -915,7 +915,7 @@ async def send_quran(bot, data: dict, file, surah: int, ayah: int, quran_type: s
                   performer=File.get_performer_name(performer),
                   title=_reference(surah, ayah, ui_lang),
                   reply_markup=reply_markup)
-    file.save_user(chat_id, (surah, ayah, quran_type))
+    await file.save_user(chat_id, (surah, ayah, quran_type))
 
 
 async def handle_update(bot, data: dict, update: telegram.Update) -> None:
@@ -1131,7 +1131,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                         # re-tapping the current view yields an identical message; ignore
                         if "not modified" not in str(err).lower():
                             raise
-                file.save_user(chat_id, (surah, ayah, quran_type))
+                await file.save_user(chat_id, (surah, ayah, quran_type))
             else:                               # arabic/audio arrive as fresh media messages
                 await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
                                  ui_lang, translation_lang, reply_markup=markup)
@@ -1156,7 +1156,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     settings = await _resolve_settings(user_settings, chat_id, update.message.from_user)
     ui_lang, translation_lang, reciter = settings.ui_lang, settings.translation_lang, settings.reciter
 
-    state = file.get_user(chat_id)
+    state = await file.get_user(chat_id)
     if state is not None:
         surah, ayah, quran_type = state
         if quran_type == "english":   # legacy stored value -> canonical name
@@ -1401,7 +1401,7 @@ async def _initialize():
         # here raised AttributeError on every boot without DATABASE_URL, because
         # get_pool() answers None in that case.
         await apply_schema()
-        print("Postgres settings store ready")
+        print("Settings store ready")
     except Exception as e:
         print("INIT ERROR (postgres):", type(e).__name__, e)
 
@@ -1475,7 +1475,11 @@ async def on_shutdown():
 
 @app.get("/")
 async def health():
-    return {"status": "ok"}
+    # `store` says where user settings live, so a deployment silently running
+    # on memory (no DATABASE_URL) is visible from a browser, not only in logs.
+    from lib.store import InMemoryStore, _store
+    store = None if _store is None else ("memory" if isinstance(_store, InMemoryStore) else "postgres")
+    return {"status": "ok", "store": store}
 
 
 @app.get(RANGE_AUDIO_PATH)

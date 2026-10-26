@@ -16,7 +16,10 @@ client = TestClient(main.app)
 def test_health_endpoint():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    body = response.json()
+    assert body["status"] == "ok"
+    # None until the first request builds the store; "memory" or "postgres" after.
+    assert body["store"] in (None, "memory", "postgres")
 
 
 def test_webhook_rejects_wrong_token():

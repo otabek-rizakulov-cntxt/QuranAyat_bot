@@ -14,12 +14,28 @@ class File(Environment):
     """Single source of truth for the Telegram-cache key of a media file."""
     return self.redis_namespace + "file:" + filename
 
-  def save_user(self, chat_id: int, state: tuple[int, int, str]):
-    """State is a tuple: (surah, ayah, type). Kept for two days."""
-    self.redis.set(self.redis_namespace + str(chat_id),
-          json.dumps(state), ex=60 * 60 * 24 * 2)
+  async def save_user(self, chat_id: int, state: tuple[int, int, str]):
+    """Remember where the user stopped reading: (surah, ayah, type).
 
-  def get_user(self, chat_id: int):
+    Durable — it lives in the store (`reader_position`), not in Redis. The old
+    two-day Redis key meant a reader who paused for a few days restarted at 1:1.
+    """
+    from .store import get_store  # lazy: lib.store imports this module's package
+    surah, ayah, view = state
+    store = await get_store()
+    await store.profiles.save_reader_position(chat_id, surah, ayah, view)
+
+  async def get_user(self, chat_id: int):
+    """`[surah, ayah, type]` where the user stopped reading, or None.
+
+    Falls back to the legacy Redis key so positions saved before the move to the
+    store survive the deploy that introduced it.
+    """
+    from .store import get_store
+    store = await get_store()
+    position = await store.profiles.get_reader_position(chat_id)
+    if position is not None:
+      return list(position)
     v = self.redis.get(self.redis_namespace + str(chat_id))
     if v is not None:
       return json.loads(v)

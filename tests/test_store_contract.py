@@ -121,6 +121,23 @@ class TestSettings:
         assert (await store.profiles.get_settings(1)).ui_lang == "en"
 
 
+class TestReaderPosition:
+    async def test_unknown_user_has_no_position(self, store):
+        assert await store.profiles.get_reader_position(1) is None
+
+    async def test_position_round_trips_and_overwrites(self, store):
+        await store.profiles.save_reader_position(1, 2, 255, "translation")
+        assert await store.profiles.get_reader_position(1) == (2, 255, "translation")
+        await store.profiles.save_reader_position(1, 3, 1, "audio")
+        assert await store.profiles.get_reader_position(1) == (3, 1, "audio")
+
+    async def test_positions_are_per_user(self, store):
+        await store.profiles.save_reader_position(1, 2, 255, "translation")
+        await store.profiles.save_reader_position(2, 114, 6, "arabic")
+        assert await store.profiles.get_reader_position(1) == (2, 255, "translation")
+        assert await store.profiles.get_reader_position(2) == (114, 6, "arabic")
+
+
 class TestProfiles:
     async def test_unknown_user_has_no_profile(self, store):
         assert await store.profiles.get_profile(1) is None

@@ -10,6 +10,18 @@ CREATE TABLE IF NOT EXISTS user_settings (
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Where the user stopped reading, so /next continues from there: (surah, ayah)
+-- plus the view they were in ('arabic', 'translation', 'audio', ...). Used to
+-- live in Redis with a two-day TTL, which meant a reader who paused for a few
+-- days started again at 1:1.
+CREATE TABLE IF NOT EXISTS reader_position (
+    telegram_user_id BIGINT PRIMARY KEY,
+    surah            INT NOT NULL,
+    ayah             INT NOT NULL,
+    view             TEXT NOT NULL,
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Hifz identity: display name, leaderboard consent, when to push, and the two
 -- denormalized streak counters (`session_log` remains the source of truth for
 -- both; these exist so /streak and /profile are one cheap read).
