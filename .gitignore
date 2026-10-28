@@ -29,6 +29,8 @@ scripts/stress/results.json
 .claude/
 CLAUDE.local.md
 
+# Generated Mini App content (scripts/export_web_content.py) — rebuilt, not committed
+build/
 # Graphify — graph.json, GRAPH_REPORT.md, manifest and labels are committed;
 # these are machine-specific or regenerable (graphify export obsidian && graphify export html)
 graphify-out/cache/

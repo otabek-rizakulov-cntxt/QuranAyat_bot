@@ -25,7 +25,6 @@
 # the same row every time and `log_session` returns None for the second one. The
 # store's idempotence is the guard.
 
-import asyncio
 import html
 from datetime import datetime
 from typing import Optional, Tuple
@@ -33,11 +32,11 @@ from typing import Optional, Tuple
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from hifz import Ctx, callback, command
-from hifz.refs import KIND_RANGE, Ref, juz_ref, parse_reference
-from lib.recall_check import (OPTION_COUNT, RecallQuestion, build_question,
-                              pick_ayah, preload_corpus)
-from lib.store.sessions import KIND_RECALL_CHECK
-from lib.streaks import record_session, user_today
+from hifz.refs import parse_reference
+from lib.recall_check import OPTION_COUNT, RecallQuestion
+from lib.streaks import user_today
+import services.check as check_service
+from services.check import DEFAULT_JUZ  # noqa: F401 — re-exported
 from modules import Quran
 
 # --- callback_data shapes ------------------------------------------------------
@@ -47,11 +46,6 @@ CB_START = "hc:start"
 CB_ANSWER = "hc:a:"
 _DATE_FORMAT = "%Y%m%d"
 
-# What a bare /check tests when the user has no plan and nothing marked. Juz 30
-# is where essentially every memorizer starts, so it is the least surprising
-# question to put in front of a brand new user — and `check_usage` is appended so
-# they learn they can name something else.
-DEFAULT_JUZ = 30
 
 
 @command("check")
@@ -96,50 +90,17 @@ async def _ask(ctx: Ctx, argument: str) -> None:
             await ctx.reply(ctx.tr("ref_invalid"))
             return
     else:
-        ref, hint = await _default_span(ctx, today)
+        ref, hint = await check_service.default_span(ctx.store, ctx.user_id, today)
 
-    picked = pick_ayah(ctx.user_id, ref, today)
-    if picked is None:                      # an empty span; nothing to test
+    question = await check_service.ask(ctx.user_id, ref, today)
+    if question is None:                    # an empty span; nothing to test
         await ctx.reply(ctx.tr("ref_invalid"))
         return
-
-    await preload_corpus()                  # 1.3 MB parse, once, off the loop
-    question = await asyncio.to_thread(build_question, ctx.user_id, picked[0],
-                                       picked[1], today)
 
     text = _question_text(ctx, question)
     if hint:
         text += "\n\n" + ctx.tr("check_usage")
     await ctx.reply(text, parse_mode="HTML", reply_markup=_options_keyboard(question, today))
-
-
-async def _default_span(ctx: Ctx, today) -> Tuple[Ref, bool]:
-    """What a bare `/check` tests, and whether we had to guess.
-
-    In order of how well it reflects what the user is actually memorizing:
-    the part of their plan they have reached, then something they have marked as
-    known, then the default. Never the whole Qur'an — a random ayah out of 6236
-    is not a recall check, it is a trick question.
-    """
-    plan = await ctx.store.plans.get_active_plan(ctx.user_id)
-    if plan is not None:
-        # Only as far as they have been pushed: testing next month's portion
-        # would be a test of what they have not been taught yet.
-        days = await ctx.store.plans.list_plan_days(plan.id, on_or_before=today)
-        if days:
-            reached = days[-1]
-            return Ref(KIND_RANGE, plan.start_surah, plan.start_ayah,
-                       reached.surah, reached.end_ayah), False
-
-    intervals = await ctx.store.hifz.list_intervals(ctx.user_id)
-    if intervals:
-        # Cycles through what they know, one interval a day: deterministic, so
-        # asking twice in a day is not a way to shop for an easier question.
-        chosen = intervals[today.toordinal() % len(intervals)]
-        return Ref(KIND_RANGE, chosen.surah, chosen.start_ayah,
-                   chosen.surah, chosen.end_ayah), False
-
-    return juz_ref(DEFAULT_JUZ), True
 
 
 def _question_text(ctx: Ctx, question: RecallQuestion) -> str:
@@ -174,24 +135,20 @@ async def _score(ctx: Ctx, cb_data: str) -> None:
         return
     surah, ayah, day, index = parsed
 
-    await preload_corpus()
-    try:
-        question = await asyncio.to_thread(build_question, ctx.user_id, surah, ayah, day)
-    except ValueError:                      # an ayah that no longer resolves
+    question = await check_service.rebuild(ctx.user_id, surah, ayah, day)
+    if question is None:                    # an ayah that no longer resolves
         await ctx.answer()
         return
 
-    if question.is_correct(index):
-        # E2: a pass logs a recall_check session with no portion, so the store
-        # dedupes every later pass today onto the same row.
-        outcome = await record_session(ctx.user_id, KIND_RECALL_CHECK)
+    scored = await check_service.score(ctx.user_id, question, index)
+    if scored.correct:
         result = ctx.tr("check_correct")
-        if not outcome.logged:
+        if not scored.logged:
             result += "\n" + ctx.tr("check_already_today")
-        elif outcome.milestone.reached is not None:
-            result += "\n" + ctx.tr(outcome.milestone.key)
+        elif scored.milestone_key is not None:
+            result += "\n" + ctx.tr(scored.milestone_key)
     else:
-        result = ctx.tr("check_wrong", correct=html.escape(question.correct))
+        result = ctx.tr("check_wrong", correct=html.escape(scored.correct_option))
 
     await ctx.answer()
     # Editing without a reply_markup drops the keyboard, so the same question

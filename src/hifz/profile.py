@@ -23,18 +23,18 @@
 #     wizard passes its own ("hm:tz:") and keeps routing its own taps.
 
 import html
-import re
-from datetime import datetime, time, timezone as _timezone
 from typing import List, Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from hifz import Ctx, callback, command, wizard
-from hifz.refs import KIND_RANGE, Ref, format_ref
-from lib.localtime import (is_valid_offset, next_due_utc, normalize_offset,
+from lib.localtime import (is_valid_offset, normalize_offset,
                            offset_options)
-from lib.store.plans import DAY_COMPLETED
-from modules import Quran
+from services.profile import (  # noqa: F401 — re-exported (see __all__)
+    NAME_MAX, NAME_MIN, active_plan_progress, format_reminder_time, join_leaderboard,
+    next_push_utc, parse_reminder_time, plan_target, save_reminder_time, save_timezone,
+    valid_display_name,
+)
 
 __all__ = [
     "NAME_MIN", "NAME_MAX",
@@ -49,8 +49,6 @@ __all__ = [
 
 # 2-32 characters (B2). Long enough for "Abu Bakr as-Siddiq", short enough that a
 # leaderboard row still fits on a phone. Uniqueness is deliberately not required.
-NAME_MIN = 2
-NAME_MAX = 32
 
 # --- callback_data (Telegram caps it at 64 bytes) ------------------------------
 # The shapes documented in `hifz.PREFIXES` ("hp:name  hp:board:on  hp:tz
@@ -74,19 +72,6 @@ WIZARD_REMINDER = "profile_reminder"
 
 
 # --- Display names -------------------------------------------------------------
-
-def valid_display_name(text: str) -> Optional[str]:
-    """The cleaned display name, or None if it is not 2-32 characters.
-
-    Whitespace is collapsed rather than rejected: someone typing "Abu   Bakr" or
-    pasting a name with a trailing newline meant the name, not an error. What is
-    stored is the *raw* text — escaping happens at render time (see `_name_line`),
-    because storing escaped text would double-escape it the next time it is shown.
-    """
-    name = " ".join((text or "").split())
-    if not NAME_MIN <= len(name) <= NAME_MAX:
-        return None
-    return name
 
 
 def telegram_username(ctx: Ctx) -> Optional[str]:
@@ -144,45 +129,8 @@ def offset_from_callback(cb_data: str, prefix: str = OFFSET_PREFIX) -> Optional[
     return normalize_offset(payload)
 
 
-async def save_timezone(store, user_id: int, offset: str):
-    """Store the user's fixed UTC offset, normalized to "+05:00" form.
-
-    Returns the updated `ProfileRow` (created if this is their first write).
-    Raises ValueError if `offset` is not a UTC offset — validate a tap with
-    `offset_from_callback` and typed text with `lib.localtime.is_valid_offset`.
-    """
-    return await store.profiles.set_timezone(user_id, normalize_offset(offset))
-
-
 # --- Reminder time (B3) --------------------------------------------------------
 
-# "07:30", "7:30", "0730", "730", "7", "7.30", "7h30". 12-hour input is not
-# accepted: `reminder_prompt` asks for 24-hour form in all 48 languages, and
-# guessing at an unqualified "7" being the evening is worse than a re-prompt.
-_TIME_RE = re.compile(r"^(?P<h>\d{1,2})\s*(?:[:.,;h\-]\s*(?P<m>\d{1,2})|(?P<m2>\d{2}))?$",
-                      re.IGNORECASE)
-
-
-def parse_reminder_time(text: str) -> Optional[time]:
-    """A typed 24-hour time as a `datetime.time`, or None if it does not parse."""
-    cleaned = (text or "").strip()
-    if not cleaned:
-        return None
-    match = _TIME_RE.match(cleaned)
-    if match is None:
-        return None
-    hour = int(match.group("h"))
-    minute = int(match.group("m") or match.group("m2") or 0)
-    if not (0 <= hour <= 23 and 0 <= minute <= 59):
-        return None
-    return time(hour=hour, minute=minute)
-
-
-def format_reminder_time(value: Optional[time]) -> str:
-    """A stored reminder time as the "07:30" token a `{time}` placeholder wants."""
-    if value is None:
-        return ""
-    return "%02d:%02d" % (value.hour, value.minute)
 
 
 def reminder_keyboard(ui_lang: str, off_data: str = REMINDER_OFF_CB,
@@ -202,50 +150,15 @@ def reminder_keyboard(ui_lang: str, off_data: str = REMINDER_OFF_CB,
     return InlineKeyboardMarkup(rows)
 
 
-async def save_reminder_time(store, user_id: int, value: Optional[time]):
-    """Store (or clear, with None) the local time of day for the daily push."""
-    return await store.profiles.set_reminder_time(user_id, value)
-
-
-def next_push_utc(profile, now: Optional[datetime] = None) -> Optional[datetime]:
-    """When this profile's next daily push is due, in UTC — or None if it has no
-    reminder time.
-
-    The scheduler queues each day's push from the profile as it stands, so this
-    is the falsifiable half of B3: change the timezone and the instant moves by
-    exactly the difference between the two offsets, with no row to migrate.
-    """
-    reminder = getattr(profile, "reminder_time", None)
-    if reminder is None:
-        return None
-    offset = getattr(profile, "timezone", None) or "+00:00"
-    if not is_valid_offset(offset):
-        offset = "+00:00"
-    return next_due_utc(reminder, offset, now or datetime.now(_timezone.utc))
-
-
 # --- The card (B1) -------------------------------------------------------------
-
-def _plan_target(plan) -> str:
-    """What to call the plan's target: a surah name when it is a whole surah,
-    otherwise the compact reference. Both are un-localized by design — a surah
-    name is a proper noun and `format_ref` is machine text."""
-    whole_surah = (plan.start_surah == plan.end_surah and plan.start_ayah == 1
-                   and plan.end_ayah == Quran.get_surah_length(plan.start_surah))
-    if plan.target_kind == "surah" or whole_surah:
-        return Quran.get_surah_name(plan.start_surah)
-    return format_ref(Ref(KIND_RANGE, plan.start_surah, plan.start_ayah,
-                          plan.end_surah, plan.end_ayah))
 
 
 async def _plan_line(ctx: Ctx) -> str:
-    plan = await ctx.store.plans.get_active_plan(ctx.user_id)
-    if plan is None:
+    progress = await active_plan_progress(ctx.store, ctx.user_id)
+    if progress is None:
         return ctx.tr("profile_plan_none")
-    total = await ctx.store.plans.count_plan_days(plan.id)
-    done = await ctx.store.plans.count_plan_days(plan.id, DAY_COMPLETED)
-    day = min(done + 1, total) if total else 0
-    return ctx.tr("profile_plan_active", target=html.escape(_plan_target(plan)),
+    plan, day, total = progress
+    return ctx.tr("profile_plan_active", target=html.escape(plan_target(plan)),
                   day=day, total=total)
 
 
@@ -389,16 +302,11 @@ async def _join_board(ctx: Ctx) -> None:
     for a name instead, and only joins once they have supplied one. Nobody is put
     on a public board under a blank label.
     """
-    profile = await ctx.store.profiles.ensure_profile(ctx.user_id)
-    name = profile.display_name or telegram_username(ctx)
-    if not name:
+    if not await join_leaderboard(ctx.store, ctx.user_id, telegram_username(ctx)):
         ctx.wiz.start(ctx.user_id, WIZARD_NAME, join=True)
         await ctx.answer()
         await ctx.edit(ctx.tr("name_prompt"), reply_markup=_cancel_keyboard(ctx))
         return
-    if not profile.display_name:
-        await ctx.store.profiles.set_display_name(ctx.user_id, name)
-    await ctx.store.profiles.set_leaderboard_opt_in(ctx.user_id, True)
     await _show_card(ctx, toast=ctx.tr("board_joined"))
 
 

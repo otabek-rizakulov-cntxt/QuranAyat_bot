@@ -51,13 +51,20 @@ from telegram import (
     ReplyKeyboardRemove,
 )
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from modules import Quran, make_index, Bot, TranslationRegistry
 import hifz
 from lib.utils import File
 from lib.page_image import fetch_and_stitch
+from lib.miniapp import app_row, set_menu_button
 from lib.store import apply_schema
 from lib.user_settings import UserSettings
 from config import Environment
+from api import router as api_router
+from services.reciters import (  # noqa: F401 — re-exported; tests and the picker use them here
+    DEFAULT_RECITER_KIND, RECITER_KINDS, _KIND_WARNING_KEYS, _RECITER_SHORTLIST,
+    reciter_catalog, reciter_group, reciter_kind,
+)
 from config.postgres import close_pool
 from locales import (
     LANGUAGES, UI_LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
@@ -452,35 +459,10 @@ def _nav_labels(ui_lang: str) -> tuple[str, str]:
     return "‹ " + prev, nxt + " ›"
 
 
-# A curated shortlist of well-known reciters (subfolder keys into performers.json).
-# These lead the catalog, so the first page of the picker is the ten names most
-# people are looking for and the pager walks through everything else.
-_RECITER_SHORTLIST = (
-    "Husary_128kbps",
-    "Alafasy_128kbps",
-    "Abdurrahmaan_As-Sudais_192kbps",
-    "Abdul_Basit_Murattal_192kbps",
-    "Minshawy_Murattal_128kbps",
-    "Saood_ash-Shuraym_128kbps",
-    "MaherAlMuaiqly128kbps",
-    "Yasser_Ad-Dussary_128kbps",
-    "Hudhaify_128kbps",
-    "Ghamadi_40kbps",
-)
-
-
 # How many reciters one page of the picker shows. Equal to the shortlist length, so
 # page 1 is exactly the shortlist.
 RECITER_PAGE_SIZE = 10
 
-
-# The catalog holds three genuinely different kinds of recording, and conflating them
-# is a correctness problem, not a cosmetic one: a riwayah is a *different reading of
-# the text* (so the audio stops matching the Arabic on screen), and a "translation"
-# entry is not recitation at all but someone reading the translated meaning aloud.
-# The picker therefore groups by kind and says so on the tab. Recitation leads.
-RECITER_KINDS = ("recitation", "riwayah", "translation")
-DEFAULT_RECITER_KIND = RECITER_KINDS[0]
 
 _KIND_LABEL_KEYS = {
     "recitation": "reciter_group_recitation",
@@ -492,42 +474,6 @@ _KIND_LABEL_KEYS = {
 # row, so the labels have to stay short in every language, and the icon does the
 # disambiguating that a longer word otherwise would.
 _KIND_ICONS = {"recitation": "🎙 ", "riwayah": "📖 ", "translation": "🗣 "}
-
-# What to warn about when the chosen entry is not ordinary Arabic recitation. A
-# riwayah *is* recitation — just a different reading of the text from the one shown
-# on screen — so the two cases cannot share a message.
-_KIND_WARNING_KEYS = {
-    "riwayah": "riwayah_warning",
-    "translation": "translation_audio_warning",
-}
-
-
-def reciter_catalog() -> list:
-    """Every reciter in src/common/performers.json, shortlist first then the rest in
-    catalog order — the order the picker pages through."""
-    performers = File._load_performers()
-    by_subfolder = {p["subfolder"]: p for p in performers}
-    # a shortlist entry the catalog no longer has is skipped, not fatal
-    ordered = [by_subfolder[s] for s in _RECITER_SHORTLIST if s in by_subfolder]
-    shortlisted = set(_RECITER_SHORTLIST)
-    ordered.extend(p for p in performers if p["subfolder"] not in shortlisted)
-    return ordered
-
-
-def reciter_kind(subfolder: str) -> str:
-    """Which group `subfolder` belongs to, defaulting to plain recitation for an
-    entry with no `kind` (or a stale saved preference no longer in the catalog)."""
-    match = next((p for p in File._load_performers() if p["subfolder"] == subfolder), None)
-    if match is None:
-        return DEFAULT_RECITER_KIND
-    return match.get("kind", DEFAULT_RECITER_KIND)
-
-
-def reciter_group(kind: str) -> list:
-    """The catalog entries of one kind, in the catalog's own order."""
-    return [p for p in reciter_catalog()
-            if p.get("kind", DEFAULT_RECITER_KIND) == kind]
-
 
 def reciter_label(performer: dict) -> str:
     """Button label for a reciter: name plus bitrate.
@@ -649,7 +595,8 @@ _MODES = (
 )
 
 
-def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> InlineKeyboardMarkup:
+def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str,
+                   app: bool = True) -> InlineKeyboardMarkup:
     """The inline keyboard attached to a verse card — localized and RTL-aware.
 
     Three rows: choose a view (Translation / Arabic / Tafsir / Audio, the active
@@ -659,6 +606,9 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
 
     `ui_lang` only: this keyboard's labels are bot UI text, independent of the
     user's chosen translation language.
+
+    With the Mini App configured, a fourth row opens this ayah in it — except on
+    an inline-mode message (`app=False`), where Telegram rejects web_app buttons.
     """
     def mode_button(mode: str, key: str, icon: str) -> InlineKeyboardButton:
         label = icon + t(key, ui_lang)
@@ -686,7 +636,8 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str) -> Inli
             InlineKeyboardButton("🌐 " + get_language(ui_lang).native, callback_data="showlang"),
             InlineKeyboardButton("📤", switch_inline_query="%d:%d" % (surah, ayah)),
         ],
-    ])
+    ] + (app_row("📱 " + t("web_btn_open_app", ui_lang), "/read/%d?a=%d" % (surah, ayah))
+         if app else []))
 
 
 # --- Mushaf page reader ------------------------------------------------------
@@ -729,7 +680,7 @@ def page_keyboard(page: int, ui_lang: str) -> InlineKeyboardMarkup:
                                  callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"],
                                                                 start_s, start_a)),
         ],
-    ])
+    ] + app_row("📱 " + t("web_btn_open_app", ui_lang), "/mushaf/%d" % page))
 
 
 def sajda_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
@@ -1113,7 +1064,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             if not Quran.exists(surah, ayah):
                 await bot.answer_callback_query(cq.id)
                 return
-            markup = verse_keyboard(surah, ayah, quran_type, ui_lang)
+            markup = verse_keyboard(surah, ayah, quran_type, ui_lang, app=not from_inline)
             msg = cq.message
             on_media = bool(msg and (msg.photo or msg.audio))
             if quran_type in ("translation", "tafsir"):
@@ -1196,6 +1147,13 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             # upgrading from the pre-inline UI; new users never see one.
             await bot.send_message(chat_id=chat_id, text=welcome_text(ui_lang),
                             parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
+            return
+        elif command == "app":
+            row = app_row("📱 " + t("web_btn_open_app", ui_lang), "/")
+            await bot.send_message(chat_id=chat_id,
+                                   text=t("web_app_intro" if row else "web_app_unavailable",
+                                          ui_lang),
+                                   reply_markup=InlineKeyboardMarkup(row) if row else None)
             return
         elif command == "about":
             await bot.send_message(chat_id=chat_id, text=t("about", ui_lang), parse_mode="HTML")
@@ -1330,6 +1288,18 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 # ---------------------------------------------------------------------------
 
 app = FastAPI()
+app.include_router(api_router)
+
+# The Mini App is served from its own origin (docs/MINI_APP_PLAN.md §4.3), so the
+# browser needs CORS to reach /api/v1. Allow-list only, bearer header only — no
+# cookies. With no origins configured the middleware is not installed at all.
+_miniapp_origins = [o.strip() for o in (Environment.get_env("miniapp_origins") or "").split(",")
+                    if o.strip()]
+if _miniapp_origins:
+    app.add_middleware(CORSMiddleware, allow_origins=_miniapp_origins,
+                       allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+                       allow_headers=["Authorization", "Content-Type"],
+                       allow_credentials=False, max_age=600)
 bot = None  # created during background init (guarded) so a bad/missing TOKEN can't crash import
 data = None  # populated by background init after corpora finish parsing
 
@@ -1425,6 +1395,11 @@ async def _initialize():
 
     if bot:
         await _set_bot_commands(bot)
+        try:
+            if await set_menu_button(bot):
+                print("Menu button opens the Mini App")
+        except Exception as e:
+            print("INIT ERROR (set_chat_menu_button):", type(e).__name__, e)
 
     # Register the hifz features (src/hifz/*.py) — imported here, once the rest of
     # main is loaded, so a feature module may import from main without a cycle.
