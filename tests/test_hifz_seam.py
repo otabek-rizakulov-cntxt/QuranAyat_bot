@@ -273,7 +273,7 @@ class TestDispatchCallback:
         bot.answer_callback_query.assert_awaited()
 
     async def test_forbidden_propagates_for_main_to_handle(self):
-        # main._process_update swallows Forbidden (user blocked the bot); the seam
+        # app.routes.webhook._process_update swallows Forbidden (user blocked the bot); the seam
         # must not turn it into a generic logged error.
         @hifz.callback("zz:")
         async def handler(ctx, cb_data):

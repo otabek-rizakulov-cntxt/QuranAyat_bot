@@ -2,7 +2,7 @@
 
 The TestClient is used WITHOUT its context manager on purpose, so the startup
 lifespan (which would kick off bot creation / webhook registration) never runs.
-`main.bot` and `main.data` therefore stay None, letting us assert the
+`app.state.runtime.bot` and `.data` therefore stay None, letting us assert the
 "still initializing" acknowledgement path without any network."""
 
 from fastapi.testclient import TestClient

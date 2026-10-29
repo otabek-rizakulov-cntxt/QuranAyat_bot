@@ -5,7 +5,8 @@ entry: it is a way to read the Qur'an rather than a language the interface exist
 in, so it must appear under /translation and nowhere else.
 """
 
-import main
+import app.lifespan as lifespan
+import bot.keyboards.language as language_kb
 from locales import (
     DEFAULT_LANG,
     LANGUAGES,
@@ -73,7 +74,7 @@ class TestTransliteration:
     def test_it_is_offered_as_a_translation(self):
         codes = [
             b.callback_data.split(":", 1)[1]
-            for row in main.translation_language_keyboard().inline_keyboard
+            for row in language_kb.translation_language_keyboard().inline_keyboard
             for b in row
         ]
         assert "translit" in codes
@@ -81,7 +82,7 @@ class TestTransliteration:
     def test_it_is_not_offered_as_an_interface_language(self):
         codes = [
             b.callback_data.split(":", 1)[1]
-            for row in main.language_keyboard().inline_keyboard
+            for row in language_kb.language_keyboard().inline_keyboard
             for b in row
         ]
         assert "translit" not in codes
@@ -92,7 +93,7 @@ class TestTransliteration:
         assert normalize_lang("translit") == DEFAULT_LANG
 
     def test_it_is_excluded_from_telegrams_command_menu(self):
-        assert "translit" not in main._COMMAND_MENU_LANGS
+        assert "translit" not in lifespan._COMMAND_MENU_LANGS
 
     def test_get_language_still_resolves_it_for_display(self):
         assert get_language("translit").native == "Transliteration"

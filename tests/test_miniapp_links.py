@@ -9,7 +9,10 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
-import main
+import app.lifespan as lifespan
+import bot.dispatch as dispatch
+import bot.keyboards.page as page_kb
+import bot.keyboards.verse as verse_kb
 from hifz import memorize
 from lib.miniapp import app_url, set_menu_button
 
@@ -27,19 +30,21 @@ def app_on(monkeypatch):
 
 def test_off_by_default():
     assert app_url() is None
-    assert _web_apps(main.verse_keyboard(2, 255, "translation", "en")) == []
-    assert _web_apps(main.page_keyboard(255, "en")) == []
+    assert _web_apps(verse_kb.verse_keyboard(2, 255, "translation", "en")) == []
+    assert _web_apps(page_kb.page_keyboard(255, "en")) == []
     assert _web_apps(memorize._drill_keyboard(9, 67, 1, "en")) == []
 
 
 def test_cards_and_drill_link_to_their_screens(app_on):
-    assert _web_apps(main.verse_keyboard(2, 255, "translation", "en")) == [APP + "/read/2?a=255"]
-    assert _web_apps(main.page_keyboard(255, "en")) == [APP + "/mushaf/255"]
+    assert _web_apps(verse_kb.verse_keyboard(2, 255, "translation", "en")) == [
+        APP + "/read/2?a=255"
+    ]
+    assert _web_apps(page_kb.page_keyboard(255, "en")) == [APP + "/mushaf/255"]
     assert _web_apps(memorize._drill_keyboard(9, 67, 1, "ru")) == [APP + "/drill"]
 
 
 def test_inline_messages_never_get_a_web_app_button(app_on):
-    assert _web_apps(main.verse_keyboard(2, 255, "audio", "en", app=False)) == []
+    assert _web_apps(verse_kb.verse_keyboard(2, 255, "audio", "en", app=False)) == []
 
 
 async def test_menu_button(app_on):
@@ -73,13 +78,13 @@ def _app_command(tg_bot):
 
 @pytest.fixture(scope="module")
 def data():
-    return main.build_data()
+    return lifespan.build_data()
 
 
 async def test_app_command(app_on, data):
     tg_bot = telegram.Bot("123456:TEST-abcdefghijklmnopqrstuvwxyz")
     bot = AsyncMock()
-    await main.handle_update(bot, data, _app_command(tg_bot))
+    await dispatch.handle_update(bot, data, _app_command(tg_bot))
     kwargs = bot.send_message.call_args.kwargs
     assert _web_apps(kwargs["reply_markup"]) == [APP + "/"]
 
@@ -87,5 +92,5 @@ async def test_app_command(app_on, data):
 async def test_app_command_without_url(data):
     tg_bot = telegram.Bot("123456:TEST-abcdefghijklmnopqrstuvwxyz")
     bot = AsyncMock()
-    await main.handle_update(bot, data, _app_command(tg_bot))
+    await dispatch.handle_update(bot, data, _app_command(tg_bot))
     assert bot.send_message.call_args.kwargs["reply_markup"] is None

@@ -11,14 +11,17 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
-import main
+import app.lifespan as lifespan
+import bot.dispatch as dispatch
+import bot.keyboards.reciter as reciter_kb
+import services.reciters as reciters
 from lib.user_settings import UserSettings
 from lib.utils import File
 
 
 @pytest.fixture(scope="module")
 def data():
-    return main.build_data()
+    return lifespan.build_data()
 
 
 @pytest.fixture(scope="module")
@@ -90,93 +93,99 @@ def _tab_row(markup):
 
 class TestCatalogOrder:
     def test_holds_every_performer_exactly_once(self):
-        catalog = main.reciter_catalog()
+        catalog = reciters.reciter_catalog()
         subfolders = [p["subfolder"] for p in catalog]
         assert sorted(subfolders) == sorted(p["subfolder"] for p in File._load_performers())
         assert len(set(subfolders)) == len(subfolders)
 
     def test_shortlist_leads_so_page_one_is_the_familiar_names(self):
-        catalog = main.reciter_catalog()
-        assert [p["subfolder"] for p in catalog[: len(main._RECITER_SHORTLIST)]] == list(
-            main._RECITER_SHORTLIST
+        catalog = reciters.reciter_catalog()
+        assert [p["subfolder"] for p in catalog[: len(reciters._RECITER_SHORTLIST)]] == list(
+            reciters._RECITER_SHORTLIST
         )
 
     def test_page_size_matches_the_shortlist(self):
         # Page 1 being exactly the shortlist is the point of the ordering above.
-        assert len(main._RECITER_SHORTLIST) == main.RECITER_PAGE_SIZE
+        assert len(reciters._RECITER_SHORTLIST) == reciter_kb.RECITER_PAGE_SIZE
 
 
 class TestLabels:
     def test_button_shows_name_and_bitrate(self):
-        label = main.reciter_label({"name": "Husary", "bitrate": "128kbps"})
+        label = reciter_kb.reciter_label({"name": "Husary", "bitrate": "128kbps"})
         assert label == "Husary · 128kbps"
 
     def test_bitrate_casing_is_normalized(self):
         # performers.json mixes "64kbps" and "64Kbps"; the picker must not.
-        assert main.reciter_label({"name": "Balayev", "bitrate": "64Kbps"}) == "Balayev · 64kbps"
+        assert (
+            reciter_kb.reciter_label({"name": "Balayev", "bitrate": "64Kbps"}) == "Balayev · 64kbps"
+        )
 
     def test_falls_back_to_the_bare_name_without_a_bitrate(self):
-        assert main.reciter_label({"name": "Husary"}) == "Husary"
+        assert reciter_kb.reciter_label({"name": "Husary"}) == "Husary"
 
     def test_same_reciter_at_two_bitrates_is_distinguishable(self):
         # The motivating case: two catalog entries share the name "Abdul Basit
         # Murattal" and used to render as two identical buttons.
-        labels = [b.text for b in _reciter_buttons(main.reciter_keyboard("en"))]
+        labels = [b.text for b in _reciter_buttons(reciter_kb.reciter_keyboard("en"))]
         murattal = [label for label in labels if label.startswith("Abdul Basit Murattal")]
         assert len(murattal) == len(set(murattal))
 
     def test_every_button_stays_within_telegrams_callback_data_limit(self):
-        for page in range(main.reciter_page_count()):
-            for button in _reciter_buttons(main.reciter_keyboard("en", page)):
+        for page in range(reciter_kb.reciter_page_count()):
+            for button in _reciter_buttons(reciter_kb.reciter_keyboard("en", page)):
                 assert len(button.callback_data.encode()) <= 64
 
 
 class TestPagination:
     def test_first_page_is_the_shortlist(self):
-        buttons = _reciter_buttons(main.reciter_keyboard("en", 0))
-        assert [b.callback_data.split(":", 1)[1] for b in buttons] == list(main._RECITER_SHORTLIST)
+        buttons = _reciter_buttons(reciter_kb.reciter_keyboard("en", 0))
+        assert [b.callback_data.split(":", 1)[1] for b in buttons] == list(
+            reciters._RECITER_SHORTLIST
+        )
 
     def test_paging_through_every_group_reaches_every_reciter(self):
         seen = []
-        for kind in main.RECITER_KINDS:
-            for page in range(main.reciter_page_count(kind)):
+        for kind in reciters.RECITER_KINDS:
+            for page in range(reciter_kb.reciter_page_count(kind)):
                 seen += [
                     b.callback_data.split(":", 1)[1]
-                    for b in _reciter_buttons(main.reciter_keyboard("en", kind, page))
+                    for b in _reciter_buttons(reciter_kb.reciter_keyboard("en", kind, page))
                 ]
-        assert sorted(seen) == sorted(p["subfolder"] for p in main.reciter_catalog())
+        assert sorted(seen) == sorted(p["subfolder"] for p in reciters.reciter_catalog())
 
     def test_pager_shows_the_position_in_the_group(self):
-        pages = main.reciter_page_count("recitation")
+        pages = reciter_kb.reciter_page_count("recitation")
         assert pages > 1  # else there is nothing to page
-        indicator = _pager_row(main.reciter_keyboard("en", "recitation", 2))[1]
+        indicator = _pager_row(reciter_kb.reciter_keyboard("en", "recitation", 2))[1]
         assert indicator.text == "3/%d" % pages
 
     def test_pages_wrap_so_neither_arrow_is_ever_dead(self):
-        pages = main.reciter_page_count("recitation")
-        first_prev, _, first_next = _pager_row(main.reciter_keyboard("en", "recitation", 0))
-        last_prev, _, last_next = _pager_row(main.reciter_keyboard("en", "recitation", pages - 1))
+        pages = reciter_kb.reciter_page_count("recitation")
+        first_prev, _, first_next = _pager_row(reciter_kb.reciter_keyboard("en", "recitation", 0))
+        last_prev, _, last_next = _pager_row(
+            reciter_kb.reciter_keyboard("en", "recitation", pages - 1)
+        )
         assert first_prev.callback_data == "recgrp:recitation:%d" % (pages - 1)
         assert first_next.callback_data == "recgrp:recitation:1"
         assert last_next.callback_data == "recgrp:recitation:0"
         assert last_prev.callback_data == "recgrp:recitation:%d" % (pages - 2)
 
     def test_out_of_range_page_wraps_instead_of_erroring(self):
-        pages = main.reciter_page_count("recitation")
+        pages = reciter_kb.reciter_page_count("recitation")
         assert _reciter_buttons(
-            main.reciter_keyboard("en", "recitation", pages)
-        ) == _reciter_buttons(main.reciter_keyboard("en", "recitation", 0))
+            reciter_kb.reciter_keyboard("en", "recitation", pages)
+        ) == _reciter_buttons(reciter_kb.reciter_keyboard("en", "recitation", 0))
 
     def test_pager_arrows_follow_reading_direction(self):
-        ltr_prev, _, ltr_next = _pager_row(main.reciter_keyboard("en", "recitation", 1))
-        rtl_prev, _, rtl_next = _pager_row(main.reciter_keyboard("ar", "recitation", 1))
+        ltr_prev, _, ltr_next = _pager_row(reciter_kb.reciter_keyboard("en", "recitation", 1))
+        rtl_prev, _, rtl_next = _pager_row(reciter_kb.reciter_keyboard("ar", "recitation", 1))
         assert ltr_prev.text.startswith("‹") and ltr_next.text.endswith("›")
         assert rtl_prev.text.endswith("›") and rtl_next.text.startswith("‹")
 
     def test_search_button_survives_on_every_page(self):
-        for kind in main.RECITER_KINDS:
-            for page in range(main.reciter_page_count(kind)):
-                markup = main.reciter_keyboard("en", kind, page)
+        for kind in reciters.RECITER_KINDS:
+            for page in range(reciter_kb.reciter_page_count(kind)):
+                markup = reciter_kb.reciter_keyboard("en", kind, page)
                 assert any(
                     b.callback_data == "reciter_search"
                     for row in markup.inline_keyboard
@@ -186,31 +195,31 @@ class TestPagination:
 
 class TestCurrentReciter:
     def test_active_reciter_is_marked(self):
-        buttons = _reciter_buttons(main.reciter_keyboard("en", 0, current="Husary_128kbps"))
+        buttons = _reciter_buttons(reciter_kb.reciter_keyboard("en", 0, current="Husary_128kbps"))
         marked = [b.text for b in buttons if b.text.startswith("• ")]
-        assert marked == ["• " + main.reciter_label(main.reciter_catalog()[0])]
+        assert marked == ["• " + reciter_kb.reciter_label(reciters.reciter_catalog()[0])]
 
     def test_page_of_finds_the_reciters_group_and_page(self):
-        recitation = main.reciter_group("recitation")
-        assert main.reciter_page_of(recitation[0]["subfolder"]) == ("recitation", 0)
-        target = recitation[main.RECITER_PAGE_SIZE * 2 + 1]["subfolder"]
-        assert main.reciter_page_of(target) == ("recitation", 2)
+        recitation = reciters.reciter_group("recitation")
+        assert reciter_kb.reciter_page_of(recitation[0]["subfolder"]) == ("recitation", 0)
+        target = recitation[reciter_kb.RECITER_PAGE_SIZE * 2 + 1]["subfolder"]
+        assert reciter_kb.reciter_page_of(target) == ("recitation", 2)
 
     def test_page_of_finds_an_entry_on_a_non_default_tab(self):
-        warsh = main.reciter_group("riwayah")[0]["subfolder"]
-        assert main.reciter_page_of(warsh) == ("riwayah", 0)
+        warsh = reciters.reciter_group("riwayah")[0]["subfolder"]
+        assert reciter_kb.reciter_page_of(warsh) == ("riwayah", 0)
 
     def test_page_of_falls_back_to_the_first_page_for_a_stale_preference(self):
-        assert main.reciter_page_of("Retired_Reciter_64kbps") == ("recitation", 0)
+        assert reciter_kb.reciter_page_of("Retired_Reciter_64kbps") == ("recitation", 0)
 
 
 class TestPickerFlow:
     async def test_reciter_command_opens_on_the_current_reciters_page(self, fake_bot, data, tg_bot):
-        recitation = main.reciter_group("recitation")
-        on_page_three = recitation[main.RECITER_PAGE_SIZE * 2]["subfolder"]
+        recitation = reciters.reciter_group("recitation")
+        on_page_three = recitation[reciter_kb.RECITER_PAGE_SIZE * 2]["subfolder"]
         await UserSettings().set_reciter(558001, 558001, on_page_three)
 
-        await main.handle_update(fake_bot, data, _message(tg_bot, "/reciter", chat_id=558001))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/reciter", chat_id=558001))
 
         markup = fake_bot.send_message.await_args.kwargs["reply_markup"]
         assert _pager_row(markup)[1].text.startswith("3/")
@@ -219,17 +228,17 @@ class TestPickerFlow:
     async def test_reciter_command_opens_on_the_tab_the_reciter_lives_on(
         self, fake_bot, data, tg_bot
     ):
-        warsh = main.reciter_group("riwayah")[0]["subfolder"]
+        warsh = reciters.reciter_group("riwayah")[0]["subfolder"]
         await UserSettings().set_reciter(558011, 558011, warsh)
 
-        await main.handle_update(fake_bot, data, _message(tg_bot, "/reciter", chat_id=558011))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/reciter", chat_id=558011))
 
         markup = fake_bot.send_message.await_args.kwargs["reply_markup"]
         active = [b for b in _tab_row(markup) if b.text.startswith("• ")]
         assert [b.callback_data for b in active] == ["recgrp:riwayah:0"]
 
     async def test_pager_tap_swaps_the_keyboard_in_place(self, fake_bot, data, tg_bot):
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _callback(tg_bot, "recgrp:recitation:1", chat_id=558002)
         )
 
@@ -240,21 +249,21 @@ class TestPickerFlow:
         fake_bot.answer_callback_query.assert_awaited()
 
     async def test_tab_tap_switches_group_in_place(self, fake_bot, data, tg_bot):
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _callback(tg_bot, "recgrp:translation:0", chat_id=558012)
         )
 
         fake_bot.send_message.assert_not_awaited()
         markup = fake_bot.edit_message_reply_markup.await_args.kwargs["reply_markup"]
         shown = {b.callback_data.split(":", 1)[1] for b in _reciter_buttons(markup)}
-        assert shown == {p["subfolder"] for p in main.reciter_group("translation")}
+        assert shown == {p["subfolder"] for p in reciters.reciter_group("translation")}
 
     async def test_pager_tap_keeps_marking_the_current_reciter(self, fake_bot, data, tg_bot):
-        recitation = main.reciter_group("recitation")
-        on_page_two = recitation[main.RECITER_PAGE_SIZE]["subfolder"]
+        recitation = reciters.reciter_group("recitation")
+        on_page_two = recitation[reciter_kb.RECITER_PAGE_SIZE]["subfolder"]
         await UserSettings().set_reciter(558003, 558003, on_page_two)
 
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _callback(tg_bot, "recgrp:recitation:1", chat_id=558003)
         )
 
@@ -262,7 +271,9 @@ class TestPickerFlow:
         assert any(b.text.startswith("• ") for b in _reciter_buttons(markup))
 
     async def test_page_indicator_tap_is_a_no_op(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _callback(tg_bot, "recpage_noop", chat_id=558004))
+        await dispatch.handle_update(
+            fake_bot, data, _callback(tg_bot, "recpage_noop", chat_id=558004)
+        )
         fake_bot.answer_callback_query.assert_awaited()
         fake_bot.edit_message_reply_markup.assert_not_awaited()
         fake_bot.send_message.assert_not_awaited()
@@ -279,15 +290,15 @@ class TestPickerFlow:
                 "data": "recpage:1",
             },
         }
-        await main.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
+        await dispatch.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
         fake_bot.edit_message_reply_markup.assert_not_awaited()
         fake_bot.answer_callback_query.assert_awaited()
 
     async def test_search_results_carry_the_bitrate(self, fake_bot, data, tg_bot):
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _callback(tg_bot, "reciter_search", chat_id=558006)
         )
-        await main.handle_update(fake_bot, data, _message(tg_bot, "basit", chat_id=558006))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "basit", chat_id=558006))
 
         markup = fake_bot.send_message.await_args.kwargs["reply_markup"]
         buttons = _reciter_buttons(markup)
@@ -300,15 +311,17 @@ class TestCatalogKinds:
     """The catalog holds three different kinds of recording and must say so."""
 
     def test_every_entry_declares_a_kind(self):
-        assert all(p.get("kind") in main.RECITER_KINDS for p in File._load_performers())
+        assert all(p.get("kind") in reciters.RECITER_KINDS for p in File._load_performers())
 
     def test_the_groups_partition_the_catalog(self):
-        grouped = [p["subfolder"] for kind in main.RECITER_KINDS for p in main.reciter_group(kind)]
+        grouped = [
+            p["subfolder"] for kind in reciters.RECITER_KINDS for p in reciters.reciter_group(kind)
+        ]
         assert sorted(grouped) == sorted(p["subfolder"] for p in File._load_performers())
 
     def test_warsh_is_riwayah_not_an_ordinary_reciter(self):
         # a different reading of the text, so the audio stops matching the Arabic
-        assert main.reciter_kind("warsh/warsh_Abdul_Basit_128kbps") == "riwayah"
+        assert reciters.reciter_kind("warsh/warsh_Abdul_Basit_128kbps") == "riwayah"
 
     def test_recited_translations_are_not_filed_as_recitation(self):
         for subfolder in (
@@ -316,15 +329,15 @@ class TestCatalogKinds:
             "translations/urdu_farhat_hashmi",
             "MultiLanguage/Basfar_Walk_192kbps",
         ):
-            assert main.reciter_kind(subfolder) == "translation"
+            assert reciters.reciter_kind(subfolder) == "translation"
 
     def test_an_unknown_reciter_is_treated_as_plain_recitation(self):
-        assert main.reciter_kind("Retired_Reciter_64kbps") == "recitation"
+        assert reciters.reciter_kind("Retired_Reciter_64kbps") == "recitation"
 
     def test_the_default_reciter_is_ordinary_recitation(self):
         from lib.user_settings import DEFAULT_RECITER
 
-        assert main.reciter_kind(DEFAULT_RECITER) == "recitation"
+        assert reciters.reciter_kind(DEFAULT_RECITER) == "recitation"
 
 
 class TestKindWarnings:
@@ -332,22 +345,22 @@ class TestKindWarnings:
     of choosing — that is the whole point of the split."""
 
     def test_plain_reciter_gets_no_warning(self):
-        text = main.reciter_set_confirmation("Husary_128kbps", "en")
+        text = reciter_kb.reciter_set_confirmation("Husary_128kbps", "en")
         assert text == "Reciter set to Husary."
 
     def test_translation_audio_says_it_is_not_recitation(self):
-        text = main.reciter_set_confirmation("translations/urdu_farhat_hashmi", "en")
+        text = reciter_kb.reciter_set_confirmation("translations/urdu_farhat_hashmi", "en")
         assert "not Qur'an recitation" in text
 
     def test_riwayah_gets_its_own_warning_not_the_translation_one(self):
         # Warsh *is* recitation, just a different reading — the two warnings
         # must not be interchanged.
-        text = main.reciter_set_confirmation("warsh/warsh_Abdul_Basit_128kbps", "en")
+        text = reciter_kb.reciter_set_confirmation("warsh/warsh_Abdul_Basit_128kbps", "en")
         assert "Warsh" in text
         assert "not Qur'an recitation" not in text
 
     def test_warnings_are_localized(self):
-        text = main.reciter_set_confirmation("translations/urdu_farhat_hashmi", "ru")
+        text = reciter_kb.reciter_set_confirmation("translations/urdu_farhat_hashmi", "ru")
         assert "не чтение Корана" in text
 
 
@@ -365,7 +378,7 @@ class TestAudioNeverFollowsLanguage:
         before = file.get_audio_filename(2, 255, "Husary_128kbps")
 
         for code in ("ru", "ur", "fa", "en"):
-            await main.handle_update(
+            await dispatch.handle_update(
                 fake_bot, data, _callback(tg_bot, "setlang:" + code, chat_id=558100)
             )
 
@@ -377,7 +390,7 @@ class TestAudioNeverFollowsLanguage:
         self, fake_bot, data, tg_bot
     ):
         await UserSettings().set_reciter(558101, 558101, "Alafasy_128kbps")
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _callback(tg_bot, "settranslang:ur", chat_id=558101)
         )
 
@@ -387,12 +400,12 @@ class TestAudioNeverFollowsLanguage:
     async def test_an_urdu_speaker_still_gets_arabic_recitation_by_default(
         self, fake_bot, data, tg_bot
     ):
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _message(tg_bot, "/start", chat_id=558102, lang="ur")
         )
         settings = await UserSettings().get(558102, 558102)
         assert settings.ui_lang == "ur"
-        assert main.reciter_kind(settings.reciter) == "recitation"
+        assert reciters.reciter_kind(settings.reciter) == "recitation"
 
 
 class TestSearch:
