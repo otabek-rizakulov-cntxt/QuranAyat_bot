@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Packages whose modules register handlers. Discovery imports every module in
 # each one whose name does not start with "_".
-FEATURE_PACKAGES = ("hifz",)
+FEATURE_PACKAGES = ("bot.handlers", "hifz")
 
 
 CommandHandler = Callable[["Ctx"], Awaitable[None]]
