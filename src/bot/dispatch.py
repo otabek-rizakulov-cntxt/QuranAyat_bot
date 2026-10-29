@@ -19,6 +19,7 @@ from bot.keyboards.reciter import (
     reciter_page_of,
     reciter_set_confirmation,
 )
+from bot.keyboards.rows import button_rows
 from bot.keyboards.sajda import sajda_keyboard
 from bot.keyboards.verse import TYPE_BY_CODE, verse_keyboard
 from bot.limits import MAX_RANGE_AYAHS
@@ -409,16 +410,13 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             await bot.send_message(chat_id=chat_id, text=t("reciter_search_no_matches", ui_lang))
             file.set_awaiting_input(chat_id, "reciter_search")  # allow one retry
             return
-        rows, row = [], []
-        for p in matches:
-            row.append(
+        rows = button_rows(
+            [
                 InlineKeyboardButton(reciter_label(p), callback_data="setreciter:" + p["subfolder"])
-            )
-            if len(row) == 2:
-                rows.append(row)
-                row = []
-        if row:
-            rows.append(row)
+                for p in matches
+            ],
+            2,
+        )
         await bot.send_message(
             chat_id=chat_id,
             text=t("reciter_search_results", ui_lang),

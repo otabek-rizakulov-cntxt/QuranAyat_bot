@@ -20,6 +20,7 @@ from typing import Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.keyboards.rows import button_rows
 from hifz import Ctx, callback, command
 from hifz.refs import format_ref, parse_reference
 from lib.hifz_progress import load_summary
@@ -112,7 +113,7 @@ async def progress_view(
         )
         for s in others[:MAX_BREAKDOWN_ROWS]
     ]
-    rows = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
+    rows = button_rows(buttons, 2)
     markup = InlineKeyboardMarkup(rows) if rows else None
     return "\n".join(lines), markup
 

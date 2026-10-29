@@ -52,6 +52,7 @@ from typing import Optional, Sequence
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 import services.plans as plans_service
+from bot.keyboards.rows import button_rows
 from bot.limits import MAX_RANGE_AYAHS, REPEAT_COUNT
 from bot.media import send_combined_audio, send_quran
 from hifz import Ctx, callback, command, wizard
@@ -254,7 +255,7 @@ def _reminder_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
     buttons = [
         InlineKeyboardButton(choice, callback_data="hm:rt:" + choice) for choice in REMINDER_CHOICES
     ]
-    rows = [buttons[i : i + 3] for i in range(0, len(buttons), 3)]
+    rows = button_rows(buttons, 3)
     rows.append(_cancel_row(ui_lang))
     return InlineKeyboardMarkup(rows)
 

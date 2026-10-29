@@ -2,6 +2,7 @@
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.keyboards.rows import button_rows
 from bot.text import nav_labels
 from lib.utils import File
 from locales import t
@@ -91,17 +92,16 @@ def reciter_keyboard(
         ]
     ]
 
-    row = []
-    for p in entries[page * RECITER_PAGE_SIZE : (page + 1) * RECITER_PAGE_SIZE]:
-        label = reciter_label(p)
-        if p["subfolder"] == current:
-            label = "• " + label
-        row.append(InlineKeyboardButton(label, callback_data="setreciter:" + p["subfolder"]))
-        if len(row) == 2:
-            rows.append(row)
-            row = []
-    if row:
-        rows.append(row)
+    rows += button_rows(
+        [
+            InlineKeyboardButton(
+                ("• " if p["subfolder"] == current else "") + reciter_label(p),
+                callback_data="setreciter:" + p["subfolder"],
+            )
+            for p in entries[page * RECITER_PAGE_SIZE : (page + 1) * RECITER_PAGE_SIZE]
+        ],
+        2,
+    )
 
     prev_label, next_label = nav_labels(ui_lang)
     rows.append(

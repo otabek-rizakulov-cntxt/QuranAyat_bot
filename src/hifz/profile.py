@@ -23,10 +23,11 @@
 #     wizard passes its own ("hm:tz:") and keeps routing its own taps.
 
 import html
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.keyboards.rows import button_rows
 from hifz import Ctx, callback, command, wizard
 from lib.localtime import is_valid_offset, normalize_offset, offset_options
 from services.profile import (  # noqa: F401 — re-exported (see __all__)
@@ -131,10 +132,7 @@ def offset_keyboard(
     buttons = [
         InlineKeyboardButton(offset, callback_data=prefix + offset) for offset in offset_options()
     ]
-    columns = max(1, int(columns))
-    rows: List[List[InlineKeyboardButton]] = [
-        buttons[i : i + columns] for i in range(0, len(buttons), columns)
-    ]
+    rows = button_rows(buttons, columns)
     if cancel_data:
         rows.append([InlineKeyboardButton(t("btn_cancel", ui_lang), callback_data=cancel_data)])
     return InlineKeyboardMarkup(rows)
