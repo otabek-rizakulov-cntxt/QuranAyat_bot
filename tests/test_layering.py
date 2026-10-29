@@ -1,8 +1,11 @@
 """Import-direction rules between the top-level packages (docs/REFACTOR_PLAN.md §4).
 
-Dependencies point one way: presentation (main, api, hifz) → services → lib /
-modules → config / locales. Nothing imports `main`, and only the presentation
-layer knows Telegram or FastAPI exist.
+Dependencies point one way:
+
+    app, main  →  bot, api, hifz  →  services  →  infra, lib, modules  →  domain, config, locales
+
+Nothing imports `main`. Only the presentation layer (app, bot, api, hifz, main)
+and infra, which wraps the Telegram client, may import Telegram or FastAPI.
 
 Today's code breaks a few of these rules. They are listed in KNOWN with the
 refactor step that removes each one, and the list is a ratchet:
@@ -20,23 +23,37 @@ import os
 
 SRC = os.path.join(os.path.dirname(__file__), "..", "src")
 
-PACKAGES = {"main", "api", "config", "hifz", "lib", "locales", "modules", "services"}
+PACKAGES = {
+    "main", "app", "bot", "api", "hifz",
+    "services",
+    "infra", "lib", "modules",
+    "domain", "config", "locales",
+}  # fmt: skip
+
+_BASE = {"domain", "config", "locales"}
+_LOWER = _BASE | {"infra", "lib", "modules"}
 
 # Which project packages each package may import (itself included).
 ALLOWED = {
     "config": {"config"},
     "locales": {"locales"},
-    "modules": {"modules", "config", "locales"},
-    "lib": {"lib", "modules", "config", "locales"},
-    "services": {"services", "lib", "modules", "config", "locales"},
-    "hifz": {"hifz", "services", "lib", "modules", "config", "locales"},
-    "api": {"api", "services", "lib", "modules", "config", "locales"},
+    "domain": {"domain", "config", "locales"},
+    "modules": _BASE | {"modules"},
+    "lib": _LOWER,
+    "infra": _LOWER,
+    "services": _LOWER | {"services"},
+    # The bot's feature modules (hifz, until it becomes bot/features) and the bot
+    # core sit side by side in the presentation layer.
+    "bot": _LOWER | {"services", "bot", "hifz"},
+    "hifz": _LOWER | {"services", "bot", "hifz"},
+    "api": _LOWER | {"services", "api"},
+    "app": PACKAGES - {"main"},
     "main": PACKAGES - {"main"},
 }
 
 FRAMEWORKS = {"telegram", "fastapi"}
 # Packages below the presentation layer: no Telegram, no FastAPI.
-FRAMEWORK_FREE = {"config", "locales", "modules", "lib", "services"}
+FRAMEWORK_FREE = {"config", "locales", "domain", "modules", "lib", "services"}
 
 # (file relative to src/, imported module) -> the refactor step that removes it.
 KNOWN = {
@@ -107,5 +124,15 @@ def test_known_violations_still_exist():
 
 
 def test_the_scan_sees_every_package():
+    # Packages appear as the refactor creates them; every one that exists must
+    # have rules, and nothing unruled may hide under src/.
+    on_disk = {
+        name.removesuffix(".py")
+        for name in os.listdir(SRC)
+        if (name.endswith(".py") or os.path.isdir(os.path.join(SRC, name)))
+        and not name.startswith(("_", "."))
+        and name not in ("common",)
+    }
+    assert on_disk <= set(ALLOWED), sorted(on_disk - set(ALLOWED))
     seen = {package for _, package, _ in _sources()}
-    assert seen == set(ALLOWED)
+    assert seen == on_disk

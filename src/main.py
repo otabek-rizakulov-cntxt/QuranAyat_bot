@@ -29,7 +29,6 @@ Required env vars (see .env.example):
 
 import logging
 import os
-import re
 
 from dotenv import load_dotenv
 
@@ -66,6 +65,7 @@ from api import router as api_router
 from config import Environment
 from config.postgres import close_pool
 from config.redis import RedisSingleton, cache_backend
+from domain.parsing import as_int, parse_ayah_range
 from lib.miniapp import app_row, set_menu_button
 from lib.page_image import fetch_and_stitch
 from lib.store import apply_schema, store_backend
@@ -300,44 +300,6 @@ def get_default_query_results(quran: Quran):
             )
         )
     return results
-
-
-def parse_ayah(message: str):
-    match = re.match(r"/?(\d+)[ :\-;.,]*(\d*)", message)
-    if match is not None:
-        surah = int(match.group(1))
-        ayah = int(match.group(2)) if match.group(2) else 1
-        return surah, ayah
-    else:
-        return None, None
-
-
-def _as_int(text: str):
-    """`text` as an int, or None if it isn't one — for command arguments like the
-    "255" in "/page 255", where a non-number is a user error, not a crash."""
-    try:
-        return int(text)
-    except ValueError:
-        return None
-
-
-def parse_ayah_range(message: str):
-    """Parse a reference into (surah, start, end).
-
-    A range like "53:1-7" -> (53, 1, 7). A single ayah like "2:255" -> (2, 255, 255).
-    Returns (None, None, None) when nothing parses.
-    """
-    # surah <sep> start <dash> end  (three numbers, second separator is a dash)
-    match = re.match(r"/?(\d+)[ :.;,]+(\d+)\s*[-–]\s*(\d+)", message)
-    if match is not None:
-        surah, start, end = (int(match.group(i)) for i in (1, 2, 3))
-        if end < start:
-            start, end = end, start
-        return surah, start, end
-    surah, ayah = parse_ayah(message)
-    if surah is None:
-        return None, None, None
-    return surah, ayah, ayah
 
 
 def build_data() -> dict:
@@ -1383,7 +1345,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             return
         elif command == "page":
             # bare /page opens where the reader already is, rather than erroring
-            page = Quran.page_of(surah, ayah) if not argument else _as_int(argument)
+            page = Quran.page_of(surah, ayah) if not argument else as_int(argument)
             if page is None or not 1 <= page <= Quran.PAGE_COUNT:
                 await bot.send_message(
                     chat_id=chat_id,
@@ -1393,7 +1355,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             await send_page(bot, page, chat_id, ui_lang)
             return
         elif command == "juz":
-            juz = Quran.juz_of(surah, ayah) if not argument else _as_int(argument)
+            juz = Quran.juz_of(surah, ayah) if not argument else as_int(argument)
             if juz is None or not 1 <= juz <= Quran.JUZ_COUNT:
                 await bot.send_message(
                     chat_id=chat_id,
@@ -1810,3 +1772,10 @@ async def telegram_webhook(token: str, request: Request):
     _background_tasks.add(task)
     task.add_done_callback(_background_tasks.discard)
     return {"ok": True}
+
+
+# --- Compatibility re-exports (refactor step 1.6 removes this block) ----------
+# Tests still reach these through `main`; they move to the new module paths in
+# one mechanical commit once every slice is out of this file.
+from domain.parsing import as_int as _as_int  # noqa: E402, F401
+from domain.parsing import parse_ayah  # noqa: E402, F401
