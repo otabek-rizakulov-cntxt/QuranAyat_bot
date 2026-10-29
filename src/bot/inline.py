@@ -20,9 +20,10 @@ from bot.limits import MAX_RANGE_AYAHS
 from bot.media import combined_audio_key, range_audio_url
 from bot.settings import resolve_settings
 from bot.text import ref_key, reference
+from config.settings import get_settings
 from domain.parsing import parse_ayah_range
+from infra import catalog, media_cache
 from lib.user_settings import UserSettings
-from lib.utils import File
 from locales import t
 from modules import Quran
 from modules.quran import get_translation
@@ -73,7 +74,7 @@ def get_default_query_results(quran: Quran):
 INLINE_PERSONAL_CACHE_TIME = 60
 
 
-def inline_audio_result(surah: int, start: int, end: int, reciter: str, ui_lang: str, file: File):
+def inline_audio_result(surah: int, start: int, end: int, reciter: str, ui_lang: str):
     """The recitation of an ayah — or of a whole range, stitched into one file —
     as a shareable inline result, or None if it can't be built.
 
@@ -83,7 +84,7 @@ def inline_audio_result(surah: int, start: int, end: int, reciter: str, ui_lang:
     left in the cache, or from our own RANGE_AUDIO_PATH.
     """
     try:
-        first_url = file.get_audio_filename(surah, start, reciter)
+        first_url = catalog.audio_url(surah, start, reciter)
     except ValueError:
         # A saved reciter that has since left the catalog. The rest of the
         # answer is still useful, so drop the audio rather than failing.
@@ -99,7 +100,7 @@ def inline_audio_result(surah: int, start: int, end: int, reciter: str, ui_lang:
             return None  # same bound the in-chat range send enforces
         # Bounded by 64 bytes — 4 + 11 + the longest subfolder in the catalog.
         result_id = "aur:%s:%s" % (ref_key(surah, start, end), reciter)
-        cached_id = file.get_file(combined_audio_key(surah, start, end, reciter))
+        cached_id = media_cache.get(combined_audio_key(surah, start, end, reciter))
         if cached_id is not None:
             # Someone has already asked for this range in a chat: replay that
             # upload instead of making Telegram fetch and stitch it again.
@@ -113,7 +114,7 @@ def inline_audio_result(surah: int, start: int, end: int, reciter: str, ui_lang:
         result_id = "au:%s:%s" % (ref_key(surah, start, end), reciter)
         audio_url = first_url
     return InlineQueryResultAudio(
-        result_id, audio_url=audio_url, title=title, performer=File.get_performer_name(reciter)
+        result_id, audio_url=audio_url, title=title, performer=catalog.performer_name(reciter)
     )
 
 
@@ -123,7 +124,7 @@ def inline_audio_result(surah: int, start: int, end: int, reciter: str, ui_lang:
 INLINE_MAX_PHOTOS = 10
 
 
-def inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: File) -> list:
+def inline_photo_results(surah: int, start: int, end: int, ui_lang: str) -> list:
     """The rendered Arabic image of each ayah in the reference, as shareable inline
     photo results.
 
@@ -134,7 +135,7 @@ def inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: F
     ayah nobody has viewed yet, and needs PHOTO_BASE_URL to be a public URL; when
     it points at a local directory, only already-cached ayahs can be offered.
     """
-    if not file.get_env("quranic_images_file_path"):
+    if not get_settings().photo_base_url:
         return []  # no images configured at all
     results = []
     for ayah in range(start, min(end, start + INLINE_MAX_PHOTOS - 1) + 1):
@@ -142,8 +143,8 @@ def inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: F
         ref = reference(surah, ayah, ui_lang)
         common = dict(title=t("btn_arabic", ui_lang), description=ref, caption=ref)
         # the same key `send_quran`'s arabic branch caches under
-        source = file.get_image_filename(surah, ayah)
-        cached_id = file.get_file(source)
+        source = catalog.image_url(surah, ayah)
+        cached_id = media_cache.get(source)
         if cached_id is not None:
             results.append(
                 InlineQueryResultCachedPhoto(result_id, photo_file_id=cached_id, **common)
@@ -158,7 +159,6 @@ def inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: F
 async def answer_inline_query(bot, data: dict, inline_query) -> None:
     """Answer one inline query: a reference in every representation, a reciter
     search, or the default suggestions."""
-    file = File()
     user_settings = UserSettings()
     query_id = inline_query.id
     query = inline_query.query
@@ -204,14 +204,14 @@ async def answer_inline_query(bot, data: dict, inline_query) -> None:
                 input_message_content=InputTextMessageContent(tafsir[:4096]),
             )
         )
-        audio = inline_audio_result(surah, start, end, settings.reciter, ui_lang, file)
+        audio = inline_audio_result(surah, start, end, settings.reciter, ui_lang)
         if audio is not None:
             results.append(audio)
-        results.extend(inline_photo_results(surah, start, end, ui_lang, file))
+        results.extend(inline_photo_results(surah, start, end, ui_lang))
     else:
         # Not an ayah reference — try it as a reciter name, so the picker is
         # reachable from any chat without opening a DM with the bot first.
-        matches = File.search_performers(query)
+        matches = catalog.search(query)
         if matches:
             # Unlike the immutable ayah text above, these are rendered in the
             # caller's own UI language and lead to a state change, so they must

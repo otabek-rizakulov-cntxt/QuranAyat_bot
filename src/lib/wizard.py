@@ -1,7 +1,7 @@
 # Multi-step conversation state ("wizards"): the draft a user is part-way through.
 #
 # The bot already had exactly one multi-step interaction — the reciter search —
-# and it is served by `File.set_awaiting_input` / `File.pop_awaiting_input`: a
+# and it is served by `infra.pending_input`: a
 # bare string under `awaiting:<chat_id>` with a 120 s TTL and nowhere to put a
 # payload. That is enough for "the next message is a reciter name" and nothing
 # more. `/memorize` needs four answers (target, pace, days, reminder time) held

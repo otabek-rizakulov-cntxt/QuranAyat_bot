@@ -17,7 +17,7 @@ from fastapi import APIRouter, Request, Response
 from app.state import AppState
 from app.tasks import spawn
 from bot.dispatch import handle_update
-from config import Environment
+from config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def webhook_secret() -> Optional[str]:
     one-way hash, so it reveals nothing about the token. 64 hex characters, well
     inside Telegram's 1-256 [A-Za-z0-9_-] limit. None when no token is set.
     """
-    token = Environment.get_env("token")
+    token = get_settings().token
     if not token:
         return None
     return hashlib.sha256(("telegram-webhook:" + token).encode()).hexdigest()

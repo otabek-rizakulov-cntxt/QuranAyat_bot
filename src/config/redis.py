@@ -4,7 +4,7 @@ import time
 
 from redis import StrictRedis
 
-from .env import Environment  # Importing the base Environment class
+from .settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +49,10 @@ RETRY_AFTER_SECONDS = 30
 
 class CacheUnavailable(RuntimeError):
     """Redis is not configured and the in-memory store is not allowed to stand
-    in for it (see `config.env.memory_store_allowed`)."""
+    in for it (see `Settings.allow_memory_store`)."""
 
 
-class RedisSingleton(Environment):
+class RedisSingleton:
     """The process's Redis connection.
 
     Redis holds only what can be rebuilt — the Telegram file_id cache, wizard
@@ -109,7 +109,7 @@ class RedisSingleton(Environment):
                 return  # another caller got here first
             cls._failed_at = time.monotonic()
             try:
-                instance.connection = cls._connect(cls.get_env("redis"))
+                instance.connection = cls._connect(get_settings().redis_url)
             except Exception as e:
                 cls.last_error = "unreachable (%s)" % type(e).__name__
                 return
@@ -135,11 +135,9 @@ class RedisSingleton(Environment):
     def _make_connection(cls):
         """(connection, degraded). Raises CacheUnavailable only when Redis is not
         configured and memory is not allowed."""
-        from .env import memory_store_allowed
-
-        redis_url = cls.get_env("redis")
+        redis_url = get_settings().redis_url
         if not redis_url:
-            if not memory_store_allowed():
+            if not get_settings().allow_memory_store:
                 raise CacheUnavailable("not configured")
             logger.warning(
                 "REDIS_HOST_URL is not set — falling back to in-memory store. "
@@ -150,7 +148,7 @@ class RedisSingleton(Environment):
         try:
             return cls._connect(redis_url), False
         except Exception as e:
-            if memory_store_allowed():
+            if get_settings().allow_memory_store:
                 logger.warning(
                     "Redis unreachable (%s: %s) — falling back to in-memory store."
                     % (type(e).__name__, e)

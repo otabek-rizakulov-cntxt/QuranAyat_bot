@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from .env import Environment, memory_store_allowed
+from .settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ CONNECT_BACKOFF_SECONDS = 1.5
 
 class DatabaseUnavailable(RuntimeError):
     """Postgres is not configured or could not be reached, and the in-memory
-    store is not allowed to stand in for it (see `memory_store_allowed`).
+    store is not allowed to stand in for it (see `Settings.allow_memory_store`).
 
     Deliberately *not* a fallback to the in-memory store: doing that silently
     meant every setting a user changed lived only in process memory and vanished
@@ -71,9 +71,9 @@ async def get_pool():
         if _pool_resolved:  # re-check: another caller may have won the race
             return _pool
 
-        database_url = Environment.get_env("database_url")
+        database_url = get_settings().database_url
         if not database_url:
-            if not memory_store_allowed():
+            if not get_settings().allow_memory_store:
                 # The production failure this guards against: the URL lived in a
                 # platform secret that the service never referenced, so it read as
                 # unset and every setting went to memory. Refuse rather than degrade.

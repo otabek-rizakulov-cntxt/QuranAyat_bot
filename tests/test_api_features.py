@@ -15,7 +15,7 @@ import pytest
 
 import main
 from api.auth import sign_init_data
-from config import Environment
+from config import get_settings
 from lib.store import get_store
 from lib.store.plans import DAY_COMPLETED
 from lib.store.sessions import KIND_DRILL
@@ -46,7 +46,7 @@ async def _login(client, user_id=ALICE, lang="en", name="Amina"):
             "signature": "c2ln",
             "user": json.dumps({"id": user_id, "first_name": name, "language_code": lang}),
         },
-        Environment.get_env("token"),
+        get_settings().token,
     )
     r = await client.post("/api/v1/auth/telegram", json={"init_data": init})
     assert r.status_code == 200, r.text

@@ -12,13 +12,14 @@ from bot.media import send_combined_audio, send_quran, send_repeated_audio
 from bot.router import callback, command
 from bot.text import build_verse_text
 from domain.parsing import parse_ayah_range
+from infra import nav_state
 from locales import button_action, t
 from modules import Quran
 
 
 async def reader_position(ctx: Ctx) -> tuple:
     """(surah, ayah, view) where the user stopped reading; 1:1 translation if never."""
-    state = await ctx.file.get_user(ctx.chat_id)
+    state = await nav_state.get(ctx.chat_id)
     if state is None:
         return 1, 1, "translation"
     surah, ayah, quran_type = state
@@ -32,7 +33,6 @@ async def _send_verse(ctx: Ctx, surah: int, ayah: int, quran_type: str, **kwargs
     await send_quran(
         ctx.bot,
         ctx.data,
-        ctx.file,
         surah,
         ayah,
         quran_type,
@@ -101,7 +101,7 @@ async def verse_card(ctx: Ctx, cb_data: str) -> None:
                     parse_mode="HTML",
                     reply_markup=markup,
                 )
-        await ctx.file.save_user(ctx.chat_id, (surah, ayah, quran_type))
+        await nav_state.save(ctx.chat_id, surah, ayah, quran_type)
     else:  # arabic/audio arrive as fresh media messages
         await _send_verse(ctx, surah, ayah, quran_type, reply_markup=markup)
     await ctx.answer()

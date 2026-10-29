@@ -424,7 +424,7 @@ test over their cache keys.
   the wall clock, not the tick's time, which made one acceptance test fail
   between 02:00 and 19:00 UTC (the test user's reminder time to local midnight).
 
-### Phase 4 — Split infrastructure god-objects
+### Phase 4 — Split infrastructure god-objects — *done*
 
 - **4.1 Split `File`** into `media_cache`, `nav_state`, `pending_input` (until 3.3
   retires it) and `catalog` (§4).
@@ -447,6 +447,19 @@ test over their cache keys.
   - `_webhook_base_url()` becomes a computed field.
 - **4.3 Bot client.** `modules/bot.py`'s singleton becomes
   `infra/telegram.create_bot(settings)`, held on `AppState` and passed via `Ctx`.
+
+*As shipped* (`refactor/phase-4-infra`):
+- `File` is now a forwarding facade over `infra/{catalog,media_cache,
+  nav_state,pending_input}`. No `src/` code calls its methods. It's only
+  constructed to fill `Ctx.file` and `SendCtx.file`, which ~30 test files
+  build contexts with. Removing it means retargeting those tests, a
+  mechanical PR on its own whenever wanted.
+- `send_quran` and the inline helpers lost their unused `file` parameter.
+- Settings are read **per call**, not once at boot, because tests and the
+  strict-storage flag change the environment after import. `Environment`
+  and `config/env.py` are deleted.
+- The singleton is gone, and the layering test's known violations are down
+  to 10.
 
 ### Phase 5 — Fix the layering
 

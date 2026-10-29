@@ -5,7 +5,7 @@ from io import BytesIO
 
 import httpx
 
-from lib.utils import File
+from infra import catalog
 
 # Cap simultaneous CDN connections: fast, but polite enough to avoid rate-limiting/blocks.
 _DOWNLOAD_CONCURRENCY = 4
@@ -18,8 +18,7 @@ async def download_stitched_audio(ayahs: list, performer: str, name: str) -> Byt
     because a mushaf page is also assembled this way and 96 of the 604 pages cross
     a surah boundary.
     """
-    file = File()
-    urls = [file.get_audio_filename(surah, ayah, performer) for surah, ayah in ayahs]
+    urls = [catalog.audio_url(surah, ayah, performer) for surah, ayah in ayahs]
     semaphore = asyncio.Semaphore(_DOWNLOAD_CONCURRENCY)
 
     async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:

@@ -1,13 +1,20 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from config import RedisSingleton
+
 from .store import get_store
 from .store.profiles import UserSettingsRow
-from .utils import File
 
 DEFAULT_UI_LANG = "en"
 DEFAULT_TRANSLATION_LANG = "en"
 DEFAULT_RECITER = "Husary_128kbps"
+
+
+def _legacy_lang_key(chat_id: int) -> str:
+    """The single-value Redis language key the bot wrote before settings moved to
+    the store. Only read (then deleted) to migrate a returning user."""
+    return "lang:" + str(chat_id)
 
 
 @dataclass
@@ -34,7 +41,7 @@ class UserSettings:
     """
 
     def __init__(self):
-        self._file = File()
+        self._redis = RedisSingleton().connection
 
     async def get(
         self, user_id: int, chat_id: Optional[int] = None, default_ui_lang: str = DEFAULT_UI_LANG
@@ -80,7 +87,7 @@ class UserSettings:
         # no pre-existing chat to read a legacy value from. Absent a legacy value,
         # fall back to the caller-supplied default (typically derived from the
         # Telegram client's language_code on first-ever contact).
-        legacy_lang = self._file.get_lang(chat_id) if chat_id is not None else None
+        legacy_lang = self._redis.get(_legacy_lang_key(chat_id)) if chat_id is not None else None
 
         ui_lang = legacy_lang or default_ui_lang
         translation_lang = legacy_lang or default_ui_lang
@@ -92,7 +99,9 @@ class UserSettings:
             # Lost an insert race to a concurrent call for the same user; re-read.
             row = await store.profiles.get_settings(user_id)
         elif legacy_lang is not None:
-            self._file.delete_lang(chat_id)  # fully superseded now; stop bit-rotting in Redis
+            self._redis.delete(
+                _legacy_lang_key(chat_id)
+            )  # fully superseded now; stop bit-rotting in Redis
 
         if row is None:
             # The re-read missed too — the row was deleted between the insert and the

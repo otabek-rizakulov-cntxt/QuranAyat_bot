@@ -1,177 +1,92 @@
-import os
+"""`File` — the old all-in-one helper, kept as a thin facade.
+
+Its jobs now live in focused modules (docs/REFACTOR_PLAN.md step 4.1):
+
+    infra.catalog        the reciter catalog and every CDN URL
+    infra.media_cache    the Telegram file_id cache
+    infra.nav_state      where each user stopped reading
+    infra.pending_input  the one-turn "next message answers my question" flag
+
+`src/` calls those directly. `File` stays because the tests and `Ctx.file`
+still reach these through it; each method just forwards.
+"""
+
 from typing import Optional
 
-import ujson as json
+from config import RedisSingleton
+from infra import catalog, media_cache, nav_state, pending_input
 
-from config import Environment, RedisSingleton
 
-
-class File(Environment):
+class File:
+    # Key formats are persistent state; the tests pin them through these.
     redis_namespace = ""
-    _performers_cache = None
 
     def __init__(self):
         self.redis = RedisSingleton().connection
 
-    def _file_key(self, filename: str) -> str:
-        """Single source of truth for the Telegram-cache key of a media file."""
-        return self.redis_namespace + "file:" + filename
+    @staticmethod
+    def _lang_key(chat_id: int) -> str:
+        return "lang:" + str(chat_id)
 
+    @staticmethod
+    def _awaiting_key(chat_id: int) -> str:
+        return pending_input._key(chat_id)
+
+    # --- reading position ---------------------------------------------------
     async def save_user(self, chat_id: int, state: tuple[int, int, str]):
-        """Remember where the user stopped reading: (surah, ayah, type).
-
-        Durable — it lives in the store (`reader_position`), not in Redis. The old
-        two-day Redis key meant a reader who paused for a few days restarted at 1:1.
-        """
-        from .store import get_store  # lazy: lib.store imports this module's package
-
-        surah, ayah, view = state
-        store = await get_store()
-        await store.profiles.save_reader_position(chat_id, surah, ayah, view)
+        await nav_state.save(chat_id, *state)
 
     async def get_user(self, chat_id: int):
-        """`[surah, ayah, type]` where the user stopped reading, or None.
+        return await nav_state.get(chat_id)
 
-        Falls back to the legacy Redis key so positions saved before the move to the
-        store survive the deploy that introduced it.
-        """
-        from .store import get_store
-
-        store = await get_store()
-        position = await store.profiles.get_reader_position(chat_id)
-        if position is not None:
-            return list(position)
-        v = self.redis.get(self.redis_namespace + str(chat_id))
-        if v is not None:
-            return json.loads(v)
-        return None
-
-    def _lang_key(self, chat_id: int) -> str:
-        """Legacy single-value language key, kept only as a migration-on-read source
-        for lib.user_settings.UserSettings (which now holds ui_lang/translation_lang
-        durably in Postgres). New code should not write this key."""
-        return self.redis_namespace + "lang:" + str(chat_id)
-
+    # --- legacy language key (read only by lib.user_settings' migration) ------
     def get_lang(self, chat_id: int):
-        """Return the user's legacy saved language code, or None. Migration-only."""
         return self.redis.get(self._lang_key(chat_id))
 
     def delete_lang(self, chat_id: int):
-        """Remove the legacy language key once it has been migrated into Postgres."""
         self.redis.delete(self._lang_key(chat_id))
 
-    def _awaiting_key(self, chat_id: int) -> str:
-        return self.redis_namespace + "awaiting:" + str(chat_id)
-
+    # --- pending input ----------------------------------------------------------
     def set_awaiting_input(self, chat_id: int, kind: str):
-        """Flag that the next free-text message from `chat_id` should be interpreted
-        as input for `kind` (e.g. "reciter_search") rather than an ayah reference.
-        Short TTL: this is a live single-turn interaction, not a durable setting."""
-        self.redis.set(self._awaiting_key(chat_id), kind, ex=120)
+        pending_input.expect(chat_id, kind)
 
     def pop_awaiting_input(self, chat_id: int) -> Optional[str]:
-        """Return and clear the pending awaited-input kind for `chat_id`, or None."""
-        key = self._awaiting_key(chat_id)
-        kind = self.redis.get(key)
-        if kind is not None:
-            self.redis.delete(key)
-        return kind
+        return pending_input.take(chat_id)
 
+    # --- file_id cache ------------------------------------------------------------
     def save_file(self, filename: str, file_id: str):
-        """Cache the Telegram file_id for a media file so we can skip re-uploading."""
-        if not file_id:
-            return
-        # keep for 2 days; Telegram file_ids are stable far longer, but this bounds staleness
-        self.redis.set(self._file_key(filename), file_id, ex=60 * 60 * 24 * 2)
+        media_cache.save(filename, file_id)
 
     def get_file(self, filename: str) -> Optional[str]:
-        """Return the cached Telegram file_id, or None on a cache miss."""
-        return self.redis.get(self._file_key(filename))
+        return media_cache.get(filename)
 
+    # --- catalog and URLs -----------------------------------------------------------
     @classmethod
     def _load_performers(cls):
-        if cls._performers_cache is None:
-            base_dir = os.path.dirname(os.path.dirname(__file__))  # up from lib/ to src/
-            file_path = os.path.join(base_dir, "common", "performers.json")
-            with open(file_path, encoding="utf-8") as fp:
-                cls._performers_cache = json.load(fp)["performers"]
-        return cls._performers_cache
-
-    def get_audio_filename(
-        self, surah: int, ayah: int, performer: Optional[str] = "Husary_128kbps"
-    ) -> str:
-        performers = self._load_performers()
-        subfolder = next(
-            (p["subfolder"] for p in performers if p["subfolder"] == performer),
-            None,
-        )
-        if subfolder is None:
-            raise ValueError(f"Unknown performer: {performer}")
-        return "{base}/{sub}/{s}{a}.mp3".format(
-            base=self.get_env("audio_base_url"),
-            sub=subfolder,
-            s=str(surah).zfill(3),
-            a=str(ayah).zfill(3),
-        )
+        return catalog.performers()
 
     @classmethod
     def get_performer_name(cls, subfolder: str) -> str:
-        """Human-readable display name for a performer, falling back to Husary's
-        name if `subfolder` is unknown (e.g. a stale saved preference)."""
-        performers = cls._load_performers()
-        match = next((p for p in performers if p["subfolder"] == subfolder), None)
-        if match is None:
-            match = next(p for p in performers if p["subfolder"] == "Husary_128kbps")
-        return match["name"]
+        return catalog.performer_name(subfolder)
 
     @classmethod
     def search_performers(cls, query: str, limit: int = 8) -> list:
-        """Case-insensitive search over performer names, for the reciter search flow.
-
-        Every whitespace-separated term must appear in the name or the bitrate, so
-        "sudais 192" narrows to the one entry at that quality instead of listing
-        every Sudais recording. Returns up to `limit` matches, in catalog order.
-        """
-        terms = query.strip().lower().split()
-        if not terms:
-            return []
-        matches = []
-        for p in cls._load_performers():
-            haystack = (p["name"] + " " + p.get("bitrate", "")).lower()
-            if all(term in haystack for term in terms):
-                matches.append(p)
-                if len(matches) == limit:
-                    break
-        return matches
-
-    def get_image_filename(self, s: int, a: int) -> str:
-        return self.get_env("quranic_images_file_path") + "/" + str(s) + "_" + str(a) + ".png"
-
-    def get_page_image_filename(self, s: int, a: int) -> str:
-        """The per-ayah image the page stitcher tiles — same naming as
-        get_image_filename, but from the uniform-width set (see config.env)."""
-        return self.get_env("page_image_base_url") + "/" + str(s) + "_" + str(a) + ".png"
+        return catalog.search(query, limit)
 
     @classmethod
     def has_page_audio(cls, subfolder: str) -> bool:
-        """Whether this recording has one-file-per-mushaf-page recitations.
+        return catalog.has_page_audio(subfolder)
 
-        Recorded per entry in performers.json rather than probed at request time: a
-        dozen entries in the catalog have no PageMp3s directory at all, and the page
-        send needs to know *before* it picks between the single file and stitching the
-        page's ayahs together.
-        """
-        match = next((p for p in cls._load_performers() if p["subfolder"] == subfolder), None)
-        return bool(match and match.get("page_audio"))
+    def get_audio_filename(
+        self, surah: int, ayah: int, performer: Optional[str] = catalog.DEFAULT_RECITER
+    ) -> str:
+        return catalog.audio_url(surah, ayah, performer)
 
     def get_page_audio_filename(self, page: int, performer: str) -> str:
-        """URL of the reciter's single-file recitation of mushaf page `page`.
+        return catalog.page_audio_url(page, performer)
 
-        Only meaningful when `has_page_audio(performer)`; callers stitch the page's
-        ayah recitations together instead when it is False.
-        """
-        return "{base}/{sub}/PageMp3s/Page{p}.mp3".format(
-            base=self.get_env("audio_base_url"),
-            sub=performer,
-            p=str(page).zfill(3),
-        )
+    def get_image_filename(self, s: int, a: int) -> str:
+        return catalog.image_url(s, a)
+
+    def get_page_image_filename(self, s: int, a: int) -> str:
+        return catalog.page_image_url(s, a)

@@ -4,6 +4,7 @@ from bot.context import Ctx
 from bot.errors import ignore_not_modified
 from bot.keyboards.reciter import reciter_keyboard, reciter_page_of, reciter_set_confirmation
 from bot.router import callback, command
+from infra import pending_input
 from lib.user_settings import UserSettings
 from locales import t
 
@@ -35,7 +36,7 @@ async def turn_page(ctx: Ctx, cb_data: str) -> None:
 
 @callback("reciter_search")  # the search button on the reciter picker
 async def start_search(ctx: Ctx, cb_data: str) -> None:
-    ctx.file.set_awaiting_input(ctx.chat_id, "reciter_search")
+    pending_input.expect(ctx.chat_id, "reciter_search")
     await ctx.answer()
     await ctx.reply(t("reciter_search_prompt", ctx.ui_lang))
 
