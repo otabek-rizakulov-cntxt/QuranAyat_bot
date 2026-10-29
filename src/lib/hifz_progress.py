@@ -27,12 +27,24 @@ from hifz.refs import Ref, contains, juz_ref, page_ref, surah_ref
 from modules import Quran
 
 __all__ = [
-    "TOTAL_AYAHS", "TOTAL_PAGES",
-    "Progress", "SurahProgress", "JuzProgress", "PageProgress", "ProgressSummary",
-    "round_percent", "format_percent",
-    "surah_progress", "juz_progress", "quran_progress",
-    "juz_page_progress", "quran_page_progress",
-    "started_surahs", "started_juzs", "summarize", "load_summary",
+    "TOTAL_AYAHS",
+    "TOTAL_PAGES",
+    "Progress",
+    "SurahProgress",
+    "JuzProgress",
+    "PageProgress",
+    "ProgressSummary",
+    "round_percent",
+    "format_percent",
+    "surah_progress",
+    "juz_progress",
+    "quran_progress",
+    "juz_page_progress",
+    "quran_page_progress",
+    "started_surahs",
+    "started_juzs",
+    "summarize",
+    "load_summary",
 ]
 
 # 6236. Summed from the corpus rather than written down, so it can never disagree
@@ -62,6 +74,7 @@ TOTAL_PAGES = Quran.PAGE_COUNT
 #
 # Symmetric at both ends, then: the only way to see 0 is to have memorized
 # nothing, and the only way to see 100 is to have memorized all of it.
+
 
 def round_percent(fraction: float) -> float:
     """`fraction` (0.0-1.0) as a percentage, rounded per the rule above.
@@ -241,6 +254,7 @@ class ProgressSummary:
 
 # --- Intersecting intervals with a span ----------------------------------------
 
+
 def _spans(intervals: Iterable) -> List[Tuple[int, int, int]]:
     """Normalize whatever the caller passed into (surah, start, end) triples.
 
@@ -253,8 +267,7 @@ def _spans(intervals: Iterable) -> List[Tuple[int, int, int]]:
         if isinstance(interval, (tuple, list)):
             surah, start, end = interval[0], interval[1], interval[2]
         else:
-            surah, start, end = (interval.surah, interval.start_ayah,
-                                 interval.end_ayah)
+            surah, start, end = (interval.surah, interval.start_ayah, interval.end_ayah)
         if start > end:
             start, end = end, start
         out.append((int(surah), int(start), int(end)))
@@ -313,13 +326,13 @@ def _covered(ref: Ref, spans: Sequence[Tuple[int, int, int]]) -> int:
 
 # --- The public readings -------------------------------------------------------
 
+
 def surah_progress(intervals: Iterable, surah: int) -> SurahProgress:
     """How much of `surah` the intervals cover. 0/0 for a surah that isn't real."""
     ref = surah_ref(surah)
     if ref is None:
         return SurahProgress(surah=surah, done=0, total=0)
-    return SurahProgress(surah=surah, done=_covered(ref, _spans(intervals)),
-                         total=ref.count())
+    return SurahProgress(surah=surah, done=_covered(ref, _spans(intervals)), total=ref.count())
 
 
 def juz_progress(intervals: Iterable, juz: int) -> JuzProgress:
@@ -327,8 +340,7 @@ def juz_progress(intervals: Iterable, juz: int) -> JuzProgress:
     ref = juz_ref(juz)
     if ref is None:
         return JuzProgress(juz=juz, done=0, total=0)
-    return JuzProgress(juz=juz, done=_covered(ref, _spans(intervals)),
-                       total=ref.count())
+    return JuzProgress(juz=juz, done=_covered(ref, _spans(intervals)), total=ref.count())
 
 
 def quran_progress(intervals: Iterable) -> Progress:
@@ -350,6 +362,7 @@ def quran_progress(intervals: Iterable) -> Progress:
 
 # --- Counting in pages ---------------------------------------------------------
 
+
 def _intersect(a: Ref, b: Ref) -> Optional[Ref]:
     """The span common to two refs, or None when they do not overlap."""
     start = max(a.start, b.start)
@@ -364,8 +377,9 @@ def _pages_of(ref: Ref) -> range:
     return range(Quran.page_of(*ref.start), Quran.page_of(*ref.end) + 1)
 
 
-def _page_share(ref: Ref, spans: Sequence[Tuple[int, int, int]],
-                pages: Iterable[int]) -> Tuple[float, float]:
+def _page_share(
+    ref: Ref, spans: Sequence[Tuple[int, int, int]], pages: Iterable[int]
+) -> Tuple[float, float]:
     """(done_pages, total_pages) for `ref`, counting in fractional pages.
 
     For each page: the share of it lying inside `ref` counts toward the total, and
@@ -416,8 +430,9 @@ def quran_page_progress(intervals: Iterable) -> PageProgress:
         clipped = _clip(ref, surah, start, end)
         if clipped is None:
             continue
-        touched.update(range(Quran.page_of(surah, clipped[0]),
-                             Quran.page_of(surah, clipped[1]) + 1))
+        touched.update(
+            range(Quran.page_of(surah, clipped[0]), Quran.page_of(surah, clipped[1]) + 1)
+        )
     done = 0.0
     for page in sorted(touched):
         span = page_ref(page)
@@ -484,15 +499,15 @@ def _focus_surah(intervals: Iterable) -> Optional[int]:
     split and is refreshed by a merge, so "most recent" tracks activity rather
     than the original learning date.
     """
-    candidates = [interval for interval in (intervals or ())
-                  if surah_ref(_surah_of(interval)) is not None]
+    candidates = [
+        interval for interval in (intervals or ()) if surah_ref(_surah_of(interval)) is not None
+    ]
     if not candidates:
         return None
     return _surah_of(max(candidates, key=_recency_key))
 
 
-def summarize(intervals: Iterable,
-              focus_surah: Optional[int] = None) -> ProgressSummary:
+def summarize(intervals: Iterable, focus_surah: Optional[int] = None) -> ProgressSummary:
     """Everything `/progress` renders, from one list of intervals.
 
     Pass `focus_surah` when there is an obvious subject — the surah of the drill
@@ -516,20 +531,23 @@ def summarize(intervals: Iterable,
         # working through now, not the one they started in a month ago.
         marked = [(start, end) for surah, start, end in spans if surah == focus_surah]
         if marked:
-            last_ayah = min(max(end for _, end in marked),
-                            Quran.get_surah_length(focus_surah))
+            last_ayah = min(max(end for _, end in marked), Quran.get_surah_length(focus_surah))
             juz = Quran.juz_of(focus_surah, last_ayah)
             focus_juz = juz_progress(spans, juz)
             focus_juz_pages = juz_page_progress(spans, juz)
 
-    return ProgressSummary(quran=quran, surahs=tuple(surahs), juzs=tuple(juzs),
-                           focus=focus, focus_juz=focus_juz,
-                           quran_pages=quran_page_progress(spans),
-                           focus_juz_pages=focus_juz_pages)
+    return ProgressSummary(
+        quran=quran,
+        surahs=tuple(surahs),
+        juzs=tuple(juzs),
+        focus=focus,
+        focus_juz=focus_juz,
+        quran_pages=quran_page_progress(spans),
+        focus_juz_pages=focus_juz_pages,
+    )
 
 
-async def load_summary(store, user_id: int,
-                       focus_surah: Optional[int] = None) -> ProgressSummary:
+async def load_summary(store, user_id: int, focus_surah: Optional[int] = None) -> ProgressSummary:
     """`summarize` over everything `user_id` has marked. One store round trip.
 
     The whole interval set is read even when only one surah is being shown,

@@ -59,8 +59,7 @@ def _fit_for_telegram(image):
     from PIL import Image
 
     scale = TELEGRAM_MAX_DIMENSION_SUM / float(width + height)
-    return image.resize((max(1, int(width * scale)), max(1, int(height * scale))),
-                        Image.LANCZOS)
+    return image.resize((max(1, int(width * scale)), max(1, int(height * scale))), Image.LANCZOS)
 
 
 def stitch_images(blobs: list) -> BytesIO:
@@ -84,7 +83,7 @@ def stitch_images(blobs: list) -> BytesIO:
     canvas = Image.new("RGB", (width, sum(im.height for im in images)), "white")
     y = 0
     for im in images:
-        rgba = im.convert("RGBA")           # sources are palette/RGBA with alpha
+        rgba = im.convert("RGBA")  # sources are palette/RGBA with alpha
         canvas.paste(rgba, ((width - im.width) // 2, y), rgba)
         y += im.height
 
@@ -110,6 +109,7 @@ async def fetch_and_stitch(urls: list, name: str = "page.jpg") -> BytesIO:
     async with _semaphore():
         limit = asyncio.Semaphore(_DOWNLOAD_CONCURRENCY)
         async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+
             async def fetch(url):
                 async with limit:
                     response = await client.get(url)

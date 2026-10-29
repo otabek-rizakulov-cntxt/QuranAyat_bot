@@ -16,8 +16,14 @@ import pytest
 from fastapi.testclient import TestClient
 
 import main
-from api.auth import (InvalidInitData, InvalidToken, decode_token, issue_token,
-                      sign_init_data, validate_init_data)
+from api.auth import (
+    InvalidInitData,
+    InvalidToken,
+    decode_token,
+    issue_token,
+    sign_init_data,
+    validate_init_data,
+)
 from config import Environment
 
 BOT_TOKEN = Environment.get_env("token")
@@ -35,9 +41,12 @@ def _jwt_secret(monkeypatch):
 def _fields(**overrides) -> dict:
     # `signature` is the Ed25519 third-party signature Telegram has sent since
     # Bot API 8.0; we don't verify it, but it is part of the HMAC'd string.
-    fields = {"auth_date": str(int(time.time())), "query_id": "AAH-test",
-              "signature": "dGVzdC1zaWduYXR1cmU",
-              "user": json.dumps(USER, separators=(",", ":"))}
+    fields = {
+        "auth_date": str(int(time.time())),
+        "query_id": "AAH-test",
+        "signature": "dGVzdC1zaWduYXR1cmU",
+        "user": json.dumps(USER, separators=(",", ":")),
+    }
     fields.update(overrides)
     return fields
 
@@ -45,6 +54,7 @@ def _fields(**overrides) -> dict:
 # ---------------------------------------------------------------------------
 # validate_init_data
 # ---------------------------------------------------------------------------
+
 
 def test_known_good_vector_computed_independently():
     # Spell out Telegram's algorithm here rather than reuse sign_init_data, so a
@@ -103,6 +113,7 @@ def test_duplicate_field_is_rejected():
 # Access token
 # ---------------------------------------------------------------------------
 
+
 def test_token_round_trip():
     assert decode_token(issue_token(7, SECRET), SECRET) == 7
 
@@ -130,8 +141,11 @@ def test_token_with_swapped_subject_is_rejected():
 def test_unsigned_alg_none_token_is_rejected():
     def seg(obj):
         return base64.urlsafe_b64encode(json.dumps(obj).encode()).rstrip(b"=").decode()
-    token = "%s.%s." % (seg({"alg": "none", "typ": "JWT"}),
-                        seg({"sub": "7", "exp": int(time.time()) + 60}))
+
+    token = "%s.%s." % (
+        seg({"alg": "none", "typ": "JWT"}),
+        seg({"sub": "7", "exp": int(time.time()) + 60}),
+    )
     with pytest.raises(InvalidToken):
         decode_token(token, SECRET)
 
@@ -140,9 +154,11 @@ def test_unsigned_alg_none_token_is_rejected():
 # Routes
 # ---------------------------------------------------------------------------
 
+
 def _auth(**overrides):
-    return client.post("/api/v1/auth/telegram",
-                       json={"init_data": sign_init_data(_fields(**overrides), BOT_TOKEN)})
+    return client.post(
+        "/api/v1/auth/telegram", json={"init_data": sign_init_data(_fields(**overrides), BOT_TOKEN)}
+    )
 
 
 def test_auth_issues_token_and_seeds_settings_from_language_code():

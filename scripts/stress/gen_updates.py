@@ -21,8 +21,8 @@ _TRAFFIC_MIX = [
     (30, "/start"),
     (15, "/progress"),
     (15, "/streak"),
-    (15, "67:5"),          # single ayah -> send_quran: image + audio + translation
-    (10, "67:1-5"),        # range -> combined stitched audio
+    (15, "67:5"),  # single ayah -> send_quran: image + audio + translation
+    (10, "67:1-5"),  # range -> combined stitched audio
     (10, "/check 67"),
     (5, "/leaderboard"),
 ]
@@ -43,8 +43,12 @@ def message_update(chat_id: int, text: str | None = None) -> dict:
             "message_id": 1,
             "date": 1700000000,
             "chat": {"id": chat_id, "type": "private"},
-            "from": {"id": chat_id, "is_bot": False, "first_name": "StressUser %d" % chat_id,
-                     "language_code": "en"},
+            "from": {
+                "id": chat_id,
+                "is_bot": False,
+                "first_name": "StressUser %d" % chat_id,
+                "language_code": "en",
+            },
             "text": text,
         },
     }

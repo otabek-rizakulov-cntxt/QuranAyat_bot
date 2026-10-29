@@ -119,7 +119,7 @@ async def test_setlang_callback_persists_ui_language(fake_bot, data, tg_bot):
     fake_bot.answer_callback_query.assert_awaited()
     settings = await UserSettings().get(555008, 555008)
     assert settings.ui_lang == "ru"
-    assert settings.translation_lang == "en"   # untouched by a UI-language change
+    assert settings.translation_lang == "en"  # untouched by a UI-language change
 
 
 async def test_settranslang_callback_persists_translation_language_only(fake_bot, data, tg_bot):
@@ -134,7 +134,8 @@ async def test_settranslang_callback_persists_translation_language_only(fake_bot
 async def test_setreciter_callback_persists_reciter_only(fake_bot, data, tg_bot):
     await main.handle_update(fake_bot, data, _callback(tg_bot, "setlang:ru", chat_id=555012))
     await main.handle_update(
-        fake_bot, data, _callback(tg_bot, "setreciter:Alafasy_128kbps", chat_id=555012))
+        fake_bot, data, _callback(tg_bot, "setreciter:Alafasy_128kbps", chat_id=555012)
+    )
     settings = await UserSettings().get(555012, 555012)
     assert settings.reciter == "Alafasy_128kbps"
     assert settings.ui_lang == "ru"
@@ -154,10 +155,12 @@ async def test_inline_query_valid_ayah_returns_all_four_views(fake_bot, data, tg
     fake_bot.answer_inline_query.assert_awaited()
     # A valid ayah yields a translation, a tafsir, the recitation and the Arabic image.
     results = fake_bot.answer_inline_query.await_args.kwargs["results"]
-    assert [type(r) for r in results] == [telegram.InlineQueryResultArticle,
-                                          telegram.InlineQueryResultArticle,
-                                          telegram.InlineQueryResultAudio,
-                                          telegram.InlineQueryResultPhoto]
+    assert [type(r) for r in results] == [
+        telegram.InlineQueryResultArticle,
+        telegram.InlineQueryResultArticle,
+        telegram.InlineQueryResultAudio,
+        telegram.InlineQueryResultPhoto,
+    ]
 
 
 async def test_textless_message_is_ignored(fake_bot, data, tg_bot):

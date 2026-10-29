@@ -72,12 +72,12 @@ class TestGrid:
     def test_days_later_this_week_are_future_not_missed(self):
         grid = build_grid([], WEDNESDAY)
         last = grid.columns[-1]
-        assert last[:3] == (0, 0, 0)             # Mon-Wed have happened
-        assert last[3:] == (None,) * 4           # Thu-Sun have not
+        assert last[:3] == (0, 0, 0)  # Mon-Wed have happened
+        assert last[3:] == (None,) * 4  # Thu-Sun have not
 
     def test_an_active_day_lands_in_the_right_cell(self):
         grid = build_grid([WEDNESDAY], WEDNESDAY)
-        assert grid.columns[-1][2] == 1          # Wednesday is row 2 of the last week
+        assert grid.columns[-1][2] == 1  # Wednesday is row 2 of the last week
         assert grid.columns[-1][1] == 0
 
     def test_repeated_dates_deepen_the_shade(self):
@@ -156,7 +156,8 @@ class TestRendering:
 class TestRenderStreakGraph:
     async def test_a_user_with_no_history_still_gets_a_graph(self):
         buf = await render_streak_graph(
-            1, utc_now=datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc))
+            1, utc_now=datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc)
+        )
         assert buf.name == "streak.png"
         assert open_png(buf).size == (GRID_WIDTH, GRID_HEIGHT)
 
@@ -168,7 +169,8 @@ class TestRenderStreakGraph:
         for n in range(3):
             await store.sessions.log_session(1, WEDNESDAY - timedelta(days=n), KIND_DRILL)
         buf = await render_streak_graph(
-            1, utc_now=datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc))
+            1, utc_now=datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc)
+        )
         image = open_png(buf).convert("RGB")
         colours = {colour for _, colour in image.getcolors(maxcolors=64)}
         assert ImageColor.getrgb(LEVELS[0]) in colours
@@ -195,10 +197,14 @@ class TestRenderStreakGraph:
         # The loop-aware semaphore must not deadlock or leak across event loops.
         import asyncio
 
-        buffers = await asyncio.gather(*(
-            render_streak_graph(user_id,
-                                utc_now=datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc))
-            for user_id in range(5)))
+        buffers = await asyncio.gather(
+            *(
+                render_streak_graph(
+                    user_id, utc_now=datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc)
+                )
+                for user_id in range(5)
+            )
+        )
         assert all(open_png(buf).size == (GRID_WIDTH, GRID_HEIGHT) for buf in buffers)
 
 

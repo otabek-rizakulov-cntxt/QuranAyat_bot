@@ -8,8 +8,7 @@ strings = {
     ),
     "welcome_commands_header": "Команди:",
     "welcome_inline": (
-        "Можеш да ме използваш във всеки чат: напиши <b>@QuranAyat_bot</b>, следвано от "
-        "препратка."
+        "Можеш да ме използваш във всеки чат: напиши <b>@QuranAyat_bot</b>, следвано от препратка."
     ),
     "about": (
         "Този бот ти позволява да четеш Свещения Коран в Telegram на много "
@@ -63,9 +62,7 @@ strings = {
     "cmd_reciter": "Смяна на четеца",
     "cmd_about": "Източници и благодарности",
     "quran_name": "Коран",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Започни план за заучаване",
     "cmd_progress": "Какво си научил наизуст",
@@ -74,7 +71,6 @@ strings = {
     "cmd_streak": "Твоята серия от дни",
     "cmd_leaderboard": "Най-добрите тази седмица",
     "cmd_profile": "Твоят профил и настройки",
-
     # Shared wizard controls
     "wizard_cancelled": "Отменено.",
     "wizard_nothing_to_cancel": "Няма какво да се отмени.",
@@ -83,7 +79,6 @@ strings = {
     "btn_cancel": "Отказ",
     "btn_back": "Назад",
     "btn_confirm": "Потвърди",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Пн",
     "day_tue": "Вт",
@@ -92,7 +87,6 @@ strings = {
     "day_fri": "Пт",
     "day_sat": "Сб",
     "day_sun": "Нд",
-
     # Profile (B1-B3)
     "profile_title": "Твоят профил",
     "profile_name_set": "Име: {name}",
@@ -125,7 +119,6 @@ strings = {
     "reminder_saved": "Дневното напомняне е зададено за {time}.",
     "btn_reminder_off": "Изключи напомнянията",
     "reminder_off": "Дневните напомняния са изключени.",
-
     # Progress and /forgot (C3)
     "progress_title": "Какво си научил наизуст",
     "progress_surah_line": "{name}: {done}/{total} айета — {pct}%",
@@ -138,7 +131,6 @@ strings = {
     "forgot_usage": "Изпрати какво да премахна, например /forgot 67:5-6.",
     "forgot_done": "Отметката е премахната: {ref}.",
     "forgot_nothing": "Това не беше отбелязано като заучено.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Какво искаш да научиш наизуст?",
     "btn_target_surah": "Сура",
@@ -174,7 +166,6 @@ strings = {
     "btn_know_by_heart": "✅ Знам го наизуст",
     "know_confirmed": "{ref} е отбелязано като заучено. Вече си на {pct}%.",
     "know_already": "Това вече беше отбелязано.",
-
     # Recall check (E2, E3)
     "check_question": "Как продължава това?",
     "check_usage": "Изпрати какво да проверя, например /check 67.",
@@ -185,7 +176,6 @@ strings = {
         "колкото искаш, просто няма да се брои два пъти."
     ),
     "btn_check_start": "Изпитай ме",
-
     # Streaks (G2, G3)
     "streak_title": "Твоята серия",
     "streak_current": "Текуща серия, дни: {n}",
@@ -196,7 +186,6 @@ strings = {
     "streak_milestone_30": "Тридесет дни. Постоянството вече е на твоя страна.",
     "streak_milestone_100": "Сто дни. Много малко хора стигат дотук.",
     "streak_milestone_365": "Цяла година, всеки един ден. Нека Аллах опази това, което си научил.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Класацията за тази седмица",
     "leaderboard_row": "{rank}. {name} — {sessions}",

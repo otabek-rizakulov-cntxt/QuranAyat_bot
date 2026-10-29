@@ -23,17 +23,21 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from hifz import Ctx, callback, command
 from hifz.refs import format_ref, parse_reference
 from lib.hifz_progress import load_summary
-from services.progress import surah_spans, unmark  # noqa: F401 — re-exported
 from modules import Quran
+from services.progress import surah_spans, unmark  # noqa: F401 — re-exported
 
 __all__ = [
-    "REFRESH_CB", "SURAH_PREFIX", "MAX_BREAKDOWN_ROWS",
-    "progress_view", "surah_spans", "unmark",
+    "REFRESH_CB",
+    "SURAH_PREFIX",
+    "MAX_BREAKDOWN_ROWS",
+    "progress_view",
+    "surah_spans",
+    "unmark",
 ]
 
 # --- callback_data (Telegram caps it at 64 bytes) ------------------------------
-REFRESH_CB = "hg:r"             # 4 bytes — redraw the summary in place
-SURAH_PREFIX = "hg:s:"          # 5 + up to 3 = 8 bytes with "114"
+REFRESH_CB = "hg:r"  # 4 bytes — redraw the summary in place
+SURAH_PREFIX = "hg:s:"  # 5 + up to 3 = 8 bytes with "114"
 
 # A user deep into hifz has started dozens of surahs; the breakdown is a summary,
 # not a ledger. Anything past this is reachable by asking for the surah directly.
@@ -42,14 +46,18 @@ MAX_BREAKDOWN_ROWS = 8
 
 def _surah_line(ctx: Ctx, progress) -> str:
     """One "{name}: {done}/{total} ayahs — {pct}%" line. Ayahs, always."""
-    return ctx.tr("progress_surah_line",
-                  name=html.escape(Quran.get_surah_name(progress.surah)),
-                  done=progress.done, total=progress.total,
-                  pct=progress.percent_text)
+    return ctx.tr(
+        "progress_surah_line",
+        name=html.escape(Quran.get_surah_name(progress.surah)),
+        done=progress.done,
+        total=progress.total,
+        pct=progress.percent_text,
+    )
 
 
-async def progress_view(ctx: Ctx, focus_surah: Optional[int] = None
-                        ) -> Tuple[str, Optional[InlineKeyboardMarkup]]:
+async def progress_view(
+    ctx: Ctx, focus_surah: Optional[int] = None
+) -> Tuple[str, Optional[InlineKeyboardMarkup]]:
     """The `/progress` screen: its HTML text and its keyboard (None when empty).
 
     `focus_surah` names the surah the headline leads with; left out, the summary
@@ -65,12 +73,20 @@ async def progress_view(ctx: Ctx, focus_surah: Optional[int] = None
         lines.append(_surah_line(ctx, summary.focus))
     if summary.focus_juz is not None and summary.focus_juz_pages is not None:
         # Pages, not ayahs — see the module docstring.
-        lines.append(ctx.tr("progress_juz_line", n=summary.focus_juz.juz,
-                            pct=summary.focus_juz_pages.percent_text))
+        lines.append(
+            ctx.tr(
+                "progress_juz_line",
+                n=summary.focus_juz.juz,
+                pct=summary.focus_juz_pages.percent_text,
+            )
+        )
     pages = summary.quran_pages
-    lines.append(ctx.tr("progress_quran_line",
-                        pct=pages.percent_text if pages is not None
-                        else summary.quran.percent_text))
+    lines.append(
+        ctx.tr(
+            "progress_quran_line",
+            pct=pages.percent_text if pages is not None else summary.quran.percent_text,
+        )
+    )
 
     focus_number = summary.focus.surah if summary.focus is not None else None
     others = [s for s in summary.surahs if s.surah != focus_number]
@@ -85,19 +101,23 @@ async def progress_view(ctx: Ctx, focus_surah: Optional[int] = None
     juzs = [j for j in summary.juzs if j.juz != focus_juz_number]
     if juzs:
         lines.append("")
-        lines.extend(ctx.tr("progress_juz_line", n=j.juz, pct=j.percent_text)
-                     for j in juzs[:MAX_BREAKDOWN_ROWS])
+        lines.extend(
+            ctx.tr("progress_juz_line", n=j.juz, pct=j.percent_text)
+            for j in juzs[:MAX_BREAKDOWN_ROWS]
+        )
 
-    buttons = [InlineKeyboardButton(Quran.get_surah_name(s.surah),
-                                    callback_data=SURAH_PREFIX + str(s.surah))
-               for s in others[:MAX_BREAKDOWN_ROWS]]
-    rows = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
+    buttons = [
+        InlineKeyboardButton(
+            Quran.get_surah_name(s.surah), callback_data=SURAH_PREFIX + str(s.surah)
+        )
+        for s in others[:MAX_BREAKDOWN_ROWS]
+    ]
+    rows = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
     markup = InlineKeyboardMarkup(rows) if rows else None
     return "\n".join(lines), markup
 
 
-async def _show(ctx: Ctx, focus_surah: Optional[int] = None,
-                prefix: str = "") -> None:
+async def _show(ctx: Ctx, focus_surah: Optional[int] = None, prefix: str = "") -> None:
     text, markup = await progress_view(ctx, focus_surah)
     if prefix:
         text = html.escape(prefix) + "\n\n" + text
@@ -131,7 +151,7 @@ async def on_progress_tap(ctx: Ctx, cb_data: str) -> None:
     """
     focus = None
     if cb_data and cb_data.startswith(SURAH_PREFIX):
-        payload = cb_data[len(SURAH_PREFIX):].strip()
+        payload = cb_data[len(SURAH_PREFIX) :].strip()
         if payload.isdigit() and 1 <= int(payload) <= 114:
             focus = int(payload)
     await _show(ctx, focus)
@@ -156,5 +176,4 @@ async def forgot_command(ctx: Ctx) -> None:
         return
     # The confirmation carries the updated numbers: unmarking is the one moment a
     # percentage goes down, and hiding that would make the next /progress a shock.
-    await _show(ctx, ref.start_surah, prefix=ctx.tr("forgot_done",
-                                                    ref=format_ref(ref)))
+    await _show(ctx, ref.start_surah, prefix=ctx.tr("forgot_done", ref=format_ref(ref)))

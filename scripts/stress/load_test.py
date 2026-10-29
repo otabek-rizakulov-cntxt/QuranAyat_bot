@@ -46,9 +46,17 @@ def _docker_stats() -> dict | None:
     """One snapshot of the app container's CPU%/memory, or None if it's gone."""
     try:
         out = subprocess.run(
-            ["docker", "stats", "--no-stream", "--format",
-             "{{.CPUPerc}}\t{{.MemUsage}}", CONTAINER],
-            capture_output=True, text=True, timeout=5,
+            [
+                "docker",
+                "stats",
+                "--no-stream",
+                "--format",
+                "{{.CPUPerc}}\t{{.MemUsage}}",
+                CONTAINER,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
     except subprocess.TimeoutExpired:
         return None
@@ -83,7 +91,8 @@ async def _sample_stats(stop: asyncio.Event, samples: list) -> None:
 def _container_alive() -> bool:
     out = subprocess.run(
         ["docker", "inspect", "-f", "{{.State.Running}}", CONTAINER],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
     return out.returncode == 0 and out.stdout.strip() == "true"
 
@@ -91,7 +100,8 @@ def _container_alive() -> bool:
 def _oom_killed() -> bool:
     out = subprocess.run(
         ["docker", "inspect", "-f", "{{.State.OOMKilled}}", CONTAINER],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
     return out.stdout.strip() == "true"
 

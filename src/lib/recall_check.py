@@ -36,14 +36,25 @@ from modules.quran import Quran, TranslationRegistry
 
 __all__ = [
     "RecallQuestion",
-    "ARABIC", "OPTION_COUNT",
-    "MODE_CONTINUATION", "MODE_NEXT_AYAH",
-    "MAX_OPTION_WORDS", "MAX_OPTION_LENGTH",
-    "MIN_PROMPT_WORDS", "MAX_PROMPT_WORDS", "PROMPT_SHARE", "MAX_CONTEXT_WORDS",
-    "LENGTH_SLACK_RATIO", "LENGTH_SLACK_MIN",
-    "build_question", "pick_ayah", "pick_ayahs",
-    "display_length", "is_similar_length",
-    "preload_corpus", "corpus",
+    "ARABIC",
+    "OPTION_COUNT",
+    "MODE_CONTINUATION",
+    "MODE_NEXT_AYAH",
+    "MAX_OPTION_WORDS",
+    "MAX_OPTION_LENGTH",
+    "MIN_PROMPT_WORDS",
+    "MAX_PROMPT_WORDS",
+    "PROMPT_SHARE",
+    "MAX_CONTEXT_WORDS",
+    "LENGTH_SLACK_RATIO",
+    "LENGTH_SLACK_MIN",
+    "build_question",
+    "pick_ayah",
+    "pick_ayahs",
+    "display_length",
+    "is_similar_length",
+    "preload_corpus",
+    "corpus",
 ]
 
 # The recall check is always in Arabic. The user's translation language decides
@@ -82,8 +93,8 @@ MAX_CONTEXT_WORDS = 10
 # is the last `c` words of some other ayah — so word count can never be the tell.
 # `c` is capped so an option fits a button label.
 MAX_OPTION_WORDS = 8
-MAX_OPTION_LENGTH = 64          # in display characters, see display_length()
-MIN_OPTION_WORDS = 2            # below this the shortening stops, cap or no cap
+MAX_OPTION_LENGTH = 64  # in display characters, see display_length()
+MIN_OPTION_WORDS = 2  # below this the shortening stops, cap or no cap
 
 # An ayah needs two words of prompt and two of continuation before splitting it
 # tests anything; below that the question changes shape (see MODE_NEXT_AYAH).
@@ -149,6 +160,7 @@ class RecallQuestion:
 
 # --- corpus access -----------------------------------------------------------
 
+
 def corpus() -> Quran:
     """The vocalized Arabic text, parsed on first use and cached thereafter.
 
@@ -206,7 +218,7 @@ def _ayah_text(surah: int, ayah: int) -> str:
     if ayah == 1 and surah != 1:
         prefix = _basmala_prefix()
         if text.startswith(prefix):
-            text = text[len(prefix):].strip()
+            text = text[len(prefix) :].strip()
     return text
 
 
@@ -222,12 +234,18 @@ def _words(surah: int, ayah: int) -> List[str]:
 # Unicode update cannot leave a stray mark being counted as width. This is a few
 # hundred category lookups; the alternative is thirty-odd million of them per
 # corpus-wide distractor search, which is what profiling showed.
-_MARKS = {code: None
-          for block in (range(0x0600, 0x0700), range(0x0750, 0x0780),
-                        range(0x08A0, 0x0900), range(0xFB50, 0xFE00),
-                        range(0xFE70, 0xFF00))
-          for code in block
-          if unicodedata.category(chr(code)) == "Mn"}
+_MARKS = {
+    code: None
+    for block in (
+        range(0x0600, 0x0700),
+        range(0x0750, 0x0780),
+        range(0x08A0, 0x0900),
+        range(0xFB50, 0xFE00),
+        range(0xFE70, 0xFF00),
+    )
+    for code in block
+    if unicodedata.category(chr(code)) == "Mn"
+}
 _MARKS[ord(_TATWEEL)] = None
 _MARKS_AND_SPACE = dict(_MARKS)
 _MARKS_AND_SPACE[ord(" ")] = None
@@ -249,8 +267,7 @@ def display_length(text: str) -> int:
 
 def is_similar_length(length: int, target: int) -> bool:
     """Whether an option of `length` is close enough to `target` to hide in a set."""
-    return abs(length - target) <= max(LENGTH_SLACK_MIN,
-                                       int(round(LENGTH_SLACK_RATIO * target)))
+    return abs(length - target) <= max(LENGTH_SLACK_MIN, int(round(LENGTH_SLACK_RATIO * target)))
 
 
 def _key(text: str) -> str:
@@ -263,6 +280,7 @@ def _key(text: str) -> str:
 
 
 # --- determinism --------------------------------------------------------------
+
 
 def _rng(*parts) -> random.Random:
     """A private RNG seeded from the given parts.
@@ -284,6 +302,7 @@ def _date_key(local_date) -> str:
 
 
 # --- candidate pools ----------------------------------------------------------
+
 
 def _same_surah(surah: int, ayah: int) -> Iterator[Tuple[int, int]]:
     """Every other ayah of the same surah — the preferred distractor source.
@@ -351,8 +370,13 @@ def _whole_ayah_option(surah: int, ayah: int) -> Optional[str]:
     return _ayah_text(surah, ayah) or None
 
 
-def _gather(stages: Sequence[Iterable[Tuple[int, int]]], make_option, exclude_keys,
-            target_length: int, rng: random.Random) -> List[str]:
+def _gather(
+    stages: Sequence[Iterable[Tuple[int, int]]],
+    make_option,
+    exclude_keys,
+    target_length: int,
+    rng: random.Random,
+) -> List[str]:
     """Three distinct distractors, widening the search only as far as needed.
 
     Stages are tried in order and *accumulate*: once a stage brings the pool to
@@ -370,15 +394,15 @@ def _gather(stages: Sequence[Iterable[Tuple[int, int]]], make_option, exclude_ke
             text = make_option(*ref)
             if text is not None:
                 pool[ref] = (text, display_length(text))
-        near = _distinct(pool, exclude_keys,
-                         lambda length: is_similar_length(length, target_length))
+        near = _distinct(
+            pool, exclude_keys, lambda length: is_similar_length(length, target_length)
+        )
         if len(near) >= OPTION_COUNT - 1:
             return [near[key][0] for key in rng.sample(sorted(near), OPTION_COUNT - 1)]
 
     everything = _distinct(pool, exclude_keys, lambda length: True)
-    nearest = sorted(everything,
-                     key=lambda key: (abs(everything[key][1] - target_length), key))
-    return [everything[key][0] for key in nearest[:OPTION_COUNT - 1]]
+    nearest = sorted(everything, key=lambda key: (abs(everything[key][1] - target_length), key))
+    return [everything[key][0] for key in nearest[: OPTION_COUNT - 1]]
 
 
 def _distinct(pool: dict, exclude_keys, keep) -> dict:
@@ -401,6 +425,7 @@ def _distinct(pool: dict, exclude_keys, keep) -> dict:
 
 
 # --- the builder ---------------------------------------------------------------
+
 
 def _split_point(word_count: int) -> int:
     """How many opening words the prompt shows — the PROMPT rule, in code."""
@@ -450,32 +475,45 @@ def build_question(user_id: int, surah: int, ayah: int, local_date) -> RecallQue
     return question
 
 
-def _continuation_question(rng: random.Random, surah: int, ayah: int,
-                           words: List[str]) -> RecallQuestion:
+def _continuation_question(
+    rng: random.Random, surah: int, ayah: int, words: List[str]
+) -> RecallQuestion:
     """Opening of the ayah, then the words that continue it."""
     prompt_words = min(_split_point(len(words)), len(words) - 1)
     count = _option_words(len(words) - prompt_words)
     count = _shorten_to_button(words[prompt_words:], count)
 
-    correct = " ".join(words[prompt_words:prompt_words + count])
+    correct = " ".join(words[prompt_words : prompt_words + count])
     target = display_length(correct)
     distractors = _gather(
-        [_same_surah(surah, ayah),
-         _neighbours(surah, ayah, NEIGHBOUR_RADIUS),
-         _neighbours(surah, ayah, WIDE_RADIUS),
-         _everything()],
+        [
+            _same_surah(surah, ayah),
+            _neighbours(surah, ayah, NEIGHBOUR_RADIUS),
+            _neighbours(surah, ayah, WIDE_RADIUS),
+            _everything(),
+        ],
         lambda s, a: _option_from(s, a, count),
         {_key(correct)},
         target,
         rng,
     )
-    return _assemble(rng, surah, ayah, " ".join(words[:prompt_words]), correct,
-                     distractors, MODE_CONTINUATION, surah, ayah,
-                     prompt_truncated=False)
+    return _assemble(
+        rng,
+        surah,
+        ayah,
+        " ".join(words[:prompt_words]),
+        correct,
+        distractors,
+        MODE_CONTINUATION,
+        surah,
+        ayah,
+        prompt_truncated=False,
+    )
 
 
-def _next_ayah_question(rng: random.Random, surah: int, ayah: int,
-                        words: List[str]) -> RecallQuestion:
+def _next_ayah_question(
+    rng: random.Random, surah: int, ayah: int, words: List[str]
+) -> RecallQuestion:
     """Tail of the preceding ayah, then the whole (short) ayah under test.
 
     For an ayah of three words or fewer there is no honest place to cut: "الم"
@@ -487,28 +525,48 @@ def _next_ayah_question(rng: random.Random, surah: int, ayah: int,
     previous = Quran.get_previous_ayah(surah, ayah)
     context = _words(*previous)
     truncated = len(context) > MAX_CONTEXT_WORDS
-    prompt = " ".join(context[len(context) - MAX_CONTEXT_WORDS:] if truncated else context)
+    prompt = " ".join(context[len(context) - MAX_CONTEXT_WORDS :] if truncated else context)
 
     correct = " ".join(words)
     target = display_length(correct)
     distractors = _gather(
-        [_same_surah(surah, ayah),
-         _neighbours(surah, ayah, NEIGHBOUR_RADIUS),
-         _neighbours(surah, ayah, WIDE_RADIUS),
-         _everything()],
+        [
+            _same_surah(surah, ayah),
+            _neighbours(surah, ayah, NEIGHBOUR_RADIUS),
+            _neighbours(surah, ayah, WIDE_RADIUS),
+            _everything(),
+        ],
         _whole_ayah_option,
         {_key(correct), _key(prompt)},
         target,
         rng,
     )
-    return _assemble(rng, surah, ayah, prompt, correct, distractors,
-                     MODE_NEXT_AYAH, previous[0], previous[1],
-                     prompt_truncated=truncated)
+    return _assemble(
+        rng,
+        surah,
+        ayah,
+        prompt,
+        correct,
+        distractors,
+        MODE_NEXT_AYAH,
+        previous[0],
+        previous[1],
+        prompt_truncated=truncated,
+    )
 
 
-def _assemble(rng: random.Random, surah: int, ayah: int, prompt: str, correct: str,
-              distractors: Sequence[str], mode: str, prompt_surah: int,
-              prompt_ayah: int, prompt_truncated: bool) -> RecallQuestion:
+def _assemble(
+    rng: random.Random,
+    surah: int,
+    ayah: int,
+    prompt: str,
+    correct: str,
+    distractors: Sequence[str],
+    mode: str,
+    prompt_surah: int,
+    prompt_ayah: int,
+    prompt_truncated: bool,
+) -> RecallQuestion:
     """Shuffle the correct option in among the distractors and record where it landed."""
     options = [correct] + list(distractors)
     rng.shuffle(options)
@@ -527,6 +585,7 @@ def _assemble(rng: random.Random, surah: int, ayah: int, prompt: str, correct: s
 
 # --- which ayah to test --------------------------------------------------------
 
+
 def _span_tuple(span) -> Tuple[int, int, int, int]:
     """Accept either a 4-tuple or anything with `as_tuple()` — i.e. a hifz Ref.
 
@@ -541,8 +600,7 @@ def _span_tuple(span) -> Tuple[int, int, int, int]:
     return tuple(int(v) for v in values)  # type: ignore[return-value]
 
 
-def _span_length(start_surah: int, start_ayah: int,
-                 end_surah: int, end_ayah: int) -> int:
+def _span_length(start_surah: int, start_ayah: int, end_surah: int, end_ayah: int) -> int:
     """Ayahs in an inclusive cross-surah span; 0 if inverted.
 
     Counted from the surah lengths rather than walked, so a whole juz costs the
@@ -582,8 +640,7 @@ def pick_ayahs(user_id: int, span, local_date, count: int = 1) -> List[Tuple[int
     total = _span_length(start_surah, start_ayah, end_surah, end_ayah)
     if total <= 0 or count <= 0:
         return []
-    rng = _rng(user_id, start_surah, start_ayah, end_surah, end_ayah,
-               _date_key(local_date))
+    rng = _rng(user_id, start_surah, start_ayah, end_surah, end_ayah, _date_key(local_date))
     offsets = sorted(rng.sample(range(total), min(count, total)))
     return [_at_offset(start_surah, start_ayah, offset) for offset in offsets]
 

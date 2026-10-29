@@ -22,8 +22,8 @@ from lib.store import get_store
 from lib.store.hifz import HifzInterval, _covers, _merge_span, _overlaps, _split_span, _touches
 
 USER = 1
-AL_MULK = 67          # 30 ayahs
-YASIN = 36            # 83 ayahs
+AL_MULK = 67  # 30 ayahs
+YASIN = 36  # 83 ayahs
 
 
 async def _hifz():
@@ -58,14 +58,14 @@ def _assert_invariant(intervals):
     for interval in intervals:
         assert interval.start_ayah <= interval.end_ayah, "inverted span %r" % (interval,)
         assert interval.start_ayah >= 1, "ayah numbers start at 1: %r" % (interval,)
-        by_surah.setdefault(interval.surah, []).append(
-            (interval.start_ayah, interval.end_ayah))
+        by_surah.setdefault(interval.surah, []).append((interval.start_ayah, interval.end_ayah))
 
     for surah, spans in by_surah.items():
         spans.sort()
         for (_, first_end), (second_start, _) in zip(spans, spans[1:]):
             assert second_start > first_end + 1, (
-                "surah %d holds overlapping or adjacent spans %r" % (surah, spans))
+                "surah %d holds overlapping or adjacent spans %r" % (surah, spans)
+            )
 
 
 # --- The pure helpers ----------------------------------------------------------
@@ -74,19 +74,20 @@ def _assert_invariant(intervals):
 # arithmetic too — only its WHERE clauses and row plumbing remain unproven, and
 # the contract suite covers those against a real Postgres when one is available.
 
+
 class TestHelpers:
     def test_touches_accepts_overlap_and_abutment_but_not_a_gap(self):
-        assert _touches(1, 8, 5, 10)           # overlapping
-        assert _touches(1, 8, 9, 10)           # abutting on the right
-        assert _touches(9, 10, 1, 8)           # abutting on the left
-        assert _touches(1, 8, 3, 4)            # contained
-        assert not _touches(1, 8, 10, 12)      # one ayah of daylight
+        assert _touches(1, 8, 5, 10)  # overlapping
+        assert _touches(1, 8, 9, 10)  # abutting on the right
+        assert _touches(9, 10, 1, 8)  # abutting on the left
+        assert _touches(1, 8, 3, 4)  # contained
+        assert not _touches(1, 8, 10, 12)  # one ayah of daylight
         assert not _touches(10, 12, 1, 8)
 
     def test_overlaps_is_touches_without_the_abutment(self):
         assert _overlaps(1, 8, 5, 10)
         assert _overlaps(1, 8, 8, 8)
-        assert not _overlaps(1, 8, 9, 10)      # abutting is NOT overlapping
+        assert not _overlaps(1, 8, 9, 10)  # abutting is NOT overlapping
         assert not _overlaps(9, 10, 1, 8)
 
     def test_covers_is_true_only_for_full_containment(self):
@@ -101,23 +102,23 @@ class TestHelpers:
         assert _merge_span([(1, 30)], 5, 6) == (1, 30)
 
     def test_split_span_yields_zero_one_or_two_pieces(self):
-        assert _split_span(1, 10, 1, 10) == []                  # erased
-        assert _split_span(1, 10, 1, 4) == [(5, 10)]            # head trimmed
-        assert _split_span(1, 10, 7, 10) == [(1, 6)]            # tail trimmed
-        assert _split_span(1, 10, 5, 6) == [(1, 4), (7, 10)]    # the /forgot hole
-        assert _split_span(1, 10, 1, 30) == []                  # removal overhangs
+        assert _split_span(1, 10, 1, 10) == []  # erased
+        assert _split_span(1, 10, 1, 4) == [(5, 10)]  # head trimmed
+        assert _split_span(1, 10, 7, 10) == [(1, 6)]  # tail trimmed
+        assert _split_span(1, 10, 5, 6) == [(1, 4), (7, 10)]  # the /forgot hole
+        assert _split_span(1, 10, 1, 30) == []  # removal overhangs
 
     def test_split_span_pieces_never_leak_outside_the_original(self):
         for span_start, span_end in ((1, 10), (5, 5), (3, 8)):
             for start in range(1, 13):
                 for end in range(start, 13):
-                    for piece_start, piece_end in _split_span(span_start, span_end,
-                                                              start, end):
+                    for piece_start, piece_end in _split_span(span_start, span_end, start, end):
                         assert span_start <= piece_start <= piece_end <= span_end
                         assert piece_end < start or piece_start > end
 
 
 # --- Marking ------------------------------------------------------------------
+
 
 class TestAddInterval:
     async def test_partial_overlap_yields_one_interval(self):
@@ -144,13 +145,15 @@ class TestAddInterval:
         """The boundary the merge turns on, tested from both sides."""
         hifz = await _hifz()
         await hifz.add_interval(USER, AL_MULK, 1, 4)
-        await hifz.add_interval(USER, AL_MULK, 5, 8)          # gap of 0 -> merges
+        await hifz.add_interval(USER, AL_MULK, 5, 8)  # gap of 0 -> merges
         assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 8)]
 
         await hifz.add_interval(USER, YASIN, 1, 4)
-        await hifz.add_interval(USER, YASIN, 6, 8)            # gap of 1 -> stays split
+        await hifz.add_interval(USER, YASIN, 6, 8)  # gap of 1 -> stays split
         assert _spans(await hifz.list_intervals(USER, surah=YASIN)) == [
-            (YASIN, 1, 4), (YASIN, 6, 8)]
+            (YASIN, 1, 4),
+            (YASIN, 6, 8),
+        ]
 
     async def test_the_bridging_ayah_joins_both_neighbours(self):
         hifz = await _hifz()
@@ -180,8 +183,7 @@ class TestAddInterval:
         for start, end in ((1, 3), (6, 8), (11, 13), (20, 22)):
             await hifz.add_interval(USER, AL_MULK, start, end)
         await hifz.add_interval(USER, AL_MULK, 2, 12)
-        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 13),
-                                                           (AL_MULK, 20, 22)]
+        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 13), (AL_MULK, 20, 22)]
 
     async def test_the_returned_interval_always_covers_what_was_asked_for(self):
         """Callers show "you now know X" from the return value, so it must be true."""
@@ -219,7 +221,8 @@ class TestAddInterval:
         state = store.state
         for start, end in ((1, 10), (5, 15)):
             state.hifz_interval.append(
-                HifzInterval(state.next_id(), USER, AL_MULK, start, end, None))
+                HifzInterval(state.next_id(), USER, AL_MULK, start, end, None)
+            )
         await store.hifz.add_interval(USER, AL_MULK, 1, 20)
         intervals = await store.hifz.list_intervals(USER)
         assert _spans(intervals) == [(AL_MULK, 1, 20)]
@@ -240,10 +243,10 @@ class TestAddInterval:
         state = store.state
         for start, end in ((1, 10), (5, 15)):
             state.hifz_interval.append(
-                HifzInterval(state.next_id(), USER, AL_MULK, start, end, None))
+                HifzInterval(state.next_id(), USER, AL_MULK, start, end, None)
+            )
         await store.hifz.add_interval(USER, AL_MULK, 12, 20)
-        assert _spans(await store.hifz.list_intervals(USER)) == [(AL_MULK, 1, 10),
-                                                                  (AL_MULK, 5, 20)]
+        assert _spans(await store.hifz.list_intervals(USER)) == [(AL_MULK, 1, 10), (AL_MULK, 5, 20)]
 
     async def test_the_advisory_lock_key_is_unique_per_user_and_surah(self):
         """The bigint packed for `pg_advisory_xact_lock` must not collide.
@@ -255,15 +258,17 @@ class TestAddInterval:
         Telegram id because the pair is packed rather than hashed.
         """
         from lib.store.hifz import PostgresHifzStore
+
         key = PostgresHifzStore._lock_key
-        pairs = [(user, surah)
-                 for user in (1, 7_000_000_000, 7_000_000_001)
-                 for surah in range(1, 115)]
+        pairs = [
+            (user, surah) for user in (1, 7_000_000_000, 7_000_000_001) for surah in range(1, 115)
+        ]
         assert len({key(*pair) for pair in pairs}) == len(pairs)
-        assert key(7_000_000_000, 114) < 2 ** 63 - 1
+        assert key(7_000_000_000, 114) < 2**63 - 1
 
 
 # --- Unmarking ----------------------------------------------------------------
+
 
 class TestRemoveRange:
     async def test_forgot_the_middle_splits_in_two(self):
@@ -272,8 +277,7 @@ class TestRemoveRange:
         await hifz.add_interval(USER, AL_MULK, 1, 10)
         pieces = await hifz.remove_range(USER, AL_MULK, 5, 6)
         assert [(p.start_ayah, p.end_ayah) for p in pieces] == [(1, 4), (7, 10)]
-        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4),
-                                                           (AL_MULK, 7, 10)]
+        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4), (AL_MULK, 7, 10)]
 
     async def test_the_split_halves_keep_the_original_marked_at(self):
         """Forgetting the middle of a page does not un-learn the edges.
@@ -284,15 +288,13 @@ class TestRemoveRange:
         hifz = await _hifz()
         original = await hifz.add_interval(USER, AL_MULK, 1, 10)
         pieces = await hifz.remove_range(USER, AL_MULK, 5, 6)
-        assert [p.marked_at for p in pieces] == [original.marked_at,
-                                                 original.marked_at]
+        assert [p.marked_at for p in pieces] == [original.marked_at, original.marked_at]
 
     async def test_removing_a_single_ayah_from_the_middle(self):
         hifz = await _hifz()
         await hifz.add_interval(USER, AL_MULK, 1, 10)
         await hifz.remove_range(USER, AL_MULK, 5, 5)
-        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4),
-                                                           (AL_MULK, 6, 10)]
+        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4), (AL_MULK, 6, 10)]
 
     async def test_removing_the_head_trims_and_removing_the_tail_trims(self):
         hifz = await _hifz()
@@ -314,7 +316,10 @@ class TestRemoveRange:
             await hifz.add_interval(USER, AL_MULK, start, end)
         await hifz.remove_range(USER, AL_MULK, 4, 18)
         assert _spans(await hifz.list_intervals(USER)) == [
-            (AL_MULK, 1, 3), (AL_MULK, 19, 20), (AL_MULK, 25, 28)]
+            (AL_MULK, 1, 3),
+            (AL_MULK, 19, 20),
+            (AL_MULK, 25, 28),
+        ]
 
     async def test_removal_does_not_reach_an_abutting_neighbour(self):
         """The asymmetry between marking and unmarking, stated as a test.
@@ -325,8 +330,7 @@ class TestRemoveRange:
         await hifz.add_interval(USER, AL_MULK, 1, 4)
         await hifz.add_interval(USER, AL_MULK, 7, 10)
         await hifz.remove_range(USER, AL_MULK, 5, 6)
-        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4),
-                                                           (AL_MULK, 7, 10)]
+        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4), (AL_MULK, 7, 10)]
 
     async def test_removing_an_unmarked_range_is_a_no_op(self):
         hifz = await _hifz()
@@ -342,8 +346,7 @@ class TestRemoveRange:
         hifz = await _hifz()
         await hifz.add_interval(USER, AL_MULK, 1, 10)
         await hifz.remove_range(USER, AL_MULK, 6, 5)
-        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4),
-                                                           (AL_MULK, 7, 10)]
+        assert _spans(await hifz.list_intervals(USER)) == [(AL_MULK, 1, 4), (AL_MULK, 7, 10)]
 
     async def test_removal_is_confined_to_one_surah_and_one_user(self):
         hifz = await _hifz()
@@ -403,6 +406,7 @@ class TestEveryRelativePosition:
 
 # --- The property test ---------------------------------------------------------
 
+
 @pytest.mark.parametrize("seed", [1, 2, 3, 5, 8, 13, 21, 34])
 async def test_any_sequence_of_marks_and_removals_keeps_the_invariant(seed):
     """A long random walk of add/remove, checked against a set of ayahs.
@@ -440,7 +444,8 @@ async def test_any_sequence_of_marks_and_removals_keeps_the_invariant(seed):
         assert _ayahs(intervals) == known
         assert await hifz.count_ayahs(USER) == len(known)
         assert await hifz.count_ayahs(USER, surah=AL_MULK) == len(
-            [a for s, a in known if s == AL_MULK])
+            [a for s, a in known if s == AL_MULK]
+        )
 
 
 @pytest.mark.parametrize("seed", [7, 42])
@@ -480,10 +485,15 @@ async def test_intervals_from_many_surahs_come_back_in_mushaf_order():
         await hifz.add_interval(USER, surah, 1, 1)
     intervals = await hifz.list_intervals(USER)
     assert _spans(intervals) == [
-        (1, 1, 1), (1, 3, 5),
-        (2, 1, 1), (2, 3, 5),
-        (36, 1, 1), (36, 3, 5),
-        (67, 1, 1), (67, 3, 5),
-        (114, 1, 1), (114, 3, 5),
+        (1, 1, 1),
+        (1, 3, 5),
+        (2, 1, 1),
+        (2, 3, 5),
+        (36, 1, 1),
+        (36, 3, 5),
+        (67, 1, 1),
+        (67, 3, 5),
+        (114, 1, 1),
+        (114, 3, 5),
     ]
     _assert_invariant(intervals)

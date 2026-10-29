@@ -23,7 +23,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # Make `from locales.languages import ...` work when run from the repo root.
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from locales.languages import (  # noqa: E402
-    LANGUAGES, ARABIC_ORIGINAL, TRANSLIT_UZ,
+    ARABIC_ORIGINAL,
+    LANGUAGES,
+    TRANSLIT_UZ,
 )
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -39,12 +41,42 @@ TOTAL_VERSES = 6236
 # The Latin values use the official Uzbek letters: oʻ / gʻ use U+02BB (ʻ) and the
 # tutuq belgisi uses U+02BC (ʼ). Multi-letter Cyrillic sounds map to digraphs.
 _UZ_MAP = {
-    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "ё": "yo",
-    "ж": "j", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
-    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
-    "ф": "f", "х": "x", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "shch",
-    "ъ": "ʼ", "ы": "i", "ь": "", "э": "e", "ю": "yu", "я": "ya",
-    "ў": "oʻ", "қ": "q", "ғ": "gʻ", "ҳ": "h",
+    "а": "a",
+    "б": "b",
+    "в": "v",
+    "г": "g",
+    "д": "d",
+    "ё": "yo",
+    "ж": "j",
+    "з": "z",
+    "и": "i",
+    "й": "y",
+    "к": "k",
+    "л": "l",
+    "м": "m",
+    "н": "n",
+    "о": "o",
+    "п": "p",
+    "р": "r",
+    "с": "s",
+    "т": "t",
+    "у": "u",
+    "ф": "f",
+    "х": "x",
+    "ц": "ts",
+    "ч": "ch",
+    "ш": "sh",
+    "щ": "shch",
+    "ъ": "ʼ",
+    "ы": "i",
+    "ь": "",
+    "э": "e",
+    "ю": "yu",
+    "я": "ya",
+    "ў": "oʻ",
+    "қ": "q",
+    "ғ": "gʻ",
+    "ҳ": "h",
 }
 # `е` is contextual: "ye" at the start of a word or after a vowel, "e" otherwise.
 _UZ_VOWELS = set("аоуэиўеёюя")
@@ -61,7 +93,7 @@ def transliterate_uz(text: str) -> str:
         else:
             mapped = _UZ_MAP.get(lower)
         if mapped is None:
-            out.append(ch)          # digits, punctuation, spaces, etc.
+            out.append(ch)  # digits, punctuation, spaces, etc.
             continue
         if ch != lower and mapped:  # was uppercase -> capitalise the digraph
             mapped = mapped[0].upper() + mapped[1:]
@@ -83,7 +115,9 @@ def to_lines(data: dict) -> str:
     lines = []
     for surah in sorted(data["surahs"], key=lambda s: s["number"]):
         for ayah in sorted(surah["ayahs"], key=lambda a: a["numberInSurah"]):
-            text = (ayah["text"] or "").replace("|", "/").replace("\r", " ").replace("\n", " ").strip()
+            text = (
+                (ayah["text"] or "").replace("|", "/").replace("\r", " ").replace("\n", " ").strip()
+            )
             lines.append("%d|%d|%s" % (surah["number"], ayah["numberInSurah"], text))
     if len(lines) != TOTAL_VERSES:
         raise ValueError("expected %d verses, got %d" % (TOTAL_VERSES, len(lines)))
@@ -114,8 +148,7 @@ def main() -> None:
         if unknown:
             sys.exit("unknown language code(s): %s" % ", ".join(sorted(unknown)))
 
-    to_fetch = [l for l in LANGUAGES
-                if l.edition != TRANSLIT_UZ and (not only or l.code in only)]
+    to_fetch = [l for l in LANGUAGES if l.edition != TRANSLIT_UZ and (not only or l.code in only)]
     meta: dict[str, dict] = {}
     failures: dict[str, str] = {}
 
@@ -135,7 +168,7 @@ def main() -> None:
     # Derive Uzbek Latin from the bundled Uzbek Cyrillic.
     uz_cyrl_path = os.path.join(OUT_DIR, "uz-Cyrl.txt")
     if only and "uz" not in only:
-        pass                                    # not part of this subset
+        pass  # not part of this subset
     elif os.path.exists(uz_cyrl_path):
         with open(uz_cyrl_path, encoding="utf-8") as f:
             cyr = f.read()
@@ -148,8 +181,9 @@ def main() -> None:
     if only:
         # A subset run only knows the editions it fetched, so rewriting the table
         # would blank every other row. The full run regenerates it correctly.
-        print("\n(subset run: ATTRIBUTIONS.md left alone — "
-              "re-run without arguments to regenerate it)")
+        print(
+            "\n(subset run: ATTRIBUTIONS.md left alone — re-run without arguments to regenerate it)"
+        )
     else:
         write_attributions(meta)
 
@@ -182,11 +216,16 @@ def write_attributions(meta: dict) -> None:
         if lang.edition == TRANSLIT_UZ:
             edition_id, translator = "(derived from uz-Cyrl)", "Automatic transliteration"
         elif lang.edition == ARABIC_ORIGINAL:
-            edition_id, translator = ARABIC_EDITION, ed.get("englishName", "Original Arabic (Tanzil)")
+            edition_id, translator = (
+                ARABIC_EDITION,
+                ed.get("englishName", "Original Arabic (Tanzil)"),
+            )
         else:
             edition_id = lang.edition
             translator = ed.get("englishName") or ed.get("name") or "—"
-        lines.append("| `%s` | %s | `%s` | %s |" % (lang.code, lang.english, edition_id, translator))
+        lines.append(
+            "| `%s` | %s | `%s` | %s |" % (lang.code, lang.english, edition_id, translator)
+        )
     lines.append("")
     with open(os.path.join(REPO_ROOT, "ATTRIBUTIONS.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines))

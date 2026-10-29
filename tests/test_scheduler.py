@@ -51,8 +51,11 @@ def _isolate_handlers():
     # Keep the kinds this module defines itself (the built-in "message"), drop the
     # ones feature modules installed. Filtering by defining module rather than by
     # name means a new feature kind never has to be added to a list here.
-    builtin = {kind: fn for kind, fn in saved.items()
-               if getattr(fn, "__module__", "") == scheduler.__name__}
+    builtin = {
+        kind: fn
+        for kind, fn in saved.items()
+        if getattr(fn, "__module__", "") == scheduler.__name__
+    }
     scheduler.SEND_HANDLERS.clear()
     scheduler.SEND_HANDLERS.update(builtin)
     yield
@@ -101,18 +104,18 @@ def _record(kind="drill"):
 
 # --- F2: idempotent enqueue ----------------------------------------------------
 
+
 class TestIdempotentEnqueue:
     async def test_the_same_key_twice_inserts_one_row_and_raises_nothing(self, store):
         first = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="2026-08-01")
         second = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="2026-08-01")
 
         assert first is not None
-        assert second is None                       # not an exception — a None
+        assert second is None  # not an exception — a None
         assert len(store.state.scheduled_send) == 1
 
     async def test_the_key_is_kind_target_local_date(self, store):
-        row = await scheduler.enqueue(store, "plan_day", 42, _at(7),
-                                      local_day=_at(7).date())
+        row = await scheduler.enqueue(store, "plan_day", 42, _at(7), local_day=_at(7).date())
         assert row.idempotency_key == "plan_day:42:2026-08-01"
 
     async def test_different_days_are_different_rows(self, store):
@@ -131,27 +134,30 @@ class TestIdempotentEnqueue:
 
     async def test_schedule_daily_uses_the_recipients_local_clock(self, store):
         # 07:00 local at UTC+05:00 is 02:00 UTC.
-        row = await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0),
-                                             "+05:00", now=_at(0))
+        row = await scheduler.schedule_daily(
+            store, "plan_day", 501, time(7, 0), "+05:00", now=_at(0)
+        )
         assert row.due_at == _at(2)
         assert row.idempotency_key == "plan_day:501:2026-08-01"
-        assert row.payload["offset"] == "+05:00"    # so staleness knows the local day
+        assert row.payload["offset"] == "+05:00"  # so staleness knows the local day
 
     async def test_schedule_daily_twice_in_one_local_day_queues_once(self, store):
-        first = await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0),
-                                               "+05:00", now=_at(0))
-        again = await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0),
-                                               "+05:00", now=_at(1))
+        first = await scheduler.schedule_daily(
+            store, "plan_day", 501, time(7, 0), "+05:00", now=_at(0)
+        )
+        again = await scheduler.schedule_daily(
+            store, "plan_day", 501, time(7, 0), "+05:00", now=_at(1)
+        )
         assert first is not None and again is None
         assert len(store.state.scheduled_send) == 1
 
     async def test_schedule_daily_after_firing_queues_tomorrow(self, store):
-        await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0), "+05:00",
-                                       now=_at(0))
+        await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0), "+05:00", now=_at(0))
         # Re-scheduling from the moment it fired must advance a day, never re-fire
         # the same instant (next_due_utc is strictly-after for this reason).
-        tomorrow = await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0),
-                                                  "+05:00", now=_at(2))
+        tomorrow = await scheduler.schedule_daily(
+            store, "plan_day", 501, time(7, 0), "+05:00", now=_at(2)
+        )
         assert tomorrow is not None
         assert tomorrow.due_at == _at(2, day=2)
         assert tomorrow.idempotency_key == "plan_day:501:2026-08-02"
@@ -159,11 +165,13 @@ class TestIdempotentEnqueue:
 
 # --- F1: the loop --------------------------------------------------------------
 
+
 class TestTick:
     async def test_a_due_row_is_delivered_and_marked_sent(self, store, bot):
         seen = _record()
-        row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="2026-08-01",
-                                      payload={"surah": 67})
+        row = await scheduler.enqueue(
+            store, "drill", 501, _at(7), local_day="2026-08-01", payload={"surah": 67}
+        )
 
         result = await scheduler.tick(bot, {}, now=_at(7), store=store)
 
@@ -178,7 +186,7 @@ class TestTick:
 
         result = await scheduler.tick(bot, {}, now=_at(6, 59), store=store)
 
-        assert result == TickResult()               # nothing happened at all
+        assert result == TickResult()  # nothing happened at all
         assert seen == []
         assert (await store.schedule.get(row.id)).state == "pending"
 
@@ -195,8 +203,7 @@ class TestTick:
 
     async def test_the_context_carries_the_row_and_the_store(self, store, bot):
         seen = _record()
-        await scheduler.enqueue(store, "drill", 501, _at(7), local_day="2026-08-01",
-                                thread_id=77)
+        await scheduler.enqueue(store, "drill", 501, _at(7), local_day="2026-08-01", thread_id=77)
 
         await scheduler.tick(bot, {"index": "x"}, now=_at(7), store=store)
 
@@ -214,7 +221,7 @@ class TestTick:
         result = await scheduler.tick(bot, {}, now=_at(9), store=store, limit=1)
 
         assert result.claimed == 1
-        assert seen[0].chat_id == 501               # the older due row went first
+        assert seen[0].chat_id == 501  # the older due row went first
 
 
 class TestTheLoopSurvivesABadRow:
@@ -235,7 +242,7 @@ class TestTheLoopSurvivesABadRow:
         result = await scheduler.tick(bot, {}, now=_at(8), store=store)
 
         assert (result.claimed, result.sent, result.failed) == (2, 1, 1)
-        assert delivered == [502]                   # the queue kept moving
+        assert delivered == [502]  # the queue kept moving
         assert (await store.schedule.get(bad.id)).state == "failed"
         assert (await store.schedule.get(ok.id)).state == "sent"
         assert isinstance(result.errors[0][1], KeyError)
@@ -253,7 +260,7 @@ class TestTheLoopSurvivesABadRow:
         await scheduler.tick(bot, {}, now=_at(7), store=store)
         await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
 
-        assert len(calls) == 1                      # 'failed' is not claimable
+        assert len(calls) == 1  # 'failed' is not claimable
 
     async def test_a_blocked_user_is_terminal_not_retried_forever(self, store, bot):
         calls = []
@@ -272,8 +279,7 @@ class TestTheLoopSurvivesABadRow:
         await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
         assert len(calls) == 1
 
-    async def test_an_unregistered_kind_fails_its_row_without_stopping_the_batch(
-            self, store, bot):
+    async def test_an_unregistered_kind_fails_its_row_without_stopping_the_batch(self, store, bot):
         delivered = _record("drill")
         orphan = await scheduler.enqueue(store, "not_a_kind", 501, _at(7), local_day="a")
         await scheduler.enqueue(store, "drill", 502, _at(7, 30), local_day="b")
@@ -284,7 +290,7 @@ class TestTheLoopSurvivesABadRow:
         assert (await store.schedule.get(orphan.id)).state == "failed"
         assert len(delivered) == 1
 
-    async def test_a_traceback_is_printed_when_a_send_fails(self, store, bot, capsys):
+    async def test_a_traceback_is_logged_when_a_send_fails(self, store, bot, caplog):
         @scheduler.send_handler("poison")
         async def poisoned(ctx):
             raise ValueError("bad payload")
@@ -292,14 +298,14 @@ class TestTheLoopSurvivesABadRow:
         await scheduler.enqueue(store, "poison", 501, _at(7), local_day="a")
         await scheduler.tick(bot, {}, now=_at(7), store=store)
 
-        captured = capsys.readouterr()
-        combined = captured.out + captured.err
+        combined = caplog.text  # the message plus the formatted traceback
         assert "ValueError: bad payload" in combined
-        assert "Traceback" in combined              # not just the type and message
-        assert "test_scheduler.py" in combined      # with the frame that raised
+        assert "Traceback" in combined  # not just the type and message
+        assert "test_scheduler.py" in combined  # with the frame that raised
 
 
 # --- F3: catch-up and staleness ------------------------------------------------
+
 
 class TestCatchUp:
     async def test_a_window_missed_during_a_restart_still_fires(self, store, bot):
@@ -312,24 +318,22 @@ class TestCatchUp:
         assert result.sent == 1
         assert len(seen) == 1
 
-    async def test_a_window_missed_overnight_is_dropped_not_delivered_at_3am(
-            self, store, bot):
+    async def test_a_window_missed_overnight_is_dropped_not_delivered_at_3am(self, store, bot):
         seen = _record()
         row = await scheduler.enqueue(store, "drill", 501, _at(7), local_day="2026-08-01")
 
         result = await scheduler.catch_up(bot, {}, now=_at(2, 0, day=2), store=store)
 
-        assert seen == []                           # nobody is woken at 03:00
+        assert seen == []  # nobody is woken at 03:00
         assert result.dropped == 1 and result.sent == 0
-        assert await store.schedule.get(row.id) is None     # pruned, not left to rot
+        assert await store.schedule.get(row.id) is None  # pruned, not left to rot
 
-    async def test_a_row_past_the_recipients_local_midnight_is_not_delivered(
-            self, store, bot):
+    async def test_a_row_past_the_recipients_local_midnight_is_not_delivered(self, store, bot):
         seen = _record()
         # 23:30 local at UTC+05:00 is 18:30 UTC.
-        row = await scheduler.enqueue(store, "drill", 501, _at(18, 30),
-                                      local_day="2026-08-01",
-                                      payload={"offset": "+05:00"})
+        row = await scheduler.enqueue(
+            store, "drill", 501, _at(18, 30), local_day="2026-08-01", payload={"offset": "+05:00"}
+        )
 
         # 40 minutes late — inside the 6 h window, but it is now 00:10 tomorrow
         # for the recipient, and yesterday's portion is not today's.
@@ -341,8 +345,9 @@ class TestCatchUp:
 
     async def test_a_row_still_inside_the_local_day_is_delivered(self, store, bot):
         seen = _record()
-        await scheduler.enqueue(store, "drill", 501, _at(18, 30), local_day="2026-08-01",
-                                payload={"offset": "+05:00"})
+        await scheduler.enqueue(
+            store, "drill", 501, _at(18, 30), local_day="2026-08-01", payload={"offset": "+05:00"}
+        )
 
         result = await scheduler.tick(bot, {}, now=_at(18, 50), store=store)
 
@@ -360,8 +365,7 @@ class TestCatchUp:
         assert result.released == 1
         assert result.sent == 1 and len(seen) == 1
 
-    async def test_a_fresh_claim_is_not_released_out_from_under_a_live_send(
-            self, store, bot):
+    async def test_a_fresh_claim_is_not_released_out_from_under_a_live_send(self, store, bot):
         """A slow send must not be released and re-claimed by the next tick —
         that would be the one way this design double-sends while running."""
         seen = _record()
@@ -369,15 +373,14 @@ class TestCatchUp:
         await store.schedule.claim_due(_at(7))
         # The store stamps claimed_at from the wall clock; these tests inject a
         # `now`, so restate the stamp on the same (fabricated) timeline.
-        _claimed_at(store, _at(7))                  # in flight, one minute ago
+        _claimed_at(store, _at(7))  # in flight, one minute ago
 
         # A routine tick (not a boot) only releases claims older than CLAIM_TIMEOUT.
         result = await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
 
         assert result.released == 0 and seen == []
 
-    async def test_a_claim_older_than_the_timeout_is_released_by_a_routine_tick(
-            self, store, bot):
+    async def test_a_claim_older_than_the_timeout_is_released_by_a_routine_tick(self, store, bot):
         seen = _record()
         await scheduler.enqueue(store, "drill", 501, _at(7), local_day="a")
         await store.schedule.claim_due(_at(7))
@@ -399,10 +402,16 @@ class TestRestartDeliversExactlyOnce:
     async def test_enqueue_restart_then_fire_delivers_exactly_once(self, state, bot):
         # --- boot 1: the wizard schedules tomorrow's portion, then the app dies.
         store = InMemoryStore(state)
-        row = await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0),
-                                             "+05:00", now=_at(20, day=1),
-                                             payload={"plan_day_id": 9})
-        assert row.due_at == _at(2, day=2)          # 07:00 local next day
+        row = await scheduler.schedule_daily(
+            store,
+            "plan_day",
+            501,
+            time(7, 0),
+            "+05:00",
+            now=_at(20, day=1),
+            payload={"plan_day_id": 9},
+        )
+        assert row.due_at == _at(2, day=2)  # 07:00 local next day
 
         # --- boot 2: a brand new process, same rows.
         delivered = []
@@ -413,7 +422,7 @@ class TestRestartDeliversExactlyOnce:
             delivered.append(ctx.payload["plan_day_id"])
 
         booted = await scheduler.catch_up(bot, {}, now=_at(1, 55, day=2), store=store)
-        assert booted.claimed == 0                  # not yet due; nothing fires early
+        assert booted.claimed == 0  # not yet due; nothing fires early
 
         fired = await scheduler.tick(bot, {}, now=_at(2, day=2), store=store)
         assert (fired.sent, delivered) == (1, [9])
@@ -423,24 +432,25 @@ class TestRestartDeliversExactlyOnce:
         after = await scheduler.catch_up(bot, {}, now=_at(2, 1, day=2), store=store)
 
         assert after.claimed == 0
-        assert delivered == [9]                     # exactly once, across two restarts
+        assert delivered == [9]  # exactly once, across two restarts
 
     async def test_rescheduling_after_a_restart_cannot_double_queue(self, state, bot):
         """A double boot re-runs whatever schedules the day's push. F2 is what
         makes that a no-op rather than two reminders."""
         store = InMemoryStore(state)
-        first = await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0),
-                                               "+05:00", now=_at(20, day=1))
+        first = await scheduler.schedule_daily(
+            store, "plan_day", 501, time(7, 0), "+05:00", now=_at(20, day=1)
+        )
 
-        store = InMemoryStore(state)                # restart, same rows
-        second = await scheduler.schedule_daily(store, "plan_day", 501, time(7, 0),
-                                                 "+05:00", now=_at(21, day=1))
+        store = InMemoryStore(state)  # restart, same rows
+        second = await scheduler.schedule_daily(
+            store, "plan_day", 501, time(7, 0), "+05:00", now=_at(21, day=1)
+        )
 
         assert first is not None and second is None
         assert len(state.scheduled_send) == 1
 
-    async def test_a_crash_between_send_and_mark_sent_is_the_known_window(
-            self, state, bot):
+    async def test_a_crash_between_send_and_mark_sent_is_the_known_window(self, state, bot):
         """Honest test of the one duplicate this design allows.
 
         The process dies after Telegram accepted the message but before
@@ -451,9 +461,10 @@ class TestRestartDeliversExactlyOnce:
         today's row, never a backlog.
         """
         store = InMemoryStore(state)
-        await scheduler.enqueue(store, "plan_day", 501, _at(7), local_day="a",
-                                payload={"plan_day_id": 9})
-        await store.schedule.claim_due(_at(7))      # claimed... sent... then crash
+        await scheduler.enqueue(
+            store, "plan_day", 501, _at(7), local_day="a", payload={"plan_day_id": 9}
+        )
+        await store.schedule.claim_due(_at(7))  # claimed... sent... then crash
 
         deliveries = []
         store = InMemoryStore(state)
@@ -465,12 +476,13 @@ class TestRestartDeliversExactlyOnce:
             deliveries.append(ctx.payload["plan_day_id"])
 
         await scheduler.catch_up(bot, {}, now=_at(7, 1), store=store)
-        assert deliveries == [9]                    # re-sent: the documented window
+        assert deliveries == [9]  # re-sent: the documented window
 
         # ... but the same crash a day later delivers nothing at all.
         store = InMemoryStore(state)
-        await scheduler.enqueue(store, "plan_day", 502, _at(7), local_day="b",
-                                payload={"plan_day_id": 10})
+        await scheduler.enqueue(
+            store, "plan_day", 502, _at(7), local_day="b", payload={"plan_day_id": 10}
+        )
         await store.schedule.claim_due(_at(7))
         store = InMemoryStore(state)
         result = await scheduler.catch_up(bot, {}, now=_at(9, day=2), store=store)
@@ -481,16 +493,16 @@ class TestRestartDeliversExactlyOnce:
 
 # --- run_scheduler -------------------------------------------------------------
 
+
 class TestRunScheduler:
     async def test_it_ticks_and_stops_on_max_ticks(self, store, bot):
         seen = _record()
-        await scheduler.enqueue(store, "drill", 501, _at(7) - timedelta(days=400),
-                                local_day="a")
+        await scheduler.enqueue(store, "drill", 501, _at(7) - timedelta(days=400), local_day="a")
         await scheduler.enqueue(store, "drill", 502, datetime.now(UTC), local_day="b")
 
         await scheduler.run_scheduler(bot, {}, interval=0, store=store, max_ticks=1)
 
-        assert [c.chat_id for c in seen] == [502]   # the 400-day-old row was dropped
+        assert [c.chat_id for c in seen] == [502]  # the 400-day-old row was dropped
 
     async def test_a_tick_that_raises_does_not_kill_the_loop(self, store, bot):
         calls = {"n": 0}
@@ -508,22 +520,21 @@ class TestRunScheduler:
 
         await scheduler.run_scheduler(bot, {}, interval=0, store=store, max_ticks=2)
 
-        assert calls["n"] == 2                      # it came back for a second pass
+        assert calls["n"] == 2  # it came back for a second pass
         assert len(seen) == 1
 
-    async def test_a_stop_event_ends_the_loop_without_waiting_out_the_interval(
-            self, store, bot):
+    async def test_a_stop_event_ends_the_loop_without_waiting_out_the_interval(self, store, bot):
         stop = asyncio.Event()
         stop.set()
 
         # interval is a minute; if the event were not honoured this would hang.
-        await scheduler.run_scheduler(bot, {}, interval=60, store=store,
-                                      stop_event=stop, max_ticks=None)
+        await scheduler.run_scheduler(
+            bot, {}, interval=60, store=store, stop_event=stop, max_ticks=None
+        )
 
     async def test_cancellation_propagates(self, store, bot):
-        task = asyncio.create_task(
-            scheduler.run_scheduler(bot, {}, interval=60, store=store))
-        await asyncio.sleep(0)                      # let it reach the first wait
+        task = asyncio.create_task(scheduler.run_scheduler(bot, {}, interval=60, store=store))
+        await asyncio.sleep(0)  # let it reach the first wait
         await asyncio.sleep(0)
         task.cancel()
         with pytest.raises(asyncio.CancelledError):
@@ -532,6 +543,7 @@ class TestRunScheduler:
 
 # --- The registry and the built-in kind ----------------------------------------
 
+
 class TestRegistry:
     def test_registering_a_kind_twice_raises_at_import_time(self):
         @scheduler.send_handler("dup")
@@ -539,6 +551,7 @@ class TestRegistry:
             pass
 
         with pytest.raises(ValueError):
+
             @scheduler.send_handler("dup")
             async def second(ctx):
                 pass
@@ -555,29 +568,34 @@ class TestRegistry:
         assert scheduler.registered_kinds()["message"] == "lib.scheduler"
 
     async def test_the_builtin_message_kind_delivers_text(self, store, bot):
-        await scheduler.enqueue(store, "message", 501, _at(7), local_day="a",
-                                payload={"text": "Assalamu alaykum"})
+        await scheduler.enqueue(
+            store, "message", 501, _at(7), local_day="a", payload={"text": "Assalamu alaykum"}
+        )
 
         result = await scheduler.tick(bot, {}, now=_at(7), store=store)
 
         assert result.sent == 1
-        bot.send_message.assert_awaited_once_with(chat_id=501, text="Assalamu alaykum",
-                                                  parse_mode="HTML")
+        bot.send_message.assert_awaited_once_with(
+            chat_id=501, text="Assalamu alaykum", parse_mode="HTML"
+        )
 
-    async def test_the_builtin_message_kind_posts_into_a_thread_when_bound(
-            self, store, bot):
-        await scheduler.enqueue(store, "message", -100123, _at(7), local_day="a",
-                                payload={"text": "hi", "parse_mode": None},
-                                thread_id=17)
+    async def test_the_builtin_message_kind_posts_into_a_thread_when_bound(self, store, bot):
+        await scheduler.enqueue(
+            store,
+            "message",
+            -100123,
+            _at(7),
+            local_day="a",
+            payload={"text": "hi", "parse_mode": None},
+            thread_id=17,
+        )
 
         await scheduler.tick(bot, {}, now=_at(7), store=store)
 
-        bot.send_message.assert_awaited_once_with(chat_id=-100123, text="hi",
-                                                  message_thread_id=17)
+        bot.send_message.assert_awaited_once_with(chat_id=-100123, text="hi", message_thread_id=17)
 
     async def test_a_message_with_no_text_fails_its_row(self, store, bot):
-        row = await scheduler.enqueue(store, "message", 501, _at(7), local_day="a",
-                                      payload={})
+        row = await scheduler.enqueue(store, "message", 501, _at(7), local_day="a", payload={})
 
         result = await scheduler.tick(bot, {}, now=_at(7), store=store)
 
@@ -610,7 +628,7 @@ class TestTransientFailuresAreRetried:
         second = await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
         assert (second.sent, second.deferred) == (1, 0)
         assert (await store.schedule.get(row.id)).state == "sent"
-        assert len(attempts) == 2          # delivered on the retry, exactly once
+        assert len(attempts) == 2  # delivered on the retry, exactly once
         # the successful send does not bump attempts further — only a release does
         assert (await store.schedule.get(row.id)).attempts == 1
 
@@ -626,6 +644,7 @@ class TestTransientFailuresAreRetried:
 
     async def test_a_released_row_clears_its_claim(self, store, bot):
         """Otherwise release_stale_claims would release an already-pending row."""
+
         @scheduler.send_handler("drill")
         async def flaky(ctx):
             raise telegram.error.NetworkError("connection reset")
@@ -636,8 +655,7 @@ class TestTransientFailuresAreRetried:
         assert stored.state == "pending"
         assert stored.claimed_at is None
 
-    async def test_a_bad_request_is_permanent_despite_subclassing_network_error(
-            self, store, bot):
+    async def test_a_bad_request_is_permanent_despite_subclassing_network_error(self, store, bot):
         """The trap this ordering exists to avoid.
 
         `telegram.error.BadRequest` subclasses `NetworkError` in PTB, so the
@@ -661,7 +679,7 @@ class TestTransientFailuresAreRetried:
         assert (await store.schedule.get(row.id)).state == "failed"
 
         await scheduler.tick(bot, {}, now=_at(7, 1), store=store)
-        assert len(calls) == 1              # terminal: never attempted again
+        assert len(calls) == 1  # terminal: never attempted again
 
     async def test_a_blocked_user_is_still_terminal(self, store, bot):
         @scheduler.send_handler("drill")
@@ -681,6 +699,7 @@ class TestTransientFailuresAreRetried:
         eventually stops because the window closed, not because attempts hit
         some cap (there is none).
         """
+
         @scheduler.send_handler("drill")
         async def never_works(ctx):
             raise telegram.error.TimedOut()

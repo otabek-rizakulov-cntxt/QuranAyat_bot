@@ -17,8 +17,7 @@ def surah_spans(ref: Ref) -> List[Tuple[int, int, int]]:
     spans = []
     for surah in range(ref.start_surah, ref.end_surah + 1):
         start = ref.start_ayah if surah == ref.start_surah else 1
-        end = (ref.end_ayah if surah == ref.end_surah
-               else Quran.get_surah_length(surah))
+        end = ref.end_ayah if surah == ref.end_surah else Quran.get_surah_length(surah)
         if start <= end:
             spans.append((surah, start, end))
     return spans
@@ -36,8 +35,10 @@ async def unmark(store, user_id: int, ref: Ref) -> bool:
     intervals = await store.hifz.list_intervals(user_id)
     removed = False
     for surah, start, end in surah_spans(ref):
-        if not any(row.surah == surah and row.start_ayah <= end
-                   and row.end_ayah >= start for row in intervals):
+        if not any(
+            row.surah == surah and row.start_ayah <= end and row.end_ayah >= start
+            for row in intervals
+        ):
             continue
         await store.hifz.remove_range(user_id, surah, start, end)
         removed = True

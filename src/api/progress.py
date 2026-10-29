@@ -60,18 +60,21 @@ def _juz(r) -> JuzRatio:
 async def _summary(user_id: int, focus: Optional[int] = None) -> ProgressOut:
     s = await load_summary(await get_store(), user_id, focus)
     return ProgressOut(
-        is_empty=s.is_empty, quran=Ratio(**_ratio(s.quran)),
+        is_empty=s.is_empty,
+        quran=Ratio(**_ratio(s.quran)),
         quran_pages_percent_text=s.quran_pages.percent_text if s.quran_pages else None,
         focus=_surah(s.focus) if s.focus is not None else None,
         focus_juz=_juz(s.focus_juz) if s.focus_juz is not None else None,
-        focus_juz_pages_percent_text=s.focus_juz_pages.percent_text
-        if s.focus_juz_pages else None,
-        surahs=[_surah(r) for r in s.surahs], juzs=[_juz(r) for r in s.juzs])
+        focus_juz_pages_percent_text=s.focus_juz_pages.percent_text if s.focus_juz_pages else None,
+        surahs=[_surah(r) for r in s.surahs],
+        juzs=[_juz(r) for r in s.juzs],
+    )
 
 
 @router.get("/progress", response_model=ProgressOut)
-async def progress(focus: Optional[int] = None,
-                   user_id: int = Depends(require_user)) -> ProgressOut:
+async def progress(
+    focus: Optional[int] = None, user_id: int = Depends(require_user)
+) -> ProgressOut:
     """The /progress summary; `focus` picks the headline surah (default: the
     most recently marked one)."""
     if focus is not None and not 1 <= focus <= 114:
@@ -96,9 +99,15 @@ async def surah_detail(n: int, user_id: int = Depends(require_user)) -> SurahDet
     store = await get_store()
     intervals = await store.hifz.list_intervals(user_id, n)
     r = surah_progress(intervals, n)
-    return SurahDetailOut(surah=n, name=Quran.get_surah_name(n), **_ratio(r),
-                          memorized=[Span(start_ayah=i.start_ayah, end_ayah=i.end_ayah)
-                                     for i in sorted(intervals, key=lambda i: i.start_ayah)])
+    return SurahDetailOut(
+        surah=n,
+        name=Quran.get_surah_name(n),
+        **_ratio(r),
+        memorized=[
+            Span(start_ayah=i.start_ayah, end_ayah=i.end_ayah)
+            for i in sorted(intervals, key=lambda i: i.start_ayah)
+        ],
+    )
 
 
 class ForgetIn(BaseModel):
@@ -117,5 +126,6 @@ async def forget(body: ForgetIn, user_id: int = Depends(require_user)) -> Forget
     updated numbers, since this is the one moment a percentage goes down."""
     ref = parse_ref_or_422(body.ref)
     removed = await progress_service.unmark(await get_store(), user_id, ref)
-    return ForgetOut(removed=removed, ref=ref_out(ref),
-                     progress=await _summary(user_id, ref.start_surah))
+    return ForgetOut(
+        removed=removed, ref=ref_out(ref), progress=await _summary(user_id, ref.start_surah)
+    )

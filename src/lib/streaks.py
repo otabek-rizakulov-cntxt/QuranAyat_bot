@@ -13,7 +13,7 @@
 #
 # The one genuinely contested piece of arithmetic is what "current" means before
 # the user has acted today — see `GRACE_DAYS`.
-
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Sequence, Tuple
@@ -21,11 +21,26 @@ from typing import Iterable, List, Optional, Sequence, Tuple
 from lib.localtime import DEFAULT_OFFSET, local_date, parse_offset
 from lib.store import get_store
 
+logger = logging.getLogger(__name__)
+
 __all__ = [
-    "GRACE_DAYS", "MILESTONE_DAYS", "PERCENTILE_MIN_USERS", "PERCENTILE_BANDS",
-    "StreakCounts", "Milestone", "StreakSummary", "SessionOutcome",
-    "compute_streak", "milestone_for", "percentile_band", "offset_of",
-    "user_offset", "user_today", "refresh_streaks", "record_session", "streak_summary",
+    "GRACE_DAYS",
+    "MILESTONE_DAYS",
+    "PERCENTILE_MIN_USERS",
+    "PERCENTILE_BANDS",
+    "StreakCounts",
+    "Milestone",
+    "StreakSummary",
+    "SessionOutcome",
+    "compute_streak",
+    "milestone_for",
+    "percentile_band",
+    "offset_of",
+    "user_offset",
+    "user_today",
+    "refresh_streaks",
+    "record_session",
+    "streak_summary",
 ]
 
 # How stale the last active day may be and still count as a live streak.
@@ -164,8 +179,9 @@ def _milestone_key(days: Optional[int]) -> Optional[str]:
     return None if days is None else "streak_milestone_%d" % days
 
 
-def percentile_band(current_streak: int,
-                    population: Optional[Sequence[int]] = None) -> Optional[int]:
+def percentile_band(
+    current_streak: int, population: Optional[Sequence[int]] = None
+) -> Optional[int]:
     """The "top N% of users" band this streak earns, or None to stay dark.
 
     None — meaning *render no percentile claim at all* — whenever:
@@ -205,7 +221,7 @@ def offset_of(profile) -> str:
     try:
         parse_offset(offset)
     except (ValueError, TypeError):
-        print("streaks: unparseable timezone %r, using UTC" % (offset,))
+        logger.warning("streaks: unparseable timezone %r, using UTC" % (offset,))
         return DEFAULT_OFFSET
     return offset
 
@@ -221,8 +237,9 @@ async def user_today(user_id: int, utc_now: Optional[datetime] = None) -> date:
     return local_date(utc_now or datetime.now(timezone.utc), await user_offset(user_id))
 
 
-async def refresh_streaks(user_id: int, today: Optional[date] = None,
-                          utc_now: Optional[datetime] = None) -> StreakCounts:
+async def refresh_streaks(
+    user_id: int, today: Optional[date] = None, utc_now: Optional[datetime] = None
+) -> StreakCounts:
     """Recompute both counters from `session_log` and write them to the profile.
 
     Recomputed from scratch rather than incremented: an incremented counter drifts
@@ -246,9 +263,14 @@ async def refresh_streaks(user_id: int, today: Optional[date] = None,
     return counts
 
 
-async def record_session(user_id: int, kind: str, utc_now: Optional[datetime] = None,
-                         surah: Optional[int] = None, start_ayah: Optional[int] = None,
-                         end_ayah: Optional[int] = None) -> SessionOutcome:
+async def record_session(
+    user_id: int,
+    kind: str,
+    utc_now: Optional[datetime] = None,
+    surah: Optional[int] = None,
+    start_ayah: Optional[int] = None,
+    end_ayah: Optional[int] = None,
+) -> SessionOutcome:
     """Log one completed session and recompute the streak in the same breath.
 
     The single entry point for "the user finished a drill / passed a recall
@@ -271,8 +293,9 @@ async def record_session(user_id: int, kind: str, utc_now: Optional[datetime] = 
     return SessionOutcome(row is not None, day, counts, milestone_for(counts.current))
 
 
-async def streak_summary(user_id: int, utc_now: Optional[datetime] = None,
-                         population: Optional[Sequence[int]] = None) -> StreakSummary:
+async def streak_summary(
+    user_id: int, utc_now: Optional[datetime] = None, population: Optional[Sequence[int]] = None
+) -> StreakSummary:
     """Everything `/streak` renders, read from the denormalized counters.
 
     Reads `user_profile`, not `session_log`: the counters are written on every

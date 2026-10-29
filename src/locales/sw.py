@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Amri:",
     "welcome_inline": (
-        "Unaweza kunitumia katika gumzo lolote: andika <b>@QuranAyat_bot</b> kisha namba "
-        "ya aya."
+        "Unaweza kunitumia katika gumzo lolote: andika <b>@QuranAyat_bot</b> kisha namba ya aya."
     ),
     "about": (
         "Boti hii inakuwezesha kusoma Qur'ani Tukufu kwenye Telegram katika "
@@ -64,7 +63,6 @@ strings = {
     "cmd_reciter": "Badilisha qari",
     "cmd_about": "Vyanzo na shukrani",
     "quran_name": "Qur'ani",
-
     # --- Hifz platform ---------------------------------------------------------
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Anzisha mpango wa kuhifadhi",
@@ -74,7 +72,6 @@ strings = {
     "cmd_streak": "Mfululizo wako wa kila siku",
     "cmd_leaderboard": "Waliohifadhi zaidi wiki hii",
     "cmd_profile": "Wasifu na mipangilio yako",
-
     # Shared wizard controls
     "wizard_cancelled": "Imeghairiwa.",
     "wizard_nothing_to_cancel": "Hakuna cha kughairi.",
@@ -83,7 +80,6 @@ strings = {
     "btn_cancel": "Ghairi",
     "btn_back": "Rudi",
     "btn_confirm": "Thibitisha",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Jtatu",
     "day_tue": "Jnne",
@@ -92,7 +88,6 @@ strings = {
     "day_fri": "Ijm",
     "day_sat": "Jmos",
     "day_sun": "Jpili",
-
     # Profile (B1-B3)
     "profile_title": "Wasifu wako",
     "profile_name_set": "Jina: {name}",
@@ -125,7 +120,6 @@ strings = {
     "reminder_saved": "Kikumbusho cha kila siku kimewekwa kwa {time}.",
     "btn_reminder_off": "Zima vikumbusho",
     "reminder_off": "Vikumbusho vya kila siku vimezimwa.",
-
     # Progress and /forgot (C3)
     "progress_title": "Uliyohifadhi",
     "progress_surah_line": "{name}: aya {done}/{total} — {pct}%",
@@ -138,7 +132,6 @@ strings = {
     "forgot_usage": "Tuma unachotaka kuondolea alama, mfano /forgot 67:5-6.",
     "forgot_done": "{ref} imeondolewa alama.",
     "forgot_nothing": "Hukuwa umeiweka alama kuwa umeihifadhi.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Ungependa kuhifadhi nini?",
     "btn_target_surah": "Sura",
@@ -174,7 +167,6 @@ strings = {
     "btn_know_by_heart": "✅ Nimeihifadhi moyoni",
     "know_confirmed": "{ref} imewekwa alama kuwa umeihifadhi. Uko kwenye {pct}%.",
     "know_already": "Ulikuwa tayari umeiweka alama.",
-
     # Recall check (E2, E3)
     "check_question": "Inaendeleaje?",
     "check_usage": "Tuma unachotaka kujipima, mfano /check 67.",
@@ -185,7 +177,6 @@ strings = {
         "mara nyingi upendavyo, ila hakitahesabiwa mara mbili."
     ),
     "btn_check_start": "Nipime",
-
     # Streaks (G2, G3)
     "streak_title": "Mfululizo wako",
     "streak_current": "Mfululizo wa sasa, siku: {n}",
@@ -196,7 +187,6 @@ strings = {
     "streak_milestone_30": "Siku thelathini. Sasa uthabiti upo upande wako.",
     "streak_milestone_100": "Siku mia moja. Ni watu wachache mno wanaofika hapa.",
     "streak_milestone_365": "Mwaka mzima, kila siku. Allah akuhifadhie uliyojifunza.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Ubao wa washindi wa wiki hii",
     "leaderboard_row": "{rank}. {name} — {sessions}",

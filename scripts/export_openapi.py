@@ -26,6 +26,7 @@ DEFAULT_OUT = os.path.join(ROOT, "build", "openapi.json")
 
 def build() -> dict:
     import main
+
     routes = [r for r in main.app.routes if getattr(r, "path", "").startswith("/api/v1")]
     return get_openapi(title="BismillahBot Mini App API", version="1", routes=routes)
 

@@ -7,9 +7,7 @@ strings = {
         "คุณยังสามารถส่งช่วงอย่าง <b>59:22-24</b> เพื่อรับการอ่านเสียงแบบรวมกันได้"
     ),
     "welcome_commands_header": "คำสั่ง:",
-    "welcome_inline": (
-        "คุณใช้ฉันในแชทใดก็ได้: พิมพ์ <b>@QuranAyat_bot</b> แล้วตามด้วยหมายเลขอายะฮ์"
-    ),
+    "welcome_inline": ("คุณใช้ฉันในแชทใดก็ได้: พิมพ์ <b>@QuranAyat_bot</b> แล้วตามด้วยหมายเลขอายะฮ์"),
     "about": (
         "บอทนี้ช่วยให้คุณอ่านอัลกุรอานบน Telegram ได้หลายภาษา\n\n"
         "คำแปลนำมาจาก tanzil.net (ดู ATTRIBUTIONS.md "
@@ -61,7 +59,6 @@ strings = {
     "cmd_reciter": "เปลี่ยนผู้อ่าน",
     "cmd_about": "แหล่งที่มาและคำขอบคุณ",
     "quran_name": "อัลกุรอาน",
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "เริ่มแผนการท่องจำ",
     "cmd_progress": "สิ่งที่คุณท่องจำแล้ว",
@@ -70,7 +67,6 @@ strings = {
     "cmd_streak": "สถิติต่อเนื่องรายวันของคุณ",
     "cmd_leaderboard": "ผู้ท่องจำยอดเยี่ยมประจำสัปดาห์นี้",
     "cmd_profile": "โปรไฟล์และการตั้งค่าของคุณ",
-
     # Shared wizard controls
     "wizard_cancelled": "ยกเลิกแล้ว",
     "wizard_nothing_to_cancel": "ไม่มีอะไรให้ยกเลิก",
@@ -79,7 +75,6 @@ strings = {
     "btn_cancel": "ยกเลิก",
     "btn_back": "ย้อนกลับ",
     "btn_confirm": "ยืนยัน",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "จ",
     "day_tue": "อ",
@@ -88,7 +83,6 @@ strings = {
     "day_fri": "ศ",
     "day_sat": "ส",
     "day_sun": "อา",
-
     # Profile (B1-B3)
     "profile_title": "โปรไฟล์ของคุณ",
     "profile_name_set": "ชื่อ: {name}",
@@ -122,20 +116,17 @@ strings = {
     "reminder_saved": "ตั้งการเตือนรายวันเวลา {time} แล้ว",
     "btn_reminder_off": "ปิดการเตือน",
     "reminder_off": "ปิดการเตือนรายวันแล้ว",
-
     # Progress and /forgot (C3)
     "progress_title": "สิ่งที่คุณท่องจำแล้ว",
     "progress_surah_line": "{name}: {done}/{total} อายะฮ์ — {pct}%",
     "progress_juz_line": "ญุซอ์ {n}: {pct}%",
     "progress_quran_line": "อัลกุรอานทั้งเล่ม: {pct}%",
     "progress_empty": (
-        "ยังไม่มีการทำเครื่องหมาย ทำส่วนหนึ่งให้เสร็จแล้วแตะ «ฉันจำได้ขึ้นใจแล้ว» "
-        "หรือเริ่มแผนด้วย /memorize"
+        "ยังไม่มีการทำเครื่องหมาย ทำส่วนหนึ่งให้เสร็จแล้วแตะ «ฉันจำได้ขึ้นใจแล้ว» หรือเริ่มแผนด้วย /memorize"
     ),
     "forgot_usage": "ส่งสิ่งที่ต้องการยกเลิกเครื่องหมาย ตัวอย่างเช่น /forgot 67:5-6",
     "forgot_done": "ยกเลิกเครื่องหมาย {ref} แล้ว",
     "forgot_nothing": "คุณยังไม่เคยทำเครื่องหมายว่าท่องจำส่วนนั้น",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "คุณต้องการท่องจำอะไร",
     "btn_target_surah": "ซูเราะฮ์",
@@ -171,18 +162,15 @@ strings = {
     "btn_know_by_heart": "✅ ฉันจำได้ขึ้นใจแล้ว",
     "know_confirmed": "ทำเครื่องหมาย {ref} ว่าท่องจำแล้ว ตอนนี้คุณอยู่ที่ {pct}%",
     "know_already": "คุณทำเครื่องหมายส่วนนั้นไปแล้ว",
-
     # Recall check (E2, E3)
     "check_question": "ข้อความนี้ต่อไปว่าอย่างไร",
     "check_usage": "ส่งสิ่งที่ต้องการทดสอบ ตัวอย่างเช่น /check 67",
     "check_correct": "ถูกต้อง",
     "check_wrong": "ยังไม่ถูก ข้อความต่อไปคือ: {correct}",
     "check_already_today": (
-        "คุณได้รับเซสชันของวันนี้จากการทดสอบความจำไปแล้ว — "
-        "ทดสอบตัวเองได้บ่อยเท่าที่ต้องการ เพียงแต่จะไม่นับซ้ำ"
+        "คุณได้รับเซสชันของวันนี้จากการทดสอบความจำไปแล้ว — ทดสอบตัวเองได้บ่อยเท่าที่ต้องการ เพียงแต่จะไม่นับซ้ำ"
     ),
     "btn_check_start": "ทดสอบฉัน",
-
     # Streaks (G2, G3)
     "streak_title": "สถิติต่อเนื่องของคุณ",
     "streak_current": "สถิติต่อเนื่องปัจจุบัน: {n} วัน",
@@ -193,7 +181,6 @@ strings = {
     "streak_milestone_30": "สามสิบวัน ตอนนี้ความสม่ำเสมออยู่ข้างคุณแล้ว",
     "streak_milestone_100": "หนึ่งร้อยวัน มีน้อยคนนักที่มาถึงจุดนี้",
     "streak_milestone_365": "ครบหนึ่งปี ทุกวันไม่ขาด ขออัลลอฮ์ทรงรักษาสิ่งที่คุณได้เรียนรู้",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "กระดานผู้นำประจำสัปดาห์นี้",
     "leaderboard_row": "{rank}. {name} — {sessions}",

@@ -8,8 +8,7 @@ strings = {
     ),
     "welcome_commands_header": "കമാൻഡുകൾ:",
     "welcome_inline": (
-        "ഏത് ചാറ്റിലും എന്നെ ഉപയോഗിക്കാം: <b>@QuranAyat_bot</b> എന്ന് ടൈപ്പ് ചെയ്ത് ശേഷം "
-        "ആയത്ത് നമ്പർ നൽകുക."
+        "ഏത് ചാറ്റിലും എന്നെ ഉപയോഗിക്കാം: <b>@QuranAyat_bot</b> എന്ന് ടൈപ്പ് ചെയ്ത് ശേഷം ആയത്ത് നമ്പർ നൽകുക."
     ),
     "about": (
         "ഈ ബോട്ട് ടെലിഗ്രാമിൽ പല ഭാഷകളിൽ വിശുദ്ധ ഖുർആൻ വായിക്കാൻ അവസരം "
@@ -63,9 +62,7 @@ strings = {
     "cmd_reciter": "ഖാരിയെ മാറ്റുക",
     "cmd_about": "സ്രോതസ്സുകളും കൃതജ്ഞതയും",
     "quran_name": "ഖുർആൻ",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "ഹിഫ്ദ് പദ്ധതി തുടങ്ങുക",
     "cmd_progress": "നിങ്ങൾ മനഃപാഠമാക്കിയത്",
@@ -74,7 +71,6 @@ strings = {
     "cmd_streak": "നിങ്ങളുടെ ദിവസേനയുള്ള തുടർച്ച",
     "cmd_leaderboard": "ഈ ആഴ്ച ഏറ്റവും കൂടുതൽ മനഃപാഠമാക്കിയവർ",
     "cmd_profile": "നിങ്ങളുടെ പ്രൊഫൈലും ക്രമീകരണങ്ങളും",
-
     # Shared wizard controls
     "wizard_cancelled": "റദ്ദാക്കി.",
     "wizard_nothing_to_cancel": "റദ്ദാക്കാൻ ഒന്നുമില്ല.",
@@ -83,7 +79,6 @@ strings = {
     "btn_cancel": "റദ്ദാക്കുക",
     "btn_back": "പിന്നോട്ട്",
     "btn_confirm": "ഉറപ്പിക്കുക",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "തിങ്ക",
     "day_tue": "ചൊവ്വ",
@@ -92,7 +87,6 @@ strings = {
     "day_fri": "വെള്ളി",
     "day_sat": "ശനി",
     "day_sun": "ഞായർ",
-
     # Profile
     "profile_title": "നിങ്ങളുടെ പ്രൊഫൈൽ",
     "profile_name_set": "പേര്: {name}",
@@ -125,7 +119,6 @@ strings = {
     "reminder_saved": "ദിവസേനയുള്ള ഓർമ്മപ്പെടുത്തൽ {time} ന് സജ്ജമാക്കി.",
     "btn_reminder_off": "ഓർമ്മപ്പെടുത്തൽ ഓഫാക്കുക",
     "reminder_off": "ദിവസേനയുള്ള ഓർമ്മപ്പെടുത്തലുകൾ ഓഫാണ്.",
-
     # Progress and /forgot
     "progress_title": "നിങ്ങൾ മനഃപാഠമാക്കിയത്",
     "progress_surah_line": "{name}: {done}/{total} ആയത്തുകൾ — {pct}%",
@@ -139,7 +132,6 @@ strings = {
     "forgot_usage": "എന്ത് നീക്കണമെന്ന് അയയ്ക്കുക, ഉദാഹരണം /forgot 67:5-6.",
     "forgot_done": "{ref} ന്റെ അടയാളം നീക്കി.",
     "forgot_nothing": "അത് നിങ്ങൾ മനഃപാഠമായി അടയാളപ്പെടുത്തിയിരുന്നില്ല.",
-
     # Memorization plans and drills
     "memorize_choose_target": "എന്താണ് മനഃപാഠമാക്കാൻ ആഗ്രഹിക്കുന്നത്?",
     "btn_target_surah": "ഒരു സൂറ",
@@ -175,7 +167,6 @@ strings = {
     "btn_know_by_heart": "✅ ഇത് എനിക്ക് മനഃപാഠമായി",
     "know_confirmed": "{ref} മനഃപാഠമായി അടയാളപ്പെടുത്തി. നിങ്ങൾ {pct}% ൽ എത്തി.",
     "know_already": "അത് നിങ്ങൾ നേരത്തെ തന്നെ അടയാളപ്പെടുത്തിയിരുന്നു.",
-
     # Recall check
     "check_question": "ഇത് എങ്ങനെ തുടരുന്നു?",
     "check_usage": "എന്ത് പരിശോധിക്കണമെന്ന് അയയ്ക്കുക, ഉദാഹരണം /check 67.",
@@ -186,7 +177,6 @@ strings = {
         "സ്വയം പരീക്ഷിക്കാം, പക്ഷേ അത് രണ്ടാമതും കണക്കാക്കില്ല."
     ),
     "btn_check_start": "എന്നെ പരീക്ഷിക്കൂ",
-
     # Streaks
     "streak_title": "നിങ്ങളുടെ തുടർച്ച",
     "streak_current": "നിലവിലെ തുടർച്ച: {n} ദിവസം",
@@ -197,7 +187,6 @@ strings = {
     "streak_milestone_30": "മുപ്പത് ദിവസം. സ്ഥിരത ഇപ്പോൾ നിങ്ങളുടെ കൂടെയുണ്ട്.",
     "streak_milestone_100": "നൂറ് ദിവസം. ഇത്രയും ദൂരം എത്തുന്നവർ വളരെ കുറവാണ്.",
     "streak_milestone_365": "ഒരു വർഷം മുഴുവൻ, ഓരോ ദിവസവും. നിങ്ങൾ പഠിച്ചത് അല്ലാഹു കാത്തുസൂക്ഷിക്കട്ടെ.",
-
     # Leaderboard
     "leaderboard_title": "ഈ ആഴ്ചയിലെ ലീഡർബോർഡ്",
     "leaderboard_row": "{rank}. {name} — {sessions}",

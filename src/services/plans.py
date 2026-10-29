@@ -14,23 +14,30 @@
 #       that won it.
 #   D5  a paused plan pushes nothing; `hifz.memorize.push_plan_day` re-reads the
 #       plan's status, and resuming re-arms the chain through `enqueue_next`.
-
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime, time, timezone
 from typing import List, Optional, Sequence
 
 from hifz.refs import KIND_JUZ, KIND_RANGE, KIND_SURAH, Ref, format_ref, juz_ref
 from lib.hifz_progress import load_summary
-from lib.localtime import DEFAULT_OFFSET, is_valid_offset, local_date, next_due_utc, \
-    normalize_offset, to_utc
+from lib.localtime import (
+    DEFAULT_OFFSET,
+    is_valid_offset,
+    local_date,
+    next_due_utc,
+    normalize_offset,
+    to_utc,
+)
 from lib.plan_builder import AUTO_PACE, Portion, advancing, build_plan, to_day_specs
 from lib.scheduler import enqueue
-from lib.store.plans import DAY_COMPLETED, DAY_PENDING, PLAN_ACTIVE, PLAN_COMPLETE, \
-    PLAN_PAUSED
+from lib.store.plans import DAY_COMPLETED, DAY_PENDING, PLAN_ACTIVE, PLAN_COMPLETE, PLAN_PAUSED
 from lib.store.sessions import KIND_DRILL
 from lib.streaks import record_session
 from modules import Quran
 from services.profile import as_time
+
+logger = logging.getLogger(__name__)
 
 # The scheduler kind a plan day's push is queued under. hifz/memorize.py
 # registers the handler that delivers it.
@@ -50,6 +57,7 @@ def utcnow() -> datetime:
 
 # --- A plan's target -----------------------------------------------------------
 
+
 def plan_ref(plan) -> Ref:
     """A stored plan's span as a `Ref`, for `build_plan` and `format_ref`.
 
@@ -58,8 +66,9 @@ def plan_ref(plan) -> Ref:
     always produce the same portions — which is how a `plan_day` row is known to
     be a consolidation day even though the table has no column for it.
     """
-    kind = plan.target_kind if plan.target_kind in (KIND_SURAH, KIND_JUZ, KIND_RANGE) \
-        else KIND_RANGE
+    kind = (
+        plan.target_kind if plan.target_kind in (KIND_SURAH, KIND_JUZ, KIND_RANGE) else KIND_RANGE
+    )
     return Ref(kind, plan.start_surah, plan.start_ayah, plan.end_surah, plan.end_ayah)
 
 
@@ -96,6 +105,7 @@ async def user_local_today(store, user_id: int, now: Optional[datetime] = None) 
 
 # --- Preview and save (D1) -----------------------------------------------------
 
+
 def preview(ref: Ref, pace: int, days: Sequence[int], start: date) -> List[Portion]:
     """The calendar a plan with these settings would have. Raises ValueError on
     an empty weekday set or an unusable pace — `build_plan`'s own validation."""
@@ -106,12 +116,20 @@ def preview(ref: Ref, pace: int, days: Sequence[int], start: date) -> List[Porti
 class SavedPlan:
     plan: object
     portions: List[Portion]
-    first_date: date          # local date of the first push
+    first_date: date  # local date of the first push
 
 
-async def save_plan(store, user_id: int, chat_id: int, ref: Ref, pace: int,
-                    days: Sequence[int], start: date, offset: str,
-                    reminder: Optional[time]) -> SavedPlan:
+async def save_plan(
+    store,
+    user_id: int,
+    chat_id: int,
+    ref: Ref,
+    pace: int,
+    days: Sequence[int],
+    start: date,
+    offset: str,
+    reminder: Optional[time],
+) -> SavedPlan:
     """Write a plan (retiring any earlier one) and queue its first push.
 
     The portions are rebuilt from the arguments rather than passed in: same
@@ -131,24 +149,33 @@ async def save_plan(store, user_id: int, chat_id: int, ref: Ref, pace: int,
             await store.plans.set_plan_status(plan.id, PLAN_COMPLETE)
 
     plan = await store.plans.create_plan(
-        user_id, target_kind(ref), ref.start_surah, ref.start_ayah,
-        ref.end_surah, ref.end_ayah, pace, list(days), to_day_specs(portions))
+        user_id,
+        target_kind(ref),
+        ref.start_surah,
+        ref.start_ayah,
+        ref.end_surah,
+        ref.end_ayah,
+        pace,
+        list(days),
+        to_day_specs(portions),
+    )
 
     await store.profiles.set_timezone(user_id, offset)
     await store.profiles.set_reminder_time(user_id, reminder)
 
     queued = await enqueue_next(store, user_id, chat_id, plan)
-    first = local_date(queued.due_at, offset) if queued is not None \
-        else portions[0].scheduled_date
-    print("HIFZ: plan #%d saved for %d — %d portion(s) over %d day(s), first push %s"
-          % (plan.id, user_id, len(advancing(portions)), len(portions), first))
+    first = local_date(queued.due_at, offset) if queued is not None else portions[0].scheduled_date
+    logger.info(
+        "HIFZ: plan #%d saved for %d — %d portion(s) over %d day(s), first push %s"
+        % (plan.id, user_id, len(advancing(portions)), len(portions), first)
+    )
     return SavedPlan(plan, portions, first)
 
 
 # --- The enqueue chain -----------------------------------------------------------
 
-async def enqueue_next(store, user_id: int, chat_id: int, plan,
-                       now: Optional[datetime] = None):
+
+async def enqueue_next(store, user_id: int, chat_id: int, plan, now: Optional[datetime] = None):
     """Queue the push for the plan's next pending portion. None if there is none.
 
     Called when a plan is saved, when a push fires, when a plan is resumed, and
@@ -169,7 +196,7 @@ async def enqueue_next(store, user_id: int, chat_id: int, plan,
     profile = await store.profiles.get_profile(user_id)
     reminder = as_time(profile.reminder_time) if profile is not None else None
     if reminder is None:
-        print("HIFZ: plan #%d has no reminder time; nothing queued" % plan.id)
+        logger.info("HIFZ: plan #%d has no reminder time; nothing queued" % plan.id)
         return None
     offset = profile_offset(profile)
 
@@ -183,13 +210,18 @@ async def enqueue_next(store, user_id: int, chat_id: int, plan,
     if due_at <= now:
         due_at = next_due_utc(reminder, offset, now)
 
-    return await enqueue(store, SEND_KIND, chat_id, due_at,
-                         local_day=local_date(due_at, offset),
-                         payload={"plan_day_id": day.id, "plan_id": plan.id,
-                                  "user_id": user_id, "offset": offset})
+    return await enqueue(
+        store,
+        SEND_KIND,
+        chat_id,
+        due_at,
+        local_day=local_date(due_at, offset),
+        payload={"plan_day_id": day.id, "plan_id": plan.id, "user_id": user_id, "offset": offset},
+    )
 
 
 # --- Reading a plan ------------------------------------------------------------
+
 
 async def current_plan(store, user_id: int):
     """The user's active plan, else their (most recent) paused one, else None."""
@@ -207,17 +239,20 @@ async def portions_of(store, plan) -> List[Portion]:
     if not days:
         return []
     try:
-        return build_plan(plan_ref(plan), plan.pace, plan.days_of_week,
-                          days[0].scheduled_date)
-    except ValueError as err:                   # a plan with no weekdays cannot exist
-        print("HIFZ: cannot re-derive plan #%d: %s" % (plan.id, err))
+        return build_plan(plan_ref(plan), plan.pace, plan.days_of_week, days[0].scheduled_date)
+    except ValueError as err:  # a plan with no weekdays cannot exist
+        logger.warning("HIFZ: cannot re-derive plan #%d: %s" % (plan.id, err))
         return []
 
 
 def match_portion(portions: Sequence[Portion], day) -> Optional[Portion]:
     for portion in portions:
-        if (portion.scheduled_date, portion.surah, portion.start_ayah, portion.end_ayah) \
-                == (day.scheduled_date, day.surah, day.start_ayah, day.end_ayah):
+        if (portion.scheduled_date, portion.surah, portion.start_ayah, portion.end_ayah) == (
+            day.scheduled_date,
+            day.surah,
+            day.start_ayah,
+            day.end_ayah,
+        ):
             return portion
     return None
 
@@ -245,8 +280,11 @@ async def day_position(store, plan, day) -> tuple:
 async def due_days(store, user_id: int, plan, now: Optional[datetime] = None) -> list:
     """The plan's portions not yet completed and due today or earlier (local)."""
     today = await user_local_today(store, user_id, now)
-    return [d for d in await store.plans.list_plan_days(plan.id, on_or_before=today)
-            if d.state != DAY_COMPLETED]
+    return [
+        d
+        for d in await store.plans.list_plan_days(plan.id, on_or_before=today)
+        if d.state != DAY_COMPLETED
+    ]
 
 
 async def owned_day(store, user_id: int, plan_day_id: int):
@@ -267,7 +305,7 @@ DONE, ALREADY, MISSING = "completed", "already", "missing"
 
 @dataclass
 class DrillResult:
-    status: str                       # DONE | ALREADY | MISSING
+    status: str  # DONE | ALREADY | MISSING
     day: object = None
     plan: object = None
     percent_text: Optional[str] = None
@@ -293,15 +331,16 @@ async def complete_day(store, user_id: int, chat_id: int, plan_day_id: int) -> D
         return DrillResult(ALREADY, day, plan)
 
     await store.hifz.add_interval(user_id, day.surah, day.start_ayah, day.end_ayah)
-    await record_session(user_id, KIND_DRILL, surah=day.surah,
-                         start_ayah=day.start_ayah, end_ayah=day.end_ayah)
+    await record_session(
+        user_id, KIND_DRILL, surah=day.surah, start_ayah=day.start_ayah, end_ayah=day.end_ayah
+    )
 
     summary = await load_summary(store, user_id, focus_surah=day.surah)
-    pct = summary.focus.percent_text if summary.focus is not None \
-        else summary.quran.percent_text
+    pct = summary.focus.percent_text if summary.focus is not None else summary.quran.percent_text
 
-    remaining = await store.plans.count_plan_days(plan.id) \
-        - await store.plans.count_plan_days(plan.id, DAY_COMPLETED)
+    remaining = await store.plans.count_plan_days(plan.id) - await store.plans.count_plan_days(
+        plan.id, DAY_COMPLETED
+    )
     if remaining <= 0:
         await store.plans.set_plan_status(plan.id, PLAN_COMPLETE)
         return DrillResult(DONE, day, plan, pct, plan_completed=True)
@@ -312,6 +351,7 @@ async def complete_day(store, user_id: int, chat_id: int, plan_day_id: int) -> D
 
 
 # --- Lifecycle (D5) -------------------------------------------------------------
+
 
 async def change_status(store, user_id: int, chat_id: int, action: str):
     """Pause, resume or abandon the user's current plan. Returns the updated plan,

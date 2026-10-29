@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Commands:",
     "welcome_inline": (
-        "You can use me inline in any chat: type <b>@QuranAyat_bot</b> followed by a "
-        "reference."
+        "You can use me inline in any chat: type <b>@QuranAyat_bot</b> followed by a reference."
     ),
     "about": (
         "This bot lets you explore the Holy Qur'an on Telegram in many languages.\n\n"
@@ -30,7 +29,7 @@ strings = {
     "choose_reciter": "Choose a reciter:",
     "reciter_set": "Reciter set to {reciter}.",
     "btn_search_reciter": "Search by name",
-    "reciter_search_prompt": "Type a reciter's name to search (e.g. \"Sudais\", \"Basit\").",
+    "reciter_search_prompt": 'Type a reciter\'s name to search (e.g. "Sudais", "Basit").',
     "reciter_search_no_matches": "No reciters matched that name — try again.",
     "reciter_search_results": "Search results:",
     "btn_set_reciter": "Set as my reciter",
@@ -71,7 +70,6 @@ strings = {
     "cmd_reciter": "Change reciter",
     "cmd_about": "Sources & credits",
     "quran_name": "Qur'an",
-
     # --- Hifz platform ---------------------------------------------------------
     # Frozen key set for the memorization features. Every key here is documented
     # in docs/HIFZ_STRINGS.md — placeholder names and all — because 47 other
@@ -83,7 +81,6 @@ strings = {
     #     message. Plain text cannot fail that way in 48 languages.
     #   * as few placeholders as possible, and never a positional one — every
     #     placeholder is multiplied by 47 translators.
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Start a memorization plan",
     "cmd_progress": "What you have memorized",
@@ -92,7 +89,6 @@ strings = {
     "cmd_streak": "Your daily streak",
     "cmd_leaderboard": "This week's top memorizers",
     "cmd_profile": "Your profile and settings",
-
     # Shared wizard controls
     "wizard_cancelled": "Cancelled.",
     "wizard_nothing_to_cancel": "There is nothing to cancel.",
@@ -101,7 +97,6 @@ strings = {
     "btn_cancel": "Cancel",
     "btn_back": "Back",
     "btn_confirm": "Confirm",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Mon",
     "day_tue": "Tue",
@@ -110,7 +105,6 @@ strings = {
     "day_fri": "Fri",
     "day_sat": "Sat",
     "day_sun": "Sun",
-
     # Profile (B1-B3)
     "profile_title": "Your profile",
     "profile_name_set": "Name: {name}",
@@ -143,20 +137,18 @@ strings = {
     "reminder_saved": "Daily reminder set for {time}.",
     "btn_reminder_off": "Turn reminders off",
     "reminder_off": "Daily reminders are off.",
-
     # Progress and /forgot (C3)
     "progress_title": "What you have memorized",
     "progress_surah_line": "{name}: {done}/{total} ayahs — {pct}%",
     "progress_juz_line": "Juz {n}: {pct}%",
     "progress_quran_line": "Whole Qur'an: {pct}%",
     "progress_empty": (
-        "Nothing marked yet. Finish a portion and tap \"I know this by heart\", "
+        'Nothing marked yet. Finish a portion and tap "I know this by heart", '
         "or start a plan with /memorize."
     ),
     "forgot_usage": "Send what to unmark, for example /forgot 67:5-6.",
     "forgot_done": "Unmarked {ref}.",
     "forgot_nothing": "You had not marked that as memorized.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "What would you like to memorize?",
     "btn_target_surah": "A surah",
@@ -192,7 +184,6 @@ strings = {
     "btn_know_by_heart": "✅ I know this by heart",
     "know_confirmed": "{ref} marked as memorized. You are at {pct}%.",
     "know_already": "You had already marked that one.",
-
     # Recall check (E2, E3)
     "check_question": "How does this continue?",
     "check_usage": "Send what to test, for example /check 67.",
@@ -203,7 +194,6 @@ strings = {
         "yourself as often as you like, it just will not count twice."
     ),
     "btn_check_start": "Test me",
-
     # Streaks (G2, G3)
     "streak_title": "Your streak",
     "streak_current": "Current streak: {n} days",
@@ -214,42 +204,40 @@ strings = {
     "streak_milestone_30": "Thirty days. Consistency is now on your side.",
     "streak_milestone_100": "A hundred days. Very few people get this far.",
     "streak_milestone_365": "A whole year, every single day. May Allah preserve what you have learned.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "This week's leaderboard",
     "leaderboard_row": "{rank}. {name} — {sessions}",
     "leaderboard_you_row": "You: {rank}. — {sessions}",
     "leaderboard_empty": "Nobody has completed a session this week yet. Be the first.",
     "leaderboard_not_opted_in": "You are not on the leaderboard. Join it from /profile.",
-
     # --- Phase 2: group cluster (en/ru/uz/uz-Cyrl only) ---  # phase2
-    'group_added': 'As-salamu alaykum! I can run a daily memorization circle in this group. An admin, tap below to set me up.',
-    'group_btn_setup': '⚙️ Set up the circle',
-    'group_setup_unknown': "I don't know this group. Add me to it first, then tap the setup link there.",
-    'group_setup_not_admin': 'Only an admin of that group can set me up.',
-    'group_topic_prompt': 'What should I name the daily topic? Send me a name.',
-    'group_topic_created': "Topic <b>{name}</b> created. I'll post there each day.",
-    'group_topic_fallback': "This group has no Topics, so I'll post in the main chat instead.",
-    'group_translation_prompt': 'Which translation should the daily posts use?',
-    'group_board_unknown': 'That study circle no longer exists.',
-    'group_board_not_member': 'You need to be a member of that group to join its board.',
-    'group_board_joined': "You're on the group's weekly board now.",
+    "group_added": "As-salamu alaykum! I can run a daily memorization circle in this group. An admin, tap below to set me up.",
+    "group_btn_setup": "⚙️ Set up the circle",
+    "group_setup_unknown": "I don't know this group. Add me to it first, then tap the setup link there.",
+    "group_setup_not_admin": "Only an admin of that group can set me up.",
+    "group_topic_prompt": "What should I name the daily topic? Send me a name.",
+    "group_topic_created": "Topic <b>{name}</b> created. I'll post there each day.",
+    "group_topic_fallback": "This group has no Topics, so I'll post in the main chat instead.",
+    "group_translation_prompt": "Which translation should the daily posts use?",
+    "group_board_unknown": "That study circle no longer exists.",
+    "group_board_not_member": "You need to be a member of that group to join its board.",
+    "group_board_joined": "You're on the group's weekly board now.",
     # --- Phase 2 J4/J5 ---  # phase2
-    'group_target_prompt': 'What should the circle memorize? Send a surah (67), a juz (juz 30), or a range (2:1-10).',
-    'group_target_invalid': 'I couldn\'t read that. Try a surah number, "juz 30", or "2:1-10".',
-    'group_pace_prompt': 'How many ayahs per day?',
-    'group_btn_pace_auto': 'Auto',
-    'group_days_prompt': 'Which days should I post?',
-    'group_btn_daily': 'Every day',
-    'group_btn_weekdays': 'Weekdays',
-    'group_timezone_prompt': "What's the group's UTC offset?",
-    'group_post_time_prompt': 'What local time should I post each day? (e.g. 07:00)',
-    'group_post_time_invalid': 'Please send a time like 07:00.',
-    'group_setup_done': 'All set — {days} portions over {total} days. Members can join the weekly board here: {board_link}',
+    "group_target_prompt": "What should the circle memorize? Send a surah (67), a juz (juz 30), or a range (2:1-10).",
+    "group_target_invalid": 'I couldn\'t read that. Try a surah number, "juz 30", or "2:1-10".',
+    "group_pace_prompt": "How many ayahs per day?",
+    "group_btn_pace_auto": "Auto",
+    "group_days_prompt": "Which days should I post?",
+    "group_btn_daily": "Every day",
+    "group_btn_weekdays": "Weekdays",
+    "group_timezone_prompt": "What's the group's UTC offset?",
+    "group_post_time_prompt": "What local time should I post each day? (e.g. 07:00)",
+    "group_post_time_invalid": "Please send a time like 07:00.",
+    "group_setup_done": "All set — {days} portions over {total} days. Members can join the weekly board here: {board_link}",
     # --- Phase 2 J6 board ---  # phase2
-    'group_board_title': "📿 This week's circle",
-    'group_board_row': '{rank}. {name} — {sessions}',
-    'group_board_empty': 'No one has completed a session yet this week. Be the first!',
+    "group_board_title": "📿 This week's circle",
+    "group_board_row": "{rank}. {name} — {sessions}",
+    "group_board_empty": "No one has completed a session yet this week. Be the first!",
     # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
     "web_loading": "Loading…",
     "web_open_in_telegram": "Open this app from Telegram to continue.",

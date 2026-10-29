@@ -21,10 +21,21 @@ from datetime import date, datetime, time, timedelta, timezone
 from typing import List, Tuple
 
 __all__ = [
-    "MIN_OFFSET_MINUTES", "MAX_OFFSET_MINUTES", "DEFAULT_OFFSET", "OFFSET_CHOICES",
-    "parse_offset", "format_offset", "normalize_offset", "is_valid_offset",
-    "local_now", "local_date", "local_time", "to_utc", "next_due_utc",
-    "week_bounds", "offset_options",
+    "MIN_OFFSET_MINUTES",
+    "MAX_OFFSET_MINUTES",
+    "DEFAULT_OFFSET",
+    "OFFSET_CHOICES",
+    "parse_offset",
+    "format_offset",
+    "normalize_offset",
+    "is_valid_offset",
+    "local_now",
+    "local_date",
+    "local_time",
+    "to_utc",
+    "next_due_utc",
+    "week_bounds",
+    "offset_options",
 ]
 
 # The real world runs from UTC-12:00 (Baker Island) to UTC+14:00 (Line Islands).
@@ -165,15 +176,45 @@ def week_bounds(d: date) -> Tuple[date, date]:
 # short enough for one inline keyboard. Anyone outside it can still be stored at
 # an exact offset — `parse_offset` accepts far more than this list offers.
 _PICKER_MINUTES = (
-    -12 * 60, -11 * 60, -10 * 60, -9 * 60, -8 * 60, -7 * 60, -6 * 60, -5 * 60,
-    -4 * 60, -3 * 60 - 30, -3 * 60, -2 * 60, -1 * 60, 0,
-    60, 2 * 60, 3 * 60, 3 * 60 + 30, 4 * 60, 4 * 60 + 30, 5 * 60, 5 * 60 + 30,
-    5 * 60 + 45, 6 * 60, 6 * 60 + 30, 7 * 60, 8 * 60, 9 * 60, 9 * 60 + 30,
-    10 * 60, 11 * 60, 12 * 60, 13 * 60, 14 * 60,
+    -12 * 60,
+    -11 * 60,
+    -10 * 60,
+    -9 * 60,
+    -8 * 60,
+    -7 * 60,
+    -6 * 60,
+    -5 * 60,
+    -4 * 60,
+    -3 * 60 - 30,
+    -3 * 60,
+    -2 * 60,
+    -1 * 60,
+    0,
+    60,
+    2 * 60,
+    3 * 60,
+    3 * 60 + 30,
+    4 * 60,
+    4 * 60 + 30,
+    5 * 60,
+    5 * 60 + 30,
+    5 * 60 + 45,
+    6 * 60,
+    6 * 60 + 30,
+    7 * 60,
+    8 * 60,
+    9 * 60,
+    9 * 60 + 30,
+    10 * 60,
+    11 * 60,
+    12 * 60,
+    13 * 60,
+    14 * 60,
 )
 
 OFFSET_CHOICES: Tuple[str, ...] = tuple(
-    format_offset(timedelta(minutes=m)) for m in _PICKER_MINUTES)
+    format_offset(timedelta(minutes=m)) for m in _PICKER_MINUTES
+)
 
 
 def offset_options() -> List[str]:

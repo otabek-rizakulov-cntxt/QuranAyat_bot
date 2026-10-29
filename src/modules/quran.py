@@ -42,8 +42,7 @@ def _division_marks(tag: str) -> tuple:
     (sura, aya) tuples sort in mushaf order, so these are also directly bisectable
     to answer "which division is this ayah in?".
     """
-    return tuple((int(e.attrib["sura"]), int(e.attrib["aya"]))
-                 for e in _QURAN_DATA.find(tag))
+    return tuple((int(e.attrib["sura"]), int(e.attrib["aya"])) for e in _QURAN_DATA.find(tag))
 
 
 def parse_quran(filename: str):
@@ -54,10 +53,9 @@ def parse_quran(filename: str):
 
     def process_verse(verse: str):
         """Add verse and replace for Arabic ligatures (salawat)"""
-        return (verse.strip()
-                .replace("– peace and blessings be upon him", "ﷺ‎"))
+        return verse.strip().replace("– peace and blessings be upon him", "ﷺ‎")
 
-    with open(filename, "r") as f:
+    with open(filename) as f:
         for line in f.readlines():
             if line == "\n":
                 continue
@@ -93,10 +91,12 @@ def parse_quran_tafsir(filename: str = "Al_Jalalain_Eng.txt"):
         """Add line and replace for Arabic ligatures (salawat)"""
         verse.append(line.strip().replace("(s)", "ﷺ‎"))
 
-    with open(filename, "r") as f:
+    with open(filename) as f:
         for line in f.readlines():
-            if line == "\n": continue
-            if re.match(r"\d+\w*", line): continue
+            if line == "\n":
+                continue
+            if re.match(r"\d+\w*", line):
+                continue
             elif line.startswith("[%d:%d]" % (s, v)):
                 in_verse = True
             elif line.startswith("[%d:%d]" % (s, v + 1)):
@@ -112,10 +112,13 @@ def parse_quran_tafsir(filename: str = "Al_Jalalain_Eng.txt"):
                 s += 1
                 v = 1
                 in_verse = True
-            elif (line.startswith("Medinese") or line.startswith("Meccan") or
-                  line.startswith("[Consists") or  # [Consists end surah 5
-                  line.startswith("Mecca, consisting") or  # end surah 73
-                  line.startswith("This was revealed")):
+            elif (
+                line.startswith("Medinese")
+                or line.startswith("Meccan")
+                or line.startswith("[Consists")  # [Consists end surah 5
+                or line.startswith("Mecca, consisting")  # end surah 73
+                or line.startswith("This was revealed")
+            ):
                 if s == 26 and v == 200:
                     # only line starting with "Meccan" that is part of a verse
                     add_line(line, verse)
@@ -131,22 +134,140 @@ def parse_quran_tafsir(filename: str = "Al_Jalalain_Eng.txt"):
 
 class Quran:
     """Interface to get ayahs from the Quran."""
-    surah_lengths = (7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6)
+
+    surah_lengths = (
+        7,
+        286,
+        200,
+        176,
+        120,
+        165,
+        206,
+        75,
+        129,
+        109,
+        123,
+        111,
+        43,
+        52,
+        99,
+        128,
+        111,
+        110,
+        98,
+        135,
+        112,
+        78,
+        118,
+        64,
+        77,
+        227,
+        93,
+        88,
+        69,
+        60,
+        34,
+        30,
+        73,
+        54,
+        45,
+        83,
+        182,
+        88,
+        75,
+        85,
+        54,
+        53,
+        89,
+        59,
+        37,
+        35,
+        38,
+        29,
+        18,
+        45,
+        60,
+        49,
+        62,
+        55,
+        78,
+        96,
+        29,
+        22,
+        24,
+        13,
+        14,
+        11,
+        11,
+        18,
+        12,
+        12,
+        30,
+        52,
+        52,
+        44,
+        28,
+        28,
+        20,
+        56,
+        40,
+        31,
+        50,
+        40,
+        46,
+        42,
+        29,
+        19,
+        36,
+        25,
+        22,
+        17,
+        19,
+        26,
+        30,
+        20,
+        15,
+        21,
+        11,
+        8,
+        8,
+        19,
+        5,
+        8,
+        8,
+        11,
+        11,
+        8,
+        3,
+        9,
+        5,
+        4,
+        7,
+        3,
+        6,
+        3,
+        5,
+        4,
+        5,
+        6,
+    )
 
     surah_names = [s.attrib["tname"] for s in _QURAN_DATA.find("suras")]
 
     # The mushaf's structural divisions, all from the same quran-data.xml the surah
     # names come from. `pages` and `juzs` back /page and /juz; the other three are
     # exposed for callers that want them but have no command of their own yet.
-    pages = _division_marks("pages")        # 604
-    juzs = _division_marks("juzs")          # 30
-    hizbs = _division_marks("hizbs")        # 240
-    manzils = _division_marks("manzils")    # 7
-    rukus = _division_marks("rukus")        # 556
+    pages = _division_marks("pages")  # 604
+    juzs = _division_marks("juzs")  # 30
+    hizbs = _division_marks("hizbs")  # 240
+    manzils = _division_marks("manzils")  # 7
+    rukus = _division_marks("rukus")  # 556
 
     # Ayahs of prostration: (sura, aya, "obligatory" | "recommended").
-    sajdas = tuple((int(s.attrib["sura"]), int(s.attrib["aya"]), s.attrib["type"])
-                   for s in _QURAN_DATA.find("sajdas"))
+    sajdas = tuple(
+        (int(s.attrib["sura"]), int(s.attrib["aya"]), s.attrib["type"])
+        for s in _QURAN_DATA.find("sajdas")
+    )
 
     def __init__(self, text: list) -> None:
         """`text` is a list of surahs, each a list of ayah strings (see parse_quran)."""
@@ -167,7 +288,7 @@ class Quran:
 
     def get_ayahs(self, surah: int, a: int, b: int) -> str:
         """Get range of Ayahs."""
-        return " ".join(self.text[surah - 1][a - 1:b]) + " (%d:%d-%d)" % (surah, a, b)
+        return " ".join(self.text[surah - 1][a - 1 : b]) + " (%d:%d-%d)" % (surah, a, b)
 
     def get_ayah_text(self, surah: int, ayah: int) -> str:
         """The ayah alone, with no "(surah:ayah)" suffix.
@@ -181,7 +302,7 @@ class Quran:
 
     def get_ayahs_text(self, surah: int, a: int, b: int) -> str:
         """A range of ayahs joined, with no reference suffix — see get_ayah_text."""
-        return " ".join(self.text[surah - 1][a - 1:b])
+        return " ".join(self.text[surah - 1][a - 1 : b])
 
     @staticmethod
     def get_random_ayah() -> Tuple[int, int]:
@@ -306,6 +427,7 @@ class TranslationRegistry:
     in memory. This keeps startup fast and memory proportional to the languages
     actually used — important on the 512 MB free instance.
     """
+
     _cache: dict[str, Quran] = {}
 
     @classmethod
@@ -362,6 +484,5 @@ def make_index():
     left = range(1, 58)
     right = range(58, 115)
     for i, j in zip(left, right):
-        index.append("/{} <code>{}</code>/{} {}"
-                     .format(i, chapters[i - 1], j, chapters[j - 1]))
+        index.append(f"/{i} <code>{chapters[i - 1]}</code>/{j} {chapters[j - 1]}")
     return "\n".join(index)

@@ -31,9 +31,19 @@ from lib.store.schedule import STATE_CLAIMED, STATE_FAILED, STATE_PENDING, STATE
 from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
 
 # Child-first, so the plan_day -> plan foreign key never blocks the truncate.
-_TABLES = ("scheduled_send", "session_log", "plan_day", "plan", "hifz_interval",
-           "user_profile", "user_settings",
-           "group_plan_day", "group_plan", "group_member_link", "group_config")
+_TABLES = (
+    "scheduled_send",
+    "session_log",
+    "plan_day",
+    "plan",
+    "hifz_interval",
+    "user_profile",
+    "user_settings",
+    "group_plan_day",
+    "group_plan",
+    "group_member_link",
+    "group_config",
+)
 
 UTC = timezone.utc
 
@@ -51,8 +61,9 @@ async def store(request):
 
     import asyncpg
 
-    pool = await asyncpg.create_pool(url, min_size=1, max_size=4, command_timeout=10,
-                                     statement_cache_size=0)
+    pool = await asyncpg.create_pool(
+        url, min_size=1, max_size=4, command_timeout=10, statement_cache_size=0
+    )
     try:
         sql_store = PostgresStore(pool)
         await sql_store.apply_schema()
@@ -68,14 +79,23 @@ def _spans(intervals):
 
 async def _make_plan(store, user_id=1, days=None, status=PLAN_ACTIVE):
     return await store.plans.create_plan(
-        user_id=user_id, target_kind="surah", start_surah=67, start_ayah=1,
-        end_surah=67, end_ayah=30, pace=2, days_of_week=[1, 2, 3, 4, 5],
-        days=days if days is not None else [
+        user_id=user_id,
+        target_kind="surah",
+        start_surah=67,
+        start_ayah=1,
+        end_surah=67,
+        end_ayah=30,
+        pace=2,
+        days_of_week=[1, 2, 3, 4, 5],
+        days=days
+        if days is not None
+        else [
             PlanDaySpec(date(2026, 8, 3), 67, 1, 2),
             PlanDaySpec(date(2026, 8, 4), 67, 3, 4),
             PlanDaySpec(date(2026, 8, 5), 67, 5, 6),
         ],
-        status=status)
+        status=status,
+    )
 
 
 class TestSettings:
@@ -85,7 +105,11 @@ class TestSettings:
     async def test_ensure_inserts_and_returns_the_row(self, store):
         row = await store.profiles.ensure_settings_row(1, "ru", "tr", "Alafasy_128kbps")
         assert (row.telegram_user_id, row.ui_lang, row.translation_lang, row.reciter) == (
-            1, "ru", "tr", "Alafasy_128kbps")
+            1,
+            "ru",
+            "tr",
+            "Alafasy_128kbps",
+        )
         assert (await store.profiles.get_settings(1)).ui_lang == "ru"
 
     async def test_ensure_returns_none_when_the_row_already_exists(self, store):
@@ -101,7 +125,10 @@ class TestSettings:
         await store.profiles.set_reciter(1, "Alafasy_128kbps")
         row = await store.profiles.get_settings(1)
         assert (row.ui_lang, row.translation_lang, row.reciter) == (
-            "uz-Cyrl", "ru", "Alafasy_128kbps")
+            "uz-Cyrl",
+            "ru",
+            "Alafasy_128kbps",
+        )
 
     async def test_setters_are_a_no_op_when_the_row_is_missing(self, store):
         # UPDATE ... WHERE telegram_user_id = $1 matches nothing; the in-memory
@@ -219,7 +246,7 @@ class TestHifzIntervals:
         first = await store.hifz.add_interval(1, 67, 1, 10)
         again = await store.hifz.add_interval(1, 67, 3, 5)
         assert (again.start_ayah, again.end_ayah) == (1, 10)
-        assert again.id == first.id            # the covering row survives untouched
+        assert again.id == first.id  # the covering row survives untouched
         assert _spans(await store.hifz.list_intervals(1)) == [(67, 1, 10)]
 
     async def test_a_bridging_range_absorbs_several_intervals(self, store):
@@ -410,8 +437,10 @@ class TestSessions:
         assert await store.sessions.log_session(1, day, KIND_DRILL, 67, 1, 8) is not None
         assert await store.sessions.log_session(1, day, KIND_RECALL_CHECK, 67, 1, 8) is not None
         assert await store.sessions.log_session(1, day, KIND_DRILL, 67, 9, 10) is not None
-        assert await store.sessions.log_session(1, day + timedelta(days=1), KIND_DRILL,
-                                                67, 1, 8) is not None
+        assert (
+            await store.sessions.log_session(1, day + timedelta(days=1), KIND_DRILL, 67, 1, 8)
+            is not None
+        )
         assert await store.sessions.count_sessions(1, day, day + timedelta(days=1)) == 4
 
     async def test_list_active_dates_is_distinct_and_sorted(self, store):
@@ -424,7 +453,8 @@ class TestSessions:
         for day in (1, 5, 9):
             await store.sessions.log_session(1, date(2026, 8, day), KIND_DRILL, 67, 1, 2)
         assert await store.sessions.list_active_dates(
-            1, since=date(2026, 8, 2), until=date(2026, 8, 8)) == [date(2026, 8, 5)]
+            1, since=date(2026, 8, 2), until=date(2026, 8, 8)
+        ) == [date(2026, 8, 5)]
 
     async def test_list_sessions_windows_and_orders(self, store):
         await store.sessions.log_session(1, date(2026, 8, 5), KIND_DRILL, 67, 1, 2)
@@ -454,8 +484,9 @@ class TestLeaderboard:
         await store.profiles.set_leaderboard_opt_in(user_id, opted_in)
         await store.profiles.set_streaks(user_id, streak, streak)
         for n in range(sessions):
-            await store.sessions.log_session(user_id, date(2026, 8, 3), KIND_DRILL,
-                                             67, n + 1, n + 1)
+            await store.sessions.log_session(
+                user_id, date(2026, 8, 3), KIND_DRILL, 67, n + 1, n + 1
+            )
 
     async def test_empty_board(self, store):
         assert await store.sessions.weekly_leaderboard(*self.WEEK) == []
@@ -466,7 +497,10 @@ class TestLeaderboard:
         await self._seed(store, 3, "three", sessions=2, streak=9)
         board = await store.sessions.weekly_leaderboard(*self.WEEK)
         assert [(e.user_id, e.sessions, e.position) for e in board] == [
-            (2, 5, 1), (3, 2, 2), (1, 2, 3)]
+            (2, 5, 1),
+            (3, 2, 2),
+            (1, 2, 3),
+        ]
         assert board[0].display_name == "two"
         assert board[1].current_streak == 9
 
@@ -512,8 +546,13 @@ class TestSchedule:
 
     async def test_enqueue_returns_the_row(self, store):
         row = await store.schedule.enqueue(
-            "plan_day", 4242, self.NOW, "plan_day:4242:2026-08-03",
-            payload={"plan_day_id": 7}, thread_id=11)
+            "plan_day",
+            4242,
+            self.NOW,
+            "plan_day:4242:2026-08-03",
+            payload={"plan_day_id": 7},
+            thread_id=11,
+        )
         assert (row.kind, row.target_chat_id, row.thread_id) == ("plan_day", 4242, 11)
         assert row.due_at == self.NOW
         assert row.payload == {"plan_day_id": 7}
@@ -585,16 +624,14 @@ class TestSchedule:
     async def test_release_stale_claims_requeues_a_crashed_claim(self, store):
         await store.schedule.enqueue("plan_day", 1, self.NOW - timedelta(hours=2), "a")
         await store.schedule.claim_due(self.NOW)
-        assert await store.schedule.release_stale_claims(
-            self.NOW + timedelta(minutes=1)) == 1
+        assert await store.schedule.release_stale_claims(self.NOW + timedelta(minutes=1)) == 1
         assert (await store.schedule.get_by_key("a")).state == STATE_PENDING
         assert len(await store.schedule.claim_due(self.NOW)) == 1
 
     async def test_release_stale_claims_leaves_a_fresh_claim_alone(self, store):
         await store.schedule.enqueue("plan_day", 1, self.NOW - timedelta(hours=2), "a")
         await store.schedule.claim_due(self.NOW)
-        assert await store.schedule.release_stale_claims(
-            self.NOW - timedelta(hours=1)) == 0
+        assert await store.schedule.release_stale_claims(self.NOW - timedelta(hours=1)) == 0
         assert (await store.schedule.get_by_key("a")).state == STATE_CLAIMED
 
     async def test_drop_stale_removes_windows_that_are_no_longer_relevant(self, store):
@@ -635,8 +672,7 @@ class TestHifzIntervalEdges:
         """
         original = await store.hifz.add_interval(1, 67, 1, 10)
         halves = await store.hifz.remove_range(1, 67, 5, 6)
-        assert [h.marked_at for h in halves] == [original.marked_at,
-                                                 original.marked_at]
+        assert [h.marked_at for h in halves] == [original.marked_at, original.marked_at]
 
     async def test_removal_stops_at_an_abutting_neighbour_that_a_mark_would_absorb(self, store):
         """The one asymmetry between marking and unmarking, pinned for both legs."""
@@ -691,9 +727,15 @@ class TestGroups:
     async def test_update_config_sets_fields(self, store):
         await store.groups.ensure_config(-100, admin_user_id=7)
         row = await store.groups.update_config(
-            -100, thread_id=42, translation_lang="ru", timezone="+05:00",
-            post_time=time(7, 0), days_of_week=[1, 3, 5],
-            content_flags={"image": True, "audio": False}, status="active")
+            -100,
+            thread_id=42,
+            translation_lang="ru",
+            timezone="+05:00",
+            post_time=time(7, 0),
+            days_of_week=[1, 3, 5],
+            content_flags={"image": True, "audio": False},
+            status="active",
+        )
         assert row.thread_id == 42 and row.translation_lang == "ru"
         assert row.post_time == time(7, 0) and row.days_of_week == [1, 3, 5]
         assert row.content_flags == {"image": True, "audio": False}
@@ -703,9 +745,9 @@ class TestGroups:
         assert await store.groups.update_config(-100, status="active") is None
 
     async def test_list_active_configs_needs_status_and_post_time(self, store):
-        await store.groups.ensure_config(-1, admin_user_id=1)          # setup, no time
+        await store.groups.ensure_config(-1, admin_user_id=1)  # setup, no time
         await store.groups.ensure_config(-2, admin_user_id=1)
-        await store.groups.update_config(-2, status="active")          # active, no time
+        await store.groups.update_config(-2, status="active")  # active, no time
         await store.groups.ensure_config(-3, admin_user_id=1)
         await store.groups.update_config(-3, status="active", post_time=time(6, 0))
         active = await store.groups.list_active_configs()
@@ -718,33 +760,41 @@ class TestGroups:
 
     async def test_create_plan_and_days(self, store):
         plan = await store.groups.create_plan(
-            -100, "surah", 67, 1, 67, 30, 2, [1, 2, 3],
-            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2),
-                  PlanDaySpec(date(2026, 8, 4), 67, 3, 4)])
+            -100,
+            "surah",
+            67,
+            1,
+            67,
+            30,
+            2,
+            [1, 2, 3],
+            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2), PlanDaySpec(date(2026, 8, 4), 67, 3, 4)],
+        )
         assert plan.chat_id == -100 and plan.status == "active"
         days = await store.groups.list_plan_days(plan.id)
-        assert [(d.surah, d.start_ayah, d.end_ayah) for d in days] == [
-            (67, 1, 2), (67, 3, 4)]
+        assert [(d.surah, d.start_ayah, d.end_ayah) for d in days] == [(67, 1, 2), (67, 3, 4)]
 
     async def test_get_active_plan_is_newest(self, store):
-        await store.groups.create_plan(-100, "surah", 67, 1, 67, 30, 2, [1],
-                                       days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)])
-        p2 = await store.groups.create_plan(-100, "surah", 36, 1, 36, 83, 2, [1],
-                                            days=[PlanDaySpec(date(2026, 8, 3), 36, 1, 2)])
+        await store.groups.create_plan(
+            -100, "surah", 67, 1, 67, 30, 2, [1], days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)]
+        )
+        p2 = await store.groups.create_plan(
+            -100, "surah", 36, 1, 36, 83, 2, [1], days=[PlanDaySpec(date(2026, 8, 3), 36, 1, 2)]
+        )
         assert (await store.groups.get_active_plan(-100)).id == p2.id
 
     async def test_claim_plan_day_is_once(self, store):
         plan = await store.groups.create_plan(
-            -100, "surah", 67, 1, 67, 30, 2, [1],
-            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)])
+            -100, "surah", 67, 1, 67, 30, 2, [1], days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)]
+        )
         day = (await store.groups.list_plan_days(plan.id))[0]
         assert (await store.groups.claim_plan_day(day.id)).state == "sent"
         assert await store.groups.claim_plan_day(day.id) is None
 
     async def test_set_plan_status(self, store):
         plan = await store.groups.create_plan(
-            -100, "surah", 67, 1, 67, 30, 2, [1],
-            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)])
+            -100, "surah", 67, 1, 67, 30, 2, [1], days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2)]
+        )
         await store.groups.set_plan_status(plan.id, "paused")
         assert await store.groups.get_active_plan(-100) is None
 
@@ -752,7 +802,7 @@ class TestGroups:
         assert await store.groups.is_linked(5, -100) is False
         await store.groups.link_member(5, -100)
         await store.groups.link_member(6, -100)
-        await store.groups.link_member(5, -100)          # idempotent
+        await store.groups.link_member(5, -100)  # idempotent
         assert await store.groups.is_linked(5, -100) is True
         assert await store.groups.list_linked(-100) == [5, 6]
         await store.groups.unlink_member(5, -100)

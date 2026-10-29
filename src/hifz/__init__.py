@@ -31,11 +31,10 @@
 # from `_initialize()` at boot), never at `import hifz` time. That means a
 # feature module may `from main import send_quran` at the top of the file without
 # a circular import, which is the mistake this package would otherwise invite.
-
 import importlib
+import logging
 import pkgutil
 import sys
-import traceback
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Dict, Optional
 
@@ -44,12 +43,25 @@ import telegram
 from lib.wizard import Wizard
 from locales import t
 
+logger = logging.getLogger(__name__)
+
 __all__ = [
-    "Ctx", "COMMANDS", "CALLBACKS", "WIZARDS", "PREFIXES",
-    "command", "callback", "wizard",
-    "handles", "handles_callback", "has_wizard",
-    "dispatch_command", "dispatch_callback", "dispatch_wizard",
-    "load_features", "registered",
+    "Ctx",
+    "COMMANDS",
+    "CALLBACKS",
+    "WIZARDS",
+    "PREFIXES",
+    "command",
+    "callback",
+    "wizard",
+    "handles",
+    "handles_callback",
+    "has_wizard",
+    "dispatch_command",
+    "dispatch_callback",
+    "dispatch_wizard",
+    "load_features",
+    "registered",
 ]
 
 
@@ -61,14 +73,14 @@ __all__ = [
 # "settranslang:", "setreciter:", "showlang" and "reciter_search"; nothing below
 # may shadow those.
 PREFIXES: Dict[str, str] = {
-    "profile":     "hp:",   # hp:name  hp:board:on  hp:tz  hp:tz:+05:00  hp:rem
-    "progress":    "hg:",   # hg:surah:67  hg:juz:30  hg:forget:...
-    "memorize":    "hm:",   # hm:t:surah  hm:pace:5  hm:days:daily  hm:ok  hm:know
-    "check":       "hc:",   # hc:a:<option>  hc:start
-    "streak":      "hs:",   # hs:grid
-    "leaderboard": "hl:",   # hl:me  hl:join
-    "group":       "gr:",   # gr:tl:ru  gr:rc:...  gr:ok — Phase 2 group setup
-    "shared":      "hx:",   # hx:cancel  hx:back — the seam's own controls
+    "profile": "hp:",  # hp:name  hp:board:on  hp:tz  hp:tz:+05:00  hp:rem
+    "progress": "hg:",  # hg:surah:67  hg:juz:30  hg:forget:...
+    "memorize": "hm:",  # hm:t:surah  hm:pace:5  hm:days:daily  hm:ok  hm:know
+    "check": "hc:",  # hc:a:<option>  hc:start
+    "streak": "hs:",  # hs:grid
+    "leaderboard": "hl:",  # hl:me  hl:join
+    "group": "gr:",  # gr:tl:ru  gr:rc:...  gr:ok — Phase 2 group setup
+    "shared": "hx:",  # hx:cancel  hx:back — the seam's own controls
 }
 
 
@@ -87,24 +99,23 @@ class Ctx:
     mutating what it was handed.
     """
 
-    bot: Any                        # telegram.Bot (an AsyncMock under test)
-    data: dict                      # the shared corpora dict built by main.build_data
-    file: Any                       # lib.utils.File — media cache + nav state
-    store: Any                      # lib.store.Store — profiles/hifz/plans/sessions/schedule
+    bot: Any  # telegram.Bot (an AsyncMock under test)
+    data: dict  # the shared corpora dict built by main.build_data
+    file: Any  # lib.utils.File — media cache + nav state
+    store: Any  # lib.store.Store — profiles/hifz/plans/sessions/schedule
     chat_id: int
     user_id: int
     ui_lang: str
     translation_lang: str
     reciter: str
-    argument: str = ""              # text after the command: "/check 67" -> "67"
-    callback_query: Any = None      # telegram.CallbackQuery, on a callback dispatch
-    message: Any = None             # telegram.Message, on a message dispatch
+    argument: str = ""  # text after the command: "/check 67" -> "67"
+    callback_query: Any = None  # telegram.CallbackQuery, on a callback dispatch
+    message: Any = None  # telegram.Message, on a message dispatch
 
     # --- construction ---------------------------------------------------------
 
     @classmethod
-    async def build(cls, bot, data, file, chat_id: int, user_id: int, settings,
-                    **kwargs) -> "Ctx":
+    async def build(cls, bot, data, file, chat_id: int, user_id: int, settings, **kwargs) -> "Ctx":
         """Build a Ctx from main.py's per-update locals.
 
         `settings` is the UserSettingsRow-shaped object `_resolve_settings`
@@ -112,11 +123,19 @@ class Ctx:
         storage is a coroutine-guarded singleton.
         """
         from lib.store import get_store
-        return cls(bot=bot, data=data, file=file, store=await get_store(),
-                   chat_id=chat_id, user_id=user_id,
-                   ui_lang=settings.ui_lang,
-                   translation_lang=settings.translation_lang,
-                   reciter=settings.reciter, **kwargs)
+
+        return cls(
+            bot=bot,
+            data=data,
+            file=file,
+            store=await get_store(),
+            chat_id=chat_id,
+            user_id=user_id,
+            ui_lang=settings.ui_lang,
+            translation_lang=settings.translation_lang,
+            reciter=settings.reciter,
+            **kwargs,
+        )
 
     # --- conveniences ---------------------------------------------------------
 
@@ -145,8 +164,9 @@ class Ctx:
         if text is None:
             await self.bot.answer_callback_query(self.callback_query.id)
         else:
-            await self.bot.answer_callback_query(self.callback_query.id, text=text,
-                                                 show_alert=show_alert)
+            await self.bot.answer_callback_query(
+                self.callback_query.id, text=text, show_alert=show_alert
+            )
 
     async def edit(self, text: str, **kwargs) -> bool:
         """Edit the tapped message in place; send a fresh one if that isn't possible.
@@ -161,8 +181,9 @@ class Ctx:
             await self.reply(text, **kwargs)
             return False
         try:
-            await self.bot.edit_message_text(text=text, chat_id=self.chat_id,
-                                             message_id=msg.message_id, **kwargs)
+            await self.bot.edit_message_text(
+                text=text, chat_id=self.chat_id, message_id=msg.message_id, **kwargs
+            )
         except telegram.error.BadRequest as err:
             if "not modified" not in str(err).lower():
                 raise
@@ -187,8 +208,9 @@ def _same_origin(a, b) -> bool:
     a reload and still distinct between two different features, which is the case
     the guard actually exists to catch.
     """
-    return (getattr(a, "__module__", None) == getattr(b, "__module__", None)
-            and getattr(a, "__qualname__", None) == getattr(b, "__qualname__", None))
+    return getattr(a, "__module__", None) == getattr(b, "__module__", None) and getattr(
+        a, "__qualname__", None
+    ) == getattr(b, "__qualname__", None)
 
 
 def command(*names: str):
@@ -198,16 +220,23 @@ def command(*names: str):
     programming error and raises at import time rather than silently letting one
     module shadow another's command.
     """
+
     def decorate(handler: CommandHandler) -> CommandHandler:
         for name in names:
             key = name.lstrip("/").lower()
             existing = COMMANDS.get(key)
-            if existing is not None and existing is not handler \
-                    and not _same_origin(existing, handler):
-                raise ValueError("command /%s is already registered by %s"
-                                 % (key, getattr(existing, "__module__", "?")))
+            if (
+                existing is not None
+                and existing is not handler
+                and not _same_origin(existing, handler)
+            ):
+                raise ValueError(
+                    "command /%s is already registered by %s"
+                    % (key, getattr(existing, "__module__", "?"))
+                )
             COMMANDS[key] = handler
         return handler
+
     return decorate
 
 
@@ -219,15 +248,22 @@ def callback(*prefixes: str):
     it defensively: callback_data comes off the wire and can be stale, truncated
     or forged.
     """
+
     def decorate(handler: CallbackHandler) -> CallbackHandler:
         for prefix in prefixes:
             existing = CALLBACKS.get(prefix)
-            if existing is not None and existing is not handler \
-                    and not _same_origin(existing, handler):
-                raise ValueError("callback prefix %r is already registered by %s"
-                                 % (prefix, getattr(existing, "__module__", "?")))
+            if (
+                existing is not None
+                and existing is not handler
+                and not _same_origin(existing, handler)
+            ):
+                raise ValueError(
+                    "callback prefix %r is already registered by %s"
+                    % (prefix, getattr(existing, "__module__", "?"))
+                )
             CALLBACKS[prefix] = handler
         return handler
+
     return decorate
 
 
@@ -238,22 +274,29 @@ def wizard(*kinds: str):
     so a module owns its own kinds and never sees another's messages. The handler
     receives the raw (un-lowercased) message text.
     """
+
     def decorate(handler: WizardHandler) -> WizardHandler:
         for kind in kinds:
             existing = WIZARDS.get(kind)
-            if existing is not None and existing is not handler \
-                    and not _same_origin(existing, handler):
-                raise ValueError("wizard kind %r is already registered by %s"
-                                 % (kind, getattr(existing, "__module__", "?")))
+            if (
+                existing is not None
+                and existing is not handler
+                and not _same_origin(existing, handler)
+            ):
+                raise ValueError(
+                    "wizard kind %r is already registered by %s"
+                    % (kind, getattr(existing, "__module__", "?"))
+                )
             WIZARDS[kind] = handler
         return handler
+
     return decorate
 
 
 # --- Feature discovery ---------------------------------------------------------
 
 _loaded = False
-_snapshot = None     # the first successful discovery, replayed after a test clears
+_snapshot = None  # the first successful discovery, replayed after a test clears
 
 
 def load_features(force: bool = False) -> Dict[str, int]:
@@ -283,7 +326,7 @@ def load_features(force: bool = False) -> Dict[str, int]:
         WIZARDS.update(_snapshot[2])
         return registered()
 
-    command("cancel")(_cancel)          # the seam's own command (see below)
+    command("cancel")(_cancel)  # the seam's own command (see below)
     for info in sorted(pkgutil.iter_modules(__path__), key=lambda m: m.name):
         if info.name.startswith("_"):
             continue
@@ -294,20 +337,21 @@ def load_features(force: bool = False) -> Dict[str, int]:
             else:
                 importlib.import_module("." + info.name, __name__)
         except Exception as e:
-            print("HIFZ: feature %r failed to load: %s: %s"
-                  % (info.name, type(e).__name__, e))
-            traceback.print_exc()
+            logger.exception(
+                "HIFZ: feature %r failed to load: %s: %s" % (info.name, type(e).__name__, e)
+            )
     _snapshot = (dict(COMMANDS), dict(CALLBACKS), dict(WIZARDS))
     counts = registered()
-    print("HIFZ: %d commands, %d callback prefixes, %d wizards registered"
-          % (counts["commands"], counts["callbacks"], counts["wizards"]))
+    logger.info(
+        "HIFZ: %d commands, %d callback prefixes, %d wizards registered"
+        % (counts["commands"], counts["callbacks"], counts["wizards"])
+    )
     return counts
 
 
 def registered() -> Dict[str, int]:
     """How much is registered — for the boot log and for tests."""
-    return {"commands": len(COMMANDS), "callbacks": len(CALLBACKS),
-            "wizards": len(WIZARDS)}
+    return {"commands": len(COMMANDS), "callbacks": len(CALLBACKS), "wizards": len(WIZARDS)}
 
 
 def reset_for_tests() -> None:
@@ -323,6 +367,7 @@ def reset_for_tests() -> None:
 # --- Cheap gates ---------------------------------------------------------------
 # main.py asks these before building a Ctx, so an update that has nothing to do
 # with hifz never touches the store.
+
 
 def handles(command_name: str) -> bool:
     """Whether a hifz feature claims `/command_name`."""
@@ -357,6 +402,7 @@ def _match_callback(cb_data: str) -> Optional[CallbackHandler]:
 
 # --- Dispatch ------------------------------------------------------------------
 
+
 async def dispatch_command(ctx: Ctx, command_name: str) -> bool:
     """Run the handler for `/command_name`. True if a feature handled it."""
     load_features()
@@ -382,10 +428,9 @@ async def dispatch_callback(ctx: Ctx, cb_data: str) -> bool:
     try:
         await handler(ctx, cb_data)
     except telegram.error.Forbidden:
-        raise                               # user blocked the bot; main.py handles it
+        raise  # user blocked the bot; main.py handles it
     except Exception as e:
-        print("HIFZ: callback %r failed: %s: %s" % (cb_data, type(e).__name__, e))
-        traceback.print_exc()
+        logger.exception("HIFZ: callback %r failed: %s: %s" % (cb_data, type(e).__name__, e))
         try:
             await ctx.answer()
         except Exception:
@@ -412,7 +457,7 @@ async def dispatch_wizard(ctx: Ctx, raw_message: str) -> bool:
     if handler is None:
         # a draft whose feature is gone (renamed kind, failed import): drop it
         # rather than trapping the user in a wizard nothing answers.
-        print("HIFZ: no handler for wizard kind %r; dropping the draft" % (draft["kind"],))
+        logger.warning("HIFZ: no handler for wizard kind %r; dropping the draft" % (draft["kind"],))
         ctx.wiz.clear(ctx.user_id)
         return False
     try:
@@ -420,8 +465,7 @@ async def dispatch_wizard(ctx: Ctx, raw_message: str) -> bool:
     except telegram.error.Forbidden:
         raise
     except Exception as e:
-        print("HIFZ: wizard %r failed: %s: %s" % (draft["kind"], type(e).__name__, e))
-        traceback.print_exc()
+        logger.exception("HIFZ: wizard %r failed: %s: %s" % (draft["kind"], type(e).__name__, e))
         ctx.wiz.clear(ctx.user_id)
         await ctx.reply(ctx.tr("wizard_invalid_input"))
     return True
@@ -432,6 +476,7 @@ async def dispatch_wizard(ctx: Ctx, raw_message: str) -> bool:
 # registries in a test and re-discovering brings it back. It lives in the seam
 # rather than in a feature module because every wizard needs the same way out,
 # and a feature that owned it would make itself a dependency of the others.
+
 
 async def _cancel(ctx: Ctx) -> None:
     """End whatever wizard is in flight."""

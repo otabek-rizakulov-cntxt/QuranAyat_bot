@@ -17,6 +17,7 @@ NAME_MAX = 32
 
 # --- Display names -------------------------------------------------------------
 
+
 def valid_display_name(text: str) -> Optional[str]:
     """The cleaned display name, or None if it is not 2-32 characters.
 
@@ -55,6 +56,7 @@ async def leave_leaderboard(store, user_id: int):
 
 # --- Timezone (B3) -------------------------------------------------------------
 
+
 async def save_timezone(store, user_id: int, offset: str):
     """Store the user's fixed UTC offset, normalized to "+05:00" form.
 
@@ -71,8 +73,9 @@ async def save_timezone(store, user_id: int, offset: str):
 # "07:30", "7:30", "0730", "730", "7", "7.30", "7h30". 12-hour input is not
 # accepted: `reminder_prompt` asks for 24-hour form in all 48 languages, and
 # guessing at an unqualified "7" being the evening is worse than a re-prompt.
-_TIME_RE = re.compile(r"^(?P<h>\d{1,2})\s*(?:[:.,;h\-]\s*(?P<m>\d{1,2})|(?P<m2>\d{2}))?$",
-                      re.IGNORECASE)
+_TIME_RE = re.compile(
+    r"^(?P<h>\d{1,2})\s*(?:[:.,;h\-]\s*(?P<m>\d{1,2})|(?P<m2>\d{2}))?$", re.IGNORECASE
+)
 
 
 def parse_reminder_time(text: str) -> Optional[time]:
@@ -132,16 +135,21 @@ def next_push_utc(profile, now: Optional[datetime] = None) -> Optional[datetime]
 
 # --- The active plan, as the profile card shows it ------------------------------
 
+
 def plan_target(plan) -> str:
     """What to call the plan's target: a surah name when it is a whole surah,
     otherwise the compact reference. Both are un-localized by design — a surah
     name is a proper noun and `format_ref` is machine text."""
-    whole_surah = (plan.start_surah == plan.end_surah and plan.start_ayah == 1
-                   and plan.end_ayah == Quran.get_surah_length(plan.start_surah))
+    whole_surah = (
+        plan.start_surah == plan.end_surah
+        and plan.start_ayah == 1
+        and plan.end_ayah == Quran.get_surah_length(plan.start_surah)
+    )
     if plan.target_kind == "surah" or whole_surah:
         return Quran.get_surah_name(plan.start_surah)
-    return format_ref(Ref(KIND_RANGE, plan.start_surah, plan.start_ayah,
-                          plan.end_surah, plan.end_ayah))
+    return format_ref(
+        Ref(KIND_RANGE, plan.start_surah, plan.start_ayah, plan.end_surah, plan.end_ayah)
+    )
 
 
 async def active_plan_progress(store, user_id: int):

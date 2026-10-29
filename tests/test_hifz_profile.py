@@ -65,11 +65,12 @@ class _CallbackQuery:
 
 async def _ctx(bot=None, username=None, argument="", tap=False) -> Ctx:
     from lib.utils import File
+
     bot = bot or AsyncMock()
-    extra = ({"callback_query": _CallbackQuery(username)} if tap
-             else {"message": _Message(username)})
-    return await Ctx.build(bot, {}, File(), CHAT_ID, USER_ID, _Settings(),
-                           argument=argument, **extra)
+    extra = {"callback_query": _CallbackQuery(username)} if tap else {"message": _Message(username)}
+    return await Ctx.build(
+        bot, {}, File(), CHAT_ID, USER_ID, _Settings(), argument=argument, **extra
+    )
 
 
 def _sent(bot) -> str:
@@ -100,6 +101,7 @@ async def _profile_row():
 
 # --- B1: the card --------------------------------------------------------------
 
+
 class TestProfileCard:
     async def test_renders_for_a_user_who_has_used_nothing_else(self):
         # B1's done-when: every field has an unset state, so a first-contact user
@@ -109,7 +111,7 @@ class TestProfileCard:
         text = _sent(bot)
         assert "Your profile" in text
         assert "Name: not set" in text
-        assert "Leaderboard: you are hidden" in text       # default off (B2)
+        assert "Leaderboard: you are hidden" in text  # default off (B2)
         assert "Time zone: not set" in text
         assert "Daily reminder: off" in text
         assert "Plan: none yet" in text
@@ -118,8 +120,12 @@ class TestProfileCard:
         bot = AsyncMock()
         await hifz.dispatch_command(await _ctx(bot), "profile")
         data = _callback_data(bot.send_message.await_args.kwargs["reply_markup"])
-        assert data == [profile_feature.NAME_CB, profile_feature.BOARD_ON_CB,
-                        profile_feature.TIMEZONE_CB, profile_feature.REMINDER_CB]
+        assert data == [
+            profile_feature.NAME_CB,
+            profile_feature.BOARD_ON_CB,
+            profile_feature.TIMEZONE_CB,
+            profile_feature.REMINDER_CB,
+        ]
 
     async def test_the_profile_row_is_created_on_first_view(self):
         assert await _profile_row() is None
@@ -140,16 +146,19 @@ class TestProfileCard:
         assert "Leaderboard: you are listed" in text
         assert "UTC+05:00" in text
         assert "07:30" in text
-        assert _callback_data(bot.send_message.await_args.kwargs["reply_markup"])[1] \
+        assert (
+            _callback_data(bot.send_message.await_args.kwargs["reply_markup"])[1]
             == profile_feature.BOARD_OFF_CB
+        )
 
     async def test_an_active_plan_is_named_with_its_progress(self):
         from lib.store.plans import PlanDaySpec
+
         store = await get_store()
-        days = [PlanDaySpec(date(2026, 8, 1), 67, 1, 5),
-                PlanDaySpec(date(2026, 8, 2), 67, 6, 10)]
-        plan = await store.plans.create_plan(USER_ID, "surah", 67, 1, 67, 30, 5,
-                                             [1, 2, 3, 4, 5], days)
+        days = [PlanDaySpec(date(2026, 8, 1), 67, 1, 5), PlanDaySpec(date(2026, 8, 2), 67, 6, 10)]
+        plan = await store.plans.create_plan(
+            USER_ID, "surah", 67, 1, 67, 30, 5, [1, 2, 3, 4, 5], days
+        )
         first = (await store.plans.list_plan_days(plan.id))[0]
         await store.plans.claim_plan_day(first.id)
         await store.plans.complete_plan_day(first.id)
@@ -166,6 +175,7 @@ class TestProfileCard:
 
 
 # --- B2: the leaderboard opt-in ------------------------------------------------
+
 
 class TestLeaderboardOptIn:
     async def test_opt_in_adopts_the_telegram_username(self):
@@ -199,7 +209,7 @@ class TestLeaderboardOptIn:
         await hifz.dispatch_callback(ctx, profile_feature.BOARD_ON_CB)
         assert "Send the name" in _edited(bot)
         assert ctx.wiz.kind(USER_ID) == profile_feature.WIZARD_NAME
-        assert (await _profile_row()).leaderboard_opt_in is False   # not yet
+        assert (await _profile_row()).leaderboard_opt_in is False  # not yet
 
     async def test_the_typed_name_completes_the_opt_in(self):
         ctx = await _ctx(username=None, tap=True)
@@ -222,7 +232,7 @@ class TestLeaderboardOptIn:
         ctx.wiz.start(USER_ID, profile_feature.WIZARD_NAME, join=True)
         await hifz.dispatch_wizard(ctx, typed)
         assert _sent(bot) == "Use between 2 and 32 characters."
-        assert ctx.wiz.is_active(USER_ID) is True       # a retry, not a dead end
+        assert ctx.wiz.is_active(USER_ID) is True  # a retry, not a dead end
         assert await _profile_row() is None
 
     async def test_the_boundaries_themselves_are_accepted(self):
@@ -246,7 +256,7 @@ class TestLeaderboardOptIn:
         ctx = await _ctx(bot)
         ctx.wiz.start(USER_ID, profile_feature.WIZARD_NAME, join=False)
         await hifz.dispatch_wizard(ctx, "<b>Ali</b> & co")
-        assert (await _profile_row()).display_name == "<b>Ali</b> & co"   # stored raw
+        assert (await _profile_row()).display_name == "<b>Ali</b> & co"  # stored raw
         text = _sent(bot)
         assert "&lt;b&gt;Ali&lt;/b&gt; &amp; co" in text
         assert "<b>Ali</b>" not in text
@@ -256,6 +266,7 @@ class TestLeaderboardOptIn:
         # renderer (lib/leaderboard.py refuses to filter at render time).
         from lib.leaderboard import weekly_board
         from lib.streaks import record_session
+
         store = await get_store()
         ctx = await _ctx(username="abubakr", tap=True)
         await hifz.dispatch_callback(ctx, profile_feature.BOARD_ON_CB)
@@ -280,6 +291,7 @@ class TestLeaderboardOptIn:
         # so that a broken profile module cannot take the board down with it. That
         # only holds if this module actually answers that exact shape.
         from hifz import leaderboard as board_feature
+
         assert board_feature.CB_JOIN == profile_feature.BOARD_ON_CB
         ctx = await _ctx(username="abubakr", tap=True)
         await hifz.dispatch_callback(ctx, board_feature.CB_JOIN)
@@ -304,9 +316,11 @@ class TestLeaderboardOptIn:
 
 # --- B3: timezone and reminder time --------------------------------------------
 
+
 class TestTimezone:
     async def test_the_picker_offers_every_offset(self):
         from lib.localtime import OFFSET_CHOICES
+
         bot = AsyncMock()
         ctx = await _ctx(bot, tap=True)
         await hifz.dispatch_callback(ctx, profile_feature.TIMEZONE_CB)
@@ -330,6 +344,7 @@ class TestTimezone:
         # it stands (lib.scheduler.schedule_daily), so the stored offset is the
         # only thing that has to move.
         from lib.scheduler import schedule_daily
+
         store = await get_store()
         now = datetime(2026, 8, 5, 0, 0, tzinfo=timezone.utc)
         await hifz.dispatch_callback(await _ctx(tap=True), "hp:tz:+00:00")
@@ -343,11 +358,12 @@ class TestTimezone:
         await hifz.dispatch_callback(await _ctx(tap=True), "hp:tz:+05:00")
         at_plus5 = profile_feature.next_push_utc(await _profile_row(), now)
         assert at_plus5 == datetime(2026, 8, 5, 2, 30, tzinfo=timezone.utc)
-        assert at_utc - at_plus5 == abs(at_utc - at_plus5)      # it moved earlier
+        assert at_utc - at_plus5 == abs(at_utc - at_plus5)  # it moved earlier
 
         # and the queued push follows the stored offset, not a copy of it
-        row = await schedule_daily(store, "plan_day", CHAT_ID, time(7, 30),
-                                   (await _profile_row()).timezone, now=now)
+        row = await schedule_daily(
+            store, "plan_day", CHAT_ID, time(7, 30), (await _profile_row()).timezone, now=now
+        )
         assert row.due_at == at_plus5
 
     async def test_a_forged_or_stale_offset_is_ignored_not_stored(self):
@@ -363,10 +379,8 @@ class TestTimezone:
         markup = profile_feature.offset_keyboard("en", prefix="hm:tz:", columns=6)
         data = _callback_data(markup)
         assert data[0] == "hm:tz:-12:00" and data[-1] == "hm:tz:+14:00"
-        assert profile_feature.offset_from_callback("hm:tz:+05:30",
-                                                    prefix="hm:tz:") == "+05:30"
-        assert profile_feature.offset_from_callback("hp:tz:+05:30",
-                                                    prefix="hm:tz:") is None
+        assert profile_feature.offset_from_callback("hm:tz:+05:30", prefix="hm:tz:") == "+05:30"
+        assert profile_feature.offset_from_callback("hp:tz:+05:30", prefix="hm:tz:") is None
 
 
 class TestReminderTime:
@@ -377,12 +391,20 @@ class TestReminderTime:
         assert "24-hour" in _edited(bot)
         assert ctx.wiz.kind(USER_ID) == profile_feature.WIZARD_REMINDER
         assert profile_feature.REMINDER_OFF_CB in _callback_data(
-            bot.edit_message_text.await_args.kwargs["reply_markup"])
+            bot.edit_message_text.await_args.kwargs["reply_markup"]
+        )
 
-    @pytest.mark.parametrize("typed,expected", [
-        ("07:30", time(7, 30)), ("7:30", time(7, 30)), ("0730", time(7, 30)),
-        ("7", time(7, 0)), ("19:05", time(19, 5)), ("23:59", time(23, 59)),
-    ])
+    @pytest.mark.parametrize(
+        "typed,expected",
+        [
+            ("07:30", time(7, 30)),
+            ("7:30", time(7, 30)),
+            ("0730", time(7, 30)),
+            ("7", time(7, 0)),
+            ("19:05", time(19, 5)),
+            ("23:59", time(23, 59)),
+        ],
+    )
     async def test_a_typed_time_is_stored(self, typed, expected):
         bot = AsyncMock()
         ctx = await _ctx(bot)
@@ -404,15 +426,13 @@ class TestReminderTime:
         store = await get_store()
         await store.profiles.set_reminder_time(USER_ID, time(7, 30))
         bot = AsyncMock()
-        await hifz.dispatch_callback(await _ctx(bot, tap=True),
-                                     profile_feature.REMINDER_OFF_CB)
+        await hifz.dispatch_callback(await _ctx(bot, tap=True), profile_feature.REMINDER_OFF_CB)
         assert (await _profile_row()).reminder_time is None
         assert _toast(bot) == "Daily reminders are off."
         assert profile_feature.next_push_utc(await _profile_row()) is None
 
     def test_the_reminder_helpers_are_reusable_by_another_wizard(self):
-        markup = profile_feature.reminder_keyboard("en", off_data="hm:rem:off",
-                                                   cancel_data="hm:x")
+        markup = profile_feature.reminder_keyboard("en", off_data="hm:rem:off", cancel_data="hm:x")
         assert _callback_data(markup) == ["hm:rem:off", "hm:x"]
         assert profile_feature.parse_reminder_time("07:30") == time(7, 30)
         assert profile_feature.parse_reminder_time("nope") is None
@@ -421,13 +441,19 @@ class TestReminderTime:
 
 # --- Defensive parsing and the 64-byte cap -------------------------------------
 
+
 class TestCallbackDataDiscipline:
     def test_every_shape_fits_telegrams_cap(self):
-        shapes = [profile_feature.PROFILE_CB, profile_feature.NAME_CB,
-                  profile_feature.BOARD_ON_CB, profile_feature.BOARD_OFF_CB,
-                  profile_feature.TIMEZONE_CB, profile_feature.REMINDER_CB,
-                  profile_feature.REMINDER_OFF_CB,
-                  profile_feature.OFFSET_PREFIX + "-12:00"]
+        shapes = [
+            profile_feature.PROFILE_CB,
+            profile_feature.NAME_CB,
+            profile_feature.BOARD_ON_CB,
+            profile_feature.BOARD_OFF_CB,
+            profile_feature.TIMEZONE_CB,
+            profile_feature.REMINDER_CB,
+            profile_feature.REMINDER_OFF_CB,
+            profile_feature.OFFSET_PREFIX + "-12:00",
+        ]
         for shape in shapes:
             assert shape.startswith(hifz.PREFIXES["profile"])
             assert len(shape.encode()) <= 64, shape
@@ -439,7 +465,7 @@ class TestCallbackDataDiscipline:
         for junk in ("hp:", "hp:zzz", "hp:b:", "hp:b:2", "hp:r:xx", "hp:n:extra"):
             bot.reset_mock()
             assert await hifz.dispatch_callback(await _ctx(bot, tap=True), junk) is True
-            bot.answer_callback_query.assert_awaited()      # no spinner left behind
+            bot.answer_callback_query.assert_awaited()  # no spinner left behind
             assert "Your profile" in _edited(bot)
 
     async def test_the_back_button_leaves_a_wizard_and_shows_the_card(self):

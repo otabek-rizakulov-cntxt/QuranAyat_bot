@@ -29,8 +29,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from config import Environment
 
-DEFAULT_INIT_DATA_MAX_AGE = 24 * 3600   # seconds an initData stays exchangeable
-DEFAULT_TOKEN_TTL = 3600                # seconds an access token lives
+DEFAULT_INIT_DATA_MAX_AGE = 24 * 3600  # seconds an initData stays exchangeable
+DEFAULT_TOKEN_TTL = 3600  # seconds an access token lives
 
 _JWT_HEADER = {"alg": "HS256", "typ": "JWT"}
 
@@ -48,6 +48,7 @@ class InvalidToken(ValueError):
 # initData
 # ---------------------------------------------------------------------------
 
+
 def _init_data_secret(bot_token: str) -> bytes:
     return hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
 
@@ -57,14 +58,18 @@ def sign_init_data(fields: dict, bot_token: str) -> str:
     when it opens the Mini App. Production never calls this; tests and local
     tooling use it to produce known-good vectors."""
     data_check_string = "\n".join("%s=%s" % (k, fields[k]) for k in sorted(fields))
-    digest = hmac.new(_init_data_secret(bot_token), data_check_string.encode(),
-                      hashlib.sha256).hexdigest()
+    digest = hmac.new(
+        _init_data_secret(bot_token), data_check_string.encode(), hashlib.sha256
+    ).hexdigest()
     return urlencode({**fields, "hash": digest})
 
 
-def validate_init_data(init_data: str, bot_token: str,
-                       max_age: int = DEFAULT_INIT_DATA_MAX_AGE,
-                       now: Optional[float] = None) -> dict:
+def validate_init_data(
+    init_data: str,
+    bot_token: str,
+    max_age: int = DEFAULT_INIT_DATA_MAX_AGE,
+    now: Optional[float] = None,
+) -> dict:
     """Verify `init_data` and return its fields, with `user` decoded from JSON.
 
     Raises InvalidInitData on a missing/forged hash, a missing or stale
@@ -86,8 +91,9 @@ def validate_init_data(init_data: str, bot_token: str,
         raise InvalidInitData("missing hash")
 
     data_check_string = "\n".join("%s=%s" % (k, fields[k]) for k in sorted(fields))
-    expected = hmac.new(_init_data_secret(bot_token), data_check_string.encode(),
-                        hashlib.sha256).hexdigest()
+    expected = hmac.new(
+        _init_data_secret(bot_token), data_check_string.encode(), hashlib.sha256
+    ).hexdigest()
     if not hmac.compare_digest(expected, received_hash):
         raise InvalidInitData("hash mismatch")
 
@@ -114,6 +120,7 @@ def validate_init_data(init_data: str, bot_token: str,
 # Access token (HS256 JWT)
 # ---------------------------------------------------------------------------
 
+
 def _b64url(raw: bytes) -> str:
     return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
 
@@ -126,12 +133,15 @@ def _sign(signing_input: str, secret: str) -> str:
     return _b64url(hmac.new(secret.encode(), signing_input.encode(), hashlib.sha256).digest())
 
 
-def issue_token(user_id: int, secret: str, ttl: int = DEFAULT_TOKEN_TTL,
-                now: Optional[float] = None) -> str:
+def issue_token(
+    user_id: int, secret: str, ttl: int = DEFAULT_TOKEN_TTL, now: Optional[float] = None
+) -> str:
     issued = int(time.time() if now is None else now)
     payload = {"sub": str(user_id), "iat": issued, "exp": issued + ttl}
-    signing_input = "%s.%s" % (_b64url(json.dumps(_JWT_HEADER, separators=(",", ":")).encode()),
-                               _b64url(json.dumps(payload, separators=(",", ":")).encode()))
+    signing_input = "%s.%s" % (
+        _b64url(json.dumps(_JWT_HEADER, separators=(",", ":")).encode()),
+        _b64url(json.dumps(payload, separators=(",", ":")).encode()),
+    )
     return "%s.%s" % (signing_input, _sign(signing_input, secret))
 
 
@@ -164,6 +174,7 @@ def decode_token(token: str, secret: str, now: Optional[float] = None) -> int:
 # Configuration + FastAPI dependency
 # ---------------------------------------------------------------------------
 
+
 def jwt_secret() -> Optional[str]:
     return Environment.get_env("miniapp_jwt_secret") or None
 
@@ -180,19 +191,25 @@ _bearer = HTTPBearer(auto_error=False)
 
 
 def _unauthorized(detail: str) -> HTTPException:
-    return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail,
-                         headers={"WWW-Authenticate": "Bearer"})
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 async def require_user(
-        credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer)) -> int:
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
+) -> int:
     """The authenticated Telegram user id, from the bearer token only."""
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise _unauthorized("missing bearer token")
     secret = jwt_secret()
     if not secret:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                            detail="mini app auth is not configured")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="mini app auth is not configured",
+        )
     try:
         return decode_token(credentials.credentials, secret)
     except InvalidToken:

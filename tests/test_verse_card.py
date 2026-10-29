@@ -51,9 +51,7 @@ def _callback(tg_bot, data_str, chat_id=556000, message_kind="text"):
     if message_kind == "text":
         message["text"] = "placeholder"
     elif message_kind == "photo":
-        message["photo"] = [
-            {"file_id": "f", "file_unique_id": "u", "width": 100, "height": 100}
-        ]
+        message["photo"] = [{"file_id": "f", "file_unique_id": "u", "width": 100, "height": 100}]
     payload = {
         "update_id": 1,
         "callback_query": {
@@ -69,6 +67,7 @@ def _callback(tg_bot, data_str, chat_id=556000, message_kind="text"):
 
 # --- Keyboard shape ---------------------------------------------------------
 
+
 class TestVerseKeyboard:
     def test_active_view_is_marked_with_a_dot(self):
         rows = main.verse_keyboard(2, 255, "tafsir", "en").inline_keyboard
@@ -83,39 +82,48 @@ class TestVerseKeyboard:
 
     def test_nav_callbacks_point_at_neighbouring_ayat(self):
         nav = main.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
-        assert nav[0].callback_data == "vc:tr:2:254"   # previous
-        assert nav[1].callback_data == "vr:tr"         # random keeps the view
-        assert nav[2].callback_data == "vc:tr:2:256"   # next
+        assert nav[0].callback_data == "vc:tr:2:254"  # previous
+        assert nav[1].callback_data == "vr:tr"  # random keeps the view
+        assert nav[2].callback_data == "vc:tr:2:256"  # next
 
     def test_arrows_flip_for_rtl(self):
         ltr = main.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
         rtl = main.verse_keyboard(2, 255, "translation", "ar").inline_keyboard[1]
-        assert ltr[0].text.startswith("‹")   # LTR: previous points left
-        assert rtl[0].text.endswith("›")      # RTL: mirrored so "next" reads forward
+        assert ltr[0].text.startswith("‹")  # LTR: previous points left
+        assert rtl[0].text.endswith("›")  # RTL: mirrored so "next" reads forward
 
     def test_share_uses_inline_mode(self):
-        share = _button(main.verse_keyboard(2, 255, "translation", "en"),
-                        lambda b: b.switch_inline_query is not None)
+        share = _button(
+            main.verse_keyboard(2, 255, "translation", "en"),
+            lambda b: b.switch_inline_query is not None,
+        )
         assert share.switch_inline_query == "2:255"
 
     def test_language_button_shows_current_language(self):
-        util = _button(main.verse_keyboard(2, 255, "translation", "uz"),
-                       lambda b: b.callback_data == "showlang")
+        util = _button(
+            main.verse_keyboard(2, 255, "translation", "uz"),
+            lambda b: b.callback_data == "showlang",
+        )
         assert get_language("uz").native in util.text
 
     def test_repeat_button_replays_this_ayah(self):
-        repeat = _button(main.verse_keyboard(2, 255, "audio", "en"),
-                         lambda b: (b.callback_data or "").startswith("rep:"))
+        repeat = _button(
+            main.verse_keyboard(2, 255, "audio", "en"),
+            lambda b: (b.callback_data or "").startswith("rep:"),
+        )
         assert repeat.callback_data == "rep:2:255"
         assert "×%d" % main.REPEAT_COUNT in repeat.text
 
     def test_repeat_label_is_localized(self):
-        repeat = _button(main.verse_keyboard(2, 255, "audio", "ru"),
-                         lambda b: (b.callback_data or "").startswith("rep:"))
+        repeat = _button(
+            main.verse_keyboard(2, 255, "audio", "ru"),
+            lambda b: (b.callback_data or "").startswith("rep:"),
+        )
         assert "Повтор" in repeat.text
 
 
 # --- Text rendering ---------------------------------------------------------
+
 
 class TestVerseText:
     async def test_has_bold_header_and_reference(self, data):
@@ -139,6 +147,7 @@ class TestVerseText:
 
 # --- Callback dispatch ------------------------------------------------------
 
+
 class TestVerseCallbacks:
     async def test_text_view_edits_message_in_place(self, fake_bot, data, tg_bot):
         await main.handle_update(fake_bot, data, _callback(tg_bot, "vc:tr:2:255"))
@@ -147,11 +156,13 @@ class TestVerseCallbacks:
         assert kwargs["message_id"] == 10
         assert kwargs["parse_mode"] == "HTML"
         fake_bot.answer_callback_query.assert_awaited()
-        fake_bot.send_message.assert_not_awaited()   # no new bubble — the page turned
+        fake_bot.send_message.assert_not_awaited()  # no new bubble — the page turned
 
     async def test_switching_from_media_posts_a_fresh_card(self, fake_bot, data, tg_bot):
         # A photo message can't be edited into text, so we send a new text card.
-        await main.handle_update(fake_bot, data, _callback(tg_bot, "vc:tf:1:1", message_kind="photo"))
+        await main.handle_update(
+            fake_bot, data, _callback(tg_bot, "vc:tf:1:1", message_kind="photo")
+        )
         fake_bot.send_message.assert_awaited()
         fake_bot.edit_message_text.assert_not_awaited()
 
@@ -173,6 +184,7 @@ class TestVerseCallbacks:
 
 
 # --- Language flags ---------------------------------------------------------
+
 
 class TestLanguageFlags:
     def test_every_catalogued_language_has_a_flag(self):

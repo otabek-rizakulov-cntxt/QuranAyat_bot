@@ -26,18 +26,28 @@ Required env vars (see .env.example):
   WEBHOOK_URL            public HTTPS base URL Telegram should POST updates to;
                          the webhook is registered as WEBHOOK_URL + "/webhook/" + TOKEN
 """
+
+import logging
 import os
 import re
+
 from dotenv import load_dotenv
+
+from config.logging import setup_logging
+
 load_dotenv()
+setup_logging()
 
 import asyncio
 import html
 from io import BytesIO
 from time import time
 from urllib.parse import urlencode
+
 import httpx
 import telegram
+from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from telegram import (
     BotCommand,
     InlineKeyboardButton,
@@ -50,32 +60,45 @@ from telegram import (
     InputTextMessageContent,
     ReplyKeyboardRemove,
 )
-from fastapi import FastAPI, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
-from modules import Quran, make_index, Bot, TranslationRegistry
+
 import hifz
-from lib.utils import File
-from lib.page_image import fetch_and_stitch
-from lib.miniapp import app_row, set_menu_button
-from lib.store import apply_schema, store_backend
-from lib.user_settings import UserSettings
-from config import Environment
 from api import router as api_router
-from services.reciters import (  # noqa: F401 — re-exported; tests and the picker use them here
-    DEFAULT_RECITER_KIND, RECITER_KINDS, _KIND_WARNING_KEYS, _RECITER_SHORTLIST,
-    reciter_catalog, reciter_group, reciter_kind,
-)
+from config import Environment
 from config.postgres import close_pool
 from config.redis import RedisSingleton, cache_backend
+from lib.miniapp import app_row, set_menu_button
+from lib.page_image import fetch_and_stitch
+from lib.store import apply_schema, store_backend
+from lib.user_settings import UserSettings
+from lib.utils import File
 from locales import (
-    LANGUAGES, UI_LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
-    t, button_action, normalize_lang, get_language, is_ui_language, welcome_text,
+    BOT_COMMANDS,
+    DEFAULT_LANG,
+    LANGUAGES,
+    UI_LANGUAGES,
+    button_action,
+    get_language,
+    normalize_lang,
+    t,
+    welcome_text,
+)
+from modules import Bot, Quran, TranslationRegistry, make_index
+from services.reciters import (  # noqa: F401 — re-exported; tests and the picker use them here
+    _KIND_WARNING_KEYS,
+    _RECITER_SHORTLIST,
+    DEFAULT_RECITER_KIND,
+    RECITER_KINDS,
+    reciter_catalog,
+    reciter_group,
+    reciter_kind,
 )
 
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Bot logic
 # ---------------------------------------------------------------------------
+
 
 def _webhook_base_url() -> str | None:
     """Public HTTPS base URL this app is reachable at.
@@ -148,6 +171,7 @@ async def _download_stitched_audio(ayahs: list, performer: str, name: str) -> By
     semaphore = asyncio.Semaphore(_DOWNLOAD_CONCURRENCY)
 
     async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+
         async def fetch(url):
             async with semaphore:
                 response = await client.get(url)
@@ -167,8 +191,10 @@ async def _download_stitched_audio(ayahs: list, performer: str, name: str) -> By
 async def _download_combined_audio(surah: int, start: int, end: int, performer: str) -> BytesIO:
     """One surah's ayah range, stitched into a single mp3."""
     return await _download_stitched_audio(
-        [(surah, ayah) for ayah in range(start, end + 1)], performer,
-        "quran_%d_%d-%d.mp3" % (surah, start, end))
+        [(surah, ayah) for ayah in range(start, end + 1)],
+        performer,
+        "quran_%d_%d-%d.mp3" % (surah, start, end),
+    )
 
 
 def _combined_audio_key(surah: int, start: int, end: int, performer: str) -> str:
@@ -177,9 +203,16 @@ def _combined_audio_key(surah: int, start: int, end: int, performer: str) -> str
     return "combined:%d:%d-%d:%s" % (surah, start, end, performer)
 
 
-async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: int,
-                              performer: str, reply_markup=None,
-                              message_thread_id=None) -> None:
+async def send_combined_audio(
+    bot,
+    surah: int,
+    start: int,
+    end: int,
+    chat_id: int,
+    performer: str,
+    reply_markup=None,
+    message_thread_id=None,
+) -> None:
     """Send a range of ayahs as a single combined audio file, cached by Telegram file_id.
 
     `message_thread_id` targets a forum topic (the group cluster's daily post);
@@ -188,9 +221,12 @@ async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: in
     file = File()
     cache_key = _combined_audio_key(surah, start, end, performer)
     title = "Quran %d:%d-%d" % (surah, start, end)
-    kwargs = dict(chat_id=chat_id, title=title,
-                  performer=File.get_performer_name(performer),
-                  reply_markup=reply_markup)
+    kwargs = dict(
+        chat_id=chat_id,
+        title=title,
+        performer=File.get_performer_name(performer),
+        reply_markup=reply_markup,
+    )
     if message_thread_id is not None:
         kwargs["message_thread_id"] = message_thread_id
 
@@ -203,8 +239,7 @@ async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: in
         except telegram.error.TelegramError:
             pass  # cached file_id rejected; rebuild below
 
-    await bot.send_chat_action(chat_id=chat_id,
-                        action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE)
     audio = await _download_combined_audio(surah, start, end, performer)
     result = await bot.send_audio(audio=audio, **kwargs)
     file.save_file(cache_key, result.audio.file_id)
@@ -231,16 +266,38 @@ def _range_audio_url(surah: int, start: int, end: int, performer: str) -> str | 
 def get_default_query_results(quran: Quran):
     results = []
     ayat = [
-        (13, 28), (33, 56), (2, 62), (10, 31), (17, 36), (5, 32), (39, 9), (17, 44), (28, 88), (17, 84), (33, 6),
-        (7, 57), (3, 7), (2, 255), (63, 9), (57, 20), (49, 12), (16, 125), (24, 35), (73, 8), (4, 103)
+        (13, 28),
+        (33, 56),
+        (2, 62),
+        (10, 31),
+        (17, 36),
+        (5, 32),
+        (39, 9),
+        (17, 44),
+        (28, 88),
+        (17, 84),
+        (33, 6),
+        (7, 57),
+        (3, 7),
+        (2, 255),
+        (63, 9),
+        (57, 20),
+        (49, 12),
+        (16, 125),
+        (24, 35),
+        (73, 8),
+        (4, 103),
     ]
     for s, a in ayat:
         ayah = "%d:%d" % (s, a)
         english = quran.get_ayah(s, a)
-        results.append(InlineQueryResultArticle(
-            ayah + "def", title=ayah,
-            description=english[:120],
-            input_message_content=InputTextMessageContent(english))
+        results.append(
+            InlineQueryResultArticle(
+                ayah + "def",
+                title=ayah,
+                description=english[:120],
+                input_message_content=InputTextMessageContent(english),
+            )
         )
     return results
 
@@ -329,8 +386,7 @@ def _ref_key(surah: int, start: int, end: int) -> str:
 INLINE_PERSONAL_CACHE_TIME = 60
 
 
-def _inline_audio_result(surah: int, start: int, end: int, reciter: str,
-                         ui_lang: str, file: File):
+def _inline_audio_result(surah: int, start: int, end: int, reciter: str, ui_lang: str, file: File):
     """The recitation of an ayah — or of a whole range, stitched into one file —
     as a shareable inline result, or None if it can't be built.
 
@@ -353,25 +409,25 @@ def _inline_audio_result(surah: int, start: int, end: int, reciter: str,
     title = _reference(surah, start, ui_lang, end)
     if end > start:
         if end - start + 1 > MAX_RANGE_AYAHS:
-            return None                 # same bound the in-chat range send enforces
+            return None  # same bound the in-chat range send enforces
         # Bounded by 64 bytes — 4 + 11 + the longest subfolder in the catalog.
         result_id = "aur:%s:%s" % (_ref_key(surah, start, end), reciter)
         cached_id = file.get_file(_combined_audio_key(surah, start, end, reciter))
         if cached_id is not None:
             # Someone has already asked for this range in a chat: replay that
             # upload instead of making Telegram fetch and stitch it again.
-            return InlineQueryResultCachedAudio(result_id, audio_file_id=cached_id,
-                                                caption=title)
+            return InlineQueryResultCachedAudio(result_id, audio_file_id=cached_id, caption=title)
         audio_url = _range_audio_url(surah, start, end, reciter)
         if audio_url is None:
-            return None                 # no public base URL to stitch it from
+            return None  # no public base URL to stitch it from
     else:
         # Keyed by reciter as well as ayah: the same query answered before and
         # after a reciter change must not collide in Telegram's result cache.
         result_id = "au:%s:%s" % (_ref_key(surah, start, end), reciter)
         audio_url = first_url
-    return InlineQueryResultAudio(result_id, audio_url=audio_url, title=title,
-                                  performer=File.get_performer_name(reciter))
+    return InlineQueryResultAudio(
+        result_id, audio_url=audio_url, title=title, performer=File.get_performer_name(reciter)
+    )
 
 
 # A range's Arabic images come back one result per ayah; cap them so a long range
@@ -392,7 +448,7 @@ def _inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: 
     it points at a local directory, only already-cached ayahs can be offered.
     """
     if not file.get_env("quranic_images_file_path"):
-        return []                       # no images configured at all
+        return []  # no images configured at all
     results = []
     for ayah in range(start, min(end, start + INLINE_MAX_PHOTOS - 1) + 1):
         result_id = "ph:%d:%d" % (surah, ayah)
@@ -402,11 +458,13 @@ def _inline_photo_results(surah: int, start: int, end: int, ui_lang: str, file: 
         source = file.get_image_filename(surah, ayah)
         cached_id = file.get_file(source)
         if cached_id is not None:
-            results.append(InlineQueryResultCachedPhoto(
-                result_id, photo_file_id=cached_id, **common))
+            results.append(
+                InlineQueryResultCachedPhoto(result_id, photo_file_id=cached_id, **common)
+            )
         elif source.startswith(("http://", "https://")):
-            results.append(InlineQueryResultPhoto(
-                result_id, photo_url=source, thumbnail_url=source, **common))
+            results.append(
+                InlineQueryResultPhoto(result_id, photo_url=source, thumbnail_url=source, **common)
+            )
     return results
 
 
@@ -476,6 +534,7 @@ _KIND_LABEL_KEYS = {
 # disambiguating that a longer word otherwise would.
 _KIND_ICONS = {"recitation": "🎙 ", "riwayah": "📖 ", "translation": "🗣 "}
 
+
 def reciter_label(performer: dict) -> str:
     """Button label for a reciter: name plus bitrate.
 
@@ -506,8 +565,9 @@ def reciter_page_of(subfolder: str) -> tuple[str, int]:
     return DEFAULT_RECITER_KIND, 0
 
 
-def reciter_keyboard(ui_lang: str, kind: str = DEFAULT_RECITER_KIND, page: int = 0,
-                     current: str | None = None) -> InlineKeyboardMarkup:
+def reciter_keyboard(
+    ui_lang: str, kind: str = DEFAULT_RECITER_KIND, page: int = 0, current: str | None = None
+) -> InlineKeyboardMarkup:
     """One page of one group of the reciter catalog, two per row, under a group-tab
     row, a Previous / n-of-m / Next pager and a search button.
 
@@ -525,15 +585,18 @@ def reciter_keyboard(ui_lang: str, kind: str = DEFAULT_RECITER_KIND, page: int =
     page %= pages
 
     # Tab row first: what kind of recording this list is, before any of the names.
-    rows = [[
-        InlineKeyboardButton(("• " if k == kind else "") + _KIND_ICONS[k]
-                             + t(_KIND_LABEL_KEYS[k], ui_lang),
-                             callback_data="recgrp:%s:0" % k)
-        for k in RECITER_KINDS
-    ]]
+    rows = [
+        [
+            InlineKeyboardButton(
+                ("• " if k == kind else "") + _KIND_ICONS[k] + t(_KIND_LABEL_KEYS[k], ui_lang),
+                callback_data="recgrp:%s:0" % k,
+            )
+            for k in RECITER_KINDS
+        ]
+    ]
 
     row = []
-    for p in entries[page * RECITER_PAGE_SIZE:(page + 1) * RECITER_PAGE_SIZE]:
+    for p in entries[page * RECITER_PAGE_SIZE : (page + 1) * RECITER_PAGE_SIZE]:
         label = reciter_label(p)
         if p["subfolder"] == current:
             label = "• " + label
@@ -545,15 +608,24 @@ def reciter_keyboard(ui_lang: str, kind: str = DEFAULT_RECITER_KIND, page: int =
         rows.append(row)
 
     prev_label, next_label = _nav_labels(ui_lang)
-    rows.append([
-        InlineKeyboardButton(prev_label,
-                             callback_data="recgrp:%s:%d" % (kind, (page - 1) % pages)),
-        InlineKeyboardButton("%d/%d" % (page + 1, pages), callback_data="recpage_noop"),
-        InlineKeyboardButton(next_label,
-                             callback_data="recgrp:%s:%d" % (kind, (page + 1) % pages)),
-    ])
-    rows.append([InlineKeyboardButton("🔍 " + t("btn_search_reciter", ui_lang),
-                                       callback_data="reciter_search")])
+    rows.append(
+        [
+            InlineKeyboardButton(
+                prev_label, callback_data="recgrp:%s:%d" % (kind, (page - 1) % pages)
+            ),
+            InlineKeyboardButton("%d/%d" % (page + 1, pages), callback_data="recpage_noop"),
+            InlineKeyboardButton(
+                next_label, callback_data="recgrp:%s:%d" % (kind, (page + 1) % pages)
+            ),
+        ]
+    )
+    rows.append(
+        [
+            InlineKeyboardButton(
+                "🔍 " + t("btn_search_reciter", ui_lang), callback_data="reciter_search"
+            )
+        ]
+    )
     return InlineKeyboardMarkup(rows)
 
 
@@ -590,14 +662,15 @@ CODE_BY_TYPE = {v: k for k, v in TYPE_BY_CODE.items()}
 # *plays* something rather than being another way to read the same verse.
 _MODES = (
     ("translation", "btn_translation", ""),
-    ("arabic",      "btn_arabic",      ""),
-    ("tafsir",      "btn_tafsir",      ""),
-    ("audio",       "btn_audio",       "🔊 "),
+    ("arabic", "btn_arabic", ""),
+    ("tafsir", "btn_tafsir", ""),
+    ("audio", "btn_audio", "🔊 "),
 )
 
 
-def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str,
-                   app: bool = True) -> InlineKeyboardMarkup:
+def verse_keyboard(
+    surah: int, ayah: int, quran_type: str, ui_lang: str, app: bool = True
+) -> InlineKeyboardMarkup:
     """The inline keyboard attached to a verse card — localized and RTL-aware.
 
     Three rows: choose a view (Translation / Arabic / Tafsir / Audio, the active
@@ -611,12 +684,14 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str,
     With the Mini App configured, a fourth row opens this ayah in it — except on
     an inline-mode message (`app=False`), where Telegram rejects web_app buttons.
     """
+
     def mode_button(mode: str, key: str, icon: str) -> InlineKeyboardButton:
         label = icon + t(key, ui_lang)
         if mode == quran_type:
-            label = "• " + label            # the dot marks the view you're in now
+            label = "• " + label  # the dot marks the view you're in now
         return InlineKeyboardButton(
-            label, callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE[mode], surah, ayah))
+            label, callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE[mode], surah, ayah)
+        )
 
     code = CODE_BY_TYPE[quran_type]
     prev_s, prev_a = Quran.get_previous_ayah(surah, ayah)
@@ -624,21 +699,35 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str,
     rnd = t("btn_random", ui_lang)
     prev_label, next_label = _nav_labels(ui_lang)
 
-    return InlineKeyboardMarkup([
-        [mode_button(*mode) for mode in _MODES],
+    return InlineKeyboardMarkup(
         [
-            InlineKeyboardButton(prev_label, callback_data="vc:%s:%d:%d" % (code, prev_s, prev_a)),
-            InlineKeyboardButton("🎲 " + rnd, callback_data="vr:%s" % code),
-            InlineKeyboardButton(next_label, callback_data="vc:%s:%d:%d" % (code, next_s, next_a)),
-        ],
-        [
-            InlineKeyboardButton("🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
-                                 callback_data="rep:%d:%d" % (surah, ayah)),
-            InlineKeyboardButton("🌐 " + get_language(ui_lang).native, callback_data="showlang"),
-            InlineKeyboardButton("📤", switch_inline_query="%d:%d" % (surah, ayah)),
-        ],
-    ] + (app_row("📱 " + t("web_btn_open_app", ui_lang), "/read/%d?a=%d" % (surah, ayah))
-         if app else []))
+            [mode_button(*mode) for mode in _MODES],
+            [
+                InlineKeyboardButton(
+                    prev_label, callback_data="vc:%s:%d:%d" % (code, prev_s, prev_a)
+                ),
+                InlineKeyboardButton("🎲 " + rnd, callback_data="vr:%s" % code),
+                InlineKeyboardButton(
+                    next_label, callback_data="vc:%s:%d:%d" % (code, next_s, next_a)
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
+                    callback_data="rep:%d:%d" % (surah, ayah),
+                ),
+                InlineKeyboardButton(
+                    "🌐 " + get_language(ui_lang).native, callback_data="showlang"
+                ),
+                InlineKeyboardButton("📤", switch_inline_query="%d:%d" % (surah, ayah)),
+            ],
+        ]
+        + (
+            app_row("📱 " + t("web_btn_open_app", ui_lang), "/read/%d?a=%d" % (surah, ayah))
+            if app
+            else []
+        )
+    )
 
 
 # --- Mushaf page reader ------------------------------------------------------
@@ -649,15 +738,14 @@ def verse_keyboard(surah: int, ayah: int, quran_type: str, ui_lang: str,
 
 
 def _page_caption(page: int, ui_lang: str) -> str:
-    """"Page 255 of 604" over the ayah span it covers, e.g. "Qur'an 13:43 - 14:5"."""
+    """ "Page 255 of 604" over the ayah span it covers, e.g. "Qur'an 13:43 - 14:5"."""
     start_s, start_a, end_s, end_a = Quran.page_range(page)
     name = t("quran_name", ui_lang)
     if start_s == end_s:
         span = "%s %d:%d-%d" % (name, start_s, start_a, end_a)
-    else:                               # the page crosses into the next surah
+    else:  # the page crosses into the next surah
         span = "%s %d:%d - %d:%d" % (name, start_s, start_a, end_s, end_a)
-    return "%s\n%s" % (t("page_label", ui_lang).format(n=page, total=Quran.PAGE_COUNT),
-                       span)
+    return "%s\n%s" % (t("page_label", ui_lang).format(n=page, total=Quran.PAGE_COUNT), span)
 
 
 def page_keyboard(page: int, ui_lang: str) -> InlineKeyboardMarkup:
@@ -668,20 +756,25 @@ def page_keyboard(page: int, ui_lang: str) -> InlineKeyboardMarkup:
     following = page + 1 if page < total else 1
     start_s, start_a, _, _ = Quran.page_range(page)
     prev_label, next_label = _nav_labels(ui_lang)
-    return InlineKeyboardMarkup([
+    return InlineKeyboardMarkup(
         [
-            InlineKeyboardButton(prev_label, callback_data="pg:%d" % previous),
-            InlineKeyboardButton("%d/%d" % (page, total), callback_data="pgnoop"),
-            InlineKeyboardButton(next_label, callback_data="pg:%d" % following),
-        ],
-        [
-            InlineKeyboardButton("🔊 " + t("btn_audio", ui_lang),
-                                 callback_data="pga:%d" % page),
-            InlineKeyboardButton("📖 " + t("btn_ayah_view", ui_lang),
-                                 callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"],
-                                                                start_s, start_a)),
-        ],
-    ] + app_row("📱 " + t("web_btn_open_app", ui_lang), "/mushaf/%d" % page))
+            [
+                InlineKeyboardButton(prev_label, callback_data="pg:%d" % previous),
+                InlineKeyboardButton("%d/%d" % (page, total), callback_data="pgnoop"),
+                InlineKeyboardButton(next_label, callback_data="pg:%d" % following),
+            ],
+            [
+                InlineKeyboardButton(
+                    "🔊 " + t("btn_audio", ui_lang), callback_data="pga:%d" % page
+                ),
+                InlineKeyboardButton(
+                    "📖 " + t("btn_ayah_view", ui_lang),
+                    callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"], start_s, start_a),
+                ),
+            ],
+        ]
+        + app_row("📱 " + t("web_btn_open_app", ui_lang), "/mushaf/%d" % page)
+    )
 
 
 def sajda_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
@@ -692,9 +785,12 @@ def sajda_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
     """
     rows, row = [], []
     for surah, ayah, _kind in Quran.sajdas:
-        row.append(InlineKeyboardButton(
-            "۩ %s %d:%d" % (Quran.get_surah_name(surah), surah, ayah),
-            callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"], surah, ayah)))
+        row.append(
+            InlineKeyboardButton(
+                "۩ %s %d:%d" % (Quran.get_surah_name(surah), surah, ayah),
+                callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE["translation"], surah, ayah),
+            )
+        )
         if len(row) == 2:
             rows.append(row)
             row = []
@@ -714,8 +810,7 @@ async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
     file = File()
     cache_key = "page:%d" % page
     caption = _page_caption(page, ui_lang)
-    kwargs = dict(chat_id=chat_id, caption=caption,
-                  reply_markup=page_keyboard(page, ui_lang))
+    kwargs = dict(chat_id=chat_id, caption=caption, reply_markup=page_keyboard(page, ui_lang))
 
     cached_id = file.get_file(cache_key)
     if cached_id is not None:
@@ -723,13 +818,14 @@ async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
             await bot.send_photo(photo=cached_id, **kwargs)
             return
         except telegram.error.TelegramError:
-            pass                        # cached file_id rejected; rebuild below
+            pass  # cached file_id rejected; rebuild below
 
-    await bot.send_chat_action(chat_id=chat_id,
-                               action=telegram.constants.ChatAction.UPLOAD_PHOTO)
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_PHOTO)
     start_s, start_a, end_s, end_a = Quran.page_range(page)
-    urls = [file.get_page_image_filename(s, a)
-            for s, a in Quran.ayahs_between((start_s, start_a), (end_s, end_a))]
+    urls = [
+        file.get_page_image_filename(s, a)
+        for s, a in Quran.ayahs_between((start_s, start_a), (end_s, end_a))
+    ]
     image = await fetch_and_stitch(urls, "page_%03d.jpg" % page)
     result = await bot.send_photo(photo=image, **kwargs)
     file.save_file(cache_key, result.photo[-1].file_id)
@@ -745,8 +841,7 @@ async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang:
     """
     file = File()
     title = _page_caption(page, ui_lang).replace("\n", " · ")
-    kwargs = dict(chat_id=chat_id, title=title,
-                  performer=File.get_performer_name(performer))
+    kwargs = dict(chat_id=chat_id, title=title, performer=File.get_performer_name(performer))
     cache_key = "pageaudio:%d:%s" % (page, performer)
 
     cached_id = file.get_file(cache_key)
@@ -757,21 +852,23 @@ async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang:
         except telegram.error.TelegramError:
             pass
 
-    await bot.send_chat_action(chat_id=chat_id,
-                               action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE)
     if File.has_page_audio(performer):
         source = file.get_page_audio_filename(page, performer)
     else:
         start_s, start_a, end_s, end_a = Quran.page_range(page)
         source = await _download_stitched_audio(
-            Quran.ayahs_between((start_s, start_a), (end_s, end_a)), performer,
-            "quran_page_%03d.mp3" % page)
+            Quran.ayahs_between((start_s, start_a), (end_s, end_a)),
+            performer,
+            "quran_page_%03d.mp3" % page,
+        )
     result = await bot.send_audio(audio=source, **kwargs)
     file.save_file(cache_key, result.audio.file_id)
 
 
-async def send_repeated_audio(bot, surah: int, ayah: int, chat_id: int, performer: str,
-                              ui_lang: str, reply_markup=None) -> None:
+async def send_repeated_audio(
+    bot, surah: int, ayah: int, chat_id: int, performer: str, ui_lang: str, reply_markup=None
+) -> None:
     """Send one ayah recited REPEAT_COUNT times back to back, for memorization.
 
     No timing data is involved and none is needed: repeating an ayah is the same
@@ -782,9 +879,12 @@ async def send_repeated_audio(bot, surah: int, ayah: int, chat_id: int, performe
     file = File()
     cache_key = "repeat:%d:%d:%d:%s" % (REPEAT_COUNT, surah, ayah, performer)
     title = "%s ×%d" % (_reference(surah, ayah, ui_lang), REPEAT_COUNT)
-    kwargs = dict(chat_id=chat_id, title=title,
-                  performer=File.get_performer_name(performer),
-                  reply_markup=reply_markup)
+    kwargs = dict(
+        chat_id=chat_id,
+        title=title,
+        performer=File.get_performer_name(performer),
+        reply_markup=reply_markup,
+    )
 
     cached_id = file.get_file(cache_key)
     if cached_id is not None:
@@ -792,19 +892,21 @@ async def send_repeated_audio(bot, surah: int, ayah: int, chat_id: int, performe
             await bot.send_audio(audio=cached_id, **kwargs)
             return
         except telegram.error.TelegramError:
-            pass                        # cached file_id rejected; rebuild below
+            pass  # cached file_id rejected; rebuild below
 
-    await bot.send_chat_action(chat_id=chat_id,
-                               action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE)
     audio = await _download_stitched_audio(
-        [(surah, ayah)] * REPEAT_COUNT, performer,
-        "quran_%d_%d_x%d.mp3" % (surah, ayah, REPEAT_COUNT))
+        [(surah, ayah)] * REPEAT_COUNT,
+        performer,
+        "quran_%d_%d_x%d.mp3" % (surah, ayah, REPEAT_COUNT),
+    )
     result = await bot.send_audio(audio=audio, **kwargs)
     file.save_file(cache_key, result.audio.file_id)
 
 
-async def build_verse_text(surah: int, ayah: int, quran_type: str,
-                           ui_lang: str, translation_lang: str, data: dict) -> str:
+async def build_verse_text(
+    surah: int, ayah: int, quran_type: str, ui_lang: str, translation_lang: str, data: dict
+) -> str:
     """HTML body for a text-view card: a bold surah-name header over the verse.
 
     Only the (untrusted) corpus text is HTML-escaped; the header is the sole tag
@@ -817,7 +919,7 @@ async def build_verse_text(surah: int, ayah: int, quran_type: str,
     """
     if quran_type == "tafsir":
         body = data["tafsir"].get_ayah(surah, ayah)
-        if ui_lang != DEFAULT_LANG:                     # tafsir is English-only; note it
+        if ui_lang != DEFAULT_LANG:  # tafsir is English-only; note it
             body += t("tafsir_en_note", ui_lang)
     else:
         quran = await get_translation(translation_lang)
@@ -838,9 +940,19 @@ async def _resolve_settings(user_settings: UserSettings, chat_id, tg_user):
     return await user_settings.get(user_id, chat_id, default_ui_lang=default_ui_lang)
 
 
-async def send_quran(bot, data: dict, file, surah: int, ayah: int, quran_type: str,
-                     chat_id: int, performer: str, ui_lang: str, translation_lang: str,
-                     reply_markup=None) -> None:
+async def send_quran(
+    bot,
+    data: dict,
+    file,
+    surah: int,
+    ayah: int,
+    quran_type: str,
+    chat_id: int,
+    performer: str,
+    ui_lang: str,
+    translation_lang: str,
+    reply_markup=None,
+) -> None:
     """Send one ayah in one representation, and remember it as the reader's position.
 
     Module level rather than a closure inside `handle_update`: the scheduler
@@ -850,23 +962,36 @@ async def send_quran(bot, data: dict, file, surah: int, ayah: int, quran_type: s
     """
     if quran_type in ("translation", "tafsir"):
         text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
-        await bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML",
-                        reply_markup=reply_markup)
+        await bot.send_message(
+            chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=reply_markup
+        )
     elif quran_type == "arabic":
-        await bot.send_chat_action(chat_id=chat_id,
-                            action=telegram.constants.ChatAction.UPLOAD_PHOTO)
+        await bot.send_chat_action(
+            chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_PHOTO
+        )
         image = file.get_image_filename(surah, ayah)
-        await send_file(bot, image, quran_type, chat_id=chat_id,
-                  caption=_reference(surah, ayah, ui_lang),
-                  reply_markup=reply_markup)
+        await send_file(
+            bot,
+            image,
+            quran_type,
+            chat_id=chat_id,
+            caption=_reference(surah, ayah, ui_lang),
+            reply_markup=reply_markup,
+        )
     elif quran_type == "audio":
-        await bot.send_chat_action(chat_id=chat_id,
-                            action=telegram.constants.ChatAction.UPLOAD_VOICE)
+        await bot.send_chat_action(
+            chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE
+        )
         audio = file.get_audio_filename(surah, ayah, performer)
-        await send_file(bot, audio, quran_type, chat_id=chat_id,
-                  performer=File.get_performer_name(performer),
-                  title=_reference(surah, ayah, ui_lang),
-                  reply_markup=reply_markup)
+        await send_file(
+            bot,
+            audio,
+            quran_type,
+            chat_id=chat_id,
+            performer=File.get_performer_name(performer),
+            title=_reference(surah, ayah, ui_lang),
+            reply_markup=reply_markup,
+        )
     await file.save_user(chat_id, (surah, ayah, quran_type))
 
 
@@ -876,12 +1001,13 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     user_settings = UserSettings()
 
     if update.my_chat_member:  # the bot was added to or removed from a chat
-        from lib.store import get_store
         from hifz import group as hifz_group
+        from lib.store import get_store
+
         try:
             await hifz_group.on_my_chat_member(bot, await get_store(), update)
         except telegram.error.Forbidden:
-            pass                # no permission to post in that group; nothing to do
+            pass  # no permission to post in that group; nothing to do
         return
 
     if update.inline_query:
@@ -892,7 +1018,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         settings = await _resolve_settings(user_settings, None, user)
         ui_lang, translation_lang = settings.ui_lang, settings.translation_lang
         results = []
-        cache_time = 66 * (60 ** 2 * 24)
+        cache_time = 66 * (60**2 * 24)
         is_personal = False
         # A range ("59:22-24") is answered as a range in every representation, the
         # same as in a chat — a single ayah is just the degenerate case start == end.
@@ -902,8 +1028,9 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             quran = await get_translation(translation_lang)
             if end > start:
                 translation = quran.get_ayahs(surah, start, end)
-                tafsir = "\n\n".join(data["tafsir"].get_ayah(surah, a)
-                                     for a in range(start, end + 1))
+                tafsir = "\n\n".join(
+                    data["tafsir"].get_ayah(surah, a) for a in range(start, end + 1)
+                )
             else:
                 translation = quran.get_ayah(surah, start)
                 tafsir = data["tafsir"].get_ayah(surah, start)
@@ -913,16 +1040,22 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             # short cache_time still absorbs the keystroke-by-keystroke repeats
             # Telegram sends while the query is being typed.
             cache_time, is_personal = INLINE_PERSONAL_CACHE_TIME, True
-            results.append(InlineQueryResultArticle(
-                ref + "translation", title=t("btn_translation", ui_lang),
-                description=translation[:120],
-                # a long range's text can outgrow Telegram's message limit
-                input_message_content=InputTextMessageContent(translation[:4096]))
+            results.append(
+                InlineQueryResultArticle(
+                    ref + "translation",
+                    title=t("btn_translation", ui_lang),
+                    description=translation[:120],
+                    # a long range's text can outgrow Telegram's message limit
+                    input_message_content=InputTextMessageContent(translation[:4096]),
+                )
             )
-            results.append(InlineQueryResultArticle(
-                ref + "tafsir", title=t("btn_tafsir", ui_lang),
-                description=tafsir[:120],
-                input_message_content=InputTextMessageContent(tafsir[:4096]))
+            results.append(
+                InlineQueryResultArticle(
+                    ref + "tafsir",
+                    title=t("btn_tafsir", ui_lang),
+                    description=tafsir[:120],
+                    input_message_content=InputTextMessageContent(tafsir[:4096]),
+                )
             )
             audio = _inline_audio_result(surah, start, end, settings.reciter, ui_lang, file)
             if audio is not None:
@@ -940,19 +1073,34 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                 for p in matches:
                     # the subfolder keys the id: two entries can share a name (same
                     # reciter at different bitrates) and Telegram rejects duplicates
-                    results.append(InlineQueryResultArticle(
-                        "reciter:" + p["subfolder"], title=reciter_label(p),
-                        description=t("reciter_inline_description", ui_lang),
-                        input_message_content=InputTextMessageContent(
-                            t("reciter_set", ui_lang).format(reciter=p["name"])),
-                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
-                            t("btn_set_reciter", ui_lang),
-                            callback_data="setreciter:" + p["subfolder"])]]))
+                    results.append(
+                        InlineQueryResultArticle(
+                            "reciter:" + p["subfolder"],
+                            title=reciter_label(p),
+                            description=t("reciter_inline_description", ui_lang),
+                            input_message_content=InputTextMessageContent(
+                                t("reciter_set", ui_lang).format(reciter=p["name"])
+                            ),
+                            reply_markup=InlineKeyboardMarkup(
+                                [
+                                    [
+                                        InlineKeyboardButton(
+                                            t("btn_set_reciter", ui_lang),
+                                            callback_data="setreciter:" + p["subfolder"],
+                                        )
+                                    ]
+                                ]
+                            ),
+                        )
                     )
             else:
                 results = data["default_query_results"]
-        await bot.answer_inline_query(inline_query_id=query_id, cache_time=cache_time,
-                                      results=results, is_personal=is_personal)
+        await bot.answer_inline_query(
+            inline_query_id=query_id,
+            cache_time=cache_time,
+            results=results,
+            is_personal=is_personal,
+        )
         return
 
     if update.callback_query:  # a tap on an inline button (language/reciter picker or verse card)
@@ -963,11 +1111,16 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         # never have opened a DM with us at all.
         from_inline = cq.message is None
         chat_id = cq.message.chat.id if cq.message else cq.from_user.id
-        settings = await _resolve_settings(user_settings, None if from_inline else chat_id,
-                                           cq.from_user)
-        ui_lang, translation_lang, reciter = settings.ui_lang, settings.translation_lang, settings.reciter
+        settings = await _resolve_settings(
+            user_settings, None if from_inline else chat_id, cq.from_user
+        )
+        ui_lang, translation_lang, reciter = (
+            settings.ui_lang,
+            settings.translation_lang,
+            settings.reciter,
+        )
 
-        if cb_data.startswith("setlang:"):     # UI language picked from the /language keyboard
+        if cb_data.startswith("setlang:"):  # UI language picked from the /language keyboard
             # normalize_lang already refuses translation-only codes (there is no
             # string table to show the interface in), falling back to English.
             code = normalize_lang(cb_data.split(":", 1)[1])
@@ -976,8 +1129,9 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             confirm = t("language_set", code).format(lang=get_language(code).native)
             # ReplyKeyboardRemove clears the persistent keyboard left over from the
             # pre-inline UI for anyone upgrading; new users never had one.
-            await bot.send_message(chat_id=chat_id, text=confirm,
-                            reply_markup=ReplyKeyboardRemove())
+            await bot.send_message(
+                chat_id=chat_id, text=confirm, reply_markup=ReplyKeyboardRemove()
+            )
             return
 
         if cb_data.startswith("settranslang:"):  # translation language picked from /translation
@@ -990,8 +1144,9 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
 
         if cb_data.startswith("setreciter:"):  # reciter picked from the shortlist or search results
             subfolder = cb_data.split(":", 1)[1]
-            await user_settings.set_reciter(cq.from_user.id, None if from_inline else chat_id,
-                                            subfolder)
+            await user_settings.set_reciter(
+                cq.from_user.id, None if from_inline else chat_id, subfolder
+            )
             confirm = reciter_set_confirmation(subfolder, ui_lang)
             if from_inline:
                 # DMing someone who never started the bot raises Forbidden; the
@@ -1002,37 +1157,45 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                 await bot.send_message(chat_id=chat_id, text=confirm)
             return
 
-        if cb_data.startswith("recgrp:"):       # a group tab or the pager on the picker
+        if cb_data.startswith("recgrp:"):  # a group tab or the pager on the picker
             _, kind, page_s = cb_data.split(":", 2)
             await bot.answer_callback_query(cq.id)
             if cq.message is None:
-                return                          # no message of ours to turn the page in
-            try:                                # swap the keyboard, don't post a new list
+                return  # no message of ours to turn the page in
+            try:  # swap the keyboard, don't post a new list
                 await bot.edit_message_reply_markup(
-                    chat_id=chat_id, message_id=cq.message.message_id,
-                    reply_markup=reciter_keyboard(ui_lang, kind, int(page_s), current=reciter))
+                    chat_id=chat_id,
+                    message_id=cq.message.message_id,
+                    reply_markup=reciter_keyboard(ui_lang, kind, int(page_s), current=reciter),
+                )
             except telegram.error.BadRequest as err:
                 if "not modified" not in str(err).lower():
                     raise
             return
 
-        if cb_data == "reciter_search":         # the search button on the reciter picker
+        if cb_data == "reciter_search":  # the search button on the reciter picker
             file.set_awaiting_input(chat_id, "reciter_search")
             await bot.answer_callback_query(cq.id)
             await bot.send_message(chat_id=chat_id, text=t("reciter_search_prompt", ui_lang))
             return
 
-        if cb_data.startswith("rep:"):          # "🔁 Repeat ×3" on a verse card
+        if cb_data.startswith("rep:"):  # "🔁 Repeat ×3" on a verse card
             _, surah_s, ayah_s = cb_data.split(":", 2)
             surah, ayah = int(surah_s), int(ayah_s)
             await bot.answer_callback_query(cq.id)
             if Quran.exists(surah, ayah):
-                await send_repeated_audio(bot, surah, ayah, chat_id, reciter, ui_lang,
-                                          reply_markup=verse_keyboard(surah, ayah,
-                                                                      "audio", ui_lang))
+                await send_repeated_audio(
+                    bot,
+                    surah,
+                    ayah,
+                    chat_id,
+                    reciter,
+                    ui_lang,
+                    reply_markup=verse_keyboard(surah, ayah, "audio", ui_lang),
+                )
             return
 
-        if cb_data.startswith("pg:"):           # the mushaf pager
+        if cb_data.startswith("pg:"):  # the mushaf pager
             page = int(cb_data.split(":", 1)[1])
             await bot.answer_callback_query(cq.id)
             if 1 <= page <= Quran.PAGE_COUNT:
@@ -1041,25 +1204,28 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                 await send_page(bot, page, chat_id, ui_lang)
             return
 
-        if cb_data.startswith("pga:"):          # "listen to this page"
+        if cb_data.startswith("pga:"):  # "listen to this page"
             page = int(cb_data.split(":", 1)[1])
             await bot.answer_callback_query(cq.id)
             if 1 <= page <= Quran.PAGE_COUNT:
                 await send_page_audio(bot, page, chat_id, reciter, ui_lang)
             return
 
-        if cb_data == "showlang":               # the 🌐 button on a verse card
+        if cb_data == "showlang":  # the 🌐 button on a verse card
             await bot.answer_callback_query(cq.id)
-            await bot.send_message(chat_id=chat_id, text=t("choose_language", ui_lang),
-                            reply_markup=language_keyboard())
+            await bot.send_message(
+                chat_id=chat_id,
+                text=t("choose_language", ui_lang),
+                reply_markup=language_keyboard(),
+            )
             return
 
         if cb_data.startswith("vc:") or cb_data.startswith("vr:"):  # a verse-card tap
             parts = cb_data.split(":")
             code = parts[1]
-            if cb_data.startswith("vr:"):       # random ayah, same view
+            if cb_data.startswith("vr:"):  # random ayah, same view
                 surah, ayah = Quran.get_random_ayah()
-            else:                               # vc:<type>:<surah>:<ayah>
+            else:  # vc:<type>:<surah>:<ayah>
                 surah, ayah = int(parts[2]), int(parts[3])
             quran_type = TYPE_BY_CODE.get(code, "translation")
             if not Quran.exists(surah, ayah):
@@ -1069,30 +1235,49 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             msg = cq.message
             on_media = bool(msg and (msg.photo or msg.audio))
             if quran_type in ("translation", "tafsir"):
-                text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
+                text = await build_verse_text(
+                    surah, ayah, quran_type, ui_lang, translation_lang, data
+                )
                 if on_media or msg is None:
                     # can't turn a photo/audio message into text — post a fresh card
-                    await bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML",
-                                    reply_markup=markup)
+                    await bot.send_message(
+                        chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=markup
+                    )
                 else:
-                    try:                        # the common path: turn the page in place
-                        await bot.edit_message_text(text=text, chat_id=chat_id,
-                                        message_id=msg.message_id, parse_mode="HTML",
-                                        reply_markup=markup)
+                    try:  # the common path: turn the page in place
+                        await bot.edit_message_text(
+                            text=text,
+                            chat_id=chat_id,
+                            message_id=msg.message_id,
+                            parse_mode="HTML",
+                            reply_markup=markup,
+                        )
                     except telegram.error.BadRequest as err:
                         # re-tapping the current view yields an identical message; ignore
                         if "not modified" not in str(err).lower():
                             raise
                 await file.save_user(chat_id, (surah, ayah, quran_type))
-            else:                               # arabic/audio arrive as fresh media messages
-                await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
-                                 ui_lang, translation_lang, reply_markup=markup)
+            else:  # arabic/audio arrive as fresh media messages
+                await send_quran(
+                    bot,
+                    data,
+                    file,
+                    surah,
+                    ayah,
+                    quran_type,
+                    chat_id,
+                    reciter,
+                    ui_lang,
+                    translation_lang,
+                    reply_markup=markup,
+                )
             await bot.answer_callback_query(cq.id)
             return
 
         # hifz features (src/hifz) claim their own callback prefixes — see hifz.PREFIXES.
-        ctx = await hifz.Ctx.build(bot, data, file, chat_id, cq.from_user.id, settings,
-                                   callback_query=cq)
+        ctx = await hifz.Ctx.build(
+            bot, data, file, chat_id, cq.from_user.id, settings, callback_query=cq
+        )
         if await hifz.dispatch_callback(ctx, cb_data):
             return
 
@@ -1106,17 +1291,21 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     raw_message = update.message.text
     message = raw_message.lower()
     settings = await _resolve_settings(user_settings, chat_id, update.message.from_user)
-    ui_lang, translation_lang, reciter = settings.ui_lang, settings.translation_lang, settings.reciter
+    ui_lang, translation_lang, reciter = (
+        settings.ui_lang,
+        settings.translation_lang,
+        settings.reciter,
+    )
 
     state = await file.get_user(chat_id)
     if state is not None:
         surah, ayah, quran_type = state
-        if quran_type == "english":   # legacy stored value -> canonical name
+        if quran_type == "english":  # legacy stored value -> canonical name
             quran_type = "translation"
     else:
         surah, ayah, quran_type = 1, 1, "translation"
 
-    print("%d:%.3f:%s" % (chat_id, time(), message.replace("\n", " ")))
+    logger.debug("%d:%.3f:%s" % (chat_id, time(), message.replace("\n", " ")))
 
     if chat_id < 0:
         # Group *text* is still ignored: the group cluster is driven entirely from
@@ -1126,7 +1315,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         return
 
     if message.startswith("/"):
-        command = message[1:].split("@", 1)[0]   # tolerate /help@BotName
+        command = message[1:].split("@", 1)[0]  # tolerate /help@BotName
         # "/page 255" -> ("page", "255"). A bare reference like "/2:255" leaves an
         # unmatched command and falls through to the reference parser, as before.
         command, _, argument = command.partition(" ")
@@ -1140,21 +1329,28 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             # the group feature owns — admin setup, or a member joining the board.
             if command == "start" and argument:
                 from hifz import group as hifz_group
-                ctx = await hifz.Ctx.build(bot, data, file, chat_id,
-                                           update.message.from_user.id, settings)
+
+                ctx = await hifz.Ctx.build(
+                    bot, data, file, chat_id, update.message.from_user.id, settings
+                )
                 if await hifz_group.handle_start_payload(ctx, argument):
                     return
             # ReplyKeyboardRemove clears the old persistent keyboard for anyone
             # upgrading from the pre-inline UI; new users never see one.
-            await bot.send_message(chat_id=chat_id, text=welcome_text(ui_lang),
-                            parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
+            await bot.send_message(
+                chat_id=chat_id,
+                text=welcome_text(ui_lang),
+                parse_mode="HTML",
+                reply_markup=ReplyKeyboardRemove(),
+            )
             return
         elif command == "app":
             row = app_row("📱 " + t("web_btn_open_app", ui_lang), "/")
-            await bot.send_message(chat_id=chat_id,
-                                   text=t("web_app_intro" if row else "web_app_unavailable",
-                                          ui_lang),
-                                   reply_markup=InlineKeyboardMarkup(row) if row else None)
+            await bot.send_message(
+                chat_id=chat_id,
+                text=t("web_app_intro" if row else "web_app_unavailable", ui_lang),
+                reply_markup=InlineKeyboardMarkup(row) if row else None,
+            )
             return
         elif command == "about":
             await bot.send_message(chat_id=chat_id, text=t("about", ui_lang), parse_mode="HTML")
@@ -1163,19 +1359,27 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             await bot.send_message(chat_id=chat_id, text=data["index"], parse_mode="HTML")
             return
         elif command == "language":
-            await bot.send_message(chat_id=chat_id, text=t("choose_language", ui_lang),
-                            reply_markup=language_keyboard())
+            await bot.send_message(
+                chat_id=chat_id,
+                text=t("choose_language", ui_lang),
+                reply_markup=language_keyboard(),
+            )
             return
         elif command == "translation":
-            await bot.send_message(chat_id=chat_id, text=t("choose_translation_language", ui_lang),
-                            reply_markup=translation_language_keyboard())
+            await bot.send_message(
+                chat_id=chat_id,
+                text=t("choose_translation_language", ui_lang),
+                reply_markup=translation_language_keyboard(),
+            )
             return
         elif command == "reciter":
             # open on the tab and page the current reciter is on, with it marked
             kind, page = reciter_page_of(reciter)
-            await bot.send_message(chat_id=chat_id, text=t("choose_reciter", ui_lang),
-                            reply_markup=reciter_keyboard(ui_lang, kind, page,
-                                                          current=reciter))
+            await bot.send_message(
+                chat_id=chat_id,
+                text=t("choose_reciter", ui_lang),
+                reply_markup=reciter_keyboard(ui_lang, kind, page, current=reciter),
+            )
             return
         elif command == "page":
             # bare /page opens where the reader already is, rather than erroring
@@ -1183,7 +1387,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             if page is None or not 1 <= page <= Quran.PAGE_COUNT:
                 await bot.send_message(
                     chat_id=chat_id,
-                    text=t("page_out_of_range", ui_lang).format(total=Quran.PAGE_COUNT))
+                    text=t("page_out_of_range", ui_lang).format(total=Quran.PAGE_COUNT),
+                )
                 return
             await send_page(bot, page, chat_id, ui_lang)
             return
@@ -1192,7 +1397,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             if juz is None or not 1 <= juz <= Quran.JUZ_COUNT:
                 await bot.send_message(
                     chat_id=chat_id,
-                    text=t("juz_out_of_range", ui_lang).format(total=Quran.JUZ_COUNT))
+                    text=t("juz_out_of_range", ui_lang).format(total=Quran.JUZ_COUNT),
+                )
                 return
             # a juz is ~20 pages of reading, so it opens the page reader at its
             # first page rather than trying to be a single message or audio file
@@ -1200,20 +1406,41 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             await send_page(bot, Quran.page_of(start_s, start_a), chat_id, ui_lang)
             return
         elif command == "sajda":
-            await bot.send_message(chat_id=chat_id, text=t("sajda_list_title", ui_lang),
-                            reply_markup=sajda_keyboard(ui_lang))
+            await bot.send_message(
+                chat_id=chat_id,
+                text=t("sajda_list_title", ui_lang),
+                reply_markup=sajda_keyboard(ui_lang),
+            )
             return
         elif command == "random":
             surah, ayah = Quran.get_random_ayah()
-            await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
-                             ui_lang, translation_lang,
-                             reply_markup=verse_keyboard(surah, ayah, quran_type, ui_lang))
+            await send_quran(
+                bot,
+                data,
+                file,
+                surah,
+                ayah,
+                quran_type,
+                chat_id,
+                reciter,
+                ui_lang,
+                translation_lang,
+                reply_markup=verse_keyboard(surah, ayah, quran_type, ui_lang),
+            )
             return
         # hifz features (src/hifz) register their own commands; they are looked up
         # here so a command escapes any wizard in progress rather than feeding it.
         if hifz.handles(command):
-            ctx = await hifz.Ctx.build(bot, data, file, chat_id, update.message.from_user.id,
-                                       settings, argument=argument, message=update.message)
+            ctx = await hifz.Ctx.build(
+                bot,
+                data,
+                file,
+                chat_id,
+                update.message.from_user.id,
+                settings,
+                argument=argument,
+                message=update.message,
+            )
             await hifz.dispatch_command(ctx, command)
             return
         # unknown command: fall through (ignored, as before)
@@ -1227,30 +1454,45 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             return
         rows, row = [], []
         for p in matches:
-            row.append(InlineKeyboardButton(reciter_label(p),
-                                            callback_data="setreciter:" + p["subfolder"]))
+            row.append(
+                InlineKeyboardButton(reciter_label(p), callback_data="setreciter:" + p["subfolder"])
+            )
             if len(row) == 2:
                 rows.append(row)
                 row = []
         if row:
             rows.append(row)
-        await bot.send_message(chat_id=chat_id, text=t("reciter_search_results", ui_lang),
-                        reply_markup=InlineKeyboardMarkup(rows))
+        await bot.send_message(
+            chat_id=chat_id,
+            text=t("reciter_search_results", ui_lang),
+            reply_markup=InlineKeyboardMarkup(rows),
+        )
         return
 
     # A hifz wizard in progress consumes free text — but only after the command
     # chain above, so /cancel and every other command remain an escape hatch.
     if hifz.has_wizard(update.message.from_user.id):
-        ctx = await hifz.Ctx.build(bot, data, file, chat_id, update.message.from_user.id,
-                                   settings, message=update.message)
+        ctx = await hifz.Ctx.build(
+            bot, data, file, chat_id, update.message.from_user.id, settings, message=update.message
+        )
         if await hifz.dispatch_wizard(ctx, raw_message):
             return
 
     action = button_action(message, ui_lang)
     if action in ("arabic", "audio", "translation", "tafsir"):
-        await send_quran(bot, data, file, surah, ayah, action, chat_id, reciter,
-                         ui_lang, translation_lang,
-                         reply_markup=verse_keyboard(surah, ayah, action, ui_lang))
+        await send_quran(
+            bot,
+            data,
+            file,
+            surah,
+            ayah,
+            action,
+            chat_id,
+            reciter,
+            ui_lang,
+            translation_lang,
+            reply_markup=verse_keyboard(surah, ayah, action, ui_lang),
+        )
         return
     elif action in ("next", "previous", "random"):
         if action == "next":
@@ -1259,9 +1501,19 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             surah, ayah = Quran.get_previous_ayah(surah, ayah)
         else:
             surah, ayah = Quran.get_random_ayah()
-        await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
-                         ui_lang, translation_lang,
-                         reply_markup=verse_keyboard(surah, ayah, quran_type, ui_lang))
+        await send_quran(
+            bot,
+            data,
+            file,
+            surah,
+            ayah,
+            quran_type,
+            chat_id,
+            reciter,
+            ui_lang,
+            translation_lang,
+            reply_markup=verse_keyboard(surah, ayah, quran_type, ui_lang),
+        )
         return
 
     surah, start, end = parse_ayah_range(message)
@@ -1271,15 +1523,32 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                 await bot.send_message(chat_id=chat_id, text=t("ayah_not_found", ui_lang))
             elif end - start + 1 > MAX_RANGE_AYAHS:
                 await bot.send_message(
-                    chat_id=chat_id,
-                    text=t("range_too_large", ui_lang).format(n=MAX_RANGE_AYAHS))
+                    chat_id=chat_id, text=t("range_too_large", ui_lang).format(n=MAX_RANGE_AYAHS)
+                )
             else:
-                await send_combined_audio(bot, surah, start, end, chat_id, reciter,
-                                          reply_markup=verse_keyboard(surah, end, "audio", ui_lang))
+                await send_combined_audio(
+                    bot,
+                    surah,
+                    start,
+                    end,
+                    chat_id,
+                    reciter,
+                    reply_markup=verse_keyboard(surah, end, "audio", ui_lang),
+                )
         elif Quran.exists(surah, start):
-            await send_quran(bot, data, file, surah, start, quran_type, chat_id, reciter,
-                             ui_lang, translation_lang,
-                             reply_markup=verse_keyboard(surah, start, quran_type, ui_lang))
+            await send_quran(
+                bot,
+                data,
+                file,
+                surah,
+                start,
+                quran_type,
+                chat_id,
+                reciter,
+                ui_lang,
+                translation_lang,
+                reply_markup=verse_keyboard(surah, start, quran_type, ui_lang),
+            )
         else:
             await bot.send_message(chat_id=chat_id, text=t("ayah_not_found", ui_lang))
 
@@ -1294,13 +1563,18 @@ app.include_router(api_router)
 # The Mini App is served from its own origin (docs/MINI_APP_PLAN.md §4.3), so the
 # browser needs CORS to reach /api/v1. Allow-list only, bearer header only — no
 # cookies. With no origins configured the middleware is not installed at all.
-_miniapp_origins = [o.strip() for o in (Environment.get_env("miniapp_origins") or "").split(",")
-                    if o.strip()]
+_miniapp_origins = [
+    o.strip() for o in (Environment.get_env("miniapp_origins") or "").split(",") if o.strip()
+]
 if _miniapp_origins:
-    app.add_middleware(CORSMiddleware, allow_origins=_miniapp_origins,
-                       allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-                       allow_headers=["Authorization", "Content-Type"],
-                       allow_credentials=False, max_age=600)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=_miniapp_origins,
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+        allow_headers=["Authorization", "Content-Type"],
+        allow_credentials=False,
+        max_age=600,
+    )
 bot = None  # created during background init (guarded) so a bad/missing TOKEN can't crash import
 data = None  # populated by background init after corpora finish parsing
 
@@ -1309,8 +1583,9 @@ data = None  # populated by background init after corpora finish parsing
 # so script-qualified and three-letter codes ("uz-Cyrl", "ber") can't be
 # registered — those users see the English default menu while the rest of their
 # UI is still localized.
-_COMMAND_MENU_LANGS = tuple(lang.code for lang in UI_LANGUAGES
-                            if len(lang.code) == 2 and lang.code != DEFAULT_LANG)
+_COMMAND_MENU_LANGS = tuple(
+    lang.code for lang in UI_LANGUAGES if len(lang.code) == 2 and lang.code != DEFAULT_LANG
+)
 
 
 def _commands_for(lang: str) -> list:
@@ -1327,8 +1602,8 @@ async def _set_bot_commands(bot) -> None:
     try:
         await bot.set_my_commands(_commands_for(DEFAULT_LANG))
     except Exception as e:
-        print("INIT ERROR (set_my_commands, default):", type(e).__name__, e)
-        return                      # the API is unhappy; skip the per-language pass
+        logger.error("INIT ERROR (set_my_commands, default): %s: %s", type(e).__name__, e)
+        return  # the API is unhappy; skip the per-language pass
     registered, rejected = 1, []
     for code in _COMMAND_MENU_LANGS:
         try:
@@ -1336,9 +1611,9 @@ async def _set_bot_commands(bot) -> None:
             registered += 1
         except Exception as e:
             rejected.append("%s (%s)" % (code, type(e).__name__))
-    print("Command menu registered for %d languages" % registered)
+    logger.info("Command menu registered for %d languages" % registered)
     if rejected:
-        print("Command menu not accepted for:", ", ".join(rejected))
+        logger.warning("Command menu not accepted for: %s", ", ".join(rejected))
 
 
 async def _initialize():
@@ -1357,14 +1632,16 @@ async def _initialize():
         # that points at a uniform set (everyayah's `quranpngs`) and produces ragged
         # pages when it does not (`images_png` varies 115-700px), so say so rather
         # than let /page quietly look broken.
-        print("WARNING: PAGE_IMAGE_BASE_URL is not set — /page will tile "
-              "PHOTO_BASE_URL's images, which must be a uniform-width set "
-              "(e.g. everyayah.com/data/quranpngs) or pages will render ragged.")
+        logger.warning(
+            "PAGE_IMAGE_BASE_URL is not set — /page will tile "
+            "PHOTO_BASE_URL's images, which must be a uniform-width set "
+            "(e.g. everyayah.com/data/quranpngs) or pages will render ragged."
+        )
 
     try:
         bot = Bot.get_instance()
     except Exception as e:
-        print("INIT ERROR (bot — check TOKEN):", type(e).__name__, e)
+        logger.error("INIT ERROR (bot — check TOKEN): %s: %s", type(e).__name__, e)
 
     try:
         # Through the repository layer: it owns the schema file and knows that the
@@ -1372,51 +1649,51 @@ async def _initialize():
         # here raised AttributeError on every boot without DATABASE_URL, because
         # get_pool() answers None in that case.
         await apply_schema()
-        print("Settings store ready")
+        logger.info("Settings store ready")
     except Exception as e:
-        print("INIT ERROR (postgres):", type(e).__name__, e)
+        logger.error("INIT ERROR (postgres): %s: %s", type(e).__name__, e)
 
     try:
         # Connect now rather than on the first update, so a missing or
         # unreachable Redis shows on the health check straight after boot. In a
         # worker thread: the client is synchronous and a connect can block.
         await asyncio.to_thread(RedisSingleton)
-        print("Cache ready (%s)" % cache_backend())
+        logger.info("Cache ready (%s)" % cache_backend())
     except Exception as e:
-        print("INIT ERROR (redis):", type(e).__name__, e)
+        logger.error("INIT ERROR (redis): %s: %s", type(e).__name__, e)
 
     try:
         # run the blocking parse in a worker thread so the event loop stays responsive
         data = await asyncio.to_thread(build_data)
-        print("Corpora loaded; bot is ready")
+        logger.info("Corpora loaded; bot is ready")
     except Exception as e:
-        print("INIT ERROR (build_data — check corpus files):", type(e).__name__, e)
+        logger.error("INIT ERROR (build_data — check corpus files): %s: %s", type(e).__name__, e)
 
     webhook_base = _webhook_base_url()
     if bot and webhook_base:
         try:
             token = Environment.get_env("token")
             await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
-            print("Webhook registered at", webhook_base)
+            logger.info("Webhook registered at %s", webhook_base)
         except Exception as e:
-            print("INIT ERROR (set_webhook):", type(e).__name__, e)
+            logger.error("INIT ERROR (set_webhook): %s: %s", type(e).__name__, e)
     else:
-        print("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
+        logger.warning("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
 
     if bot:
         await _set_bot_commands(bot)
         try:
             if await set_menu_button(bot):
-                print("Menu button opens the Mini App")
+                logger.info("Menu button opens the Mini App")
         except Exception as e:
-            print("INIT ERROR (set_chat_menu_button):", type(e).__name__, e)
+            logger.error("INIT ERROR (set_chat_menu_button): %s: %s", type(e).__name__, e)
 
     # Register the hifz features (src/hifz/*.py) — imported here, once the rest of
     # main is loaded, so a feature module may import from main without a cycle.
     try:
         hifz.load_features()
     except Exception as e:
-        print("INIT ERROR (hifz features):", type(e).__name__, e)
+        logger.error("INIT ERROR (hifz features): %s: %s", type(e).__name__, e)
 
     # --- SCHEDULER SLOT (Wave 1D) ---------------------------------------------
     # The due-queue loop. It goes last because it needs `bot` and `data`
@@ -1428,11 +1705,12 @@ async def _initialize():
     # It is stopped by cancellation when uvicorn tears the event loop down.
     try:
         from lib.scheduler import run_scheduler
+
         task = asyncio.create_task(run_scheduler(bot, data))
-        _background_tasks.add(task)          # strong ref: tasks are GC'd otherwise
+        _background_tasks.add(task)  # strong ref: tasks are GC'd otherwise
         task.add_done_callback(_background_tasks.discard)
     except Exception as e:
-        print("INIT ERROR (scheduler):", type(e).__name__, e)
+        logger.error("INIT ERROR (scheduler): %s: %s", type(e).__name__, e)
 
 
 @app.on_event("startup")
@@ -1442,7 +1720,7 @@ async def on_startup():
     task = asyncio.create_task(_initialize())
     _background_tasks.add(task)
     task.add_done_callback(_background_tasks.discard)
-    print("Startup event returned — HTTP server is listening")
+    logger.info("Startup event returned — HTTP server is listening")
 
 
 @app.on_event("shutdown")
@@ -1451,11 +1729,11 @@ async def on_shutdown():
         try:
             await bot.delete_webhook()
         except Exception as e:
-            print("Shutdown: delete_webhook failed:", type(e).__name__, e)
+            logger.error("Shutdown: delete_webhook failed: %s: %s", type(e).__name__, e)
     try:
         await close_pool()
     except Exception as e:
-        print("Shutdown: close_pool failed:", type(e).__name__, e)
+        logger.error("Shutdown: close_pool failed: %s: %s", type(e).__name__, e)
 
 
 @app.get("/")
@@ -1487,15 +1765,18 @@ async def range_audio(surah: int, start: int, end: int, reciter: str):
         return Response(status_code=404)
     try:
         audio = await _download_combined_audio(surah, start, end, reciter)
-    except ValueError:                          # reciter is not in the catalog
+    except ValueError:  # reciter is not in the catalog
         return Response(status_code=404)
-    except httpx.HTTPError as e:                # the recitation CDN is unreachable
-        print("range_audio: upstream fetch failed:", type(e).__name__, e)
+    except httpx.HTTPError as e:  # the recitation CDN is unreachable
+        logger.error("range_audio: upstream fetch failed: %s: %s", type(e).__name__, e)
         return Response(status_code=502)
     return Response(
-        content=audio.getvalue(), media_type="audio/mpeg",
-        headers={"Content-Disposition": 'inline; filename="%s"' % audio.name,
-                 "Cache-Control": "public, max-age=86400"},
+        content=audio.getvalue(),
+        media_type="audio/mpeg",
+        headers={
+            "Content-Disposition": 'inline; filename="%s"' % audio.name,
+            "Cache-Control": "public, max-age=86400",
+        },
     )
 
 
@@ -1509,7 +1790,7 @@ async def _process_update(update: telegram.Update) -> None:
     except telegram.error.Forbidden:
         pass  # user has blocked or removed the bot; nothing to do
     except Exception as e:
-        print("Error handling update:", type(e).__name__, e)
+        logger.error("Error handling update: %s: %s", type(e).__name__, e)
 
 
 @app.post("/webhook/{token}")
@@ -1518,7 +1799,7 @@ async def telegram_webhook(token: str, request: Request):
         return Response(status_code=404)
     if bot is None or data is None:
         # still initializing (corpora parsing) — ack so Telegram doesn't retry-flood
-        print("Webhook hit before init finished; acking without processing")
+        logger.warning("Webhook hit before init finished; acking without processing")
         return {"ok": True}
 
     payload = await request.json()

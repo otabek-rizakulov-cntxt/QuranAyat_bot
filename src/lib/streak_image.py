@@ -35,31 +35,45 @@ from lib.store import get_store
 from lib.streaks import user_today
 
 __all__ = [
-    "GRID_WEEKS", "GRID_WIDTH", "GRID_HEIGHT", "BACKGROUND", "EMPTY", "FUTURE", "LEVELS",
-    "CELL", "GAP", "PADDING", "LEGEND_CELL", "LEGEND_GAP", "LEGEND_MARGIN",
-    "Grid", "build_grid", "level_for", "draw_contribution_graph",
-    "render_streak_graph", "cache_key",
+    "GRID_WEEKS",
+    "GRID_WIDTH",
+    "GRID_HEIGHT",
+    "BACKGROUND",
+    "EMPTY",
+    "FUTURE",
+    "LEVELS",
+    "CELL",
+    "GAP",
+    "PADDING",
+    "LEGEND_CELL",
+    "LEGEND_GAP",
+    "LEGEND_MARGIN",
+    "Grid",
+    "build_grid",
+    "level_for",
+    "draw_contribution_graph",
+    "render_streak_graph",
+    "cache_key",
 ]
 
-GRID_WEEKS = 12                 # 12 columns x 7 rows = 84 days, one quarter
+GRID_WEEKS = 12  # 12 columns x 7 rows = 84 days, one quarter
 
-CELL = 12                       # a square day
-GAP = 3                         # between squares
-PADDING = 12                    # around the whole card
+CELL = 12  # a square day
+GAP = 3  # between squares
+PADDING = 12  # around the whole card
 LEGEND_CELL = 8
 LEGEND_GAP = 3
-LEGEND_MARGIN = 10              # between the grid and the legend strip
+LEGEND_MARGIN = 10  # between the grid and the legend strip
 
-GRID_WIDTH = 2 * PADDING + GRID_WEEKS * CELL + (GRID_WEEKS - 1) * GAP          # 201
-GRID_HEIGHT = (2 * PADDING + 7 * CELL + 6 * GAP
-               + LEGEND_MARGIN + LEGEND_CELL)                                   # 144
+GRID_WIDTH = 2 * PADDING + GRID_WEEKS * CELL + (GRID_WEEKS - 1) * GAP  # 201
+GRID_HEIGHT = 2 * PADDING + 7 * CELL + 6 * GAP + LEGEND_MARGIN + LEGEND_CELL  # 144
 
 # A five-step scale, light card. Chosen to survive Telegram's JPEG-ish preview
 # scaling and to stay legible against both light and dark chat wallpapers, which
 # is why the card has an opaque background instead of transparency.
 BACKGROUND = "#ffffff"
-EMPTY = "#ebedf0"               # a day with no session
-FUTURE = "#f6f8fa"              # a day that has not happened yet this week
+EMPTY = "#ebedf0"  # a day with no session
+FUTURE = "#f6f8fa"  # a day that has not happened yet this week
 LEVELS = ("#9be9a8", "#40c463", "#30a14e", "#216e39")
 
 # Sessions per day at which each shade kicks in. Four sessions is a heavy day;
@@ -78,9 +92,9 @@ class Grid:
     test without decoding a PNG, and so a text fallback stays possible.
     """
 
-    start: date                 # the Monday of the leftmost column
+    start: date  # the Monday of the leftmost column
     today: date
-    columns: tuple              # tuple of 7-tuples, one per week
+    columns: tuple  # tuple of 7-tuples, one per week
 
 
 def level_for(count: int) -> int:
@@ -130,8 +144,7 @@ def build_grid(activity: Activity, today: date, weeks: int = GRID_WEEKS) -> Grid
     return Grid(start, today, tuple(columns))
 
 
-def draw_contribution_graph(activity: Activity, today: date,
-                            weeks: int = GRID_WEEKS) -> BytesIO:
+def draw_contribution_graph(activity: Activity, today: date, weeks: int = GRID_WEEKS) -> BytesIO:
     """Render the grid to a PNG. Synchronous, no I/O, no font file.
 
     PNG rather than JPEG (the choice `page_image` makes for scanned text): this
@@ -203,9 +216,12 @@ def cache_key(user_id: int, today: date) -> str:
     return "streak_graph_v1_%d_%s" % (user_id, today.isoformat())
 
 
-async def render_streak_graph(user_id: int, today: Optional[date] = None,
-                              utc_now: Optional[datetime] = None,
-                              weeks: int = GRID_WEEKS) -> BytesIO:
+async def render_streak_graph(
+    user_id: int,
+    today: Optional[date] = None,
+    utc_now: Optional[datetime] = None,
+    weeks: int = GRID_WEEKS,
+) -> BytesIO:
     """Read the user's last `weeks` weeks and render their graph.
 
     Pillow runs in a worker thread: it is CPU-bound, and however small this

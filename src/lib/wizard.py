@@ -21,8 +21,9 @@
 # re-runs `/memorize` — no durable state is involved, since nothing is written to
 # Postgres until the wizard is confirmed.
 
-import ujson as json
 from typing import Any, Dict, Optional
+
+import ujson as json
 
 from config import RedisSingleton
 
@@ -63,7 +64,7 @@ class Wizard:
             return None
         try:
             draft = json.loads(raw)
-        except ValueError:                  # corrupt/legacy value: treat as absent
+        except ValueError:  # corrupt/legacy value: treat as absent
             self.clear(user_id)
             return None
         if not isinstance(draft, dict) or "kind" not in draft:
@@ -92,8 +93,7 @@ class Wizard:
 
     # --- writes --------------------------------------------------------------
 
-    def start(self, user_id: int, kind: str, step: str = "",
-              **data: Any) -> Dict[str, Any]:
+    def start(self, user_id: int, kind: str, step: str = "", **data: Any) -> Dict[str, Any]:
         """Begin (or restart) a wizard, discarding any draft already in flight.
 
         One draft per user by design: two half-finished wizards at once has no
@@ -118,8 +118,9 @@ class Wizard:
         draft["step"] = step
         return self.save(user_id, draft)
 
-    def update(self, user_id: int, step: Optional[str] = None,
-               **fields: Any) -> Optional[Dict[str, Any]]:
+    def update(
+        self, user_id: int, step: Optional[str] = None, **fields: Any
+    ) -> Optional[Dict[str, Any]]:
         """Merge `fields` into the draft's data (and optionally move to `step`).
 
         Returns the updated draft, or None if no wizard is in flight — every

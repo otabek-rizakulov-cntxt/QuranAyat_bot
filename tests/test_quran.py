@@ -24,8 +24,8 @@ class TestExists:
 
     def test_ayah_out_of_range(self):
         assert not Quran.exists(1, 0)
-        assert not Quran.exists(1, 8)     # Al-Faatiha has 7 ayahs
-        assert not Quran.exists(2, 287)   # Al-Baqara has 286 ayahs
+        assert not Quran.exists(1, 8)  # Al-Faatiha has 7 ayahs
+        assert not Quran.exists(2, 287)  # Al-Baqara has 286 ayahs
 
 
 class TestNavigation:

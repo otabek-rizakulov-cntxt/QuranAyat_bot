@@ -27,8 +27,12 @@ from lib.store.sessions import LeaderboardEntry
 from lib.streaks import offset_of, user_offset
 
 __all__ = [
-    "DEFAULT_LIMIT", "LeaderboardEntry", "WeeklyBoard",
-    "week_window", "user_week_window", "weekly_board",
+    "DEFAULT_LIMIT",
+    "LeaderboardEntry",
+    "WeeklyBoard",
+    "week_window",
+    "user_week_window",
+    "weekly_board",
 ]
 
 # Ten rows is what fits in a Telegram message without scrolling past the point
@@ -63,14 +67,14 @@ def week_window(utc_now: datetime, offset: str) -> Tuple[date, date]:
     return week_bounds(local_date(utc_now, offset))
 
 
-async def user_week_window(user_id: int,
-                           utc_now: Optional[datetime] = None) -> Tuple[date, date]:
+async def user_week_window(user_id: int, utc_now: Optional[datetime] = None) -> Tuple[date, date]:
     """`week_window` for a user's stored offset (UTC if they have none yet)."""
     return week_window(utc_now or datetime.now(timezone.utc), await user_offset(user_id))
 
 
-async def weekly_board(user_id: int, utc_now: Optional[datetime] = None,
-                       limit: int = DEFAULT_LIMIT) -> WeeklyBoard:
+async def weekly_board(
+    user_id: int, utc_now: Optional[datetime] = None, limit: int = DEFAULT_LIMIT
+) -> WeeklyBoard:
     """The current week's board as seen by `user_id`, with their own row attached.
 
     The viewer's rank costs a second query only when they are *not* already in the

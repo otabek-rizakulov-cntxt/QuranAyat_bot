@@ -7,7 +7,7 @@ way to the screen.
 
 from datetime import date, datetime, timedelta, timezone
 
-from lib.leaderboard import DEFAULT_LIMIT, weekly_board, week_window
+from lib.leaderboard import DEFAULT_LIMIT, week_window, weekly_board
 from lib.store import get_store
 from lib.store.sessions import KIND_DRILL
 
@@ -15,8 +15,7 @@ MONDAY = date(2026, 3, 16)
 SUNDAY = date(2026, 3, 22)
 
 
-async def make_user(user_id, sessions=0, opt_in=True, streak=0, tz="+00:00",
-                    name=None, day=None):
+async def make_user(user_id, sessions=0, opt_in=True, streak=0, tz="+00:00", name=None, day=None):
     """A profile plus `sessions` sessions in the current week."""
     store = await get_store()
     await store.profiles.set_timezone(user_id, tz)
@@ -25,33 +24,40 @@ async def make_user(user_id, sessions=0, opt_in=True, streak=0, tz="+00:00",
     await store.profiles.set_streaks(user_id, streak, streak)
     for n in range(sessions):
         # Distinct portions so the store's idempotence does not collapse them.
-        await store.sessions.log_session(user_id, day or MONDAY, KIND_DRILL,
-                                         surah=1, start_ayah=1, end_ayah=n + 1)
+        await store.sessions.log_session(
+            user_id, day or MONDAY, KIND_DRILL, surah=1, start_ayah=1, end_ayah=n + 1
+        )
     return store
 
 
 class TestWeekWindow:
     def test_the_window_is_monday_to_sunday_inclusive(self):
-        assert week_window(datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc),
-                           "+00:00") == (MONDAY, SUNDAY)
+        assert week_window(datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc), "+00:00") == (
+            MONDAY,
+            SUNDAY,
+        )
 
     def test_two_offsets_can_disagree_about_which_week_it_is(self):
         # 22:00 UTC on Sunday: still Sunday in London, already Monday in Tashkent.
         instant = datetime(2026, 3, 22, 22, 0, tzinfo=timezone.utc)
         assert week_window(instant, "+00:00") == (MONDAY, SUNDAY)
-        assert week_window(instant, "+05:00") == (MONDAY + timedelta(days=7),
-                                                  SUNDAY + timedelta(days=7))
+        assert week_window(instant, "+05:00") == (
+            MONDAY + timedelta(days=7),
+            SUNDAY + timedelta(days=7),
+        )
 
     def test_a_western_offset_can_still_be_in_the_previous_week(self):
         # 01:00 UTC on Monday is still Sunday evening in New York.
         instant = datetime(2026, 3, 23, 1, 0, tzinfo=timezone.utc)
-        assert week_window(instant, "+00:00") == (MONDAY + timedelta(days=7),
-                                                  SUNDAY + timedelta(days=7))
+        assert week_window(instant, "+00:00") == (
+            MONDAY + timedelta(days=7),
+            SUNDAY + timedelta(days=7),
+        )
         assert week_window(instant, "-05:00") == (MONDAY, SUNDAY)
 
 
 class TestWeeklyBoard:
-    NOW = datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc)      # Wednesday
+    NOW = datetime(2026, 3, 18, 12, 0, tzinfo=timezone.utc)  # Wednesday
 
     async def test_an_empty_week_is_an_empty_board(self):
         await make_user(1)
@@ -70,7 +76,7 @@ class TestWeeklyBoard:
 
     async def test_an_opted_out_user_is_absent_from_the_query_result(self):
         await make_user(1, sessions=1)
-        await make_user(2, sessions=99, opt_in=False)             # would be first
+        await make_user(2, sessions=99, opt_in=False)  # would be first
         board = await weekly_board(1, utc_now=self.NOW)
         assert [e.user_id for e in board.entries] == [1]
         assert all(e.user_id != 2 for e in board.entries)
@@ -112,7 +118,7 @@ class TestWeeklyBoard:
         assert board.opted_in is True
 
     async def test_last_weeks_sessions_do_not_count(self):
-        await make_user(1, sessions=3, day=MONDAY - timedelta(days=1))   # last Sunday
+        await make_user(1, sessions=3, day=MONDAY - timedelta(days=1))  # last Sunday
         board = await weekly_board(1, utc_now=self.NOW)
         assert board.entries == ()
 

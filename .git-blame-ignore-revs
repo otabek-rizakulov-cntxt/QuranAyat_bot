@@ -1,0 +1,5 @@
+# Commits that only reformat code. GitHub's blame view reads this file; locally:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: format the codebase with ruff (2-space -> 4-space, line length 100)
+cc2af35824bcab6191fa7d10a086cc4471c7c757

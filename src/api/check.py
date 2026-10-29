@@ -15,8 +15,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from lib.streaks import user_today
 from lib.store import get_store
+from lib.streaks import user_today
 from services import check as check_service
 
 from .auth import jwt_secret, require_user
@@ -26,9 +26,13 @@ router = APIRouter()
 
 
 def _sign(payload: str, secret: str) -> str:
-    return base64.urlsafe_b64encode(
-        hmac.new(secret.encode(), ("check:" + payload).encode(), hashlib.sha256).digest()[:18]
-    ).decode().rstrip("=")
+    return (
+        base64.urlsafe_b64encode(
+            hmac.new(secret.encode(), ("check:" + payload).encode(), hashlib.sha256).digest()[:18]
+        )
+        .decode()
+        .rstrip("=")
+    )
 
 
 def make_token(user_id: int, surah: int, ayah: int, day: date, secret: str) -> str:
@@ -51,8 +55,10 @@ def read_token(token: str, user_id: int, secret: str):
 def _secret() -> str:
     secret = jwt_secret()
     if not secret:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                            detail="mini app auth is not configured")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="mini app auth is not configured",
+        )
     return secret
 
 
@@ -61,13 +67,16 @@ class QuestionOut(BaseModel):
     prompt: str
     options: List[str]
     span: RefOut
-    guessed_span: bool = Field(description="No reference given and nothing memorized: "
-                                           "fell back to juz 30")
+    guessed_span: bool = Field(
+        description="No reference given and nothing memorized: fell back to juz 30"
+    )
 
 
 @router.get("/check/question", response_model=QuestionOut)
-async def question(ref: Optional[str] = Query(None, description='"67", "juz 30", "67:1-8"'),
-                   user_id: int = Depends(require_user)) -> QuestionOut:
+async def question(
+    ref: Optional[str] = Query(None, description='"67", "juz 30", "67:1-8"'),
+    user_id: int = Depends(require_user),
+) -> QuestionOut:
     """Today's question for `ref`, or — with no `ref` — for what the user is
     memorizing (the part of their plan they have reached, else something marked
     known, else juz 30). Asking again today returns the same question."""
@@ -78,11 +87,16 @@ async def question(ref: Optional[str] = Query(None, description='"67", "juz 30",
         span, guessed = await check_service.default_span(await get_store(), user_id, today)
     q = await check_service.ask(user_id, span, today)
     if q is None:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="nothing to test in that span")
-    return QuestionOut(question_token=make_token(user_id, q.surah, q.ayah, today, _secret()),
-                       prompt=q.prompt, options=list(q.options), span=ref_out(span),
-                       guessed_span=guessed)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="nothing to test in that span"
+        )
+    return QuestionOut(
+        question_token=make_token(user_id, q.surah, q.ayah, today, _secret()),
+        prompt=q.prompt,
+        options=list(q.options),
+        span=ref_out(span),
+        guessed_span=guessed,
+    )
 
 
 class AnswerIn(BaseModel):
@@ -97,7 +111,9 @@ class AnswerOut(BaseModel):
     surah: int
     ayah: int
     already_today: bool = Field(description="A pass, but today was already earned")
-    milestone_key: Optional[str] = Field(None, description="Locale key of a streak milestone reached")
+    milestone_key: Optional[str] = Field(
+        None, description="Locale key of a streak milestone reached"
+    )
 
 
 @router.post("/check/answer", response_model=AnswerOut)
@@ -106,15 +122,22 @@ async def answer(body: AnswerIn, user_id: int = Depends(require_user)) -> Answer
     shared with /check in chat) and may reach a streak milestone."""
     parsed = read_token(body.question_token, user_id, _secret())
     if parsed is None:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="invalid question_token")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="invalid question_token"
+        )
     surah, ayah, day = parsed
     q = await check_service.rebuild(user_id, surah, ayah, day)
     if q is None or body.choice >= len(q.options):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="invalid choice")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="invalid choice"
+        )
     scored = await check_service.score(user_id, q, body.choice)
-    return AnswerOut(correct=scored.correct, correct_index=q.correct_index,
-                     correct_option=scored.correct_option, surah=surah, ayah=ayah,
-                     already_today=scored.correct and not scored.logged,
-                     milestone_key=scored.milestone_key)
+    return AnswerOut(
+        correct=scored.correct,
+        correct_index=q.correct_index,
+        correct_option=scored.correct_option,
+        surah=surah,
+        ayah=ayah,
+        already_today=scored.correct and not scored.logged,
+        milestone_key=scored.milestone_key,
+    )

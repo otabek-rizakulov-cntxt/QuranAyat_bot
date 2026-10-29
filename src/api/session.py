@@ -18,8 +18,15 @@ from modules import TranslationRegistry
 from services import plans as plans_service
 from services import profile as profile_service
 
-from .auth import (DEFAULT_TOKEN_TTL, InvalidInitData, init_data_max_age, issue_token,
-                   jwt_secret, require_user, validate_init_data)
+from .auth import (
+    DEFAULT_TOKEN_TTL,
+    InvalidInitData,
+    init_data_max_age,
+    issue_token,
+    jwt_secret,
+    require_user,
+    validate_init_data,
+)
 
 router = APIRouter()
 
@@ -89,8 +96,7 @@ class MeOut(BaseModel):
 
 
 def _settings(row) -> Settings:
-    return Settings(ui_lang=row.ui_lang, translation_lang=row.translation_lang,
-                    reciter=row.reciter)
+    return Settings(ui_lang=row.ui_lang, translation_lang=row.translation_lang, reciter=row.reciter)
 
 
 def _profile(profile) -> Profile:
@@ -101,7 +107,9 @@ def _profile(profile) -> Profile:
         leaderboard_opt_in=profile.leaderboard_opt_in,
         timezone=profile.timezone,
         reminder_time=profile_service.format_reminder_time(
-            profile_service.as_time(profile.reminder_time)) or None,
+            profile_service.as_time(profile.reminder_time)
+        )
+        or None,
         current_streak=profile.current_streak,
         longest_streak=profile.longest_streak,
     )
@@ -113,20 +121,22 @@ async def auth_telegram(body: TelegramAuthIn) -> AuthOut:
     secret = jwt_secret()
     bot_token = Environment.get_env("token")
     if not secret or not bot_token:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                            detail="mini app auth is not configured")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="mini app auth is not configured",
+        )
     try:
         fields = validate_init_data(body.init_data, bot_token, max_age=init_data_max_age())
     except InvalidInitData:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="invalid initData")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid initData")
 
     tg_user = fields["user"]
     user_id = int(tg_user["id"])
     # The same row first contact with the bot creates: chat_id == user_id in a
     # private chat, so the legacy-Redis migration in UserSettings applies too.
-    row = await UserSettings().get(user_id, user_id,
-                                   default_ui_lang=normalize_lang(tg_user.get("language_code")))
+    row = await UserSettings().get(
+        user_id, user_id, default_ui_lang=normalize_lang(tg_user.get("language_code"))
+    )
 
     start_param = fields.get("start_param")
     if start_param is not None and not _START_PARAM.match(start_param):
@@ -151,17 +161,28 @@ async def _me(user_id: int) -> MeOut:
     if plan is not None:
         total = await store.plans.count_plan_days(plan.id)
         done = await store.plans.count_plan_days(plan.id, "completed")
-        plan_out = PlanSummary(id=plan.id, status=plan.status,
-                               target=plans_service.target_label(plan),
-                               day=min(done + 1, total) if total else 0, total=total)
+        plan_out = PlanSummary(
+            id=plan.id,
+            status=plan.status,
+            target=plans_service.target_label(plan),
+            day=min(done + 1, total) if total else 0,
+            total=total,
+        )
 
     streak = await streak_summary(user_id)
-    return MeOut(user_id=user_id, settings=_settings(row), profile=_profile(profile),
-                 plan=plan_out,
-                 streak=StreakBrief(current=streak.current, longest=streak.longest,
-                                    active_today=streak.active_today,
-                                    at_risk=streak.at_risk),
-                 offsets=offset_options())
+    return MeOut(
+        user_id=user_id,
+        settings=_settings(row),
+        profile=_profile(profile),
+        plan=plan_out,
+        streak=StreakBrief(
+            current=streak.current,
+            longest=streak.longest,
+            active_today=streak.active_today,
+            at_risk=streak.at_risk,
+        ),
+        offsets=offset_options(),
+    )
 
 
 @router.get("/me", response_model=MeOut)
@@ -192,8 +213,10 @@ async def patch_settings(body: SettingsPatch, user_id: int = Depends(require_use
             raise _unprocessable("unknown ui_lang")
         await settings.set_ui_lang(user_id, user_id, body.ui_lang)
     if body.translation_lang is not None:
-        if not is_supported(body.translation_lang) \
-                or body.translation_lang not in TranslationRegistry.available():
+        if (
+            not is_supported(body.translation_lang)
+            or body.translation_lang not in TranslationRegistry.available()
+        ):
             raise _unprocessable("unknown translation_lang")
         await settings.set_translation_lang(user_id, user_id, body.translation_lang)
     if body.reciter is not None:
@@ -205,6 +228,7 @@ async def patch_settings(body: SettingsPatch, user_id: int = Depends(require_use
 
 class ProfilePatch(BaseModel):
     """Every field optional; send `null` to clear a reminder time."""
+
     display_name: Optional[str] = None
     leaderboard_opt_in: Optional[bool] = None
     timezone: Optional[str] = None
@@ -222,8 +246,10 @@ async def patch_profile(body: ProfilePatch, user_id: int = Depends(require_user)
     if "display_name" in fields:
         name = profile_service.valid_display_name(body.display_name or "")
         if name is None:
-            raise _unprocessable("display_name must be %d-%d characters"
-                                 % (profile_service.NAME_MIN, profile_service.NAME_MAX))
+            raise _unprocessable(
+                "display_name must be %d-%d characters"
+                % (profile_service.NAME_MIN, profile_service.NAME_MAX)
+            )
         await profile_service.set_display_name(store, user_id, name)
 
     if "timezone" in fields:
@@ -242,8 +268,7 @@ async def patch_profile(body: ProfilePatch, user_id: int = Depends(require_user)
     if "leaderboard_opt_in" in fields and body.leaderboard_opt_in is not None:
         if body.leaderboard_opt_in:
             if not await profile_service.join_leaderboard(store, user_id, None):
-                raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                                    detail="name_required")
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="name_required")
         else:
             await profile_service.leave_leaderboard(store, user_id)
 

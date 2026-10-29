@@ -16,9 +16,18 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 
 from locales import (  # noqa: E402
-    ACTION_BUTTON_KEYS, BOT_COMMANDS, DEFAULT_LANG, LANGUAGES, LOCALES,
-    UI_LANGUAGES, button_action, keyboard_rows, missing_keys, missing_locales,
-    t, welcome_text,
+    ACTION_BUTTON_KEYS,
+    BOT_COMMANDS,
+    DEFAULT_LANG,
+    LANGUAGES,
+    LOCALES,
+    UI_LANGUAGES,
+    button_action,
+    keyboard_rows,
+    missing_keys,
+    missing_locales,
+    t,
+    welcome_text,
 )
 
 PLACEHOLDER = re.compile(r"\{(\w+)\}")
@@ -56,8 +65,9 @@ def main() -> int:
             want = placeholders(LOCALES[DEFAULT_LANG][key])
             got = placeholders(table[key])
             if want != got:
-                problems.append("%s: %r placeholders %s, expected %s"
-                                % (code, key, sorted(got), sorted(want)))
+                problems.append(
+                    "%s: %r placeholders %s, expected %s" % (code, key, sorted(got), sorted(want))
+                )
             if not table[key].strip():
                 problems.append("%s: %r is empty" % (code, key))
 
@@ -68,14 +78,14 @@ def main() -> int:
             label = t(btn_key, code)
             resolved = button_action(label, code)
             if resolved != action:
-                problems.append("%s: button %r resolves to %r, expected %r"
-                                % (code, label, resolved, action))
+                problems.append(
+                    "%s: button %r resolves to %r, expected %r" % (code, label, resolved, action)
+                )
 
         labels = [label for row in keyboard_rows(code) for label in row]
         dupes = {x for x in labels if labels.count(x) > 1}
         if dupes:
-            problems.append("%s: duplicate keyboard labels: %s"
-                            % (code, ", ".join(sorted(dupes))))
+            problems.append("%s: duplicate keyboard labels: %s" % (code, ", ".join(sorted(dupes))))
 
         # HTML-parsed messages must not carry unbalanced tags: Telegram rejects
         # the whole send if they don't pair up.
@@ -88,19 +98,23 @@ def main() -> int:
         message = welcome_text(code)
         absent_commands = [c for c, _ in BOT_COMMANDS if "/%s " % c not in message]
         if absent_commands:
-            problems.append("%s: /start omits: %s"
-                            % (code, ", ".join("/" + c for c in absent_commands)))
+            problems.append(
+                "%s: /start omits: %s" % (code, ", ".join("/" + c for c in absent_commands))
+            )
 
     # Every bundled translation must actually exist on disk, including the
     # translation-only ones that have no string table to check.
     for lang in LANGUAGES:
-        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
-                            "translations", lang.code + ".txt")
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "translations", lang.code + ".txt"
+        )
         if not os.path.exists(path):
             problems.append("%s: translations/%s.txt is missing" % (lang.code, lang.code))
 
-    print("checked %d interface languages (%d keys each) and %d bundled translations"
-          % (len(UI_LANGUAGES), len(REQUIRED_KEYS), len(LANGUAGES)))
+    print(
+        "checked %d interface languages (%d keys each) and %d bundled translations"
+        % (len(UI_LANGUAGES), len(REQUIRED_KEYS), len(LANGUAGES))
+    )
     if problems:
         print("\n%d problem(s):" % len(problems))
         for p in problems:

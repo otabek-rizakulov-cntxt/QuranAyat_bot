@@ -36,9 +36,17 @@ def resolved_table(code: str) -> dict:
 
 
 def languages() -> list:
-    return [{"code": lang.code, "native": lang.native, "english": lang.english,
-             "rtl": lang.rtl, "flag": lang.flag, "ui": not lang.translation_only}
-            for lang in LANGUAGES]
+    return [
+        {
+            "code": lang.code,
+            "native": lang.native,
+            "english": lang.english,
+            "rtl": lang.rtl,
+            "flag": lang.flag,
+            "ui": not lang.translation_only,
+        }
+        for lang in LANGUAGES
+    ]
 
 
 def export(out_dir: str = DEFAULT_OUT_DIR) -> list:

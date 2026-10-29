@@ -64,7 +64,6 @@ strings = {
     "cmd_reciter": "Canza mai karatu",
     "cmd_about": "Maɓuɓɓugai da godiya",
     "quran_name": "Alkur'ani",
-
     # --- Hifz platform ---------------------------------------------------------
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Fara shirin haddar Alkur'ani",
@@ -74,7 +73,6 @@ strings = {
     "cmd_streak": "Jerin kwanakinka",
     "cmd_leaderboard": "Manyan masu haddar wannan mako",
     "cmd_profile": "Bayananka da saitunanka",
-
     # Shared wizard controls
     "wizard_cancelled": "An soke.",
     "wizard_nothing_to_cancel": "Babu abin da za a soke.",
@@ -83,7 +81,6 @@ strings = {
     "btn_cancel": "Soke",
     "btn_back": "Koma baya",
     "btn_confirm": "Tabbatar",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Lit",
     "day_tue": "Tal",
@@ -92,7 +89,6 @@ strings = {
     "day_fri": "Jum",
     "day_sat": "Asa",
     "day_sun": "Lah",
-
     # Profile (B1-B3)
     "profile_title": "Bayananka",
     "profile_name_set": "Suna: {name}",
@@ -125,7 +121,6 @@ strings = {
     "reminder_saved": "An saita tunatarwar yau da kullum zuwa {time}.",
     "btn_reminder_off": "Kashe tunatarwa",
     "reminder_off": "An kashe tunatarwar yau da kullum.",
-
     # Progress and /forgot (C3)
     "progress_title": "Abin da ka haddace",
     "progress_surah_line": "{name}: ayoyi {done}/{total} — {pct}%",
@@ -138,7 +133,6 @@ strings = {
     "forgot_usage": "Aika abin da za a cire alama, misali /forgot 67:5-6.",
     "forgot_done": "An cire alamar {ref}.",
     "forgot_nothing": "Ba ka sanya wannan a matsayin abin da ka haddace ba.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Me kake son ka haddace?",
     "btn_target_surah": "Sura",
@@ -174,7 +168,6 @@ strings = {
     "btn_know_by_heart": "✅ Na haddace wannan",
     "know_confirmed": "An sanya {ref} a matsayin abin da ka haddace. Kana kan {pct}%.",
     "know_already": "Ka riga ka sanya wannan alama.",
-
     # Recall check (E2, E3)
     "check_question": "Yaya wannan ke ci gaba?",
     "check_usage": "Aika abin da za a gwada, misali /check 67.",
@@ -185,7 +178,6 @@ strings = {
         "yadda kake so, sai dai ba za a ƙidaya shi sau biyu ba."
     ),
     "btn_check_start": "Gwada ni",
-
     # Streaks (G2, G3)
     "streak_title": "Jerin kwanakinka",
     "streak_current": "Jeri na yanzu, kwanaki: {n}",
@@ -196,7 +188,6 @@ strings = {
     "streak_milestone_30": "Kwanaki talatin. Yanzu daidaito yana tare da kai.",
     "streak_milestone_100": "Kwanaki ɗari. Mutane kaɗan ne kawai ke kai wannan matakin.",
     "streak_milestone_365": "Shekara guda cikakkiya, kowace rana. Allah ya tsare maka abin da ka koya.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Jadawalin wannan mako",
     "leaderboard_row": "{rank}. {name} — {sessions}",

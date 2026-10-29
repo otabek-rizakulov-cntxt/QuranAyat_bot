@@ -31,13 +31,13 @@ from typing import Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+import services.check as check_service
 from hifz import Ctx, callback, command
 from hifz.refs import parse_reference
 from lib.recall_check import OPTION_COUNT, RecallQuestion
 from lib.streaks import user_today
-import services.check as check_service
-from services.check import DEFAULT_JUZ  # noqa: F401 — re-exported
 from modules import Quran
+from services.check import DEFAULT_JUZ  # noqa: F401 — re-exported
 
 # --- callback_data shapes ------------------------------------------------------
 # hc:start                              start a check from another screen (23 B max: 8)
@@ -45,7 +45,6 @@ from modules import Quran
 CB_START = "hc:start"
 CB_ANSWER = "hc:a:"
 _DATE_FORMAT = "%Y%m%d"
-
 
 
 @command("check")
@@ -74,10 +73,11 @@ async def on_check(ctx: Ctx, cb_data: str) -> None:
     if cb_data.startswith(CB_ANSWER):
         await _score(ctx, cb_data)
         return
-    await ctx.answer()                      # unknown shape: acknowledge, ignore
+    await ctx.answer()  # unknown shape: acknowledge, ignore
 
 
 # --- asking --------------------------------------------------------------------
+
 
 async def _ask(ctx: Ctx, argument: str) -> None:
     """Pick an ayah, build the question and send it with its four options."""
@@ -93,7 +93,7 @@ async def _ask(ctx: Ctx, argument: str) -> None:
         ref, hint = await check_service.default_span(ctx.store, ctx.user_id, today)
 
     question = await check_service.ask(ctx.user_id, ref, today)
-    if question is None:                    # an empty span; nothing to test
+    if question is None:  # an empty span; nothing to test
         await ctx.reply(ctx.tr("ref_invalid"))
         return
 
@@ -115,17 +115,26 @@ def _question_text(ctx: Ctx, question: RecallQuestion) -> str:
 def _options_keyboard(question: RecallQuestion, today) -> InlineKeyboardMarkup:
     """One option per row — an Arabic fragment does not share a row legibly."""
     return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(option, callback_data=_answer_data(question, today, index))]
-         for index, option in enumerate(question.options)])
+        [
+            [InlineKeyboardButton(option, callback_data=_answer_data(question, today, index))]
+            for index, option in enumerate(question.options)
+        ]
+    )
 
 
 def _answer_data(question: RecallQuestion, today, index: int) -> str:
-    """"hc:a:67:12:20260731:2" — 23 bytes at the very worst (2:282, option 3)."""
-    return "%s%d:%d:%s:%d" % (CB_ANSWER, question.surah, question.ayah,
-                              today.strftime(_DATE_FORMAT), index)
+    """ "hc:a:67:12:20260731:2" — 23 bytes at the very worst (2:282, option 3)."""
+    return "%s%d:%d:%s:%d" % (
+        CB_ANSWER,
+        question.surah,
+        question.ayah,
+        today.strftime(_DATE_FORMAT),
+        index,
+    )
 
 
 # --- scoring -------------------------------------------------------------------
+
 
 async def _score(ctx: Ctx, cb_data: str) -> None:
     """Regenerate the tapped question, judge the answer, and earn the day."""
@@ -136,7 +145,7 @@ async def _score(ctx: Ctx, cb_data: str) -> None:
     surah, ayah, day, index = parsed
 
     question = await check_service.rebuild(ctx.user_id, surah, ayah, day)
-    if question is None:                    # an ayah that no longer resolves
+    if question is None:  # an ayah that no longer resolves
         await ctx.answer()
         return
 
@@ -157,7 +166,7 @@ async def _score(ctx: Ctx, cb_data: str) -> None:
 
 
 def _parse_answer(cb_data: str) -> Optional[Tuple[int, int, object, int]]:
-    """"hc:a:67:12:20260731:2" -> (67, 12, date(2026, 7, 31), 2), or None.
+    """ "hc:a:67:12:20260731:2" -> (67, 12, date(2026, 7, 31), 2), or None.
 
     Everything is checked: the shape, every integer, the date, the option index
     and whether the ayah exists. A tap that fails any of them is acknowledged and

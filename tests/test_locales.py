@@ -13,13 +13,11 @@ from locales import (
     BOT_COMMANDS,
     DEFAULT_LANG,
     GROUP_LOCALES,
-    LANGUAGES,
     LOCALES,
     UI_LANGUAGES,
     button_action,
     get_language,
     is_supported,
-    is_ui_language,
     keyboard_rows,
     missing_keys,
     missing_locales,
@@ -52,7 +50,7 @@ class TestGroupLocaleExemption:
     (2026-08-02): missing_keys() flagging group_* for all 44 other locales."""
 
     def test_group_locales_is_exactly_the_four(self):
-        assert GROUP_LOCALES == {"en", "ru", "uz", "uz-Cyrl"}
+        assert {"en", "ru", "uz", "uz-Cyrl"} == GROUP_LOCALES
 
     @pytest.mark.parametrize("code", sorted(GROUP_LOCALES))
     def test_group_locales_have_every_group_key(self, code):

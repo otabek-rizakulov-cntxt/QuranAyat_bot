@@ -27,12 +27,18 @@ class TestDefaults:
     async def test_new_user_gets_documented_defaults(self):
         settings = await UserSettings().get(700001, 700001)
         assert (settings.ui_lang, settings.translation_lang, settings.reciter) == (
-            "en", "en", "Husary_128kbps")
+            "en",
+            "en",
+            "Husary_128kbps",
+        )
 
     def test_module_defaults_match_documented_values(self):
         # The literals asserted above are the contract; keep the constants honest.
         assert (DEFAULT_UI_LANG, DEFAULT_TRANSLATION_LANG, DEFAULT_RECITER) == (
-            "en", "en", "Husary_128kbps")
+            "en",
+            "en",
+            "Husary_128kbps",
+        )
 
     async def test_supplied_default_seeds_both_languages(self):
         # No legacy value: the caller-supplied default (derived from Telegram's
@@ -65,7 +71,9 @@ class TestDefaults:
         await user_settings.set_reciter(700006, 700006, "Alafasy_128kbps")
         settings = await user_settings.get(700006, 700006)
         assert (settings.ui_lang, settings.translation_lang) == (
-            DEFAULT_UI_LANG, DEFAULT_TRANSLATION_LANG)
+            DEFAULT_UI_LANG,
+            DEFAULT_TRANSLATION_LANG,
+        )
         assert settings.reciter == "Alafasy_128kbps"
 
     async def test_supplied_default_is_ignored_once_the_row_exists(self):
@@ -105,7 +113,7 @@ class TestIndependence:
 
     async def test_setting_ui_lang_leaves_the_others_alone(self):
         user_settings = UserSettings()
-        await user_settings.get(700020, 700020)      # existing user, English defaults
+        await user_settings.get(700020, 700020)  # existing user, English defaults
         await user_settings.set_ui_lang(700020, 700020, "ru")
         settings = await user_settings.get(700020, 700020)
         assert settings.translation_lang == DEFAULT_TRANSLATION_LANG
@@ -145,7 +153,10 @@ class TestIndependence:
         await user_settings.set_reciter(700024, 700024, "Alafasy_128kbps")
         settings = await user_settings.get(700024, 700024)
         assert (settings.ui_lang, settings.translation_lang, settings.reciter) == (
-            "uz-Cyrl", "ru", "Alafasy_128kbps")
+            "uz-Cyrl",
+            "ru",
+            "Alafasy_128kbps",
+        )
 
 
 class TestLegacyMigration:
@@ -193,7 +204,10 @@ class TestInlineCaller:
     async def test_get_without_chat_id_returns_defaults(self):
         settings = await UserSettings().get(700040, None)
         assert (settings.ui_lang, settings.translation_lang, settings.reciter) == (
-            DEFAULT_UI_LANG, DEFAULT_TRANSLATION_LANG, DEFAULT_RECITER)
+            DEFAULT_UI_LANG,
+            DEFAULT_TRANSLATION_LANG,
+            DEFAULT_RECITER,
+        )
 
     async def test_get_without_chat_id_skips_the_legacy_lookup(self):
         # A legacy key exists under an unrelated chat id; with no chat id to key
@@ -202,7 +216,7 @@ class TestInlineCaller:
         settings = await UserSettings().get(700042, None)
         assert settings.ui_lang == DEFAULT_UI_LANG
         assert settings.translation_lang == DEFAULT_TRANSLATION_LANG
-        assert File().get_lang(700041) == "ru"   # left untouched
+        assert File().get_lang(700041) == "ru"  # left untouched
 
     async def test_inline_setter_without_chat_id_persists(self):
         user_settings = UserSettings()

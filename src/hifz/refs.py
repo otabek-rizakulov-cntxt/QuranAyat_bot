@@ -16,8 +16,16 @@ from typing import Optional, Tuple
 from modules import Quran
 
 __all__ = [
-    "Ref", "parse_reference", "parse_range", "surah_ref", "juz_ref", "page_ref",
-    "ayah_count", "format_ref", "contains", "clamp_to_quran",
+    "Ref",
+    "parse_reference",
+    "parse_range",
+    "surah_ref",
+    "juz_ref",
+    "page_ref",
+    "ayah_count",
+    "format_ref",
+    "contains",
+    "clamp_to_quran",
 ]
 
 # Kinds mirror `plan.target_kind` in the data model, plus "page" for the drill
@@ -36,6 +44,7 @@ class Ref:
     `kind` records how it was expressed so a plan can say "Juz 30" rather than
     "78:1-114:6"; `n` carries the juz/page number for those kinds.
     """
+
     kind: str
     start_surah: int
     start_ayah: int
@@ -64,8 +73,7 @@ class Ref:
 
 
 # "67:1-68:5" / "67.1 - 68.5" — two surah:ayah pairs joined by a dash.
-_CROSS = re.compile(
-    r"^/?(\d{1,3})\s*[:.;,]\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*[:.;,]\s*(\d{1,3})$")
+_CROSS = re.compile(r"^/?(\d{1,3})\s*[:.;,]\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*[:.;,]\s*(\d{1,3})$")
 # "67:1-8" — one surah, two ayah numbers.
 _WITHIN = re.compile(r"^/?(\d{1,3})\s*[:.;, ]\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})$")
 # "67:5" — a single ayah.
@@ -171,8 +179,7 @@ def _validated(kind: str, s1: int, a1: int, s2: int, a2: int) -> Optional[Ref]:
     return Ref(kind, s1, a1, s2, a2)
 
 
-def ayah_count(start_surah: int, start_ayah: int,
-               end_surah: int, end_ayah: int) -> int:
+def ayah_count(start_surah: int, start_ayah: int, end_surah: int, end_ayah: int) -> int:
     """Ayahs in an inclusive cross-surah span; 0 if the span is inverted.
 
     Counted from the surah lengths rather than by walking, so a juz costs the

@@ -54,10 +54,12 @@ class _CallbackQuery:
 
 async def _ctx(bot=None, argument="", tap=False) -> Ctx:
     from lib.utils import File
+
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}
-    return await Ctx.build(bot, {}, File(), CHAT_ID, USER_ID, _Settings(),
-                           argument=argument, **extra)
+    return await Ctx.build(
+        bot, {}, File(), CHAT_ID, USER_ID, _Settings(), argument=argument, **extra
+    )
 
 
 def _sent(bot) -> str:
@@ -85,6 +87,7 @@ async def _progress(bot=None, argument=""):
 
 # --- /progress -----------------------------------------------------------------
 
+
 class TestProgressCommand:
     async def test_a_user_with_nothing_marked_gets_the_empty_copy(self):
         text = await _progress()
@@ -101,6 +104,7 @@ class TestProgressCommand:
         # The decision this module exists to carry: a juz is "twenty pages", never
         # "431 ayahs". By ayahs juz 29 would read 2%; by pages it reads 3%.
         from lib.hifz_progress import summarize
+
         await _mark(67, 1, 8)
         summary = summarize([(67, 1, 8)])
         assert summary.focus_juz.percent_text != summary.focus_juz_pages.percent_text
@@ -112,6 +116,7 @@ class TestProgressCommand:
         # A whole juz 30 is 9% of the Qur'an by ayahs (its ayahs are short) and 4%
         # by pages. The page figure is the one a hafiz recognizes.
         from lib.hifz_progress import summarize
+
         ref = juz_ref(30)
         spans = progress_feature.surah_spans(ref)
         for surah, start, end in spans:
@@ -128,7 +133,7 @@ class TestProgressCommand:
         await _mark(112, 1, 4)
         text = await _progress(argument="112")
         assert "%s: 4/4 ayahs — 100%%" % Quran.get_surah_name(112) in text  # the focus
-        assert "Al-Mulk: 8/30 ayahs — 27%" in text       # the breakdown
+        assert "Al-Mulk: 8/30 ayahs — 27%" in text  # the breakdown
 
     async def test_the_focus_juz_is_not_repeated_in_the_breakdown(self):
         # It was already shown in pages; a second, different percentage for the
@@ -154,13 +159,13 @@ class TestProgressTaps:
         await _mark(67, 1, 8)
         await _mark(112, 1, 4)
         bot = AsyncMock()
-        assert await hifz.dispatch_callback(await _ctx(bot, tap=True),
-                                            "hg:s:67") is True
+        assert await hifz.dispatch_callback(await _ctx(bot, tap=True), "hg:s:67") is True
         assert _edited(bot).splitlines()[2].startswith("Al-Mulk:")
         bot.answer_callback_query.assert_awaited()
 
-    @pytest.mark.parametrize("junk", ["hg:", "hg:s:", "hg:s:zzz", "hg:s:0",
-                                      "hg:s:115", "hg:s:67:extra", "hg:r"])
+    @pytest.mark.parametrize(
+        "junk", ["hg:", "hg:s:", "hg:s:zzz", "hg:s:0", "hg:s:115", "hg:s:67:extra", "hg:r"]
+    )
     async def test_stale_or_forged_data_redraws_instead_of_raising(self, junk):
         await _mark(67, 1, 8)
         bot = AsyncMock()
@@ -169,13 +174,13 @@ class TestProgressTaps:
         bot.answer_callback_query.assert_awaited()
 
     def test_every_callback_shape_fits_telegrams_cap(self):
-        for shape in (progress_feature.REFRESH_CB,
-                      progress_feature.SURAH_PREFIX + "114"):
+        for shape in (progress_feature.REFRESH_CB, progress_feature.SURAH_PREFIX + "114"):
             assert shape.startswith(hifz.PREFIXES["progress"])
             assert len(shape.encode()) <= 64, shape
 
 
 # --- /forgot -------------------------------------------------------------------
+
 
 class TestForgot:
     async def test_it_splits_an_interval_in_two(self):
@@ -250,7 +255,7 @@ class TestForgot:
         bot = AsyncMock()
         await hifz.dispatch_command(await _ctx(bot, junk), "forgot")
         assert "isn't a reference I recognise" in _sent(bot)
-        assert await _intervals(67) == [(67, 1, 10)]        # nothing touched
+        assert await _intervals(67) == [(67, 1, 10)]  # nothing touched
 
     async def test_forgetting_something_never_marked_says_so(self):
         await _mark(67, 1, 10)
@@ -270,12 +275,16 @@ class TestForgot:
 class TestSurahSpans:
     def test_a_within_surah_reference_is_one_span(self):
         from hifz.refs import parse_reference
+
         assert progress_feature.surah_spans(parse_reference("67:5-6")) == [(67, 5, 6)]
 
     def test_a_cross_surah_reference_is_split_at_the_boundary(self):
         from hifz.refs import parse_reference
+
         assert progress_feature.surah_spans(parse_reference("67:30-68:2")) == [
-            (67, 30, 30), (68, 1, 2)]
+            (67, 30, 30),
+            (68, 1, 2),
+        ]
 
     def test_a_juz_covers_every_surah_it_touches_whole(self):
         ref = juz_ref(30)

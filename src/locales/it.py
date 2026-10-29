@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Comandi:",
     "welcome_inline": (
-        "Puoi usarmi in qualsiasi chat: digita <b>@QuranAyat_bot</b> seguito da un "
-        "riferimento."
+        "Puoi usarmi in qualsiasi chat: digita <b>@QuranAyat_bot</b> seguito da un riferimento."
     ),
     "about": (
         "Questo bot ti permette di esplorare il Sacro Corano su Telegram in "
@@ -64,9 +63,7 @@ strings = {
     "cmd_reciter": "Cambia recitatore",
     "cmd_about": "Fonti e ringraziamenti",
     "quran_name": "Corano",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Avvia un piano di hifz",
     "cmd_progress": "Ciò che hai memorizzato",
@@ -75,7 +72,6 @@ strings = {
     "cmd_streak": "La tua serie quotidiana",
     "cmd_leaderboard": "I migliori di questa settimana",
     "cmd_profile": "Il tuo profilo e le impostazioni",
-
     # Shared wizard controls
     "wizard_cancelled": "Annullato.",
     "wizard_nothing_to_cancel": "Non c'è nulla da annullare.",
@@ -84,7 +80,6 @@ strings = {
     "btn_cancel": "Annulla",
     "btn_back": "Indietro",
     "btn_confirm": "Conferma",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "lun",
     "day_tue": "mar",
@@ -93,7 +88,6 @@ strings = {
     "day_fri": "ven",
     "day_sat": "sab",
     "day_sun": "dom",
-
     # Profile (B1-B3)
     "profile_title": "Il tuo profilo",
     "profile_name_set": "Nome: {name}",
@@ -126,7 +120,6 @@ strings = {
     "reminder_saved": "Promemoria giornaliero impostato alle {time}.",
     "btn_reminder_off": "Disattiva promemoria",
     "reminder_off": "I promemoria giornalieri sono disattivati.",
-
     # Progress and /forgot (C3)
     "progress_title": "Ciò che hai memorizzato",
     "progress_surah_line": "{name}: {done}/{total} versetti — {pct}%",
@@ -139,7 +132,6 @@ strings = {
     "forgot_usage": "Invia cosa vuoi rimuovere, ad esempio /forgot 67:5-6.",
     "forgot_done": "{ref} rimosso.",
     "forgot_nothing": "Non l'avevi segnato come memorizzato.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Che cosa vuoi memorizzare?",
     "btn_target_surah": "Una sura",
@@ -175,7 +167,6 @@ strings = {
     "btn_know_by_heart": "✅ Lo so a memoria",
     "know_confirmed": "{ref} segnato come memorizzato. Sei al {pct}%.",
     "know_already": "L'avevi già segnato.",
-
     # Recall check (E2, E3)
     "check_question": "Come prosegue?",
     "check_usage": "Invia cosa vuoi verificare, ad esempio /check 67.",
@@ -186,7 +177,6 @@ strings = {
         "mettiti alla prova quanto vuoi, semplicemente non conterà due volte."
     ),
     "btn_check_start": "Mettimi alla prova",
-
     # Streaks (G2, G3)
     "streak_title": "La tua serie",
     "streak_current": "Serie attuale: {n}",
@@ -197,7 +187,6 @@ strings = {
     "streak_milestone_30": "Trenta giorni. Ora la costanza è dalla tua parte.",
     "streak_milestone_100": "Cento giorni. Pochissimi arrivano fin qui.",
     "streak_milestone_365": "Un anno intero, ogni singolo giorno. Che Allah preservi ciò che hai imparato.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "La classifica di questa settimana",
     "leaderboard_row": "{rank}. {name} — {sessions}",

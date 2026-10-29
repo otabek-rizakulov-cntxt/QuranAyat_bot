@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "কমান্ড:",
     "welcome_inline": (
-        "আমাকে যেকোনো চ্যাটে ব্যবহার করতে পারেন: <b>@QuranAyat_bot</b> লিখে তারপর আয়াতের "
-        "নম্বর দিন।"
+        "আমাকে যেকোনো চ্যাটে ব্যবহার করতে পারেন: <b>@QuranAyat_bot</b> লিখে তারপর আয়াতের নম্বর দিন।"
     ),
     "about": (
         "এই বট আপনাকে টেলিগ্রামে অনেক ভাষায় পবিত্র কুরআন পড়ার সুযোগ দেয়।\n\n"
@@ -63,9 +62,7 @@ strings = {
     "cmd_reciter": "ক্বারী পরিবর্তন",
     "cmd_about": "সূত্র ও কৃতজ্ঞতা",
     "quran_name": "কুরআন",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "হিফজের পরিকল্পনা শুরু করুন",
     "cmd_progress": "আপনি যা মুখস্থ করেছেন",
@@ -74,7 +71,6 @@ strings = {
     "cmd_streak": "আপনার দৈনিক ধারাবাহিকতা",
     "cmd_leaderboard": "এই সপ্তাহের শীর্ষ হিফজকারীরা",
     "cmd_profile": "আপনার প্রোফাইল ও সেটিংস",
-
     # Shared wizard controls
     "wizard_cancelled": "বাতিল করা হয়েছে।",
     "wizard_nothing_to_cancel": "বাতিল করার মতো কিছু নেই।",
@@ -83,7 +79,6 @@ strings = {
     "btn_cancel": "বাতিল",
     "btn_back": "পেছনে",
     "btn_confirm": "নিশ্চিত করুন",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "সোম",
     "day_tue": "মঙ্গল",
@@ -92,7 +87,6 @@ strings = {
     "day_fri": "শুক্র",
     "day_sat": "শনি",
     "day_sun": "রবি",
-
     # Profile
     "profile_title": "আপনার প্রোফাইল",
     "profile_name_set": "নাম: {name}",
@@ -125,7 +119,6 @@ strings = {
     "reminder_saved": "দৈনিক অনুস্মারক {time} এ সেট করা হয়েছে।",
     "btn_reminder_off": "অনুস্মারক বন্ধ করুন",
     "reminder_off": "দৈনিক অনুস্মারক বন্ধ আছে।",
-
     # Progress and /forgot
     "progress_title": "আপনি যা মুখস্থ করেছেন",
     "progress_surah_line": "{name}: {done}/{total} আয়াত — {pct}%",
@@ -138,7 +131,6 @@ strings = {
     "forgot_usage": "কোন অংশের চিহ্ন সরাতে চান তা পাঠান, যেমন /forgot 67:5-6।",
     "forgot_done": "{ref} এর চিহ্ন সরানো হয়েছে।",
     "forgot_nothing": "সেটি আপনি মুখস্থ হিসেবে চিহ্নিত করেননি।",
-
     # Memorization plans and drills
     "memorize_choose_target": "আপনি কী মুখস্থ করতে চান?",
     "btn_target_surah": "একটি সূরা",
@@ -174,7 +166,6 @@ strings = {
     "btn_know_by_heart": "✅ আমার মুখস্থ হয়েছে",
     "know_confirmed": "{ref} মুখস্থ হিসেবে চিহ্নিত হলো। আপনি এখন {pct}% এ আছেন।",
     "know_already": "সেটি আগেই চিহ্নিত করা ছিল।",
-
     # Recall check
     "check_question": "এরপর কীভাবে চলে?",
     "check_usage": "কী যাচাই করতে চান তা পাঠান, যেমন /check 67।",
@@ -185,7 +176,6 @@ strings = {
         "পরীক্ষা করুন, কেবল দুবার গণনা হবে না।"
     ),
     "btn_check_start": "পরীক্ষা নিন",
-
     # Streaks
     "streak_title": "আপনার ধারাবাহিকতা",
     "streak_current": "বর্তমান ধারা: {n} দিন",
@@ -196,7 +186,6 @@ strings = {
     "streak_milestone_30": "ত্রিশ দিন। ধারাবাহিকতা এখন আপনার পক্ষে।",
     "streak_milestone_100": "একশ দিন। খুব কম মানুষই এতদূর আসে।",
     "streak_milestone_365": "পুরো এক বছর, প্রতিটি দিন। আপনি যা শিখেছেন আল্লাহ তা হেফাজত করুন।",
-
     # Leaderboard
     "leaderboard_title": "এই সপ্তাহের লিডারবোর্ড",
     "leaderboard_row": "{rank}. {name} — {sessions}",

@@ -63,11 +63,13 @@ def swept():
     Every sweeping test asks a different question of the same corpus of generated
     questions, and building them is the expensive part — one pass, not eight.
     """
-    return [(surah, ayah, rc.build_question(USER, surah, ayah, TODAY))
-            for surah, ayah in sweep_refs()]
+    return [
+        (surah, ayah, rc.build_question(USER, surah, ayah, TODAY)) for surah, ayah in sweep_refs()
+    ]
 
 
 # --- the done-when ------------------------------------------------------------
+
 
 def test_correct_option_is_never_a_length_outlier(swept):
     """Across all 114 surahs, no answer stands out by how long it is.
@@ -142,6 +144,7 @@ def test_prompt_is_never_offered_back_as_an_option(swept):
 
 # --- the correct answer is actually correct -----------------------------------
 
+
 def test_correct_option_really_follows_the_prompt(swept):
     """In continuation mode, prompt + correct option is a prefix of the ayah.
 
@@ -154,7 +157,7 @@ def test_correct_option_really_follows_the_prompt(swept):
             continue
         words = rc._words(surah, ayah)
         joined = (question.prompt + " " + question.correct).split()
-        assert words[:len(joined)] == joined, (surah, ayah)
+        assert words[: len(joined)] == joined, (surah, ayah)
 
 
 def test_both_question_modes_show_up_in_the_sweep(swept):
@@ -167,7 +170,7 @@ def test_next_ayah_mode_answers_with_the_whole_short_ayah():
     question = rc.build_question(USER, 2, 1, TODAY)
     assert question.mode == rc.MODE_NEXT_AYAH
     assert question.correct == " ".join(rc._words(2, 1))
-    assert question.prompt_ref == (1, 7)          # crosses the surah boundary
+    assert question.prompt_ref == (1, 7)  # crosses the surah boundary
     assert question.prompt == " ".join(rc._words(1, 7))
 
 
@@ -202,12 +205,13 @@ def test_every_option_carries_the_same_word_count(swept):
     """Word count must not be the tell either — that is why distractors are tails."""
     for surah, ayah, question in swept:
         if question.mode != rc.MODE_CONTINUATION:
-            continue          # whole short ayahs vary by a word, by construction
+            continue  # whole short ayahs vary by a word, by construction
         counts = {len(o.split()) for o in question.options}
         assert len(counts) == 1, (surah, ayah, question.options)
 
 
 # --- determinism ---------------------------------------------------------------
+
 
 def test_same_inputs_give_the_same_question():
     """A retry must not be a reroll — same options, same order, same index."""
@@ -254,12 +258,12 @@ def test_the_global_random_module_is_never_touched():
 
 def test_the_answer_does_not_always_land_in_the_same_slot():
     """If the correct option were always index 0, tapping the first button wins."""
-    slots = {rc.build_question(USER, 36, ayah, TODAY).correct_index
-             for ayah in range(1, 40)}
+    slots = {rc.build_question(USER, 36, ayah, TODAY).correct_index for ayah in range(1, 40)}
     assert slots == {0, 1, 2, 3}
 
 
 # --- degenerate spans -----------------------------------------------------------
+
 
 @pytest.mark.parametrize("surah", [AL_ASR, AL_KAWTHAR, AL_IKHLAS])
 def test_short_surahs_still_get_four_distinct_options(surah):
@@ -301,7 +305,7 @@ def test_the_first_and_last_ayah_of_the_quran():
 
 
 def test_muqattaat_get_muqattaat_shaped_distractors():
-    """"الم" is three characters; three fully-vocalized ayahs beside it would be a tell."""
+    """ "الم" is three characters; three fully-vocalized ayahs beside it would be a tell."""
     question = rc.build_question(USER, 2, 1, TODAY)
     lengths = [rc.display_length(o) for o in question.options]
     assert max(lengths) <= rc.display_length(question.correct) + rc.LENGTH_SLACK_MIN
@@ -315,6 +319,7 @@ def test_unknown_ayahs_are_rejected():
 
 
 # --- corpus hygiene --------------------------------------------------------------
+
 
 def test_the_basmala_heading_is_not_part_of_the_question():
     """Tanzil prepends the basmala to ayah 1 of every surah but At-Tawbah.
@@ -334,7 +339,7 @@ def test_the_basmala_heading_is_not_part_of_the_question():
     assert _nfc(stripped) == _nfc("إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ")
     # ...and independently of any literal: it is exactly the ayah minus the heading
     raw = TranslationRegistry.get("ar").get_ayah_text(108, 1)
-    assert stripped == raw[len(basmala):].strip()
+    assert stripped == raw[len(basmala) :].strip()
 
     assert " ".join(rc._words(1, 1)) == basmala
     assert " ".join(rc._words(9, 1)).startswith("بَرَاءَةٌ")
@@ -367,11 +372,12 @@ def test_is_similar_length_bands():
     assert rc.is_similar_length(100, 100)
     assert rc.is_similar_length(75, 100)
     assert not rc.is_similar_length(74, 100)
-    assert rc.is_similar_length(7, 3)             # absolute floor for muqatta'at
+    assert rc.is_similar_length(7, 3)  # absolute floor for muqatta'at
     assert not rc.is_similar_length(8, 3)
 
 
 # --- picking which ayah to test ---------------------------------------------------
+
 
 def test_pick_ayah_stays_inside_the_span():
     span = (67, 1, 67, 30)
@@ -401,7 +407,7 @@ def test_pick_ayahs_returns_distinct_ayahs():
     span = (2, 1, 2, 286)
     picked = rc.pick_ayahs(USER, span, TODAY, 5)
     assert len(picked) == len(set(picked)) == 5
-    assert picked == sorted(picked)          # mushaf order
+    assert picked == sorted(picked)  # mushaf order
     assert picked == rc.pick_ayahs(USER, span, TODAY, 5)
 
 
@@ -442,6 +448,7 @@ def test_pick_then_build_is_the_whole_check_flow():
 
 
 # --- loading -----------------------------------------------------------------------
+
 
 async def test_preload_corpus_returns_the_same_cached_object():
     """Wave 2C can warm the 1.3 MB parse off the event loop; it must not re-parse."""
