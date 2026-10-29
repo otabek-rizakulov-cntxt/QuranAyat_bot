@@ -10,7 +10,7 @@ import os
 
 import pytest
 
-from modules import Quran
+from domain.quran import Quran
 
 _SCRIPT = os.path.join(os.path.dirname(__file__), "..", "scripts", "export_web_content.py")
 _spec = importlib.util.spec_from_file_location("export_web_content", _SCRIPT)

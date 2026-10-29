@@ -7,6 +7,7 @@ in, so it must appear under /translation and nowhere else.
 
 import app.lifespan as lifespan
 import bot.keyboards.language as language_kb
+from domain.quran import TranslationRegistry
 from locales import (
     DEFAULT_LANG,
     LANGUAGES,
@@ -16,7 +17,6 @@ from locales import (
     is_ui_language,
     normalize_lang,
 )
-from modules import TranslationRegistry
 
 
 class TestAvailable:

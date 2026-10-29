@@ -32,7 +32,7 @@ class Settings:
     miniapp_jwt_secret: Optional[str]
     miniapp_origins: Tuple[str, ...]
     # Public URL of the Mini App; turns on the bot's "Open in app" buttons, /app
-    # and the menu button (src/lib/miniapp.py).
+    # and the menu button (src/bot/miniapp.py).
     miniapp_url: Optional[str]
     # Opt-in for the in-memory stores (tests, local dev). Off by default, so a
     # deployment whose database or Redis URL is missing fails instead of

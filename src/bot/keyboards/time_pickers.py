@@ -5,7 +5,7 @@ from typing import Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.rows import button_rows
-from lib.localtime import offset_options
+from domain.localtime import offset_options
 from locales import t
 
 
@@ -16,7 +16,7 @@ def offset_keyboard(
     cancel_data: Optional[str] = None,
     label_prefix: str = "",
 ) -> InlineKeyboardMarkup:
-    """Every offset the picker offers (see lib/localtime.py), `columns` per row.
+    """Every offset the picker offers (see domain/localtime.py), `columns` per row.
 
     The labels *are* the offsets ("+05:00", or "UTC+05:00" with
     `label_prefix="UTC"`), so this keyboard needs no translation — half the

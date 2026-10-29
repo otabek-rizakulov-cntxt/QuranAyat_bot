@@ -16,7 +16,7 @@ import bot.dispatch as dispatch
 import bot.limits as limits
 import bot.media
 import domain.parsing as parsing
-from modules import Quran
+from domain.quran import Quran
 
 
 @pytest.fixture(scope="module")

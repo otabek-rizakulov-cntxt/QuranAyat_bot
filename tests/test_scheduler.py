@@ -1,4 +1,4 @@
-"""The due-queue scheduler (`src/lib/scheduler.py`) — workstream F.
+"""The due-queue scheduler (`src/infra/scheduler.py`) — workstream F.
 
 The acceptance criterion this file exists for is §7's:
 
@@ -20,10 +20,10 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
-from lib import scheduler
-from lib.scheduler import SendCtx, TickResult
-from lib.store import InMemoryStore
-from lib.store._state import MemoryState
+from infra import scheduler
+from infra.scheduler import SendCtx, TickResult
+from infra.store import InMemoryStore
+from infra.store._state import MemoryState
 
 UTC = timezone.utc
 
@@ -565,7 +565,7 @@ class TestRegistry:
         assert scheduler.SEND_HANDLERS["same"] is handler
 
     def test_registered_kinds_names_the_defining_module(self):
-        assert scheduler.registered_kinds()["message"] == "lib.scheduler"
+        assert scheduler.registered_kinds()["message"] == "infra.scheduler"
 
     async def test_the_builtin_message_kind_delivers_text(self, store, bot):
         await scheduler.enqueue(

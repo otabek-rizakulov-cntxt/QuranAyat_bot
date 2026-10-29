@@ -1,7 +1,7 @@
 """The mushaf page reader's pager.
 
 The page, not the ayah, is the unit people actually read and memorize in. A page
-card is one stitched image of the whole page (see lib/page_image.py) under a
+card is one stitched image of the whole page (see infra/page_image.py) under a
 1-604 pager, with its recitation one tap away rather than attached — a page of
 audio is ~1 MB nobody asked for if they only wanted to read.
 """
@@ -9,10 +9,10 @@ audio is ~1 MB nobody asked for if they only wanted to read.
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.verse import CODE_BY_TYPE
+from bot.miniapp import app_row
 from bot.text import nav_labels
-from lib.miniapp import app_row
+from domain.quran import Quran
 from locales import t
-from modules import Quran
 
 
 def page_keyboard(page: int, ui_lang: str) -> InlineKeyboardMarkup:

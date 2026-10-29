@@ -7,9 +7,9 @@ tests check that a session logged through `record_session` lands on the user's
 
 from datetime import date, datetime, timedelta, timezone
 
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
-from lib.streaks import (
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
+from services.streaks import (
     GRACE_DAYS,
     MILESTONE_DAYS,
     PERCENTILE_MIN_USERS,

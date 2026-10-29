@@ -7,8 +7,8 @@ from fastapi import APIRouter, Response
 
 from bot.limits import MAX_RANGE_AYAHS
 from bot.media import RANGE_AUDIO_PATH
+from domain.quran import Quran
 from infra import audio as cdn_audio
-from modules import Quran
 
 logger = logging.getLogger(__name__)
 

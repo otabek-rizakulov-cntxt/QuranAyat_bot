@@ -1,4 +1,4 @@
-"""The plan generator (`lib.plan_builder`).
+"""The plan generator (`domain.plan_builder`).
 
 D2's acceptance criterion is exact and is asserted exactly: al-Mulk over
 weekdays produces 15 advancing days ending on 67:30, with a consolidation day
@@ -14,8 +14,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from hifz.refs import juz_ref, page_ref, parse_reference, surah_ref
-from lib.plan_builder import (
+from domain.plan_builder import (
     AUTO_PACE,
     DRILL_PAGE,
     DRILL_RANGE,
@@ -25,9 +24,10 @@ from lib.plan_builder import (
     auto_pace,
     build_plan,
     next_scheduled_date,
-    to_day_specs,
 )
-from modules import Quran
+from domain.quran import Quran
+from domain.refs import juz_ref, page_ref, parse_reference, surah_ref
+from services.plans import to_day_specs
 
 WEEKDAYS = [1, 2, 3, 4, 5]
 EVERY_DAY = [1, 2, 3, 4, 5, 6, 7]
@@ -379,7 +379,7 @@ class TestPortionShape:
         assert Portion(MONDAY, 67, 5, 5).ayahs == 1
 
     def test_as_ref_round_trips_through_format(self):
-        from hifz.refs import format_ref
+        from domain.refs import format_ref
 
         assert format_ref(Portion(MONDAY, 67, 1, 12, DRILL_PAGE, 562).as_ref()) == "67:1-12"
         assert format_ref(Portion(MONDAY, 67, 5, 5).as_ref()) == "67:5"

@@ -9,7 +9,7 @@
 # grid is ~201x144 px, roughly 29k pixels, where a stitched mushaf page is tens
 # of millions. It is an order of magnitude cheaper than work this same instance
 # already does per /page. It is still bounded — the same loop-aware semaphore as
-# `lib/page_image.py`, because on a 512 MB box the rule is that nothing
+# `infra/page_image.py`, because on a 512 MB box the rule is that nothing
 # unbounded ever runs, not that this particular thing is small.
 #
 # Two production constraints shape the drawing:
@@ -30,9 +30,10 @@ from datetime import date, datetime, timedelta
 from io import BytesIO
 from typing import Iterable, Mapping, Optional, Union
 
-from lib.localtime import week_bounds
-from lib.store import get_store
-from lib.streaks import user_today
+from domain.localtime import week_bounds
+from domain.streaks import GRID_WEEKS  # re-exported
+from infra.store import get_store
+from services.streaks import user_today
 
 __all__ = [
     "GRID_WEEKS",
@@ -56,7 +57,6 @@ __all__ = [
     "cache_key",
 ]
 
-GRID_WEEKS = 12  # 12 columns x 7 rows = 84 days, one quarter
 
 CELL = 12  # a square day
 GAP = 3  # between squares

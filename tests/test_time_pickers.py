@@ -2,7 +2,7 @@
 /profile, the /memorize wizard and group setup share."""
 
 from bot.keyboards.time_pickers import offset_keyboard
-from lib.localtime import offset_options
+from domain.localtime import offset_options
 
 
 def _grid(markup):

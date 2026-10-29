@@ -4,7 +4,7 @@
 # whole feature is worthless if a user can pass by tapping the longest button
 # without reading Arabic. It sweeps every one of the 114 surahs.
 #
-# Everything here goes through `lib.recall_check`, which parses translations/ar.txt
+# Everything here goes through `domain.recall_check`, which parses translations/ar.txt
 # on the first question and caches it at class level for the process. That is one
 # 1.3 MB parse for the whole file — no test may pull in a second language, because
 # translations/ totals 71 MB and the production instance has 512 MB.
@@ -15,8 +15,8 @@ import unicodedata
 
 import pytest
 
-from lib import recall_check as rc
-from modules.quran import Quran, TranslationRegistry
+from domain import recall_check as rc
+from domain.quran import Quran, TranslationRegistry
 
 
 def _nfc(text: str) -> str:
@@ -243,7 +243,7 @@ def test_dates_and_iso_strings_are_interchangeable():
 def test_the_global_random_module_is_never_touched():
     """Seeding the global RNG must not change what a user sees.
 
-    `modules.quran` imports `random.randint` for /random, and any other test may
+    `domain.quran` imports `random.randint` for /random, and any other test may
     seed the global RNG. If this builder used it, a question would depend on
     whatever ran before it.
     """
@@ -417,7 +417,7 @@ def test_pick_ayahs_cannot_exceed_the_span():
 
 
 def test_pick_ayah_accepts_anything_with_as_tuple():
-    """i.e. a `hifz.refs.Ref`, without this module importing the hifz package."""
+    """i.e. a `domain.refs.Ref`, without this module importing the hifz package."""
 
     class FakeRef:
         def as_tuple(self):

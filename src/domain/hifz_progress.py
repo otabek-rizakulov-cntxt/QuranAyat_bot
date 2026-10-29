@@ -23,8 +23,8 @@ import math
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Sequence, Tuple
 
-from hifz.refs import Ref, contains, juz_ref, page_ref, surah_ref
-from modules import Quran
+from domain.quran import Quran
+from domain.refs import Ref, contains, juz_ref, page_ref, surah_ref
 
 __all__ = [
     "TOTAL_AYAHS",
@@ -44,7 +44,6 @@ __all__ = [
     "started_surahs",
     "started_juzs",
     "summarize",
-    "load_summary",
 ]
 
 # 6236. Summed from the corpus rather than written down, so it can never disagree
@@ -285,7 +284,7 @@ def _clip(ref: Ref, surah: int, start: int, end: int) -> Optional[Tuple[int, int
     This is the only piece of real geometry in the module, and it is here because
     a juz is a cross-surah span while an interval is per-surah: juz 1 runs
     1:1-2:141, so the user's single 2:1-286 row contributes 141 ayahs to juz 1 and
-    the rest to juz 2 and 3. Membership is asked of `hifz.refs.contains` rather
+    the rest to juz 2 and 3. Membership is asked of `domain.refs.contains` rather
     than re-derived, so mushaf ordering is defined in exactly one place.
 
     Clipping through here also makes the module robust to a row that runs past the
@@ -545,13 +544,3 @@ def summarize(intervals: Iterable, focus_surah: Optional[int] = None) -> Progres
         quran_pages=quran_page_progress(spans),
         focus_juz_pages=focus_juz_pages,
     )
-
-
-async def load_summary(store, user_id: int, focus_surah: Optional[int] = None) -> ProgressSummary:
-    """`summarize` over everything `user_id` has marked. One store round trip.
-
-    The whole interval set is read even when only one surah is being shown,
-    because the summary always carries the whole-Qur'an line and a per-surah query
-    could not produce it.
-    """
-    return summarize(await store.hifz.list_intervals(user_id), focus_surah)

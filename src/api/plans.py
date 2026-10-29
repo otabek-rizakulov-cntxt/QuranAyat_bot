@@ -8,11 +8,11 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
-from hifz.refs import KIND_RANGE, Ref, format_ref
-from lib.localtime import DEFAULT_OFFSET, is_valid_offset
-from lib.plan_builder import AUTO_PACE, advancing
-from lib.store import get_store
-from lib.store.plans import DAY_COMPLETED
+from domain.localtime import DEFAULT_OFFSET, is_valid_offset
+from domain.plan_builder import AUTO_PACE, advancing
+from domain.refs import KIND_RANGE, Ref, format_ref
+from infra.store import get_store
+from infra.store.plans import DAY_COMPLETED
 from services import plans as plans_service
 from services import profile as profile_service
 

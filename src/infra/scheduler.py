@@ -35,8 +35,8 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 
 import telegram
 
-from lib.localtime import local_date, next_due_utc
-from lib.store.schedule import ScheduledSend
+from domain.localtime import local_date, next_due_utc
+from infra.store.schedule import ScheduledSend
 
 logger = logging.getLogger(__name__)
 
@@ -90,11 +90,11 @@ CATCH_UP_WINDOW = timedelta(hours=6)
 # The scheduler knows how to claim a row, when to give up on it and how to keep
 # the queue moving. It deliberately knows nothing about what a 'plan_day' *is* —
 # that is the drill's business. Feature modules register a coroutine per `kind`,
-# exactly as `src/hifz/__init__.py` registers commands, so nobody has to edit
+# exactly as `src/bot/features/__init__.py` registers commands, so nobody has to edit
 # this file to add a scheduled send:
 #
-#     # src/hifz/memorize.py
-#     from lib.scheduler import SendCtx, send_handler
+#     # src/bot/features/memorize.py
+#     from infra.scheduler import SendCtx, send_handler
 #
 #     @send_handler("plan_day")
 #     async def push_plan_day(ctx: SendCtx) -> None:
@@ -147,7 +147,7 @@ def register_send_handler(kind: str, handler: SendHandler) -> SendHandler:
     """Bind `kind` to `handler`. Registering a kind twice raises.
 
     A silent overwrite would mean one feature module quietly stealing another's
-    sends, so this fails at import time instead — same rule as `hifz.command`.
+    sends, so this fails at import time instead — same rule as `bot.features.command`.
     """
     existing = SEND_HANDLERS.get(kind)
     if existing is not None and existing is not handler and not _same_origin(existing, handler):
@@ -162,7 +162,7 @@ def register_send_handler(kind: str, handler: SendHandler) -> SendHandler:
 def _same_origin(a, b) -> bool:
     """Whether two functions are the same declaration, across a module reload.
 
-    Identity is the obvious test and the wrong one: `hifz.load_features` reloads
+    Identity is the obvious test and the wrong one: `bot.features.load_features` reloads
     already-imported feature modules so their decorators run again, and a reload
     produces a *new* function object for the same `def`. Under identity that reads
     as a second module stealing the kind and raises. Module plus qualified name is
@@ -195,7 +195,7 @@ def registered_kinds() -> Dict[str, str]:
 class SendCtx:
     """Everything a scheduled-send handler needs, assembled once per row.
 
-    Deliberately shaped like `hifz.Ctx`: a handler reads its context and writes
+    Deliberately shaped like `bot.features.Ctx`: a handler reads its context and writes
     through `store`. There is no `ui_lang` here — a scheduled push happens
     outside any update, so the handler looks the recipient's settings up itself
     (`store.profiles.get_settings`), which is also what makes a group post in one
@@ -204,8 +204,8 @@ class SendCtx:
 
     bot: Any  # telegram.Bot (an AsyncMock under test)
     data: dict  # the shared corpora dict built by main.build_data
-    file: Any  # lib.utils.File — media cache + nav state
-    store: Any  # lib.store.Store
+    file: Any  # infra.file_facade.File — media cache + nav state
+    store: Any  # infra.store.Store
     send: ScheduledSend  # the row being delivered
     # The tick's notion of "now". A handler that queues a follow-up (the next
     # portion, next week's board) computes it from this, not from the wall
@@ -289,7 +289,7 @@ async def schedule_daily(
     """Queue the next occurrence of a daily push at the user's local `reminder_time`.
 
     `offset` is a fixed UTC offset (`"+05:00"`); all the arithmetic goes through
-    `lib.localtime`, never through hand-rolled timedeltas. The due instant is the
+    `domain.localtime`, never through hand-rolled timedeltas. The due instant is the
     first one strictly after `now` at which the recipient's wall clock reads
     `reminder_time`, and the key is keyed on the *local* date of that instant —
     so scheduling twice in the same local day is a no-op, and the row for
@@ -331,7 +331,7 @@ class TickResult:
 # An asyncio primitive binds to the loop it is first awaited in, and pytest gives
 # every test its own loop, so a module-level Lock would hang the second test that
 # touched it. Rebuild it whenever the running loop changes — the same pattern as
-# `lib/page_image.py`'s stitch semaphore and `lib/store/__init__.py`'s creation
+# `infra/page_image.py`'s stitch semaphore and `infra/store/__init__.py`'s creation
 # lock. The lock itself exists so a manual `tick()` (boot catch-up, a test) can
 # never interleave with the polling loop's tick and claim the same batch twice.
 _tick_lock_obj = None
@@ -423,8 +423,8 @@ async def tick(
 
 
 async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
-    from lib.store import get_store
-    from lib.utils import File
+    from infra.file_facade import File
+    from infra.store import get_store
 
     now = _utcnow(now)
     store = store if store is not None else await get_store()

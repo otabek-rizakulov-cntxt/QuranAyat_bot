@@ -2,9 +2,8 @@
 
 import html
 
+from domain.quran import Quran, get_translation
 from locales import DEFAULT_LANG, get_language, t
-from modules import Quran
-from modules.quran import get_translation
 
 
 def reference(surah: int, ayah: int, ui_lang: str, end: int | None = None) -> str:

@@ -15,17 +15,17 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz import memorize as memorize_feature
-from lib import scheduler
-from lib.hifz_progress import summarize
-from lib.leaderboard import weekly_board
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
-from lib.streaks import record_session, streak_summary
-from lib.wizard import Wizard
+from bot.features import Ctx
+from bot.features import memorize as memorize_feature
+from domain.hifz_progress import summarize
+from infra import scheduler
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
+from infra.wizard_store import Wizard
+from services.leaderboard import weekly_board
+from services.streaks import record_session, streak_summary
 
 USER = 990001
 CHAT = 990001
@@ -70,7 +70,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, user=USER, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}
@@ -406,7 +406,7 @@ class TestSevenTheCommandsExist:
         """A loop nobody starts is a feature nobody gets."""
         source = open("src/app/lifespan.py", encoding="utf-8").read()  # boot sequence
         assert "run_scheduler" in source
-        assert "hifz.load_features()" in source
-        assert source.index("hifz.load_features()") < source.index("run_scheduler"), (
+        assert "features.load_features()" in source
+        assert source.index("features.load_features()") < source.index("run_scheduler"), (
             "handlers must be registered before the loop that dispatches to them"
         )

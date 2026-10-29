@@ -3,10 +3,10 @@
 # Owns: /streak, the 12-week activity graph, and the fixed milestone copy at
 # 7 / 30 / 100 / 365 days. A day ticks when a session is completed, never when a
 # command is typed, so the grid is bot-measured throughout.
-# Callback prefix: "hs:" (see hifz.PREFIXES).
+# Callback prefix: "hs:" (see bot.features.PREFIXES).
 #
 # **The grid is a PNG, not an emoji block.** §4 G2 and assumption 1 called for an
-# emoji grid; that was overridden with approval and `lib/streak_image.py` renders
+# emoji grid; that was overridden with approval and `bot/streak_image.py` renders
 # a real contribution graph. An emoji grid wraps at a different column on every
 # client; a PNG is one image that looks the same everywhere, and it is the thing
 # people screenshot into their circle.
@@ -23,10 +23,10 @@ import logging
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.features import Ctx, callback, command
 from bot.media import send_cached
-from hifz import Ctx, callback, command
-from lib.streak_image import cache_key, render_streak_graph
-from lib.streaks import StreakSummary, streak_summary
+from bot.streak_image import cache_key, render_streak_graph
+from services.streaks import StreakSummary, streak_summary
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ CB_GRID = "hs:grid"
 
 # The check module's "start a check" tap, spelled out rather than imported: the
 # seam guarantees one broken feature module cannot take another down, and an
-# import here would give that guarantee back. See hifz.PREFIXES ("hc:").
+# import here would give that guarantee back. See bot.features.PREFIXES ("hc:").
 CB_CHECK_START = "hc:start"
 
 

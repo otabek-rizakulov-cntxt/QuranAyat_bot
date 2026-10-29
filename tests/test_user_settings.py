@@ -1,4 +1,4 @@
-"""Durable per-user settings (`lib.user_settings.UserSettings`).
+"""Durable per-user settings (`services.user_settings.UserSettings`).
 
 Exercised against the in-process in-memory store + MemoryStore stand-ins that
 conftest pins via empty DATABASE_URL / REDIS_HOST_URL, so nothing here touches a
@@ -7,13 +7,13 @@ are independent by design; that independence and the one-shot migration of the
 legacy Redis `lang:<chat_id>` key are what this module protects.
 """
 
-from lib.user_settings import (
+from infra.file_facade import File
+from services.user_settings import (
     DEFAULT_RECITER,
     DEFAULT_TRANSLATION_LANG,
     DEFAULT_UI_LANG,
     UserSettings,
 )
-from lib.utils import File
 
 
 def _seed_legacy_lang(chat_id: int, code: str) -> None:

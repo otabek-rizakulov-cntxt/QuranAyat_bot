@@ -1,4 +1,4 @@
-"""The recall check (`src/hifz/check.py`) — spec items E2 and E3.
+"""The recall check (`src/bot/features/check.py`) — spec items E2 and E3.
 
 This is the feature that makes the leaderboard fair to someone memorizing from a
 paper mushaf: it measures hifz, not app usage. So the tests that matter most are
@@ -19,15 +19,15 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz.check import CB_ANSWER, CB_START, _parse_answer
-from lib.recall_check import OPTION_COUNT, build_question
-from lib.store import get_store
-from lib.store.sessions import KIND_RECALL_CHECK
-from lib.streaks import streak_summary, user_today
+from bot.features import Ctx
+from bot.features.check import CB_ANSWER, CB_START, _parse_answer
+from domain.recall_check import OPTION_COUNT, build_question
+from infra.store import get_store
+from infra.store.sessions import KIND_RECALL_CHECK
 from locales import t
+from services.streaks import streak_summary, user_today
 
 USER = 900_501
 
@@ -58,7 +58,7 @@ def _callback_query(message_id: int = 11):
 
 
 async def _ctx(bot=None, **kwargs) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     return await Ctx.build(bot or AsyncMock(), {}, File(), USER, USER, _Settings(), **kwargs)
 
@@ -142,7 +142,7 @@ class TestCheckEntryPoint:
         assert t("check_usage", "en") in text
 
     async def test_bare_check_prefers_the_plan_portion_already_reached(self):
-        from lib.store.plans import PlanDaySpec
+        from infra.store.plans import PlanDaySpec
 
         store = await get_store()
         today = await user_today(USER)
@@ -345,7 +345,7 @@ class TestCallbackDataDiscipline:
     async def test_garbage_is_acknowledged_and_dropped(self, cb_data):
         # Called directly rather than through dispatch_callback, which would
         # swallow an exception and make a crash look like a clean drop.
-        from hifz.check import on_check
+        from bot.features.check import on_check
 
         bot = AsyncMock()
         ctx = await _ctx(bot=bot, callback_query=_callback_query())

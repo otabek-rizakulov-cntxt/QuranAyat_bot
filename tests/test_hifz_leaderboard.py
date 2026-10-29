@@ -14,11 +14,11 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL
+from bot.features import Ctx
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL
 
 USER_ID = 930001
 CHAT_ID = 930001
@@ -61,7 +61,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, user_id=USER_ID, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}
@@ -100,7 +100,7 @@ class TestBoard:
 
     async def test_an_opted_out_user_is_absent_from_the_query_not_just_the_render(self):
         """H1's done-when, asserted at the source rather than in the text."""
-        from lib.leaderboard import weekly_board
+        from services.leaderboard import weekly_board
 
         store = await get_store()
         await _join(store, USER_ID, "Otabek")
@@ -117,7 +117,7 @@ class TestBoard:
 
     async def test_a_user_outside_the_top_ten_still_sees_their_own_rank(self):
         """ "a user ranked 400th sees rows 1-10 plus their own row"."""
-        from lib.leaderboard import weekly_board
+        from services.leaderboard import weekly_board
 
         store = await get_store()
         # twenty people ahead of the caller
@@ -136,7 +136,7 @@ class TestBoard:
         assert board.me_in_top is False
 
     async def test_a_user_inside_the_top_is_not_drawn_twice(self):
-        from lib.leaderboard import weekly_board
+        from services.leaderboard import weekly_board
 
         store = await get_store()
         await _join(store, USER_ID, "Otabek")
@@ -163,14 +163,14 @@ class TestBoard:
         assert bot.send_message.await_args.kwargs.get("reply_markup") is not None
 
     async def test_the_window_is_monday_to_sunday(self):
-        from lib.leaderboard import week_window
+        from services.leaderboard import week_window
 
         start, end = week_window(NOW, "+00:00")
         assert start.weekday() == 0 and end.weekday() == 6
         assert (end - start).days == 6
 
     async def test_a_session_from_last_week_does_not_count(self):
-        from lib.leaderboard import weekly_board
+        from services.leaderboard import weekly_board
 
         store = await get_store()
         await _join(store, USER_ID, "Otabek")

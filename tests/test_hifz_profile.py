@@ -12,11 +12,11 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz import profile as profile_feature
-from lib.store import get_store
+from bot.features import Ctx
+from bot.features import profile as profile_feature
+from infra.store import get_store
 
 USER_ID = 900123
 CHAT_ID = 900123
@@ -65,7 +65,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, username=None, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery(username)} if tap else {"message": _Message(username)}
@@ -153,7 +153,7 @@ class TestProfileCard:
         )
 
     async def test_an_active_plan_is_named_with_its_progress(self):
-        from lib.store.plans import PlanDaySpec
+        from infra.store.plans import PlanDaySpec
 
         store = await get_store()
         days = [PlanDaySpec(date(2026, 8, 1), 67, 1, 5), PlanDaySpec(date(2026, 8, 2), 67, 6, 10)]
@@ -264,9 +264,9 @@ class TestLeaderboardOptIn:
 
     async def test_opt_out_removes_the_user_from_every_board_query(self):
         # B2's done-when, second half: absent from the *query*, not hidden by the
-        # renderer (lib/leaderboard.py refuses to filter at render time).
-        from lib.leaderboard import weekly_board
-        from lib.streaks import record_session
+        # renderer (services/leaderboard.py refuses to filter at render time).
+        from services.leaderboard import weekly_board
+        from services.streaks import record_session
 
         store = await get_store()
         ctx = await _ctx(username="abubakr", tap=True)
@@ -291,7 +291,7 @@ class TestLeaderboardOptIn:
         # `hifz/leaderboard.py` hard-codes "hp:board:on" rather than importing it,
         # so that a broken profile module cannot take the board down with it. That
         # only holds if this module actually answers that exact shape.
-        from hifz import leaderboard as board_feature
+        from bot.features import leaderboard as board_feature
 
         assert board_feature.CB_JOIN == profile_feature.BOARD_ON_CB
         ctx = await _ctx(username="abubakr", tap=True)
@@ -320,7 +320,7 @@ class TestLeaderboardOptIn:
 
 class TestTimezone:
     async def test_the_picker_offers_every_offset(self):
-        from lib.localtime import OFFSET_CHOICES
+        from domain.localtime import OFFSET_CHOICES
 
         bot = AsyncMock()
         ctx = await _ctx(bot, tap=True)
@@ -342,9 +342,9 @@ class TestTimezone:
 
     async def test_changing_the_timezone_shifts_the_next_push(self):
         # B3's done-when. The scheduler queues each day's push from the profile as
-        # it stands (lib.scheduler.schedule_daily), so the stored offset is the
+        # it stands (infra.scheduler.schedule_daily), so the stored offset is the
         # only thing that has to move.
-        from lib.scheduler import schedule_daily
+        from infra.scheduler import schedule_daily
 
         store = await get_store()
         now = datetime(2026, 8, 5, 0, 0, tzinfo=timezone.utc)

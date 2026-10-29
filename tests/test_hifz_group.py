@@ -12,11 +12,11 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz import group as G
-from lib.store import get_store
+from bot.features import Ctx
+from bot.features import group as G
+from infra.store import get_store
 
 ADMIN = 500
 CHAT = -100200300
@@ -52,7 +52,7 @@ def _bot(**kw):
 
 
 async def _ctx(bot, user=ADMIN, chat=ADMIN):
-    from lib.utils import File
+    from infra.file_facade import File
 
     return await Ctx.build(bot, {}, File(), chat, user, _Settings())
 
@@ -294,7 +294,7 @@ class TestPlanWizard:
     async def test_an_empty_offset_falls_back_to_the_default(self):
         # Regression: both fallbacks named DEFAULT_OFFSET without importing it,
         # so an offset-less tap crashed the wizard with a NameError.
-        from lib.localtime import DEFAULT_OFFSET
+        from domain.localtime import DEFAULT_OFFSET
 
         store = await get_store()
         bot = _bot(
@@ -343,7 +343,7 @@ class TestDailyPost:
     async def _saved_plan(self, store):
         from datetime import date
 
-        from lib.store.plans import PlanDaySpec
+        from infra.store.plans import PlanDaySpec
 
         await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
         from datetime import time as _time
@@ -370,8 +370,8 @@ class TestDailyPost:
         )
 
     async def test_a_post_delivers_to_the_topic_and_queues_the_next(self, monkeypatch):
-        from lib import scheduler
-        from lib.scheduler import SendCtx
+        from infra import scheduler
+        from infra.scheduler import SendCtx
 
         store = await get_store()
         plan = await self._saved_plan(store)
@@ -384,7 +384,7 @@ class TestDailyPost:
         ):
             posted["audio"] = (s, a, b, chat_id, message_thread_id)
 
-        monkeypatch.setattr("hifz.group.send_combined_audio", fake_audio)
+        monkeypatch.setattr("bot.features.group.send_combined_audio", fake_audio)
 
         bot = AsyncMock()
         row = SimpleNamespace(
@@ -406,15 +406,15 @@ class TestDailyPost:
         assert pending, "next portion queued"
 
     async def test_a_second_delivery_of_the_same_day_is_a_no_op(self, monkeypatch):
-        from lib import scheduler
-        from lib.scheduler import SendCtx
+        from infra import scheduler
+        from infra.scheduler import SendCtx
 
         store = await get_store()
         plan = await self._saved_plan(store)
         day = (await store.groups.list_plan_days(plan.id))[0]
         await store.groups.claim_plan_day(day.id)  # already sent
 
-        monkeypatch.setattr("hifz.group.send_combined_audio", AsyncMock())
+        monkeypatch.setattr("bot.features.group.send_combined_audio", AsyncMock())
         bot = AsyncMock()
         row = SimpleNamespace(
             id=1,
@@ -429,8 +429,8 @@ class TestDailyPost:
         bot.send_message.assert_not_awaited()  # nothing re-posted
 
     async def test_a_paused_group_posts_nothing(self, monkeypatch):
-        from lib import scheduler
-        from lib.scheduler import SendCtx
+        from infra import scheduler
+        from infra.scheduler import SendCtx
 
         store = await get_store()
         plan = await self._saved_plan(store)
@@ -472,7 +472,7 @@ class TestBoard:
     async def test_board_ranks_linked_members_by_sessions(self, monkeypatch):
         from datetime import date, datetime, timezone
 
-        from lib.store.sessions import KIND_DRILL
+        from infra.store.sessions import KIND_DRILL
 
         store = await get_store()
         await self._group(store)
@@ -494,7 +494,7 @@ class TestBoard:
     async def test_a_member_who_left_is_dropped(self, monkeypatch):
         from datetime import date, datetime, timezone
 
-        from lib.store.sessions import KIND_DRILL
+        from infra.store.sessions import KIND_DRILL
 
         store = await get_store()
         await self._group(store)
@@ -559,8 +559,8 @@ class TestBoard:
         assert G.SEND_KIND in kinds and G.BOARD_KIND in kinds
 
     async def test_board_send_handler_reposts_weekly(self):
-        from lib import scheduler
-        from lib.scheduler import SendCtx
+        from infra import scheduler
+        from infra.scheduler import SendCtx
 
         store = await get_store()
         await self._group(store)

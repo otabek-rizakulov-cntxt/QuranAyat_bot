@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from config.settings import get_settings
+from domain.quran import Quran, TranslationRegistry
 from infra import nav_state
 from locales import LANGUAGES, UI_LANGUAGES
-from modules import Quran, TranslationRegistry
 from services.reciters import _KIND_WARNING_KEYS, RECITER_KINDS, reciter_catalog
 
 from .auth import require_user

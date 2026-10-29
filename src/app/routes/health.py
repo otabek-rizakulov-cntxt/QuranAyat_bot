@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, Response
 
-from config.redis import cache_backend
-from lib.store import store_backend
+from infra.redis_client import cache_backend
+from infra.store import store_backend
 
 router = APIRouter()
 

@@ -5,8 +5,8 @@ from telegram import ReplyKeyboardRemove
 from bot.context import Ctx
 from bot.keyboards.language import language_keyboard, translation_language_keyboard
 from bot.router import callback, command
-from lib.user_settings import UserSettings
 from locales import get_language, normalize_lang, t
+from services.user_settings import UserSettings
 
 
 @command("language")

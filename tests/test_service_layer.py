@@ -2,7 +2,7 @@
 
 `src/services/` is shared by the bot and the Mini App API, so it must not depend
 on Telegram; `src/api/` is an HTTP adapter, so it must not hold SQL — storage
-goes through `lib.store`, the same as the bot."""
+goes through `infra.store`, the same as the bot."""
 
 import ast
 import os

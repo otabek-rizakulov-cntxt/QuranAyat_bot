@@ -1,9 +1,9 @@
-"""`/streak` (`src/hifz/streak.py`) — spec items G2 and G3.
+"""`/streak` (`src/bot/features/streak.py`) — spec items G2 and G3.
 
 Two properties are load-bearing:
 
 * **The 12-week grid is a rendered PNG.** §4 G2 and assumption 1 asked for an
-  emoji grid; that was overridden with approval. `lib/streak_image.py` renders
+  emoji grid; that was overridden with approval. `bot/streak_image.py` renders
   the card and this module sends it, caching the Telegram `file_id` per
   (user, local date) so a user hammering /streak pays for one render a day.
 * **No percentile line is ever rendered.** G3 holds "top X% of users" dark until
@@ -19,15 +19,15 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz.streak import CB_GRID
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
-from lib.streak_image import cache_key
-from lib.streaks import refresh_streaks, user_today
+from bot.features import Ctx
+from bot.features.streak import CB_GRID
+from bot.streak_image import cache_key
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
 from locales import t
+from services.streaks import refresh_streaks, user_today
 
 USER = 900_601
 MILESTONES = (
@@ -64,7 +64,7 @@ def _photo_message(file_id: str = "FILEID"):
 
 
 async def _ctx(bot=None, **kwargs) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     bot.send_photo.return_value = _photo_message()
@@ -215,8 +215,8 @@ class TestMilestones:
 
 class TestGraphCache:
     async def test_the_graph_is_rendered_once_a_day_and_re_sent_from_the_file_id(self, monkeypatch):
-        import hifz.streak as streak_module
-        from lib.utils import File
+        import bot.features.streak as streak_module
+        from infra.file_facade import File
 
         renders = []
         original = streak_module.render_streak_graph
@@ -237,7 +237,7 @@ class TestGraphCache:
         assert second.send_photo.await_args.kwargs["photo"] == "FILEID"
 
     async def test_the_cache_is_keyed_per_user_and_per_local_day(self):
-        from lib.utils import File
+        from infra.file_facade import File
 
         today = await _earn((0,))
         await _streak()
@@ -247,7 +247,7 @@ class TestGraphCache:
         assert File().get_file(cache_key(USER + 1, today)) is None
 
     async def test_a_rejected_file_id_falls_back_to_a_fresh_upload(self):
-        from lib.utils import File
+        from infra.file_facade import File
 
         today = await _earn((0,))
         File().save_file(cache_key(USER, today), "STALE")
@@ -281,7 +281,7 @@ class TestCallback:
 
     @pytest.mark.parametrize("cb_data", ["hs:", "hs:grid:extra", "hs:garbage"])
     async def test_an_unknown_shape_is_acknowledged_and_ignored(self, cb_data):
-        from hifz.streak import on_streak
+        from bot.features.streak import on_streak
 
         bot = AsyncMock()
         cq = type("CQ", (), {"id": "cq-1", "message": None})()

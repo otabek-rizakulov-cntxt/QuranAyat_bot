@@ -1,4 +1,4 @@
-"""One contract, two implementations (`lib.store`).
+"""One contract, two implementations (`infra.store`).
 
 Every test in this file runs twice: once against `InMemoryStore` and once against
 `PostgresStore`. That is the entire point of the file — the in-memory store is
@@ -17,8 +17,8 @@ from datetime import date, datetime, time, timedelta, timezone
 
 import pytest
 
-from lib.store import InMemoryStore, PostgresStore
-from lib.store.plans import (
+from infra.store import InMemoryStore, PostgresStore
+from infra.store.plans import (
     DAY_COMPLETED,
     DAY_PENDING,
     DAY_SENT,
@@ -27,8 +27,8 @@ from lib.store.plans import (
     PLAN_PAUSED,
     PlanDaySpec,
 )
-from lib.store.schedule import STATE_CLAIMED, STATE_FAILED, STATE_PENDING, STATE_SENT
-from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
+from infra.store.schedule import STATE_CLAIMED, STATE_FAILED, STATE_PENDING, STATE_SENT
+from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
 
 # Child-first, so the plan_day -> plan foreign key never blocks the truncate.
 _TABLES = (

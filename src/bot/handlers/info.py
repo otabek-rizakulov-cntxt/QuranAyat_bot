@@ -3,9 +3,9 @@
 from telegram import InlineKeyboardMarkup, ReplyKeyboardRemove
 
 from bot.context import Ctx
+from bot.features import group as hifz_group
+from bot.miniapp import app_row
 from bot.router import command
-from hifz import group as hifz_group
-from lib.miniapp import app_row
 from locales import t, welcome_text
 
 

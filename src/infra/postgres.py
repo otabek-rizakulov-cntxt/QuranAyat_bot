@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from .settings import get_settings
+from config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ _pool = None
 _pool_resolved = False
 
 # Why the last attempt to get a pool failed, or None. Read by the health check
-# (`lib.store.store_backend`) to tell "down" apart from "not tried yet".
+# (`infra.store.store_backend`) to tell "down" apart from "not tried yet".
 last_error = None
 
 _pool_lock = None
@@ -26,7 +26,7 @@ def _lock() -> asyncio.Lock:
     An asyncio.Lock binds to the loop it is first awaited in. Production has a
     single loop for the process lifetime; pytest-asyncio gives each test its own,
     so a module-level lock would be bound to a dead loop by the second test. Same
-    pattern as `lib/page_image.py`'s stitch semaphore.
+    pattern as `infra/page_image.py`'s stitch semaphore.
     """
     global _pool_lock, _pool_lock_loop
     loop = asyncio.get_running_loop()
@@ -128,7 +128,7 @@ async def close_pool():
 
 
 def reset_for_tests():
-    """Forget the pool and its creation lock. Called by `lib.store.reset_for_tests`."""
+    """Forget the pool and its creation lock. Called by `infra.store.reset_for_tests`."""
     global _pool, _pool_resolved, _pool_lock, _pool_lock_loop, last_error
     _pool = None
     _pool_resolved = False

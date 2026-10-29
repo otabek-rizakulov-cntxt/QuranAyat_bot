@@ -1,7 +1,7 @@
 """Reading the caller's durable settings at the start of an update."""
 
-from lib.user_settings import UserSettings
 from locales import normalize_lang
+from services.user_settings import UserSettings
 
 
 async def resolve_settings(user_settings: UserSettings, chat_id, tg_user):

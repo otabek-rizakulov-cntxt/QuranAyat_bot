@@ -5,8 +5,8 @@ from typing import Optional
 from fastapi import HTTPException, status
 from pydantic import BaseModel
 
-from hifz.refs import Ref, format_ref, parse_reference
-from modules import Quran
+from domain.quran import Quran
+from domain.refs import Ref, format_ref, parse_reference
 
 
 class RefOut(BaseModel):

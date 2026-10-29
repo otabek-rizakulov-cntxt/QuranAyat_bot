@@ -12,7 +12,7 @@
 #   * `config.settings` reads deterministic values, and
 #   * `main.load_dotenv()` (which does NOT override already-set vars) can never
 #     pull real secrets from a local `.env` into the test process.
-# An empty REDIS_HOST_URL forces the in-memory store (config/redis.py), so tests
+# An empty REDIS_HOST_URL forces the in-memory store (infra/redis_client.py), so tests
 # never touch the network or a real Redis.
 
 import os
@@ -46,14 +46,14 @@ def _clean_state_store():
     Both live on process-wide module state, so without this one test's saved
     user state / language / reciter would leak into the next.
 
-    `lib.store.reset_for_tests()` drops the store singleton, every in-memory row
+    `infra.store.reset_for_tests()` drops the store singleton, every in-memory row
     and the creation locks. The locks matter because an asyncio.Lock binds to the
     loop it is first awaited in and pytest-asyncio gives each test its own loop;
     production has a single loop for the process lifetime, so this only bites
     under test.
     """
-    from lib.store import reset_for_tests
-    from lib.utils import File
+    from infra.file_facade import File
+    from infra.store import reset_for_tests
 
     redis = File().redis
     if hasattr(redis, "_data"):  # MemoryStore, not a real Redis connection

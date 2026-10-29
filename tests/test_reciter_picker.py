@@ -15,8 +15,8 @@ import app.lifespan as lifespan
 import bot.dispatch as dispatch
 import bot.keyboards.reciter as reciter_kb
 import services.reciters as reciters
-from lib.user_settings import UserSettings
-from lib.utils import File
+from infra.file_facade import File
+from services.user_settings import UserSettings
 
 
 @pytest.fixture(scope="module")
@@ -335,7 +335,7 @@ class TestCatalogKinds:
         assert reciters.reciter_kind("Retired_Reciter_64kbps") == "recitation"
 
     def test_the_default_reciter_is_ordinary_recitation(self):
-        from lib.user_settings import DEFAULT_RECITER
+        from services.user_settings import DEFAULT_RECITER
 
         assert reciters.reciter_kind(DEFAULT_RECITER) == "recitation"
 

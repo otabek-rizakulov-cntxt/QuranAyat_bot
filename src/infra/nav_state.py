@@ -4,14 +4,14 @@ from typing import Optional
 
 import ujson as json
 
-from config import RedisSingleton
+from infra.redis_client import RedisSingleton
 
 
 async def save(chat_id: int, surah: int, ayah: int, view: str) -> None:
     """Remember the reader's position. Durable — it lives in the store
     (`reader_position`); the old two-day Redis key meant a reader who paused for a
     few days restarted at 1:1."""
-    from lib.store import get_store  # lazy: lib.store imports lib, which imports this
+    from infra.store import get_store  # lazy: infra.store imports lib, which imports this
 
     store = await get_store()
     await store.profiles.save_reader_position(chat_id, surah, ayah, view)
@@ -23,7 +23,7 @@ async def get(chat_id: int) -> Optional[list]:
     Falls back to the legacy Redis key so positions saved before the move to the
     store survive the deploy that introduced it.
     """
-    from lib.store import get_store
+    from infra.store import get_store
 
     store = await get_store()
     position = await store.profiles.get_reader_position(chat_id)

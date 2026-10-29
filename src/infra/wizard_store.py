@@ -15,7 +15,7 @@
 #
 # Storage: `RedisSingleton().connection`, the same store the navigation state
 # uses. **With REDIS_HOST_URL unset the backing store is the in-process
-# `MemoryStore` (see config/redis.py), so a draft does not survive a restart and
+# `MemoryStore` (see infra/redis_client.py), so a draft does not survive a restart and
 # is not shared between processes.** That is acceptable here: a draft lives for
 # 30 minutes, the deployment is a single worker, and losing one means the user
 # re-runs `/memorize` — no durable state is involved, since nothing is written to
@@ -25,7 +25,7 @@ from typing import Any, Dict, Optional
 
 import ujson as json
 
-from config import RedisSingleton
+from infra.redis_client import RedisSingleton
 
 __all__ = ["Wizard", "DRAFT_TTL", "CANCEL_COMMANDS"]
 
@@ -43,7 +43,7 @@ class Wizard:
     """Per-user draft state for a multi-step flow.
 
     A draft is `{"kind": str, "step": str, "data": dict}`. `kind` names the
-    wizard (and is what `hifz.dispatch_wizard` routes on), `step` is that
+    wizard (and is what `bot.features.dispatch_wizard` routes on), `step` is that
     wizard's own business, and `data` accumulates the answers.
     """
 

@@ -19,9 +19,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timezone
 from typing import List, Optional, Sequence
 
-from hifz.refs import KIND_JUZ, KIND_RANGE, KIND_SURAH, Ref, format_ref, juz_ref
-from lib.hifz_progress import load_summary
-from lib.localtime import (
+from domain.localtime import (
     DEFAULT_OFFSET,
     is_valid_offset,
     local_date,
@@ -29,13 +27,22 @@ from lib.localtime import (
     normalize_offset,
     to_utc,
 )
-from lib.plan_builder import AUTO_PACE, Portion, advancing, build_plan, to_day_specs
-from lib.scheduler import enqueue
-from lib.store.plans import DAY_COMPLETED, DAY_PENDING, PLAN_ACTIVE, PLAN_COMPLETE, PLAN_PAUSED
-from lib.store.sessions import KIND_DRILL
-from lib.streaks import record_session
-from modules import Quran
+from domain.plan_builder import AUTO_PACE, Portion, advancing, build_plan
+from domain.quran import Quran
+from domain.refs import KIND_JUZ, KIND_RANGE, KIND_SURAH, Ref, format_ref, juz_ref
+from infra.scheduler import enqueue
+from infra.store.plans import (
+    DAY_COMPLETED,
+    DAY_PENDING,
+    PLAN_ACTIVE,
+    PLAN_COMPLETE,
+    PLAN_PAUSED,
+    PlanDaySpec,
+)
+from infra.store.sessions import KIND_DRILL
 from services.profile import as_time
+from services.progress import load_summary
+from services.streaks import record_session
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +56,15 @@ PAUSE, RESUME, ABANDON = "pause", "resume", "abandon"
 # A reminder time is required to queue a push; a plan saved without one (the
 # Mini App lets the profile carry it) falls back to this.
 DEFAULT_REMINDER = time(7, 0)
+
+
+def to_day_specs(portions: Sequence[Portion]) -> list:
+    """`Portion`s as `PlanDaySpec`s, ready for `store.plans.create_plan`.
+
+    Here rather than in domain.plan_builder: the generator is pure, and this is
+    where its output becomes rows of the repository layer.
+    """
+    return [PlanDaySpec(p.scheduled_date, p.surah, p.start_ayah, p.end_ayah) for p in portions]
 
 
 def utcnow() -> datetime:

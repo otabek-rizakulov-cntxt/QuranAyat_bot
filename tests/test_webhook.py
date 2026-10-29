@@ -64,7 +64,7 @@ async def test_startup_registers_the_webhook_without_the_token(monkeypatch):
     monkeypatch.setenv("WEBHOOK_URL", "https://bot.example")
     monkeypatch.setattr(lifespan, "create_bot", lambda settings: bot)
     monkeypatch.setattr(lifespan, "build_data", lambda: {})
-    monkeypatch.setattr(lifespan.hifz, "load_features", lambda: None)
+    monkeypatch.setattr(lifespan.features, "load_features", lambda: None)
     monkeypatch.setattr(lifespan, "spawn", lambda coro: coro.close())
     await lifespan.initialize(AppState())
 

@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from config import RedisSingleton
-
-from .store import get_store
-from .store.profiles import UserSettingsRow
+from infra.redis_client import RedisSingleton
+from infra.store import get_store
+from infra.store.profiles import UserSettingsRow
 
 DEFAULT_UI_LANG = "en"
 DEFAULT_TRANSLATION_LANG = "en"
@@ -34,7 +33,7 @@ class UserSettings:
     equal there, but the inline-query path only ever has a user id, and keying
     on user id keeps both paths consistent without ever needing to revisit this.
 
-    Persistence lives in `lib.store.profiles`; this class holds no SQL. The one
+    Persistence lives in `infra.store.profiles`; this class holds no SQL. The one
     thing it does still own is the legacy Redis read/delete around row creation —
     the store layer has no business knowing Redis exists, and the migration is a
     property of *this* module's history, not of the settings table.

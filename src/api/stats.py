@@ -6,11 +6,11 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from lib.leaderboard import weekly_board
-from lib.localtime import week_bounds
-from lib.store import get_store
-from lib.streak_image import GRID_WEEKS
-from lib.streaks import streak_summary
+from domain.localtime import week_bounds
+from domain.streaks import GRID_WEEKS
+from infra.store import get_store
+from services.leaderboard import weekly_board
+from services.streaks import streak_summary
 
 from .auth import require_user
 

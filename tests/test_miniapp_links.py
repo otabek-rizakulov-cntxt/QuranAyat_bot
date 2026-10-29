@@ -13,8 +13,8 @@ import app.lifespan as lifespan
 import bot.dispatch as dispatch
 import bot.keyboards.page as page_kb
 import bot.keyboards.verse as verse_kb
-from hifz import memorize
-from lib.miniapp import app_url, set_menu_button
+from bot.features import memorize
+from bot.miniapp import app_url, set_menu_button
 
 APP = "https://miniapp.test"
 

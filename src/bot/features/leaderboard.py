@@ -1,13 +1,13 @@
 # Workstream H — weekly leaderboard (spec items H1, H2).
 #
 # Owns: /leaderboard. Ranks sessions completed in the Mon->Sun week local to the
-# user (see lib/localtime.week_bounds), ties broken by streak length, opted-in
+# user (see domain/localtime.week_bounds), ties broken by streak length, opted-in
 # users only. The caller's own row is always shown, even outside the top N.
-# Callback prefix: "hl:" (see hifz.PREFIXES).
+# Callback prefix: "hl:" (see bot.features.PREFIXES).
 #
 # Three things this module deliberately does *not* do:
 #
-#   * It does not filter. `lib.leaderboard.weekly_board` composes two store
+#   * It does not filter. `services.leaderboard.weekly_board` composes two store
 #     queries that join on `leaderboard_opt_in`, so an opted-out user is absent
 #     from the data, not hidden by this renderer. A renderer that filtered would
 #     leak a position count and would put a private user on a public list the
@@ -15,7 +15,7 @@
 #   * It does not draw the caller twice. `WeeklyBoard.me_in_top` says whether
 #     their row is already among `entries`; the extra "you" row is drawn only
 #     when it is not.
-#   * It does not own the opt-in. Workstream B (src/hifz/profile.py) owns that
+#   * It does not own the opt-in. Workstream B (src/bot/features/profile.py) owns that
 #     flow; this offers a button into it and names /profile in the copy, so the
 #     user has a path even if the button's owner is not loaded.
 #
@@ -25,15 +25,15 @@
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from hifz import Ctx, callback, command
-from lib.leaderboard import weekly_board
+from bot.features import Ctx, callback, command
+from services.leaderboard import weekly_board
 
 # --- callback_data shapes ------------------------------------------------------
 # hl:me     re-send the board (for other screens to link to) — 5 bytes
 CB_ME = "hl:me"
 
 # Workstream B's opt-in tap. Spelled out rather than imported so a broken profile
-# module cannot take the board down with it; see hifz.PREFIXES ("hp:board:on").
+# module cannot take the board down with it; see bot.features.PREFIXES ("hp:board:on").
 CB_JOIN = "hp:board:on"
 
 # A row for an opted-in user who somehow has no display name. B2 sets one at

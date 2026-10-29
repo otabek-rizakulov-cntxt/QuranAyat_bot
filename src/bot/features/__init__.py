@@ -1,7 +1,7 @@
 # The hifz feature package: one module per memorization feature (profile,
 # progress, memorize, check, streak, leaderboard, group).
 #
-# Adding a feature is: create `src/hifz/<feature>.py` and decorate its handlers.
+# Adding a feature is: create `src/bot/features/<feature>.py` and decorate its handlers.
 # The router (bot/router.py) discovers every module here by walking the
 # directory, so there is no shared import list and two features never edit the
 # same line:

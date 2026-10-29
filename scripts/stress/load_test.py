@@ -6,7 +6,7 @@ Telegram call is faked out, everything else is the real app), samples
 `docker stats` for CPU/memory throughout, and polls the harness's
 `/__stress__/stats` introspection endpoint to find out when background
 processing actually drains — not just when the webhook ACKs, since ACK and
-completion are deliberately decoupled (main.py fires `_process_update` as a
+completion are deliberately decoupled (the webhook fires `_process_update` as a
 background task and returns immediately).
 
 Usage:

@@ -22,8 +22,8 @@ import bot.media
 import bot.media as bot_media
 import infra.audio
 import infra.audio as cdn_audio
-from lib import page_image
-from lib.utils import File
+from infra import page_image
+from infra.file_facade import File
 
 
 def _png(width: int, height: int, colour=(0, 0, 0)) -> bytes:

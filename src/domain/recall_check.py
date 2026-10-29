@@ -32,7 +32,7 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Iterable, Iterator, List, Optional, Sequence, Tuple
 
-from modules.quran import Quran, TranslationRegistry
+from domain.quran import Quran, TranslationRegistry
 
 __all__ = [
     "RecallQuestion",
@@ -589,7 +589,7 @@ def _assemble(
 def _span_tuple(span) -> Tuple[int, int, int, int]:
     """Accept either a 4-tuple or anything with `as_tuple()` — i.e. a hifz Ref.
 
-    Duck-typed on purpose: `hifz.refs.Ref` is the natural argument from a plan
+    Duck-typed on purpose: `domain.refs.Ref` is the natural argument from a plan
     portion or from `/check 67`, but this module has no reason to import it and
     every reason not to grow a dependency on the hifz package.
     """

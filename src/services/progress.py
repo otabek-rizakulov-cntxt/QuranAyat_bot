@@ -1,10 +1,11 @@
 # Progress operations (spec items C2-C3): the derived summary and /forgot.
 # Used by hifz/progress.py and the Mini App's /progress routes.
 
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
-from hifz.refs import Ref
-from modules import Quran
+from domain.hifz_progress import ProgressSummary, summarize
+from domain.quran import Quran
+from domain.refs import Ref
 
 
 def surah_spans(ref: Ref) -> List[Tuple[int, int, int]]:
@@ -43,3 +44,13 @@ async def unmark(store, user_id: int, ref: Ref) -> bool:
         await store.hifz.remove_range(user_id, surah, start, end)
         removed = True
     return removed
+
+
+async def load_summary(store, user_id: int, focus_surah: Optional[int] = None) -> ProgressSummary:
+    """`summarize` over everything `user_id` has marked. One store round trip.
+
+    The whole interval set is read even when only one surah is being shown,
+    because the summary always carries the whole-Qur'an line and a per-surah query
+    could not produce it.
+    """
+    return summarize(await store.hifz.list_intervals(user_id), focus_surah)

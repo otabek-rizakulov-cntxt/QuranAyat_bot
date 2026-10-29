@@ -1,4 +1,4 @@
-"""Derived hifz percentages (`lib.hifz_progress`), C2.
+"""Derived hifz percentages (`domain.hifz_progress`), C2.
 
 The spec pins two numbers and this file exists mainly to hold them: marking
 67:1-8 must report Al-Mulk **27%**, and re-marking 67:5-10 must report **33%**.
@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from lib.hifz_progress import (
+from domain.hifz_progress import (
     TOTAL_AYAHS,
     TOTAL_PAGES,
     JuzProgress,
@@ -29,7 +29,6 @@ from lib.hifz_progress import (
     format_percent,
     juz_page_progress,
     juz_progress,
-    load_summary,
     quran_page_progress,
     quran_progress,
     round_percent,
@@ -38,9 +37,10 @@ from lib.hifz_progress import (
     summarize,
     surah_progress,
 )
-from lib.store import get_store
-from lib.store.hifz import HifzInterval
-from modules import Quran
+from domain.quran import Quran
+from infra.store import get_store
+from infra.store.hifz import HifzInterval
+from services.progress import load_summary
 
 USER = 1
 AL_MULK = 67  # 30 ayahs, juz 29

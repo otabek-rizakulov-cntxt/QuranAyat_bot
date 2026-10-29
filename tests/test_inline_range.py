@@ -24,9 +24,9 @@ import bot.text as bot_text
 import infra.audio
 import infra.audio as cdn_audio
 import locales
-from lib.user_settings import UserSettings
-from lib.utils import File
-from modules import TranslationRegistry
+from domain.quran import TranslationRegistry
+from infra.file_facade import File
+from services.user_settings import UserSettings
 
 
 @pytest.fixture(scope="module")

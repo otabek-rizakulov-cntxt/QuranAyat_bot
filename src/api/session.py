@@ -8,15 +8,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from config.settings import get_settings
+from domain.localtime import is_valid_offset, normalize_offset, offset_options
+from domain.quran import TranslationRegistry
 from infra import catalog
-from lib.localtime import is_valid_offset, normalize_offset, offset_options
-from lib.store import get_store
-from lib.streaks import streak_summary
-from lib.user_settings import UserSettings
+from infra.store import get_store
 from locales import is_supported, is_ui_language, normalize_lang
-from modules import TranslationRegistry
 from services import plans as plans_service
 from services import profile as profile_service
+from services.streaks import streak_summary
+from services.user_settings import UserSettings
 
 from .auth import (
     DEFAULT_TOKEN_TTL,

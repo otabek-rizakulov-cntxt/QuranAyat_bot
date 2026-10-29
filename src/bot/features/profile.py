@@ -2,7 +2,7 @@
 #
 # Owns: /profile, the leaderboard opt-in and display name, and the timezone +
 # reminder-time capture that the streak day boundary and the scheduler depend on.
-# Callback prefix: "hp:" (see hifz.PREFIXES). Wizard kinds: prefix them "profile_".
+# Callback prefix: "hp:" (see bot.features.PREFIXES). Wizard kinds: prefix them "profile_".
 #
 # Three things here are deliberate and worth knowing before changing them:
 #
@@ -29,9 +29,9 @@ from typing import Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.features import Ctx, callback, command, wizard
 from bot.keyboards.time_pickers import offset_keyboard  # re-exported (see __all__)
-from hifz import Ctx, callback, command, wizard
-from lib.localtime import is_valid_offset, normalize_offset
+from domain.localtime import is_valid_offset, normalize_offset
 from services.profile import (  # noqa: F401 — re-exported (see __all__)
     NAME_MAX,
     NAME_MIN,
@@ -76,7 +76,7 @@ __all__ = [
 # leaderboard row still fits on a phone. Uniqueness is deliberately not required.
 
 # --- callback_data (Telegram caps it at 64 bytes) ------------------------------
-# The shapes documented in `hifz.PREFIXES` ("hp:name  hp:board:on  hp:tz
+# The shapes documented in `bot.features.PREFIXES` ("hp:name  hp:board:on  hp:tz
 # hp:tz:+05:00  hp:rem"), because another module already spells one of them out
 # rather than importing it: `hifz/leaderboard.py` puts "hp:board:on" under its
 # own "join the board" button so a broken profile module cannot take the board

@@ -12,7 +12,7 @@
 import asyncio
 import os
 
-from config.postgres import get_pool
+from infra.postgres import get_pool
 
 from ._state import MemoryState
 from .groups import GroupStore, InMemoryGroupStore, PostgresGroupStore
@@ -38,7 +38,7 @@ __all__ = [
     "GroupStore",
 ]
 
-# src/lib/store/__init__.py -> src/lib/store -> src/lib -> src
+# src/infra/store/__init__.py -> src/infra/store -> src/lib -> src
 _SRC_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SCHEMA_PATH = os.path.join(_SRC_DIR, "common", "schema.sql")
 
@@ -88,7 +88,7 @@ class InMemoryStore(Store):
 
 
 class PostgresStore(Store):
-    """asyncpg-backed store, wrapping a pool created by `config.postgres.get_pool`."""
+    """asyncpg-backed store, wrapping a pool created by `infra.postgres.get_pool`."""
 
     def __init__(self, pool):
         self.pool = pool
@@ -123,7 +123,7 @@ def _lock() -> asyncio.Lock:
 
     An asyncio.Lock binds to the loop it is first awaited in. Production has one
     loop for the process lifetime, but pytest-asyncio gives every test its own —
-    same concern, and the same fix, as `lib/page_image.py`'s stitch semaphore.
+    same concern, and the same fix, as `infra/page_image.py`'s stitch semaphore.
     """
     global _store_lock, _store_lock_loop
     loop = asyncio.get_running_loop()
@@ -169,7 +169,7 @@ def store_backend() -> str:
     "memory", "unavailable" (the last connect failed) or "pending" (not built yet)."""
     if _store is not None:
         return "memory" if isinstance(_store, InMemoryStore) else "postgres"
-    from config import postgres
+    from infra import postgres
 
     return "unavailable" if postgres.last_error else "pending"
 
@@ -193,6 +193,6 @@ def reset_for_tests() -> None:
     _store_lock = None
     _store_lock_loop = None
 
-    from config import postgres
+    from infra import postgres
 
     postgres.reset_for_tests()

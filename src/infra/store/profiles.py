@@ -16,7 +16,7 @@ from ._state import MemoryState
 
 @dataclass
 class UserSettingsRow:
-    """A row of `user_settings`. Defaults live in `lib.user_settings`, never here —
+    """A row of `user_settings`. Defaults live in `services.user_settings`, never here —
     this layer stores what it is handed."""
 
     telegram_user_id: int
@@ -34,7 +34,7 @@ class ProfileRow:
     could be stored later without a migration.
 
     `current_streak` / `longest_streak` are denormalized from `session_log` for
-    cheap reads; `lib.streaks` owns recomputing them.
+    cheap reads; `services.streaks` owns recomputing them.
     """
 
     telegram_user_id: int
@@ -83,7 +83,7 @@ class ProfileStore(abc.ABC):
         `None` is the "you lost the insert race" signal (`ON CONFLICT DO NOTHING
         RETURNING` yields no row on conflict), which is what lets the caller know
         whether the values it supplied were actually the ones written — the legacy
-        Redis migration in `lib.user_settings` depends on that distinction.
+        Redis migration in `services.user_settings` depends on that distinction.
         """
 
     @abc.abstractmethod

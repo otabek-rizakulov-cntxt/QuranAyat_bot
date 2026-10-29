@@ -15,15 +15,15 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz import memorize as memorize_feature
-from hifz.refs import surah_ref
-from lib import scheduler
-from lib.plan_builder import advancing, build_plan
-from lib.store import get_store
-from lib.store.plans import DAY_COMPLETED, PLAN_ACTIVE, PLAN_PAUSED
+from bot.features import Ctx
+from bot.features import memorize as memorize_feature
+from domain.plan_builder import advancing, build_plan
+from domain.refs import surah_ref
+from infra import scheduler
+from infra.store import get_store
+from infra.store.plans import DAY_COMPLETED, PLAN_ACTIVE, PLAN_PAUSED
 
 USER_ID = 940001
 CHAT_ID = 940001
@@ -67,7 +67,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}
@@ -127,7 +127,7 @@ class TestWizard:
         preview and the save call the same function with the same arguments."""
         await _run_wizard()
         draft = hifz.Ctx.build  # noqa: F841 - keep the import obvious
-        from lib.wizard import Wizard
+        from infra.wizard_store import Wizard
 
         data = Wizard().data(USER_ID)
         previewed = build_plan(
@@ -168,7 +168,7 @@ class TestWizard:
         await _tap("hm:t:s")
         bot, handled = await _type("not a surah")
         assert handled is True
-        from lib.wizard import Wizard
+        from infra.wizard_store import Wizard
 
         assert Wizard().is_active(USER_ID) is True  # still in the wizard
 
@@ -177,21 +177,21 @@ class TestWizard:
         await _tap("hm:t:s")
         bot, handled = await _type("/cancel")
         assert handled is True
-        from lib.wizard import Wizard
+        from infra.wizard_store import Wizard
 
         assert Wizard().is_active(USER_ID) is False
 
     async def test_the_cancel_button_ends_the_wizard(self):
         await hifz.dispatch_command(await _ctx(), "memorize")
         await _tap("hm:x")
-        from lib.wizard import Wizard
+        from infra.wizard_store import Wizard
 
         assert Wizard().is_active(USER_ID) is False
 
     async def test_a_draft_expiring_mid_wizard_does_not_crash(self):
         """A draft can expire between two taps; every step must survive it."""
         await hifz.dispatch_command(await _ctx(), "memorize")
-        from lib.wizard import Wizard
+        from infra.wizard_store import Wizard
 
         Wizard().clear(USER_ID)
         for cb in ("hm:p:2", "hm:d:wk", "hm:tz:+05:00", "hm:rt:07:00", "hm:ok"):
@@ -338,7 +338,7 @@ class TestDrill:
         day = (await store.plans.list_plan_days(plan.id))[0]
         assert day.end_ayah > day.start_ayah, "need a multi-ayah portion to test this"
 
-        from lib.utils import File
+        from infra.file_facade import File
 
         await memorize_feature._send_drill(
             AsyncMock(), {}, File(), store, CHAT_ID, plan, day, "en", "en", "Husary_128kbps"

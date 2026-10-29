@@ -14,7 +14,7 @@ import telegram
 import app.lifespan as lifespan
 import bot.dispatch as dispatch
 import locales
-from lib.user_settings import UserSettings
+from services.user_settings import UserSettings
 
 
 @pytest.fixture(scope="module")
