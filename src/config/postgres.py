@@ -1,5 +1,5 @@
 import asyncio
-from .env import Environment
+from .env import Environment, memory_store_allowed
 
 # Sentinel-free two-flag cache: `_pool` is the pool (or None when there isn't
 # one), `_pool_resolved` says whether we have already decided. Without the second
@@ -7,6 +7,10 @@ from .env import Environment
 # call.
 _pool = None
 _pool_resolved = False
+
+# Why the last attempt to get a pool failed, or None. Read by the health check
+# (`lib.store.store_backend`) to tell "down" apart from "not tried yet".
+last_error = None
 
 _pool_lock = None
 _pool_lock_loop = None
@@ -36,7 +40,8 @@ CONNECT_BACKOFF_SECONDS = 1.5
 
 
 class DatabaseUnavailable(RuntimeError):
-  """DATABASE_URL is set but Postgres could not be reached.
+  """Postgres is not configured or could not be reached, and the in-memory
+  store is not allowed to stand in for it (see `memory_store_allowed`).
 
   Deliberately *not* a fallback to the in-memory store: doing that silently
   meant every setting a user changed lived only in process memory and vanished
@@ -49,12 +54,12 @@ class DatabaseUnavailable(RuntimeError):
 async def get_pool():
   """Lazily create (once) and return the shared Postgres connection pool.
 
-  Returns **None** only when DATABASE_URL is unset/empty — local dev and tests —
-  in which case `get_store()` builds the in-memory repository. When DATABASE_URL
-  is set and the server cannot be reached, raises `DatabaseUnavailable` and
-  caches nothing, so the next call retries.
+  Returns **None** only when DATABASE_URL is unset *and* ALLOW_MEMORY_STORE is
+  on — local dev and tests — in which case `get_store()` builds the in-memory
+  repository. Unset without the flag, or set but unreachable, raises
+  `DatabaseUnavailable` and caches nothing, so the next call retries.
   """
-  global _pool, _pool_resolved
+  global _pool, _pool_resolved, last_error
   if _pool_resolved:
     return _pool
 
@@ -64,6 +69,13 @@ async def get_pool():
 
     database_url = Environment.get_env("database_url")
     if not database_url:
+      if not memory_store_allowed():
+        # The production failure this guards against: the URL lived in a
+        # platform secret that the service never referenced, so it read as
+        # unset and every setting went to memory. Refuse rather than degrade.
+        last_error = "not configured"
+        raise DatabaseUnavailable(
+          "DATABASE_URL is not set; set it, or ALLOW_MEMORY_STORE=1 for dev/tests")
       print("WARNING: DATABASE_URL is not set — using the in-memory store. "
             "Every user setting is lost on restart; never run production like this.")
       _pool_resolved = True
@@ -71,7 +83,7 @@ async def get_pool():
 
     import asyncpg  # imported lazily so the in-memory path never requires the dependency
 
-    last_error = None
+    connect_error = None
     for attempt in range(1, CONNECT_ATTEMPTS + 1):
       try:
         _pool = await asyncpg.create_pool(
@@ -84,14 +96,16 @@ async def get_pool():
           statement_cache_size=0,
         )
         _pool_resolved = True
+        last_error = None
         return _pool
       except Exception as e:
-        last_error = e
+        connect_error = e
         print("WARNING: Postgres connect attempt %d/%d failed (%s)"
               % (attempt, CONNECT_ATTEMPTS, type(e).__name__))
         if attempt < CONNECT_ATTEMPTS:
           await asyncio.sleep(CONNECT_BACKOFF_SECONDS * attempt)
-    raise DatabaseUnavailable("Postgres unreachable after %d attempts" % CONNECT_ATTEMPTS) from last_error
+    last_error = "unreachable (%s)" % type(connect_error).__name__
+    raise DatabaseUnavailable("Postgres unreachable after %d attempts" % CONNECT_ATTEMPTS) from connect_error
 
 
 async def close_pool():
@@ -104,8 +118,9 @@ async def close_pool():
 
 def reset_for_tests():
   """Forget the pool and its creation lock. Called by `lib.store.reset_for_tests`."""
-  global _pool, _pool_resolved, _pool_lock, _pool_lock_loop
+  global _pool, _pool_resolved, _pool_lock, _pool_lock_loop, last_error
   _pool = None
   _pool_resolved = False
+  last_error = None
   _pool_lock = None
   _pool_lock_loop = None

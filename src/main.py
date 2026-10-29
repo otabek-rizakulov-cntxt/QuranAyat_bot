@@ -57,7 +57,7 @@ import hifz
 from lib.utils import File
 from lib.page_image import fetch_and_stitch
 from lib.miniapp import app_row, set_menu_button
-from lib.store import apply_schema
+from lib.store import apply_schema, store_backend
 from lib.user_settings import UserSettings
 from config import Environment
 from api import router as api_router
@@ -66,6 +66,7 @@ from services.reciters import (  # noqa: F401 — re-exported; tests and the pic
     reciter_catalog, reciter_group, reciter_kind,
 )
 from config.postgres import close_pool
+from config.redis import RedisSingleton, cache_backend
 from locales import (
     LANGUAGES, UI_LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
     t, button_action, normalize_lang, get_language, is_ui_language, welcome_text,
@@ -1376,6 +1377,15 @@ async def _initialize():
         print("INIT ERROR (postgres):", type(e).__name__, e)
 
     try:
+        # Connect now rather than on the first update, so a missing or
+        # unreachable Redis shows on the health check straight after boot. In a
+        # worker thread: the client is synchronous and a connect can block.
+        await asyncio.to_thread(RedisSingleton)
+        print("Cache ready (%s)" % cache_backend())
+    except Exception as e:
+        print("INIT ERROR (redis):", type(e).__name__, e)
+
+    try:
         # run the blocking parse in a worker thread so the event loop stays responsive
         data = await asyncio.to_thread(build_data)
         print("Corpora loaded; bot is ready")
@@ -1449,12 +1459,17 @@ async def on_shutdown():
 
 
 @app.get("/")
-async def health():
-    # `store` says where user settings live, so a deployment silently running
-    # on memory (no DATABASE_URL) is visible from a browser, not only in logs.
-    from lib.store import InMemoryStore, _store
-    store = None if _store is None else ("memory" if isinstance(_store, InMemoryStore) else "postgres")
-    return {"status": "ok", "store": store}
+async def health(response: Response):
+    """Liveness plus where state lives: `store` for user settings, `cache` for
+    Redis. 503 when either could not be reached or isn't configured, so a
+    deployment missing its database or Redis fails its health check instead of
+    serving a bot that forgets every user on the next restart. "pending" (still
+    booting) stays 200, so a slow start isn't mistaken for an outage."""
+    store, cache = store_backend(), cache_backend()
+    healthy = "unavailable" not in (store, cache)
+    if not healthy:
+        response.status_code = 503
+    return {"status": "ok" if healthy else "unavailable", "store": store, "cache": cache}
 
 
 @app.get(RANGE_AUDIO_PATH)

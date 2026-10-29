@@ -29,6 +29,7 @@ os.chdir(ROOT)
 os.environ["TOKEN"] = "123456:TEST-abcdefghijklmnopqrstuvwxyz012345"
 os.environ["REDIS_HOST_URL"] = ""          # -> in-memory store, no network
 os.environ["DATABASE_URL"] = ""            # -> in-memory settings store, no network
+os.environ["ALLOW_MEMORY_STORE"] = "1"     # the two lines above are refused without it
 os.environ["AUDIO_BASE_URL"] = "https://cdn.test/audio"
 os.environ["PHOTO_BASE_URL"] = "https://cdn.test/images"
 # Pinned empty so the local .env's real public URL can't leak in: it decides whether

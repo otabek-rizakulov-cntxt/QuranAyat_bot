@@ -18,8 +18,9 @@ def test_health_endpoint():
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "ok"
-    # None until the first request builds the store; "memory" or "postgres" after.
-    assert body["store"] in (None, "memory", "postgres")
+    # "pending" until first use; tests run on the in-memory stores after that.
+    assert body["store"] in ("pending", "memory")
+    assert body["cache"] in ("pending", "memory")
 
 
 def test_webhook_rejects_wrong_token():

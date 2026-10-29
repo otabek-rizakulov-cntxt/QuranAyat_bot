@@ -92,8 +92,129 @@ class TestUnreachableDatabase:
         assert any("reader_position" in q for q in pool.executed)
 
 
-class TestHealthReportsTheStore:
-    async def test_memory_store_is_visible_on_the_health_endpoint(self):
+@pytest.fixture
+def strict(monkeypatch):
+    """Production defaults: the in-memory stores are not allowed."""
+    monkeypatch.delenv("ALLOW_MEMORY_STORE", raising=False)
+
+
+@pytest.fixture
+def fresh_redis(monkeypatch):
+    """A RedisSingleton that has never connected; restored after the test."""
+    from config.redis import RedisSingleton
+    monkeypatch.setattr(RedisSingleton, "_instance", None)
+    monkeypatch.setattr(RedisSingleton, "last_error", None)
+    monkeypatch.setattr(RedisSingleton, "_failed_at", None)
+    return RedisSingleton
+
+
+class TestStrictByDefault:
+    """Regression: the production database URL lived in a platform secret the
+    service never referenced, so it read as unset and the bot ran on memory —
+    every setting lost at each restart, with nothing failing visibly."""
+
+    async def test_an_unset_database_url_raises_without_the_flag(self, strict):
+        with pytest.raises(postgres.DatabaseUnavailable):
+            await store_module.get_store()
+        assert store_module._store is None
+        assert store_module.store_backend() == "unavailable"
+
+    async def test_an_unset_database_url_uses_memory_with_the_flag(self):
+        store = await store_module.get_store()
+        assert isinstance(store, store_module.InMemoryStore)
+        assert store_module.store_backend() == "memory"
+
+    def test_an_unset_redis_url_raises_without_the_flag(self, strict, fresh_redis, monkeypatch):
+        from config.redis import CacheUnavailable, cache_backend
+        monkeypatch.setenv("REDIS_HOST_URL", "")
+        with pytest.raises(CacheUnavailable):
+            fresh_redis()
+        assert cache_backend() == "unavailable"
+
+    def test_an_unreachable_redis_raises_without_the_flag(self, strict, fresh_redis, monkeypatch):
+        from config import redis as redis_module
+        monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
+        monkeypatch.setattr(redis_module.StrictRedis, "from_url",
+                            classmethod(lambda cls, *a, **k: _Unreachable()))
+        with pytest.raises(redis_module.CacheUnavailable):
+            fresh_redis()
+
+    def test_an_unreachable_redis_falls_back_to_memory_with_the_flag(self, fresh_redis, monkeypatch):
+        from config import redis as redis_module
+        monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
+        monkeypatch.setattr(redis_module.StrictRedis, "from_url",
+                            classmethod(lambda cls, *a, **k: _Unreachable()))
+        assert isinstance(fresh_redis().connection, redis_module.MemoryStore)
+        assert redis_module.cache_backend() == "memory"
+
+    def test_a_failed_redis_connect_is_not_retried_on_every_update(self, strict, fresh_redis,
+                                                                   monkeypatch):
+        # The client is synchronous: retrying on every update while Redis is down
+        # would block the event loop for the connect timeout each time.
+        from config import redis as redis_module
+        attempts = []
+        real = redis_module.RedisSingleton._make_connection.__func__
+
+        def counting(cls):
+            attempts.append(1)
+            return real(cls)
+        monkeypatch.setenv("REDIS_HOST_URL", "")
+        monkeypatch.setattr(redis_module.RedisSingleton, "_make_connection", classmethod(counting))
+        for _ in range(3):
+            with pytest.raises(redis_module.CacheUnavailable):
+                fresh_redis()
+        assert len(attempts) == 1
+
+        # Once the cooldown has passed it tries again — and recovers.
+        monkeypatch.setattr(fresh_redis, "_failed_at",
+                            fresh_redis._failed_at - redis_module.RETRY_AFTER_SECONDS - 1)
+        monkeypatch.setenv("ALLOW_MEMORY_STORE", "1")
+        assert isinstance(fresh_redis().connection, redis_module.MemoryStore)
+        assert len(attempts) == 2
+        assert redis_module.cache_backend() == "memory"
+
+
+class _Unreachable:
+    def ping(self):
+        raise ConnectionError("connection refused")
+
+
+class TestHealthReportsTheStores:
+    async def test_memory_stores_are_visible_on_the_health_endpoint(self):
         import main
+        from fastapi import Response
         await store_module.get_store()
-        assert await main.health() == {"status": "ok", "store": "memory"}
+        response = Response()
+        assert await main.health(response) == {"status": "ok", "store": "memory",
+                                               "cache": "memory"}
+        assert response.status_code == 200
+
+    async def test_a_store_that_is_not_built_yet_is_pending_not_down(self, fresh_redis):
+        import main
+        from fastapi import Response
+        response = Response()
+        body = await main.health(response)
+        assert (body["store"], body["cache"]) == ("pending", "pending")
+        assert response.status_code == 200
+
+    async def test_a_missing_database_fails_the_health_check(self, strict):
+        import main
+        from fastapi import Response
+        with pytest.raises(postgres.DatabaseUnavailable):
+            await store_module.get_store()
+        response = Response()
+        body = await main.health(response)
+        assert body["status"] == "unavailable" and body["store"] == "unavailable"
+        assert response.status_code == 503
+
+    async def test_a_missing_redis_fails_the_health_check(self, strict, fresh_redis, monkeypatch):
+        import main
+        from fastapi import Response
+        from config.redis import CacheUnavailable
+        monkeypatch.setenv("REDIS_HOST_URL", "")
+        with pytest.raises(CacheUnavailable):
+            fresh_redis()
+        response = Response()
+        body = await main.health(response)
+        assert body["cache"] == "unavailable"
+        assert response.status_code == 503
