@@ -15,6 +15,15 @@ __pycache__/
 *.pyc
 .DS_Store
 
+# Docs, tooling and generated output — not needed at runtime
+docs/
+*.md
+graphify-out/
+scripts/
+build/
+docker-compose.stress.yml
+.claude/
+
 # Tests & CI — not needed in the runtime image
 tests/
 conftest.py

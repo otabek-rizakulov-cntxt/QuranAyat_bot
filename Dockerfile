@@ -1,13 +1,13 @@
 FROM python:3.10.6
 
-# Unbuffered stdout/stderr so print() logs show up live in Railway/Docker logs.
+# Unbuffered stdout/stderr so logs show up live in the platform's log viewer.
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt && pip install -U python-dotenv
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
