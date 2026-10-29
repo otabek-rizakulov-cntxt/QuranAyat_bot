@@ -3,7 +3,7 @@
 #
 # One-off / maintenance script: download every Qur'an translation listed in
 # src/locales/languages.py from the free alquran.cloud API (which serves the
-# tanzil.net editions) and write each one to translations/<code>.txt in the same
+# tanzil.net editions) and write each one to data/translations/<code>.txt in the same
 # `surah|ayah|text` line format the existing parse_quran() already reads.
 #
 # It also:
@@ -29,7 +29,7 @@ from locales.languages import (  # noqa: E402
 )
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-OUT_DIR = os.path.join(REPO_ROOT, "translations")
+OUT_DIR = os.path.join(REPO_ROOT, "data", "translations")
 API = "http://api.alquran.cloud/v1/quran/{edition}"
 ARABIC_EDITION = "quran-simple"
 TOTAL_VERSES = 6236
@@ -198,7 +198,7 @@ def write_attributions(meta: dict) -> None:
     lines = [
         "# Translation attributions",
         "",
-        "Qur'an translations bundled in `translations/` are sourced from the",
+        "Qur'an translations bundled in `data/translations/` are sourced from the",
         "[tanzil.net](https://tanzil.net) project via the free",
         "[alquran.cloud](https://alquran.cloud) API. Each translation carries its",
         "own copyright and licence held by its translator/publisher; the editions",

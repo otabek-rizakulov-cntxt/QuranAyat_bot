@@ -35,10 +35,7 @@ yarn.lock
 *.woff2
 *.ttf
 # Quran text / translation data dumps
-translations/
-en.ahmedraza
-Al_Jalalain_Eng.txt
-quran-data.xml
+data/
 # Licences and pinned dependency lists add no knowledge
 LICENSE*
 requirements*.txt

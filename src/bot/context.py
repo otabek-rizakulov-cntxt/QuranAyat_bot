@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from bot.errors import ignore_not_modified
+from infra.store import get_store
 from infra.wizard_store import Wizard
 from locales import t
 
@@ -39,7 +40,6 @@ class Ctx:
         returns. The store is fetched here so no call site has to know that
         storage is a coroutine-guarded singleton.
         """
-        from infra.store import get_store
 
         return cls(
             bot=bot,

@@ -23,14 +23,15 @@ from typing import Tuple
 
 from locales.languages import DEFAULT_LANG
 
-# translations/ lives at the repo root (next to en.ahmedraza, quran-data.xml).
-# Resolve it absolutely from this file so it works regardless of the process cwd.
+# The corpora live in data/ at the repo root. Every path is resolved from this
+# file rather than the process cwd, so they load wherever the app is started.
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-TRANSLATIONS_DIR = os.path.join(_REPO_ROOT, "translations")
+DATA_DIR = os.path.join(_REPO_ROOT, "data")
+TRANSLATIONS_DIR = os.path.join(DATA_DIR, "translations")
+TAFSIR_PATH = os.path.join(DATA_DIR, "Al_Jalalain_Eng.txt")
 
-# tanzil's quran-data.xml, parsed once at import. Resolved absolutely for the same
-# reason TRANSLATIONS_DIR is: the corpus must load whatever the process cwd is.
-_QURAN_DATA = ET.parse(os.path.join(_REPO_ROOT, "quran-data.xml")).getroot()
+# tanzil's quran-data.xml, parsed once at import.
+_QURAN_DATA = ET.parse(os.path.join(DATA_DIR, "quran-data.xml")).getroot()
 
 
 def _division_marks(tag: str) -> tuple:
@@ -75,7 +76,7 @@ def parse_quran(filename: str):
     return quran
 
 
-def parse_quran_tafsir(filename: str = "Al_Jalalain_Eng.txt"):
+def parse_quran_tafsir(filename: str = TAFSIR_PATH):
     """Parse tafsir al-Jalalayn from http://www.altafsir.com/Al-Jalalayn.asp, after
     that PDF was processed with `pdftotext -nopgbrk Al_Jalalain_Eng.pdf`.
     """
@@ -280,7 +281,7 @@ class Quran:
         return cls(parse_quran(path))
 
     @classmethod
-    def from_tafsir(cls, path: str = "Al_Jalalain_Eng.txt") -> "Quran":
+    def from_tafsir(cls, path: str = TAFSIR_PATH) -> "Quran":
         return cls(parse_quran_tafsir(path))
 
     def get_ayah(self, surah: int, ayah: int) -> str:
@@ -424,7 +425,7 @@ class TranslationRegistry:
     """Lazily loads and caches Qur'an translations, one per language.
 
     Only the default language is preloaded at startup (see preload()); every other
-    language is parsed from translations/<code>.txt on first request and then kept
+    language is parsed from data/translations/<code>.txt on first request and then kept
     in memory. This keeps startup fast and memory proportional to the languages
     actually used — important on the 512 MB free instance.
     """

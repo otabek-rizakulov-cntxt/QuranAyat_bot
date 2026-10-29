@@ -500,7 +500,7 @@ test over their cache keys.
   singleton). It's fixed and was checked end to end.
 - Merged in `fix/webhook-secret-and-redis-outage` and resolved it onto the
   Phase 4 settings API.
-### Phase 6 — Repository hygiene
+### Phase 6 — Repository hygiene — *done*
 
 - **6.1 Corpora → `data/`.** Resolve them relative to the package, never the
   CWD, so `conftest.py`'s `os.chdir` and the Dockerfile's comment about it can
@@ -516,6 +516,23 @@ test over their cache keys.
   - Add `docs/`, `graphify-out/` and `scripts/` to `.dockerignore`.
 - **6.5 Tests mirror source.** Regroup `tests/` into `tests/{domain,services,bot,app,infra}/`
   as a pure move.
+
+*As shipped* (`refactor/phase-6-hygiene`):
+- 6.1: the corpora are in `data/`, resolved from `domain.quran`'s own
+  location; the tafsir default no longer depends on the cwd. `conftest.py`
+  keeps its `chdir` only because a few tests open repo files by relative
+  path.
+- 6.2: `.DS_Store` untracked. The tafsir PDF moved to `data/` and is still
+  tracked (question 3 is open).
+- 6.3: the three root docs are in `docs/`, with an index at
+  `docs/README.md`.
+- 6.4: the dotenv override is gone and the image leaves out docs, scripts
+  and tooling. Python stays on 3.10.6 (question 2 is open).
+- **6.5 skipped on purpose.** Most tests are end to end across layers
+  (`test_navigation`, `test_acceptance`), so sorting them by layer would
+  misfile many of them. They are grouped by feature name instead.
+- Added: the 32 leftover cycle-dodging local imports were hoisted. What
+  stays local is deliberate.
 
 ## 6. Ordering, risk, size
 
@@ -552,19 +569,27 @@ phase boundary and leave the tree in a consistent state.
 
 ## 8. Expected result
 
-| Metric | Now | After |
-|---|---|---|
-| `main.py` lines | 1,512 | < 60 |
-| Largest source file | 1,512 | ~300 (`bot/features/memorize.py`, split further if still over) |
-| Imports of `main` from `src/` | 2 | 0 |
-| Upward imports (`lib`/`services` → `hifz`) | 6 | 0 |
-| Function-local imports | 18 | 0 (except deliberate lazy loads, commented) |
-| `print()` calls | 56 | 0 |
-| Indentation styles | 2 | 1 (enforced) |
-| Copies of cache-or-upload | 5 | 1 |
-| Copies of row-chunking | 10 | 1 |
-| Offset pickers | 3 | 1 |
-| Places to edit to add a command | 2 (chain + menu) | 1 handler (+ locale key) |
+Measured after Phase 6:
+
+| Metric | Before | Target | After |
+|---|---|---|---|
+| `main.py` lines | 1,512 | < 60 | **41** |
+| `handle_update` lines | ~410 | < 40 | **25** (+ two ~30-line helpers) |
+| Imports of `main` from `src/` | 2 | 0 | **0** |
+| Layering violations | 13 | 0 | **0** (`KNOWN = {}`) |
+| Function-local imports | 18 | 0 except deliberate | **3 deliberate** |
+| `print()` calls | 56 | 0 | **0** |
+| Indentation styles | 2 | 1 | **1**, enforced by ruff in CI |
+| Copies of cache-or-upload | 5 | 1 | **1** (6 callers) |
+| Copies of row-chunking | 10 | 1 | **1** |
+| Offset pickers | 3 | 1 | **1** |
+| Places to edit to add a command | 2 | 1 | **1** handler (+ locale key) |
+| Largest source file | 1,512 | ~300 | **971**: `bot/features/memorize.py` — **not met** |
+
+Still over ~300 lines: `bot/features/memorize.py` (971), `infra/scheduler.py`
+(680), `domain/recall_check.py` (651) and `bot/features/group.py` (601).
+Each is one cohesive feature, not a grab bag, so splitting them is ordinary
+feature-level refactoring. It's left for follow-up PRs, one file each.
 
 ## 9. Decisions and open questions
 

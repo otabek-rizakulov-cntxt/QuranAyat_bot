@@ -3,7 +3,7 @@ Husary/
 quranic_images/
 *.mp3
 *.png
-Al_Jalalain_Eng.pdf
+data/Al_Jalalain_Eng.pdf
 
 # Local/dev artifacts
 venv/
@@ -14,6 +14,15 @@ dump.rdb
 __pycache__/
 *.pyc
 .DS_Store
+
+# Docs, tooling and generated output — not needed at runtime
+docs/
+*.md
+graphify-out/
+scripts/
+build/
+docker-compose.stress.yml
+.claude/
 
 # Tests & CI — not needed in the runtime image
 tests/

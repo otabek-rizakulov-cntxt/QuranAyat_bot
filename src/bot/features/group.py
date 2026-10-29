@@ -21,21 +21,30 @@
 # the typed topic name, `@callback` (prefix `gr:`) for the inline choices.
 import html
 import logging
+from datetime import datetime, timedelta, timezone
+from datetime import datetime as _dt
+from datetime import time as _time
 from typing import Optional
 
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.features import Ctx, callback, wizard
+from bot.features.profile import parse_reminder_time
 from bot.keyboards.time_pickers import offset_keyboard
 from bot.media import send_combined_audio
-from domain.localtime import DEFAULT_OFFSET
+from domain.localtime import DEFAULT_OFFSET, local_date, next_due_utc, normalize_offset, to_utc
+from domain.plan_builder import advancing, build_plan
 from domain.quran import get_translation
+from domain.refs import Ref, parse_reference
 from infra import catalog
 from infra.page_image import fetch_and_stitch
-from infra.scheduler import send_handler
-from infra.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
+from infra.scheduler import enqueue, send_handler
+from infra.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED, GDAY_PENDING, GPLAN_ACTIVE
+from infra.store.groups import CONFIG_ACTIVE as _ACTIVE
 from locales import t
+from services.leaderboard import week_window
+from services.plans import to_day_specs
 
 logger = logging.getLogger(__name__)
 
@@ -201,7 +210,6 @@ async def _step_topic(ctx: Ctx, draft, text: str) -> None:
 
 
 async def _step_target(ctx: Ctx, draft, text: str) -> None:
-    from domain.refs import parse_reference
 
     ref = parse_reference(text)
     if ref is None:
@@ -216,7 +224,6 @@ async def _step_target(ctx: Ctx, draft, text: str) -> None:
 
 
 async def _step_post_time(ctx: Ctx, draft, text: str) -> None:
-    from bot.features.profile import parse_reminder_time
 
     post_time = parse_reminder_time(text)
     if post_time is None:
@@ -227,10 +234,6 @@ async def _step_post_time(ctx: Ctx, draft, text: str) -> None:
 
 async def _save_group_plan(ctx: Ctx, data: dict, post_time) -> None:
     """Build the plan (same pure generator as the personal plan) and queue day one."""
-    from domain.localtime import local_date, normalize_offset
-    from domain.plan_builder import advancing, build_plan
-    from domain.refs import Ref
-    from services.plans import to_day_specs
 
     chat_id = data.get("chat_id")
     kind, s_s, s_a, e_s, e_a = data["target"]
@@ -243,8 +246,6 @@ async def _save_group_plan(ctx: Ctx, data: dict, post_time) -> None:
     old = await ctx.store.groups.get_active_plan(chat_id)
     if old is not None:
         await ctx.store.groups.set_plan_status(old.id, "complete")
-
-    from datetime import datetime, timezone
 
     start = local_date(datetime.now(timezone.utc), offset)
     portions = build_plan(ref, pace, days, start)
@@ -287,11 +288,6 @@ async def _enqueue_next_group(store, chat_id: int, plan, now=None):
     Mirrors `hifz.memorize._enqueue_next`: `enqueue` answers None on a key clash
     rather than raising, so re-arming the chain more often than needed is a no-op.
     """
-    from datetime import datetime, timezone
-
-    from domain.localtime import local_date, next_due_utc, normalize_offset, to_utc
-    from infra.scheduler import enqueue
-    from infra.store.groups import GDAY_PENDING, GPLAN_ACTIVE
 
     if plan is None or plan.status != GPLAN_ACTIVE:
         return None
@@ -306,7 +302,6 @@ async def _enqueue_next_group(store, chat_id: int, plan, now=None):
     day = pending[0]
 
     now = now or datetime.now(timezone.utc)
-    from datetime import datetime as _dt
 
     due_at = to_utc(_dt.combine(day.scheduled_date, config.post_time), offset)
     if due_at <= now:
@@ -402,10 +397,6 @@ async def group_board_entries(store, bot, chat_id: int, utc_now=None):
     group's own week window, ties broken by streak — the same rule as the personal
     board (H1).
     """
-    from datetime import datetime, timezone
-
-    from domain.localtime import DEFAULT_OFFSET, normalize_offset
-    from services.leaderboard import week_window
 
     config = await store.groups.get_config(chat_id)
     if config is None:
@@ -475,14 +466,6 @@ async def _enqueue_next_board(store, chat_id: int, now=None):
     Keyed by the week's Sunday so a restart cannot double-post it; `enqueue`
     answers None on a clash rather than raising.
     """
-    from datetime import datetime, timedelta, timezone
-    from datetime import datetime as _dt
-    from datetime import time as _time
-
-    from domain.localtime import DEFAULT_OFFSET, normalize_offset, to_utc
-    from infra.scheduler import enqueue
-    from infra.store.groups import CONFIG_ACTIVE as _ACTIVE
-    from services.leaderboard import week_window
 
     config = await store.groups.get_config(chat_id)
     if config is None or config.status != _ACTIVE:
