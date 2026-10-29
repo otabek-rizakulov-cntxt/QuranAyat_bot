@@ -461,7 +461,7 @@ test over their cache keys.
 - The singleton is gone, and the layering test's known violations are down
   to 10.
 
-### Phase 5 — Fix the layering
+### Phase 5 — Fix the layering — *done*
 
 - **5.1 Domain package.**
   - Move `hifz/refs.py` → `domain/refs.py` (removes every `lib`/`services` →
@@ -477,6 +477,29 @@ test over their cache keys.
   `app_row` → `bot/keyboards/`. Delete `lib/` and `modules/`.
 - **5.4 Turn the layering test's `xfail`s into hard failures.**
 
+*As shipped* (`refactor/phase-5-layering`):
+- `src/` is now `api app bot config domain infra locales services`, plus
+  `main.py`. `lib/`, `modules/` and `hifz/` are gone.
+- The layering test's known-violation list is **empty**: every import points
+  down the layers.
+- **Splits beyond the plan:**
+  - `to_day_specs` → `services/plans`, and `load_summary` →
+    `services/progress`, so `domain/` never touches the store.
+  - The streak arithmetic → `domain/streaks.py`, re-exported by
+    `services/streaks`.
+  - `GRID_WEEKS` → `domain/streaks`, so the Mini App API doesn't import
+    `bot/`.
+- **Placement changes:**
+  - `streak_image` went to `bot/`, not `infra/`: it renders a chat image and
+    reads streaks.
+  - `user_settings` went to `services/`.
+  - Redis became `infra/redis_client.py`, so it can't be mistaken for the
+    library.
+- The stress harness (`scripts/stress/run_app.py`) had been broken since
+  Phase 1 (it patched `main._process_update` and the removed bot
+  singleton). It's fixed and was checked end to end.
+- Merged in `fix/webhook-secret-and-redis-outage` and resolved it onto the
+  Phase 4 settings API.
 ### Phase 6 — Repository hygiene
 
 - **6.1 Corpora → `data/`.** Resolve them relative to the package, never the
