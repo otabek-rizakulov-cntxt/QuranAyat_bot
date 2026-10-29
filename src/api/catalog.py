@@ -90,8 +90,8 @@ class ReaderPosition(BaseModel):
 
 @router.get("/reader/position", response_model=Optional[ReaderPosition])
 async def get_position(user_id: int = Depends(require_user)) -> Optional[ReaderPosition]:
-    """Where the user last read — in the bot or the app. Null when never/expired."""
-    state = File().get_user(user_id)
+    """Where the user last read — in the bot or the app. Null if they never have."""
+    state = await File().get_user(user_id)
     if not state:
         return None
     try:
@@ -107,9 +107,9 @@ async def get_position(user_id: int = Depends(require_user)) -> Optional[ReaderP
 @router.put("/reader/position", response_model=ReaderPosition)
 async def put_position(body: ReaderPosition,
                        user_id: int = Depends(require_user)) -> ReaderPosition:
-    """Save the position under the same key the bot's next/previous read."""
+    """Save the position where the bot's next/previous read it."""
     if not Quran.exists(body.surah, body.ayah) or body.type not in _READER_TYPES:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                             detail="invalid position")
-    File().save_user(user_id, (body.surah, body.ayah, body.type))
+    await File().save_user(user_id, (body.surah, body.ayah, body.type))
     return body

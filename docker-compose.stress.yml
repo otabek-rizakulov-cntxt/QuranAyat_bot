@@ -54,6 +54,7 @@ services:
       TOKEN: stress-test-token
       DATABASE_URL: postgresql://postgres@db:5432/quranayat_stress
       REDIS_HOST_URL: ""
+      ALLOW_MEMORY_STORE: "1"     # no Redis in the stress stack
       WEBHOOK_URL: ""
       PORT: "8000"
     ports:

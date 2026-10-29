@@ -555,20 +555,26 @@ fix closes):
 
 **Fix.**
 
-- **Fail loudly in production.**
-  - Add a deploy-mode setting. When it's on, a missing or unreachable store is a
-    startup error, not a fallback, so the deploy fails its health check instead of
-    serving a bot that forgets.
-  - Keep the in-memory store for tests and local development only. That's what
-    it was built for.
-- **Retry instead of caching failure.** On a connection error, `get_pool()`
-  retries with backoff (e.g. 5 attempts over ~30 s) and leaves `_pool_resolved`
-  false until it succeeds, so a cold database at boot doesn't decide the process's
-  fate. Apply the same rule to `RedisSingleton`.
-- **Expose the state.** `GET /` reports which backend each store uses
-  (`{"status": "ok", "settings_store": "postgres", "cache": "redis"}`), and
-  returns 503 when production mode is on and either one is in memory.
-- **Make the reading position durable.** Move `(surah, ayah, type)` from the
+- **Fail loudly by default.** *(done on `fix/settings-persistence`)*
+  - The in-memory stores are refused unless `ALLOW_MEMORY_STORE=1` is set.
+    Tests, the local `.env` and the stress stack set it; production doesn't.
+  - Without the flag, a missing or unreachable database raises
+    `DatabaseUnavailable`, and Redis raises `CacheUnavailable`, instead of
+    degrading. That covers both the forgotten Secret reference and an outage.
+- **Retry instead of caching failure.** *(done)*
+  - Postgres retries 4 times with backoff and caches nothing on failure, so the
+    next call reconnects.
+  - Redis, whose client is synchronous, waits 30 s after a failed connect before
+    trying again, so a Redis outage doesn't stall every update for the 5 s
+    connect timeout.
+- **Expose the state.** *(done)* `GET /` returns
+  `{"status", "store", "cache"}`, where `store` is postgres/memory/unavailable/pending
+  and `cache` is redis/memory/unavailable/pending. It answers **503** when either is
+  unavailable; `pending` (still booting) stays 200. Redis connects at boot, so this
+  is accurate straight after startup.
+  - **Koyeb must use an HTTP health check on `GET /`** for a 503 to fail the
+    deploy. A TCP check only sees that the port is open.
+- **Make the reading position durable.** *(done)* Move `(surah, ayah, type)` from the
   2-day Redis key to a column on `user_profile`. Postgres already holds every
   other per-user setting. Redis stays for what's truly temporary: the file-id
   cache, wizard drafts and the pending-input flag.

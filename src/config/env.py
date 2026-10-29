@@ -10,6 +10,10 @@ class Environment:
       "token": os.getenv("TOKEN"),
       "redis": os.getenv("REDIS_HOST_URL"),
       "database_url": os.getenv("DATABASE_URL"),
+      # Opt-in for the in-memory stores (tests, local dev). Off by default, so a
+      # deployment whose database or Redis URL is missing fails instead of
+      # silently keeping every user setting in process memory.
+      "allow_memory_store": os.getenv("ALLOW_MEMORY_STORE"),
       "audio_base_url": os.getenv("AUDIO_BASE_URL"),
       "quranic_images_file_path": os.getenv("PHOTO_BASE_URL"),
       # Per-ayah images the mushaf-page stitcher tiles. Wants a uniform-width set
@@ -28,3 +32,9 @@ class Environment:
     if name not in variables:
       raise KeyError(f"Unknown environment variable requested: {name}")
     return variables[name]
+
+
+def memory_store_allowed() -> bool:
+  """Whether the in-memory stores may stand in for Postgres and Redis."""
+  value = Environment.get_env("allow_memory_store") or ""
+  return value.strip().lower() in ("1", "true", "yes")

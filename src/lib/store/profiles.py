@@ -9,7 +9,7 @@
 import abc
 from dataclasses import dataclass, replace
 from datetime import time
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from ._state import MemoryState
 
@@ -125,6 +125,14 @@ class ProfileStore(abc.ABC):
     """Write both denormalized streak counters (creating the profile if needed)."""
 
   @abc.abstractmethod
+  async def get_reader_position(self, user_id: int) -> Optional[Tuple[int, int, str]]:
+    """Where the user stopped reading, as `(surah, ayah, view)`, or None."""
+
+  @abc.abstractmethod
+  async def save_reader_position(self, user_id: int, surah: int, ayah: int, view: str) -> None:
+    """Record where the user stopped reading. Kept until overwritten."""
+
+  @abc.abstractmethod
   async def list_reminder_profiles(self) -> List[ProfileRow]:
     """Every profile with a reminder time set, ascending by user id.
 
@@ -206,6 +214,14 @@ class InMemoryProfileStore(ProfileStore):
     row.current_streak = int(current_streak)
     row.longest_streak = int(longest_streak)
     return replace(row)
+
+  # -- reader_position -----------------------------------------------------
+
+  async def get_reader_position(self, user_id):
+    return self._state.reader_position.get(user_id)
+
+  async def save_reader_position(self, user_id, surah, ayah, view):
+    self._state.reader_position[user_id] = (int(surah), int(ayah), view)
 
   async def list_reminder_profiles(self):
     rows = [r for r in self._state.user_profile.values() if r.reminder_time is not None]
@@ -315,3 +331,17 @@ class PostgresProfileStore(ProfileStore):
       "SELECT " + _PROFILE_COLUMNS + " FROM user_profile "
       "WHERE reminder_time IS NOT NULL ORDER BY telegram_user_id")
     return [self._profile(r) for r in records]
+
+  # -- reader_position -----------------------------------------------------
+
+  async def get_reader_position(self, user_id):
+    record = await self._pool.fetchrow(
+      "SELECT surah, ayah, view FROM reader_position WHERE telegram_user_id = $1", user_id)
+    return None if record is None else (record["surah"], record["ayah"], record["view"])
+
+  async def save_reader_position(self, user_id, surah, ayah, view):
+    await self._pool.execute(
+      "INSERT INTO reader_position (telegram_user_id, surah, ayah, view) VALUES ($1, $2, $3, $4) "
+      "ON CONFLICT (telegram_user_id) DO UPDATE SET surah = EXCLUDED.surah, "
+      "ayah = EXCLUDED.ayah, view = EXCLUDED.view, updated_at = now()",
+      user_id, int(surah), int(ayah), view)

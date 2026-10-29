@@ -96,9 +96,9 @@ async def test_reader_position_is_the_bots_position(client):
     r = await client.put("/api/v1/reader/position", headers=h,
                          json={"surah": 2, "ayah": 255, "type": "arabic"})
     assert r.status_code == 200
-    assert File().get_user(ALICE) == [2, 255, "arabic"]       # the key next/prev read
+    assert await File().get_user(ALICE) == [2, 255, "arabic"]  # what next/prev read
 
-    File().save_user(ALICE, (18, 10, "translation"))           # the bot moved on
+    await File().save_user(ALICE, (18, 10, "translation"))     # the bot moved on
     assert (await client.get("/api/v1/reader/position", headers=h)).json() \
         == {"surah": 18, "ayah": 10, "type": "translation"}
     assert (await client.put("/api/v1/reader/position", headers=h,

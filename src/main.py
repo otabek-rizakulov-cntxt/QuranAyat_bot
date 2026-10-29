@@ -57,7 +57,7 @@ import hifz
 from lib.utils import File
 from lib.page_image import fetch_and_stitch
 from lib.miniapp import app_row, set_menu_button
-from lib.store import apply_schema
+from lib.store import apply_schema, store_backend
 from lib.user_settings import UserSettings
 from config import Environment
 from api import router as api_router
@@ -66,6 +66,7 @@ from services.reciters import (  # noqa: F401 — re-exported; tests and the pic
     reciter_catalog, reciter_group, reciter_kind,
 )
 from config.postgres import close_pool
+from config.redis import RedisSingleton, cache_backend
 from locales import (
     LANGUAGES, UI_LANGUAGES, DEFAULT_LANG, BOT_COMMANDS,
     t, button_action, normalize_lang, get_language, is_ui_language, welcome_text,
@@ -197,7 +198,7 @@ async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: in
     if cached_id is not None:
         try:
             await bot.send_audio(audio=cached_id, **kwargs)
-            file.save_user(chat_id, (surah, end, "audio"))
+            await file.save_user(chat_id, (surah, end, "audio"))
             return
         except telegram.error.TelegramError:
             pass  # cached file_id rejected; rebuild below
@@ -207,7 +208,7 @@ async def send_combined_audio(bot, surah: int, start: int, end: int, chat_id: in
     audio = await _download_combined_audio(surah, start, end, performer)
     result = await bot.send_audio(audio=audio, **kwargs)
     file.save_file(cache_key, result.audio.file_id)
-    file.save_user(chat_id, (surah, end, "audio"))
+    await file.save_user(chat_id, (surah, end, "audio"))
 
 
 # Route (on this very app) that stitches a range of recitations on demand. An
@@ -866,7 +867,7 @@ async def send_quran(bot, data: dict, file, surah: int, ayah: int, quran_type: s
                   performer=File.get_performer_name(performer),
                   title=_reference(surah, ayah, ui_lang),
                   reply_markup=reply_markup)
-    file.save_user(chat_id, (surah, ayah, quran_type))
+    await file.save_user(chat_id, (surah, ayah, quran_type))
 
 
 async def handle_update(bot, data: dict, update: telegram.Update) -> None:
@@ -1082,7 +1083,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                         # re-tapping the current view yields an identical message; ignore
                         if "not modified" not in str(err).lower():
                             raise
-                file.save_user(chat_id, (surah, ayah, quran_type))
+                await file.save_user(chat_id, (surah, ayah, quran_type))
             else:                               # arabic/audio arrive as fresh media messages
                 await send_quran(bot, data, file, surah, ayah, quran_type, chat_id, reciter,
                                  ui_lang, translation_lang, reply_markup=markup)
@@ -1107,7 +1108,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     settings = await _resolve_settings(user_settings, chat_id, update.message.from_user)
     ui_lang, translation_lang, reciter = settings.ui_lang, settings.translation_lang, settings.reciter
 
-    state = file.get_user(chat_id)
+    state = await file.get_user(chat_id)
     if state is not None:
         surah, ayah, quran_type = state
         if quran_type == "english":   # legacy stored value -> canonical name
@@ -1371,9 +1372,18 @@ async def _initialize():
         # here raised AttributeError on every boot without DATABASE_URL, because
         # get_pool() answers None in that case.
         await apply_schema()
-        print("Postgres settings store ready")
+        print("Settings store ready")
     except Exception as e:
         print("INIT ERROR (postgres):", type(e).__name__, e)
+
+    try:
+        # Connect now rather than on the first update, so a missing or
+        # unreachable Redis shows on the health check straight after boot. In a
+        # worker thread: the client is synchronous and a connect can block.
+        await asyncio.to_thread(RedisSingleton)
+        print("Cache ready (%s)" % cache_backend())
+    except Exception as e:
+        print("INIT ERROR (redis):", type(e).__name__, e)
 
     try:
         # run the blocking parse in a worker thread so the event loop stays responsive
@@ -1449,8 +1459,17 @@ async def on_shutdown():
 
 
 @app.get("/")
-async def health():
-    return {"status": "ok"}
+async def health(response: Response):
+    """Liveness plus where state lives: `store` for user settings, `cache` for
+    Redis. 503 when either could not be reached or isn't configured, so a
+    deployment missing its database or Redis fails its health check instead of
+    serving a bot that forgets every user on the next restart. "pending" (still
+    booting) stays 200, so a slow start isn't mistaken for an outage."""
+    store, cache = store_backend(), cache_backend()
+    healthy = "unavailable" not in (store, cache)
+    if not healthy:
+        response.status_code = 503
+    return {"status": "ok" if healthy else "unavailable", "store": store, "cache": cache}
 
 
 @app.get(RANGE_AUDIO_PATH)

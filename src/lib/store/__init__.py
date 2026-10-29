@@ -24,7 +24,7 @@ from .groups import GroupStore, InMemoryGroupStore, PostgresGroupStore
 
 __all__ = [
   "Store", "InMemoryStore", "PostgresStore",
-  "get_store", "apply_schema", "reset_for_tests",
+  "get_store", "apply_schema", "store_backend", "reset_for_tests",
   "HifzStore", "PlanStore", "ProfileStore", "ScheduleStore", "SessionStore",
   "GroupStore",
 ]
@@ -127,9 +127,11 @@ def _lock() -> asyncio.Lock:
 async def get_store() -> Store:
   """Lazily build (once) and return the process-wide store.
 
-  Postgres-backed when DATABASE_URL is set and reachable; in-memory when it is
-  unset, or when the pool could not be created (`config.postgres.get_pool`
-  returns None in both cases, having printed the warning).
+  Postgres-backed when DATABASE_URL is set; in-memory only when it is unset and
+  ALLOW_MEMORY_STORE is on (tests, local dev) — otherwise `get_pool` raises.
+  When it is set but the server cannot be reached, `get_pool` raises
+  `DatabaseUnavailable` and nothing is cached, so the next call retries — the
+  store never silently degrades to memory in a deployment that has a database.
   """
   global _store
   if _store is not None:
@@ -139,11 +141,27 @@ async def get_store() -> Store:
     if _store is not None:              # re-check: another caller may have won the race
       return _store
 
-    # get_pool() answers None — having printed the warning — both when
-    # DATABASE_URL is unset and when the server could not be reached.
+    # None only when DATABASE_URL is unset and memory is allowed; else it raises.
     pool = await get_pool()
-    _store = PostgresStore(pool) if pool is not None else InMemoryStore()
+    if pool is None:
+      _store = InMemoryStore()
+      return _store
+    store = PostgresStore(pool)
+    # Apply the (idempotent) schema on first connect rather than trusting boot to
+    # have done it: if the database was down at boot, this is the first time we
+    # can, and new tables must exist before the first query touches them.
+    await store.apply_schema()
+    _store = store
     return _store
+
+
+def store_backend() -> str:
+  """Where user settings live right now, for the health check: "postgres",
+  "memory", "unavailable" (the last connect failed) or "pending" (not built yet)."""
+  if _store is not None:
+    return "memory" if isinstance(_store, InMemoryStore) else "postgres"
+  from config import postgres
+  return "unavailable" if postgres.last_error else "pending"
 
 
 async def apply_schema() -> None:

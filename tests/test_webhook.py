@@ -16,7 +16,11 @@ client = TestClient(main.app)
 def test_health_endpoint():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    body = response.json()
+    assert body["status"] == "ok"
+    # "pending" until first use; tests run on the in-memory stores after that.
+    assert body["store"] in ("pending", "memory")
+    assert body["cache"] in ("pending", "memory")
 
 
 def test_webhook_rejects_wrong_token():
