@@ -148,15 +148,68 @@ class TestStrictByDefault:
             fresh_redis()
         assert cache_backend() == "unavailable"
 
-    def test_an_unreachable_redis_raises_without_the_flag(self, strict, fresh_redis, monkeypatch):
+    def test_an_unreachable_redis_degrades_instead_of_failing(
+        self, strict, fresh_redis, monkeypatch
+    ):
+        # Production incident: the Upstash database behind the configured URL was
+        # deleted, its hostname stopped resolving, and every update and Mini App
+        # login failed — though nothing durable lives in Redis.
         from config import redis as redis_module
 
         monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
         monkeypatch.setattr(
             redis_module.StrictRedis, "from_url", classmethod(lambda cls, *a, **k: _Unreachable())
         )
-        with pytest.raises(redis_module.CacheUnavailable):
-            fresh_redis()
+        instance = fresh_redis()
+        assert isinstance(instance.connection, redis_module.MemoryStore)
+        assert redis_module.cache_backend() == "degraded"
+        instance.connection.set("k", "v")  # usable while degraded
+        assert instance.connection.get("k") == "v"
+
+    async def test_a_degraded_cache_keeps_the_health_check_green(
+        self, strict, fresh_redis, monkeypatch
+    ):
+        from fastapi import Response
+
+        from config import redis as redis_module
+
+        monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
+        monkeypatch.setattr(
+            redis_module.StrictRedis, "from_url", classmethod(lambda cls, *a, **k: _Unreachable())
+        )
+        fresh_redis()
+        response = Response()
+        body = await health_route.health(response)
+        assert body["cache"] == "degraded" and body["status"] == "ok"
+        assert response.status_code == 200
+
+    def test_a_degraded_cache_recovers_when_redis_returns(self, strict, fresh_redis, monkeypatch):
+        from config import redis as redis_module
+
+        monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
+        attempts = []
+        healthy = _Reachable()
+
+        def from_url(cls, *a, **k):
+            attempts.append(1)
+            return healthy if len(attempts) >= 3 else _Unreachable()
+
+        monkeypatch.setattr(redis_module.StrictRedis, "from_url", classmethod(from_url))
+        fresh_redis()  # attempt 1: down -> degraded
+        fresh_redis()
+        fresh_redis()  # inside the cooldown: no new attempt
+        assert len(attempts) == 1
+
+        expire = lambda: monkeypatch.setattr(  # noqa: E731
+            fresh_redis, "_failed_at", fresh_redis._failed_at - redis_module.RETRY_AFTER_SECONDS - 1
+        )
+        expire()
+        fresh_redis()  # attempt 2: still down
+        assert redis_module.cache_backend() == "degraded" and len(attempts) == 2
+        expire()
+        instance = fresh_redis()  # attempt 3: back
+        assert instance.connection is healthy
+        assert redis_module.cache_backend() == "redis"
 
     def test_an_unreachable_redis_falls_back_to_memory_with_the_flag(
         self, fresh_redis, monkeypatch
@@ -204,6 +257,11 @@ class TestStrictByDefault:
 class _Unreachable:
     def ping(self):
         raise ConnectionError("connection refused")
+
+
+class _Reachable:
+    def ping(self):
+        return True
 
 
 class TestHealthReportsTheStores:

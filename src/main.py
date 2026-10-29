@@ -24,7 +24,8 @@ Required env vars (see .env.example):
   AUDIO_BASE_URL         base URL for recitation mp3s
   PHOTO_BASE_URL         base URL/path for Arabic ayah images
   WEBHOOK_URL            public HTTPS base URL Telegram should POST updates to;
-                         the webhook is registered as WEBHOOK_URL + "/webhook/" + TOKEN
+                         the webhook is registered as WEBHOOK_URL + "/webhook",
+                         authenticated by a secret header derived from TOKEN
 """
 
 from dotenv import load_dotenv

@@ -16,6 +16,7 @@ Usage:
 """
 
 import asyncio
+import hashlib
 import json
 import statistics
 import subprocess
@@ -30,6 +31,12 @@ from gen_updates import batch  # noqa: E402
 
 BASE_URL = "http://localhost:8091"
 TOKEN = "stress-test-token"
+# The app checks this header against a hash of its token (app/routes/webhook.py).
+WEBHOOK_HEADERS = {
+    "X-Telegram-Bot-Api-Secret-Token": hashlib.sha256(
+        ("telegram-webhook:" + TOKEN).encode()
+    ).hexdigest()
+}
 CONTAINER = "quranayat-stress-app"
 TIERS = [5, 10, 20, 40, 80, 150, 300, 600, 1000]
 # httpx.AsyncClient defaults to max_connections=100, which would silently
@@ -109,7 +116,7 @@ def _oom_killed() -> bool:
 async def _fire_one(client: httpx.AsyncClient, update: dict) -> tuple[float, int]:
     t0 = time.perf_counter()
     try:
-        resp = await client.post("/webhook/%s" % TOKEN, json=update, timeout=30)
+        resp = await client.post("/webhook", json=update, timeout=30, headers=WEBHOOK_HEADERS)
         return time.perf_counter() - t0, resp.status_code
     except httpx.HTTPError:
         return time.perf_counter() - t0, -1
