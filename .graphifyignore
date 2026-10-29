@@ -1,0 +1,44 @@
+# Graphify: paths excluded from the knowledge graph (gitignore syntax).
+# Code + markdown docs only; skip binaries, data dumps, build output and secrets.
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+venv/
+.venv/
+__pycache__/
+.pytest_cache/
+graphify-out/
+.claude/
+CLAUDE.local.md
+.env
+.env.*
+!.env.example
+*.lock
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+*.pdf
+*.xml
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.ico
+*.mp3
+*.mp4
+*.woff
+*.woff2
+*.ttf
+# Quran text / translation data dumps
+translations/
+en.ahmedraza
+Al_Jalalain_Eng.txt
+quran-data.xml
+# Licences and pinned dependency lists add no knowledge
+LICENSE*
+requirements*.txt
