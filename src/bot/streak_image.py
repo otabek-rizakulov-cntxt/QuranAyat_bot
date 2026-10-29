@@ -31,8 +31,9 @@ from io import BytesIO
 from typing import Iterable, Mapping, Optional, Union
 
 from domain.localtime import week_bounds
+from domain.streaks import GRID_WEEKS  # re-exported
 from lib.store import get_store
-from lib.streaks import user_today
+from services.streaks import user_today
 
 __all__ = [
     "GRID_WEEKS",
@@ -56,7 +57,6 @@ __all__ = [
     "cache_key",
 ]
 
-GRID_WEEKS = 12  # 12 columns x 7 rows = 84 days, one quarter
 
 CELL = 12  # a square day
 GAP = 3  # between squares

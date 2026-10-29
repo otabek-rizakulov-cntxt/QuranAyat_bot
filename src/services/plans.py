@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timezone
 from typing import List, Optional, Sequence
 
-from domain.hifz_progress import load_summary
 from domain.localtime import (
     DEFAULT_OFFSET,
     is_valid_offset,
@@ -41,8 +40,9 @@ from lib.store.plans import (
     PlanDaySpec,
 )
 from lib.store.sessions import KIND_DRILL
-from lib.streaks import record_session
 from services.profile import as_time
+from services.progress import load_summary
+from services.streaks import record_session
 
 logger = logging.getLogger(__name__)
 

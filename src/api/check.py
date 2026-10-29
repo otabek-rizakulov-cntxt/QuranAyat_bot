@@ -16,8 +16,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
 from lib.store import get_store
-from lib.streaks import user_today
 from services import check as check_service
+from services.streaks import user_today
 
 from .auth import jwt_secret, require_user
 from .common import RefOut, parse_ref_or_422, ref_out

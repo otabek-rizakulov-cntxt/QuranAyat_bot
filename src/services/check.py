@@ -13,7 +13,7 @@ from typing import Optional, Tuple
 from domain.recall_check import RecallQuestion, build_question, pick_ayah, preload_corpus
 from domain.refs import KIND_RANGE, Ref, juz_ref
 from lib.store.sessions import KIND_RECALL_CHECK
-from lib.streaks import record_session
+from services.streaks import record_session
 
 # What a bare /check tests when the user has no plan and nothing marked. Juz 30
 # is where essentially every memorizer starts, so it is the least surprising

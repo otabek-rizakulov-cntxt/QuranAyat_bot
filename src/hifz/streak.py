@@ -6,7 +6,7 @@
 # Callback prefix: "hs:" (see hifz.PREFIXES).
 #
 # **The grid is a PNG, not an emoji block.** §4 G2 and assumption 1 called for an
-# emoji grid; that was overridden with approval and `lib/streak_image.py` renders
+# emoji grid; that was overridden with approval and `bot/streak_image.py` renders
 # a real contribution graph. An emoji grid wraps at a different column on every
 # client; a PNG is one image that looks the same everywhere, and it is the thing
 # people screenshot into their circle.
@@ -24,9 +24,9 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.media import send_cached
+from bot.streak_image import cache_key, render_streak_graph
 from hifz import Ctx, callback, command
-from lib.streak_image import cache_key, render_streak_graph
-from lib.streaks import StreakSummary, streak_summary
+from services.streaks import StreakSummary, streak_summary
 
 logger = logging.getLogger(__name__)
 

@@ -7,9 +7,9 @@ way to the screen.
 
 from datetime import date, datetime, timedelta, timezone
 
-from lib.leaderboard import DEFAULT_LIMIT, week_window, weekly_board
 from lib.store import get_store
 from lib.store.sessions import KIND_DRILL
+from services.leaderboard import DEFAULT_LIMIT, week_window, weekly_board
 
 MONDAY = date(2026, 3, 16)
 SUNDAY = date(2026, 3, 22)

@@ -9,9 +9,7 @@ that a brand-new user with no history renders rather than crashing.
 from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL
-from lib.streak_image import (
+from bot.streak_image import (
     CELL,
     EMPTY,
     FUTURE,
@@ -28,6 +26,8 @@ from lib.streak_image import (
     level_for,
     render_streak_graph,
 )
+from lib.store import get_store
+from lib.store.sessions import KIND_DRILL
 
 WEDNESDAY = date(2026, 3, 18)
 MONDAY = date(2026, 3, 16)

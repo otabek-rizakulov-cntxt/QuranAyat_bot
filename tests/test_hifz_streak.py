@@ -3,7 +3,7 @@
 Two properties are load-bearing:
 
 * **The 12-week grid is a rendered PNG.** §4 G2 and assumption 1 asked for an
-  emoji grid; that was overridden with approval. `lib/streak_image.py` renders
+  emoji grid; that was overridden with approval. `bot/streak_image.py` renders
   the card and this module sends it, caching the Telegram `file_id` per
   (user, local date) so a user hammering /streak pays for one render a day.
 * **No percentile line is ever rendered.** G3 holds "top X% of users" dark until
@@ -21,13 +21,13 @@ import telegram
 
 import bot.router as router
 import hifz
+from bot.streak_image import cache_key
 from hifz import Ctx
 from hifz.streak import CB_GRID
 from lib.store import get_store
 from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
-from lib.streak_image import cache_key
-from lib.streaks import refresh_streaks, user_today
 from locales import t
+from services.streaks import refresh_streaks, user_today
 
 USER = 900_601
 MILESTONES = (

@@ -21,11 +21,11 @@ from domain.hifz_progress import summarize
 from hifz import Ctx
 from hifz import memorize as memorize_feature
 from lib import scheduler
-from lib.leaderboard import weekly_board
 from lib.store import get_store
 from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
-from lib.streaks import record_session, streak_summary
 from lib.wizard import Wizard
+from services.leaderboard import weekly_board
+from services.streaks import record_session, streak_summary
 
 USER = 990001
 CHAT = 990001

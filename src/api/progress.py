@@ -7,10 +7,11 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from domain.hifz_progress import load_summary, surah_progress
+from domain.hifz_progress import surah_progress
 from domain.quran import Quran
 from lib.store import get_store
 from services import progress as progress_service
+from services.progress import load_summary
 
 from .auth import require_user
 from .common import RefOut, not_found, parse_ref_or_422, ref_out

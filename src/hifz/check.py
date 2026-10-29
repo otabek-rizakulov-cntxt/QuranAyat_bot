@@ -36,8 +36,8 @@ from domain.quran import Quran
 from domain.recall_check import OPTION_COUNT, RecallQuestion
 from domain.refs import parse_reference
 from hifz import Ctx, callback, command
-from lib.streaks import user_today
 from services.check import DEFAULT_JUZ  # noqa: F401 — re-exported
+from services.streaks import user_today
 
 # --- callback_data shapes ------------------------------------------------------
 # hc:start                              start a check from another screen (23 B max: 8)

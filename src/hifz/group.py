@@ -405,7 +405,7 @@ async def group_board_entries(store, bot, chat_id: int, utc_now=None):
     from datetime import datetime, timezone
 
     from domain.localtime import DEFAULT_OFFSET, normalize_offset
-    from lib.leaderboard import week_window
+    from services.leaderboard import week_window
 
     config = await store.groups.get_config(chat_id)
     if config is None:
@@ -480,9 +480,9 @@ async def _enqueue_next_board(store, chat_id: int, now=None):
     from datetime import time as _time
 
     from domain.localtime import DEFAULT_OFFSET, normalize_offset, to_utc
-    from lib.leaderboard import week_window
     from lib.scheduler import enqueue
     from lib.store.groups import CONFIG_ACTIVE as _ACTIVE
+    from services.leaderboard import week_window
 
     config = await store.groups.get_config(chat_id)
     if config is None or config.status != _ACTIVE:

@@ -44,7 +44,6 @@ __all__ = [
     "started_surahs",
     "started_juzs",
     "summarize",
-    "load_summary",
 ]
 
 # 6236. Summed from the corpus rather than written down, so it can never disagree
@@ -545,13 +544,3 @@ def summarize(intervals: Iterable, focus_surah: Optional[int] = None) -> Progres
         quran_pages=quran_page_progress(spans),
         focus_juz_pages=focus_juz_pages,
     )
-
-
-async def load_summary(store, user_id: int, focus_surah: Optional[int] = None) -> ProgressSummary:
-    """`summarize` over everything `user_id` has marked. One store round trip.
-
-    The whole interval set is read even when only one surah is being shown,
-    because the summary always carries the whole-Qur'an line and a per-surah query
-    could not produce it.
-    """
-    return summarize(await store.hifz.list_intervals(user_id), focus_surah)

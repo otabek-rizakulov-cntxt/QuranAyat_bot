@@ -7,10 +7,10 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from domain.localtime import week_bounds
-from lib.leaderboard import weekly_board
+from domain.streaks import GRID_WEEKS
 from lib.store import get_store
-from lib.streak_image import GRID_WEEKS
-from lib.streaks import streak_summary
+from services.leaderboard import weekly_board
+from services.streaks import streak_summary
 
 from .auth import require_user
 

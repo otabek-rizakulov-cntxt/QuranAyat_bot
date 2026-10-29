@@ -26,8 +26,8 @@ from hifz import Ctx
 from hifz.check import CB_ANSWER, CB_START, _parse_answer
 from lib.store import get_store
 from lib.store.sessions import KIND_RECALL_CHECK
-from lib.streaks import streak_summary, user_today
 from locales import t
+from services.streaks import streak_summary, user_today
 
 USER = 900_501
 

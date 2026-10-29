@@ -264,9 +264,9 @@ class TestLeaderboardOptIn:
 
     async def test_opt_out_removes_the_user_from_every_board_query(self):
         # B2's done-when, second half: absent from the *query*, not hidden by the
-        # renderer (lib/leaderboard.py refuses to filter at render time).
-        from lib.leaderboard import weekly_board
-        from lib.streaks import record_session
+        # renderer (services/leaderboard.py refuses to filter at render time).
+        from services.leaderboard import weekly_board
+        from services.streaks import record_session
 
         store = await get_store()
         ctx = await _ctx(username="abubakr", tap=True)

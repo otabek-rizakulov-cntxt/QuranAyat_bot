@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from lib.store import get_store
 from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
-from lib.streaks import (
+from services.streaks import (
     GRACE_DAYS,
     MILESTONE_DAYS,
     PERCENTILE_MIN_USERS,

@@ -7,7 +7,7 @@
 #
 # Three things this module deliberately does *not* do:
 #
-#   * It does not filter. `lib.leaderboard.weekly_board` composes two store
+#   * It does not filter. `services.leaderboard.weekly_board` composes two store
 #     queries that join on `leaderboard_opt_in`, so an opted-out user is absent
 #     from the data, not hidden by this renderer. A renderer that filtered would
 #     leak a position count and would put a private user on a public list the
@@ -26,7 +26,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from hifz import Ctx, callback, command
-from lib.leaderboard import weekly_board
+from services.leaderboard import weekly_board
 
 # --- callback_data shapes ------------------------------------------------------
 # hl:me     re-send the board (for other screens to link to) — 5 bytes

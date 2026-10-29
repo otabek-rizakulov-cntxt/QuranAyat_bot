@@ -29,7 +29,6 @@ from domain.hifz_progress import (
     format_percent,
     juz_page_progress,
     juz_progress,
-    load_summary,
     quran_page_progress,
     quran_progress,
     round_percent,
@@ -41,6 +40,7 @@ from domain.hifz_progress import (
 from domain.quran import Quran
 from lib.store import get_store
 from lib.store.hifz import HifzInterval
+from services.progress import load_summary
 
 USER = 1
 AL_MULK = 67  # 30 ayahs, juz 29

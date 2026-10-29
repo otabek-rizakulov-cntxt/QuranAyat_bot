@@ -34,7 +34,7 @@ class ProfileRow:
     could be stored later without a migration.
 
     `current_streak` / `longest_streak` are denormalized from `session_log` for
-    cheap reads; `lib.streaks` owns recomputing them.
+    cheap reads; `services.streaks` owns recomputing them.
     """
 
     telegram_user_id: int

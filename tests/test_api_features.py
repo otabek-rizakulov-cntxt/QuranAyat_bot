@@ -339,7 +339,7 @@ async def test_progress_numbers_match_the_spec_and_forget_lowers_them(client):
 
 
 async def test_opted_out_user_is_absent_from_the_board(client):
-    from lib.streaks import record_session
+    from services.streaks import record_session
 
     h_alice = await _login(client, ALICE)
     await _login(client, BOB)

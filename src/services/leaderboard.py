@@ -24,7 +24,7 @@ from typing import Optional, Tuple
 from domain.localtime import local_date, week_bounds
 from lib.store import get_store
 from lib.store.sessions import LeaderboardEntry
-from lib.streaks import offset_of, user_offset
+from services.streaks import offset_of, user_offset
 
 __all__ = [
     "DEFAULT_LIMIT",
