@@ -26,11 +26,15 @@ from typing import Optional
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.media import send_combined_audio
 from hifz import Ctx, callback, wizard
 from lib.localtime import DEFAULT_OFFSET
+from lib.page_image import fetch_and_stitch
 from lib.scheduler import send_handler
 from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
+from lib.utils import File
 from locales import t
+from modules.quran import get_translation
 
 logger = logging.getLogger(__name__)
 
@@ -348,10 +352,6 @@ async def push_group_day(ctx) -> None:
 
 async def _post_portion(bot, config, day) -> None:
     """Post one portion to the group's topic: image, audio, translation, per flags."""
-    from lib.page_image import fetch_and_stitch
-    from lib.utils import File
-    from main import get_translation, send_combined_audio
-
     flags = config.content_flags or {}
     thread = config.thread_id
     chat_id = config.chat_id

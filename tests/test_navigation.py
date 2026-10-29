@@ -11,6 +11,7 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.media
 import main
 from modules import Quran
 
@@ -46,7 +47,7 @@ def _no_network(monkeypatch):
         buf.name = name
         return buf
 
-    monkeypatch.setattr(main, "fetch_and_stitch", fake_stitch)
+    monkeypatch.setattr(bot.media, "fetch_and_stitch", fake_stitch)
 
 
 def _message(tg_bot, text, chat_id=771000, lang="en"):

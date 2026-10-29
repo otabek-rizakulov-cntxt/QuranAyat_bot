@@ -8,12 +8,14 @@ stitching route is exercised directly (it is a plain async function) rather than
 over HTTP, which would drag the app's startup hooks in.
 """
 
+import io
 from unittest.mock import AsyncMock
 
 import httpx
 import pytest
 import telegram
 
+import infra.audio
 import main
 from lib.user_settings import UserSettings
 from lib.utils import File
@@ -247,11 +249,11 @@ class TestRangeAudioRoute:
 
         async def fake_download(surah, start, end, performer):
             calls.append((surah, start, end, performer))
-            buf = main.BytesIO(content)
+            buf = io.BytesIO(content)
             buf.name = "quran_%d_%d-%d.mp3" % (surah, start, end)
             return buf
 
-        monkeypatch.setattr(main, "_download_combined_audio", fake_download)
+        monkeypatch.setattr(infra.audio, "download_combined_audio", fake_download)
         return calls
 
     async def test_serves_the_stitched_mp3(self, monkeypatch):
@@ -291,7 +293,7 @@ class TestRangeAudioRoute:
         async def boom(*args):
             raise httpx.ConnectError("cdn down")
 
-        monkeypatch.setattr(main, "_download_combined_audio", boom)
+        monkeypatch.setattr(infra.audio, "download_combined_audio", boom)
 
         response = await main.range_audio(59, 22, 24, "Husary_128kbps")
         assert response.status_code == 502
@@ -323,7 +325,7 @@ class TestStitching:
             async def get(self, url):
                 return FakeResponse(bodies[url[-7:-4]])
 
-        monkeypatch.setattr(main.httpx, "AsyncClient", FakeClient)
+        monkeypatch.setattr(httpx, "AsyncClient", FakeClient)
 
         buf = await main._download_combined_audio(59, 22, 24, "Husary_128kbps")
 

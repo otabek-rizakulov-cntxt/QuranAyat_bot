@@ -27,10 +27,10 @@
 #     async def name_step(ctx: Ctx, text: str) -> None:
 #         ...
 #
-# Discovery is *lazy* on purpose: it runs on the first dispatch (and explicitly
-# from `_initialize()` at boot), never at `import hifz` time. That means a
-# feature module may `from main import send_quran` at the top of the file without
-# a circular import, which is the mistake this package would otherwise invite.
+# Discovery is *lazy*: it runs on the first dispatch (and explicitly from
+# `_initialize()` at boot), never at `import hifz` time. Feature modules take
+# what they send with from `bot.media` and friends — never from `main`, which
+# tests/test_layering.py enforces.
 import importlib
 import logging
 import pkgutil

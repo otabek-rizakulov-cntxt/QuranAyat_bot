@@ -15,6 +15,8 @@ import pytest
 import telegram
 from PIL import Image
 
+import bot.media
+import infra.audio
 import main
 from lib import page_image
 from lib.utils import File
@@ -91,7 +93,7 @@ class TestStitching:
 
 class TestPageCard:
     async def test_sends_the_stitched_image_with_a_pager(self, fake_bot, monkeypatch):
-        monkeypatch.setattr(main, "fetch_and_stitch", _stub_stitch())
+        monkeypatch.setattr(bot.media, "fetch_and_stitch", _stub_stitch())
         await main.send_page(fake_bot, 255, 4001, "en")
 
         kwargs = fake_bot.send_photo.await_args.kwargs
@@ -100,7 +102,7 @@ class TestPageCard:
         assert rows[0][1].text == "255/604"
 
     async def test_caption_names_both_surahs_when_the_page_crosses(self, fake_bot, monkeypatch):
-        monkeypatch.setattr(main, "fetch_and_stitch", _stub_stitch())
+        monkeypatch.setattr(bot.media, "fetch_and_stitch", _stub_stitch())
         await main.send_page(fake_bot, 255, 4002, "en")
         caption = fake_bot.send_photo.await_args.kwargs["caption"]
         assert "13:43" in caption and "14:5" in caption
@@ -112,7 +114,7 @@ class TestPageCard:
             seen["urls"] = urls
             return _buffer()
 
-        monkeypatch.setattr(main, "fetch_and_stitch", capture)
+        monkeypatch.setattr(bot.media, "fetch_and_stitch", capture)
         await main.send_page(fake_bot, 255, 4003, "en")
         assert len(seen["urls"]) == 6  # 13:43 plus 14:1-14:5
         assert seen["urls"][0].endswith("/13_43.png")
@@ -127,7 +129,7 @@ class TestPageCard:
             calls.append(name)
             return _buffer()
 
-        monkeypatch.setattr(main, "fetch_and_stitch", counting)
+        monkeypatch.setattr(bot.media, "fetch_and_stitch", counting)
         await main.send_page(fake_bot, 100, 4004, "en")
         await main.send_page(fake_bot, 100, 4005, "en")
 
@@ -136,7 +138,7 @@ class TestPageCard:
         assert fake_bot.send_photo.await_args.kwargs["photo"] == "photo-file-id"
 
     async def test_a_rejected_cached_file_id_is_rebuilt(self, fake_bot, monkeypatch):
-        monkeypatch.setattr(main, "fetch_and_stitch", _stub_stitch())
+        monkeypatch.setattr(bot.media, "fetch_and_stitch", _stub_stitch())
         File().save_file("page:7", "stale-file-id")
         fake_bot.send_photo.side_effect = [
             telegram.error.BadRequest("wrong file identifier"),
@@ -195,7 +197,7 @@ class TestPageAudio:
             buf.name = name
             return buf
 
-        monkeypatch.setattr(main, "_download_stitched_audio", capture)
+        monkeypatch.setattr(infra.audio, "download_stitched_audio", capture)
         await main.send_page_audio(fake_bot, 255, 4008, reciter, "en")
 
         # the fallback has to cross the surah boundary this page sits on
@@ -227,14 +229,14 @@ class TestRepeatForMemorization:
             seen.update(ayahs=ayahs, name=name, performer=performer)
             return BytesIO(b"mp3")
 
-        monkeypatch.setattr(main, "_download_stitched_audio", capture)
+        monkeypatch.setattr(infra.audio, "download_stitched_audio", capture)
         await main.send_repeated_audio(fake_bot, 2, 255, 5001, "Husary_128kbps", "en")
 
         assert seen["ayahs"] == [(2, 255)] * main.REPEAT_COUNT
         assert seen["performer"] == "Husary_128kbps"
 
     async def test_the_title_says_how_many_times(self, fake_bot, monkeypatch):
-        monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
+        monkeypatch.setattr(infra.audio, "download_stitched_audio", _stub_audio())
         await main.send_repeated_audio(fake_bot, 2, 255, 5002, "Husary_128kbps", "en")
         title = fake_bot.send_audio.await_args.kwargs["title"]
         assert title == "Qur'an 2:255 ×%d" % main.REPEAT_COUNT
@@ -246,7 +248,7 @@ class TestRepeatForMemorization:
             calls.append(name)
             return BytesIO(b"mp3")
 
-        monkeypatch.setattr(main, "_download_stitched_audio", counting)
+        monkeypatch.setattr(infra.audio, "download_stitched_audio", counting)
         await main.send_repeated_audio(fake_bot, 2, 255, 5003, "Husary_128kbps", "en")
         await main.send_repeated_audio(fake_bot, 2, 255, 5004, "Husary_128kbps", "en")
 
@@ -254,7 +256,7 @@ class TestRepeatForMemorization:
         assert fake_bot.send_audio.await_args.kwargs["audio"] == "audio-file-id"
 
     async def test_a_different_reciter_gets_its_own_recording(self, fake_bot, monkeypatch):
-        monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
+        monkeypatch.setattr(infra.audio, "download_stitched_audio", _stub_audio())
         await main.send_repeated_audio(fake_bot, 2, 255, 5005, "Husary_128kbps", "en")
         fake_bot.reset_mock()
         fake_bot.send_audio.return_value = telegram.Message(
@@ -265,7 +267,7 @@ class TestRepeatForMemorization:
 
     async def test_it_works_for_a_reciter_with_no_upstream_timings(self, fake_bot, monkeypatch):
         # the point of dropping the timings files: coverage is the whole catalog
-        monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
+        monkeypatch.setattr(infra.audio, "download_stitched_audio", _stub_audio())
         await main.send_repeated_audio(fake_bot, 36, 1, 5007, "Yaser_Salamah_128kbps", "en")
         fake_bot.send_audio.assert_awaited()
 
@@ -278,7 +280,7 @@ class TestStitchedAudioAcrossSurahs:
             captured.update(ayahs=ayahs, name=name)
             return BytesIO(b"")
 
-        monkeypatch.setattr(main, "_download_stitched_audio", fake_download)
+        monkeypatch.setattr(infra.audio, "download_stitched_audio", fake_download)
         await main._download_combined_audio(59, 22, 24, "Husary_128kbps")
         assert captured["ayahs"] == [(59, 22), (59, 23), (59, 24)]
         assert captured["name"] == "quran_59_22-24.mp3"
