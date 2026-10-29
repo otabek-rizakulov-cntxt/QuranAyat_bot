@@ -1,6 +1,6 @@
 from telegram import Bot as TelegramBot
 
-from config import Environment
+from config.settings import get_settings
 
 
 class Bot:
@@ -9,6 +9,6 @@ class Bot:
     @classmethod
     def get_instance(cls):
         if cls._instance is None:
-            token = Environment.get_env("token")
+            token = get_settings().token
             cls._instance = TelegramBot(token=token)
         return cls._instance

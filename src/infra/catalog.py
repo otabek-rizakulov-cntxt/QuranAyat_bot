@@ -5,7 +5,7 @@ from typing import List, Optional
 
 import ujson as json
 
-from config import Environment
+from config.settings import get_settings
 
 DEFAULT_RECITER = "Husary_128kbps"
 _PERFORMERS_PATH = os.path.join(
@@ -72,11 +72,8 @@ def audio_url(surah: int, ayah: int, performer: str = DEFAULT_RECITER) -> str:
     not in the catalog."""
     if find(performer) is None:
         raise ValueError(f"Unknown performer: {performer}")
-    return "{base}/{sub}/{s}{a}.mp3".format(
-        base=Environment.get_env("audio_base_url"),
-        sub=performer,
-        s=str(surah).zfill(3),
-        a=str(ayah).zfill(3),
+    return (
+        f"{get_settings().audio_base_url}/{performer}/{str(surah).zfill(3)}{str(ayah).zfill(3)}.mp3"
     )
 
 
@@ -86,17 +83,15 @@ def page_audio_url(page: int, performer: str) -> str:
     Only meaningful when `has_page_audio(performer)`; callers stitch the page's
     ayah recitations together instead when it is False.
     """
-    return "{base}/{sub}/PageMp3s/Page{p}.mp3".format(
-        base=Environment.get_env("audio_base_url"), sub=performer, p=str(page).zfill(3)
-    )
+    return f"{get_settings().audio_base_url}/{performer}/PageMp3s/Page{str(page).zfill(3)}.mp3"
 
 
 def image_url(surah: int, ayah: int) -> str:
     """The rendered Arabic image of one ayah."""
-    return "%s/%d_%d.png" % (Environment.get_env("quranic_images_file_path"), surah, ayah)
+    return "%s/%d_%d.png" % (get_settings().photo_base_url, surah, ayah)
 
 
 def page_image_url(surah: int, ayah: int) -> str:
     """The per-ayah image the page stitcher tiles — same naming as `image_url`,
-    but from the uniform-width set (see config.env)."""
-    return "%s/%d_%d.png" % (Environment.get_env("page_image_base_url"), surah, ayah)
+    but from the uniform-width set (see `Settings.page_image_base_url`)."""
+    return "%s/%d_%d.png" % (get_settings().page_image_base_url, surah, ayah)

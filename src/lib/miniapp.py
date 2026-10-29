@@ -11,12 +11,12 @@ from typing import Optional
 
 from telegram import InlineKeyboardButton, MenuButtonWebApp, WebAppInfo
 
-from config import Environment
+from config.settings import get_settings
 
 
 def app_url(path: str = "/") -> Optional[str]:
     """The Mini App URL for an app route ("/read/2?a=255"), or None when unset."""
-    base = (Environment.get_env("miniapp_url") or "").rstrip("/")
+    base = (get_settings().miniapp_url or "").rstrip("/")
     if not base:
         return None
     return base + (path if path.startswith("/") else "/" + path)

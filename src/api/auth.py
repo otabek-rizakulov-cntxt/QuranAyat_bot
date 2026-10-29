@@ -27,7 +27,7 @@ from urllib.parse import parse_qsl, urlencode
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from config import Environment
+from config.settings import get_settings
 
 DEFAULT_INIT_DATA_MAX_AGE = 24 * 3600  # seconds an initData stays exchangeable
 DEFAULT_TOKEN_TTL = 3600  # seconds an access token lives
@@ -176,7 +176,7 @@ def decode_token(token: str, secret: str, now: Optional[float] = None) -> int:
 
 
 def jwt_secret() -> Optional[str]:
-    return Environment.get_env("miniapp_jwt_secret") or None
+    return get_settings().miniapp_jwt_secret or None
 
 
 def init_data_max_age() -> int:

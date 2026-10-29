@@ -4,7 +4,7 @@ import time
 
 from redis import StrictRedis
 
-from .env import Environment  # Importing the base Environment class
+from .settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +49,10 @@ RETRY_AFTER_SECONDS = 30
 
 class CacheUnavailable(RuntimeError):
     """Redis is not configured or could not be reached, and the in-memory store
-    is not allowed to stand in for it (see `config.env.memory_store_allowed`)."""
+    is not allowed to stand in for it (see `Settings.allow_memory_store`)."""
 
 
-class RedisSingleton(Environment):
+class RedisSingleton:
     _instance = None
     _lock = threading.Lock()
     # Why the last connect failed, and when (time.monotonic()); None once connected.
@@ -83,11 +83,10 @@ class RedisSingleton(Environment):
 
     @classmethod
     def _make_connection(cls):
-        from .env import memory_store_allowed
 
-        redis_url = cls.get_env("redis")
+        redis_url = get_settings().redis_url
         if not redis_url:
-            if not memory_store_allowed():
+            if not get_settings().allow_memory_store:
                 raise CacheUnavailable("not configured")
             logger.warning(
                 "REDIS_HOST_URL is not set — falling back to in-memory store. "
@@ -107,7 +106,7 @@ class RedisSingleton(Environment):
             connection.ping()  # verify once up-front rather than on every request
             return connection
         except Exception as e:
-            if not memory_store_allowed():
+            if not get_settings().allow_memory_store:
                 raise CacheUnavailable("unreachable (%s)" % type(e).__name__) from e
             logger.warning(
                 "Redis unreachable (%s: %s) — falling back to in-memory store."

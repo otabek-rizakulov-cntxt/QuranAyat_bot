@@ -12,7 +12,7 @@ import telegram
 from bot.keyboards.page import page_keyboard
 from bot.limits import REPEAT_COUNT
 from bot.text import build_verse_text, page_caption, reference
-from config.env import webhook_base_url
+from config.settings import get_settings
 from infra import audio as cdn_audio
 from infra import catalog, media_cache, nav_state
 from lib.page_image import fetch_and_stitch
@@ -119,7 +119,7 @@ RANGE_AUDIO_PATH = "/media/range.mp3"
 def range_audio_url(surah: int, start: int, end: int, performer: str) -> str | None:
     """Public URL of the stitched recitation of `surah:start-end`, or None when we
     have no public base URL to serve it from (local dev without WEBHOOK_URL)."""
-    base = webhook_base_url()
+    base = get_settings().webhook_base_url
     if not base or not base.startswith("https://"):
         return None
     query = urlencode({"surah": surah, "start": start, "end": end, "reciter": performer})

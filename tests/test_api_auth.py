@@ -24,9 +24,9 @@ from api.auth import (
     sign_init_data,
     validate_init_data,
 )
-from config import Environment
+from config import get_settings
 
-BOT_TOKEN = Environment.get_env("token")
+BOT_TOKEN = get_settings().token
 SECRET = "test-jwt-secret-not-real"
 USER = {"id": 424242, "first_name": "Amina", "language_code": "ru"}
 

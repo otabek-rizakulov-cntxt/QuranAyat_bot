@@ -7,7 +7,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from config import Environment
+from config.settings import get_settings
 from infra import catalog
 from lib.localtime import is_valid_offset, normalize_offset, offset_options
 from lib.store import get_store
@@ -119,7 +119,7 @@ def _profile(profile) -> Profile:
 async def auth_telegram(body: TelegramAuthIn) -> AuthOut:
     """Exchange the Mini App's initData for a short-lived access token."""
     secret = jwt_secret()
-    bot_token = Environment.get_env("token")
+    bot_token = get_settings().token
     if not secret or not bot_token:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

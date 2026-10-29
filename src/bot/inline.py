@@ -20,7 +20,7 @@ from bot.limits import MAX_RANGE_AYAHS
 from bot.media import combined_audio_key, range_audio_url
 from bot.settings import resolve_settings
 from bot.text import ref_key, reference
-from config import Environment
+from config.settings import get_settings
 from domain.parsing import parse_ayah_range
 from infra import catalog, media_cache
 from lib.user_settings import UserSettings
@@ -135,7 +135,7 @@ def inline_photo_results(surah: int, start: int, end: int, ui_lang: str) -> list
     ayah nobody has viewed yet, and needs PHOTO_BASE_URL to be a public URL; when
     it points at a local directory, only already-cached ayahs can be offered.
     """
-    if not Environment.get_env("quranic_images_file_path"):
+    if not get_settings().photo_base_url:
         return []  # no images configured at all
     results = []
     for ayah in range(start, min(end, start + INLINE_MAX_PHOTOS - 1) + 1):

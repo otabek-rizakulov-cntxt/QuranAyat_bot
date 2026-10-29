@@ -8,7 +8,7 @@ from fastapi import APIRouter, Request, Response
 from app.state import AppState
 from app.tasks import spawn
 from bot.dispatch import handle_update
-from config import Environment
+from config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ router = APIRouter()
 
 @router.post("/webhook/{token}")
 async def telegram_webhook(token: str, request: Request):
-    if token != Environment.get_env("token"):
+    if token != get_settings().token:
         return Response(status_code=404)
     state: AppState = request.app.state.runtime
     if state.bot is None or state.data is None:

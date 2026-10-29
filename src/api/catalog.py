@@ -6,7 +6,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from config import Environment
+from config.settings import get_settings
 from infra import nav_state
 from locales import LANGUAGES, UI_LANGUAGES
 from modules import Quran, TranslationRegistry
@@ -41,7 +41,7 @@ async def reciters(_: int = Depends(require_user)) -> RecitersOut:
     """All reciters in the bot's picker order (shortlist first)."""
     return RecitersOut(
         kinds=list(RECITER_KINDS),
-        audio_base_url=(Environment.get_env("audio_base_url") or "").rstrip("/"),
+        audio_base_url=(get_settings().audio_base_url or "").rstrip("/"),
         reciters=[
             Reciter(
                 subfolder=p["subfolder"],

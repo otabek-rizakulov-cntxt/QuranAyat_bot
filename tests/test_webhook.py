@@ -8,7 +8,7 @@ lifespan (which would kick off bot creation / webhook registration) never runs.
 from fastapi.testclient import TestClient
 
 import main
-from config import Environment
+from config import get_settings
 
 client = TestClient(main.app)
 
@@ -29,7 +29,7 @@ def test_webhook_rejects_wrong_token():
 
 
 def test_webhook_acks_before_initialization():
-    token = Environment.get_env("token")
+    token = get_settings().token
     response = client.post("/webhook/%s" % token, json={"update_id": 1})
     assert response.status_code == 200
     assert response.json() == {"ok": True}
