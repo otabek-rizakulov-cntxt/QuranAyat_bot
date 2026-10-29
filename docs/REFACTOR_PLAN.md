@@ -261,7 +261,7 @@ stay readable.
 - Logging keeps httpx/httpcore at WARNING, because Bot API URLs contain the
   bot token.
 
-### Phase 1 — Take `main.py` apart (pure moves)
+### Phase 1 — Take `main.py` apart (pure moves) — *done*
 
 `main.py` keeps `from bot.… import *`-style re-exports of every moved name until
 step 1.6. Tests patch ~40 `main.*` attributes (73 references to
@@ -299,6 +299,21 @@ step 1.6. Tests patch ~40 `main.*` attributes (73 references to
 
 *Done when:* `main.py` < 60 lines; `grep -r "from main import" src` is empty.
 
+*As shipped* (`refactor/phase-1-split-main`):
+- `main.py` is 40 lines, down from 1,512.
+- `handle_update` moved unchanged to `bot/dispatch.py` in 1.5. Leaving it in
+  `main.py` until Phase 3 would have broken the line count above, so Phase 3
+  rewrites it there instead.
+- 2.5 (`spawn`) was pulled forward into 1.5, since the three task sites were
+  moving anyway.
+- `@app.on_event` became a `lifespan` handler; the suite now runs with no
+  deprecation warnings.
+- `get_translation` lives in `modules/quran.py` until Phase 5 moves the
+  module to `domain/`.
+- The re-export shim only worked for *reading* names. Tests that patched a
+  function through `main` had to move in the step that moved the function
+  (1.3), because a patch on `main` no longer reaches the caller.
+
 ### Phase 2 — DRY the duplicated patterns
 
 - **2.1 `send_cached(bot, key, kind, build_source, **kwargs)`** in `bot/media.py`.
@@ -325,7 +340,7 @@ step 1.6. Tests patch ~40 `main.*` attributes (73 references to
 - **2.4 `ignore_not_modified()`** context manager in `bot/errors.py`, applied to
   all six sites.
 - **2.5 `spawn(coro)`** in `app/tasks.py`, applied to all three background-task
-  sites.
+  sites. *(Done in 1.5.)*
 - **2.6 (optional, behaviour-adjacent) Group portion image.** `group._post_portion`
   re-downloads and re-stitches the portion image on every daily post, for every
   group. It skips the file_id cache that `send_page` uses for the same kind of

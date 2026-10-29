@@ -8,13 +8,22 @@ stitching route is exercised directly (it is a plain async function) rather than
 over HTTP, which would drag the app's startup hooks in.
 """
 
+import io
 from unittest.mock import AsyncMock
 
 import httpx
 import pytest
 import telegram
 
-import main
+import app.lifespan as lifespan
+import app.routes.media as media_route
+import bot.dispatch as dispatch
+import bot.inline as inline
+import bot.limits as limits
+import bot.text as bot_text
+import infra.audio
+import infra.audio as cdn_audio
+import locales
 from lib.user_settings import UserSettings
 from lib.utils import File
 from modules import TranslationRegistry
@@ -22,7 +31,7 @@ from modules import TranslationRegistry
 
 @pytest.fixture(scope="module")
 def data():
-    return main.build_data()
+    return lifespan.build_data()
 
 
 @pytest.fixture(scope="module")
@@ -67,7 +76,7 @@ class TestRangeText:
     async def test_translation_covers_every_ayah_in_the_range(self, fake_bot, data, tg_bot):
         quran = TranslationRegistry.get("en")
 
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24"))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24"))
 
         translation = _results(fake_bot)[0].input_message_content.message_text
         # the bug this test exists for: only 59:22 used to come back
@@ -78,7 +87,9 @@ class TestRangeText:
             assert quran.get_ayah(59, ayah).rsplit(" (", 1)[0] in translation
 
     async def test_tafsir_covers_every_ayah_in_the_range(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557001))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557001)
+        )
         tafsir = _results(fake_bot)[1].input_message_content.message_text
         for ayah in (22, 23, 24):
             assert "(59:%d)" % ayah in tafsir
@@ -87,12 +98,14 @@ class TestRangeText:
         self, fake_bot, data, tg_bot
     ):
         # Surah 2's first 50 ayahs run well past 4096 characters in both views.
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:1-50", user_id=557002))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "2:1-50", user_id=557002)
+        )
         for result in _results(fake_bot)[:2]:
             assert len(result.input_message_content.message_text) <= 4096
 
     async def test_single_ayah_is_unchanged(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557003))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557003))
         translation = _results(fake_bot)[0].input_message_content.message_text
         assert translation.endswith("(2:255)")
 
@@ -101,20 +114,24 @@ class TestRangeAudio:
     async def test_offers_one_combined_recitation_of_the_whole_range(
         self, fake_bot, data, tg_bot, public_url
     ):
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557010))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557010)
+        )
 
         audio = _of_type(fake_bot, telegram.InlineQueryResultAudio)
         assert len(audio) == 1  # one file for 22-24, not one per ayah
         assert audio[0].audio_url == (
             public_url + "/media/range.mp3?surah=59&start=22&end=24&reciter=Husary_128kbps"
         )
-        assert audio[0].title == main._reference(59, 22, "en", 24)
+        assert audio[0].title == bot_text.reference(59, 22, "en", 24)
         assert len(audio[0].id.encode()) <= 64  # Telegram's hard limit on result ids
 
     async def test_recitation_follows_the_callers_reciter(self, fake_bot, data, tg_bot, public_url):
         await UserSettings().set_reciter(557011, None, "Alafasy_128kbps")
 
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557011))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557011)
+        )
 
         audio = _of_type(fake_bot, telegram.InlineQueryResultAudio)[0]
         assert "reciter=Alafasy_128kbps" in audio.audio_url
@@ -126,19 +143,23 @@ class TestRangeAudio:
         # would be pure waste, so the cached id wins over the URL.
         File().save_file("combined:59:22-24:Husary_128kbps", "CACHED-FILE-ID")
 
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557012))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557012)
+        )
 
         cached = _of_type(fake_bot, telegram.InlineQueryResultCachedAudio)
         assert len(cached) == 1
         assert cached[0].audio_file_id == "CACHED-FILE-ID"
-        assert cached[0].caption == main._reference(59, 22, "en", 24)
+        assert cached[0].caption == bot_text.reference(59, 22, "en", 24)
         assert not _of_type(fake_bot, telegram.InlineQueryResultAudio)
 
     async def test_dropped_without_a_public_base_url(self, fake_bot, data, tg_bot):
         # WEBHOOK_URL is unset here: there is nowhere for Telegram to fetch the
         # stitched file from, so the answer drops the audio instead of offering a
         # link that would 404.
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557013))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557013)
+        )
         assert not _of_type(
             fake_bot, telegram.InlineQueryResultAudio, telegram.InlineQueryResultCachedAudio
         )
@@ -147,8 +168,8 @@ class TestRangeAudio:
     async def test_dropped_when_the_range_exceeds_the_stitching_cap(
         self, fake_bot, data, tg_bot, public_url
     ):
-        too_many = main.MAX_RANGE_AYAHS + 1
-        await main.handle_update(
+        too_many = limits.MAX_RANGE_AYAHS + 1
+        await dispatch.handle_update(
             fake_bot, data, _inline_query(tg_bot, "2:1-%d" % too_many, user_id=557014)
         )
         assert not _of_type(
@@ -159,23 +180,25 @@ class TestRangeAudio:
         self, fake_bot, data, tg_bot, public_url
     ):
         # No stitching needed for one ayah, so it must not be routed through us.
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557015))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557015))
         audio = _of_type(fake_bot, telegram.InlineQueryResultAudio)[0]
         assert audio.audio_url == "https://cdn.test/audio/Husary_128kbps/002255.mp3"
 
 
 class TestInlineArabicImage:
     async def test_single_ayah_offers_its_rendered_image(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557020))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557020))
         photos = _of_type(fake_bot, telegram.InlineQueryResultPhoto)
         assert len(photos) == 1
         assert photos[0].photo_url == "https://cdn.test/images/2_255.png"
         assert photos[0].thumbnail_url == photos[0].photo_url
-        assert photos[0].title == main.t("btn_arabic", "en")
-        assert photos[0].caption == main._reference(2, 255, "en")
+        assert photos[0].title == locales.t("btn_arabic", "en")
+        assert photos[0].caption == bot_text.reference(2, 255, "en")
 
     async def test_range_offers_one_image_per_ayah(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557021))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "59:22-24", user_id=557021)
+        )
         photos = _of_type(fake_bot, telegram.InlineQueryResultPhoto)
         assert [p.photo_url for p in photos] == [
             "https://cdn.test/images/59_%d.png" % a for a in (22, 23, 24)
@@ -185,29 +208,31 @@ class TestInlineArabicImage:
     async def test_long_range_caps_the_images(self, fake_bot, data, tg_bot, public_url):
         # Telegram accepts at most 50 results per answer, and a wall of thumbnails
         # would bury the text and audio results anyway.
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:1-40", user_id=557022))
+        await dispatch.handle_update(
+            fake_bot, data, _inline_query(tg_bot, "2:1-40", user_id=557022)
+        )
         photos = _of_type(fake_bot, telegram.InlineQueryResultPhoto)
-        assert len(photos) == main.INLINE_MAX_PHOTOS
+        assert len(photos) == inline.INLINE_MAX_PHOTOS
         assert len(_results(fake_bot)) <= 50
 
     async def test_localized_title(self, fake_bot, data, tg_bot):
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557023, lang="ru")
         )
         photo = _of_type(fake_bot, telegram.InlineQueryResultPhoto)[0]
-        assert photo.title == main.t("btn_arabic", "ru")
+        assert photo.title == locales.t("btn_arabic", "ru")
 
     async def test_replays_the_file_id_an_in_chat_send_left_behind(self, fake_bot, data, tg_bot):
         # Our ayah renders are PNG and the Bot API wants a JPEG behind photo_url, so
         # a file Telegram already holds is both cheaper and more dependable.
         File().save_file("https://cdn.test/images/2_255.png", "CACHED-PHOTO-ID")
 
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557025))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557025))
 
         cached = _of_type(fake_bot, telegram.InlineQueryResultCachedPhoto)
         assert len(cached) == 1
         assert cached[0].photo_file_id == "CACHED-PHOTO-ID"
-        assert cached[0].caption == main._reference(2, 255, "en")
+        assert cached[0].caption == bot_text.reference(2, 255, "en")
         assert not _of_type(fake_bot, telegram.InlineQueryResultPhoto)
 
     async def test_local_images_are_offered_only_once_cached(
@@ -218,19 +243,19 @@ class TestInlineArabicImage:
         monkeypatch.setenv("PHOTO_BASE_URL", "/srv/quranic_images")
         File().save_file("/srv/quranic_images/2_255.png", "CACHED-PHOTO-ID")
 
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:254", user_id=557026))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "2:254", user_id=557026))
         assert not _of_type(
             fake_bot, telegram.InlineQueryResultPhoto, telegram.InlineQueryResultCachedPhoto
         )
         assert _results(fake_bot)  # the rest of the answer survives
 
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557026))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557026))
         assert _of_type(fake_bot, telegram.InlineQueryResultCachedPhoto)
 
     async def test_dropped_when_no_images_are_configured(self, fake_bot, data, tg_bot, monkeypatch):
         monkeypatch.delenv("PHOTO_BASE_URL")
 
-        await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557027))
+        await dispatch.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=557027))
 
         assert not _of_type(
             fake_bot, telegram.InlineQueryResultPhoto, telegram.InlineQueryResultCachedPhoto
@@ -247,17 +272,17 @@ class TestRangeAudioRoute:
 
         async def fake_download(surah, start, end, performer):
             calls.append((surah, start, end, performer))
-            buf = main.BytesIO(content)
+            buf = io.BytesIO(content)
             buf.name = "quran_%d_%d-%d.mp3" % (surah, start, end)
             return buf
 
-        monkeypatch.setattr(main, "_download_combined_audio", fake_download)
+        monkeypatch.setattr(infra.audio, "download_combined_audio", fake_download)
         return calls
 
     async def test_serves_the_stitched_mp3(self, monkeypatch):
         calls = self._stub_download(monkeypatch, b"AYAH22AYAH23AYAH24")
 
-        response = await main.range_audio(59, 22, 24, "Husary_128kbps")
+        response = await media_route.range_audio(59, 22, 24, "Husary_128kbps")
 
         assert calls == [(59, 22, 24, "Husary_128kbps")]
         assert response.status_code == 200
@@ -272,28 +297,28 @@ class TestRangeAudioRoute:
             (115, 1, 2),  # ditto
             (59, 22, 25),  # surah 59 ends at 24
             (59, 24, 22),  # inverted range
-            (2, 1, 2 + main.MAX_RANGE_AYAHS),  # past the stitching cap
+            (2, 1, 2 + limits.MAX_RANGE_AYAHS),  # past the stitching cap
         ],
     )
     async def test_rejects_references_the_bot_would_never_send(
         self, monkeypatch, surah, start, end
     ):
         calls = self._stub_download(monkeypatch)
-        response = await main.range_audio(surah, start, end, "Husary_128kbps")
+        response = await media_route.range_audio(surah, start, end, "Husary_128kbps")
         assert response.status_code == 404
         assert calls == []  # rejected before any upstream fetch
 
     async def test_rejects_a_reciter_outside_the_catalog(self, monkeypatch):
-        response = await main.range_audio(59, 22, 24, "Not_A_Reciter_128kbps")
+        response = await media_route.range_audio(59, 22, 24, "Not_A_Reciter_128kbps")
         assert response.status_code == 404
 
     async def test_reports_an_unreachable_recitation_cdn_as_a_bad_gateway(self, monkeypatch):
         async def boom(*args):
             raise httpx.ConnectError("cdn down")
 
-        monkeypatch.setattr(main, "_download_combined_audio", boom)
+        monkeypatch.setattr(infra.audio, "download_combined_audio", boom)
 
-        response = await main.range_audio(59, 22, 24, "Husary_128kbps")
+        response = await media_route.range_audio(59, 22, 24, "Husary_128kbps")
         assert response.status_code == 502
 
 
@@ -323,9 +348,9 @@ class TestStitching:
             async def get(self, url):
                 return FakeResponse(bodies[url[-7:-4]])
 
-        monkeypatch.setattr(main.httpx, "AsyncClient", FakeClient)
+        monkeypatch.setattr(httpx, "AsyncClient", FakeClient)
 
-        buf = await main._download_combined_audio(59, 22, 24, "Husary_128kbps")
+        buf = await cdn_audio.download_combined_audio(59, 22, 24, "Husary_128kbps")
 
         assert buf.getvalue() == b"<22><23><24>"
         assert buf.name == "quran_59_22-24.mp3"

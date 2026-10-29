@@ -52,6 +52,8 @@ from typing import Optional, Sequence
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 import services.plans as plans_service
+from bot.limits import MAX_RANGE_AYAHS, REPEAT_COUNT
+from bot.media import send_combined_audio, send_quran
 from hifz import Ctx, callback, command, wizard
 from hifz.profile import (
     format_reminder_time,
@@ -71,8 +73,8 @@ from lib.scheduler import SendCtx, send_handler
 from lib.store.plans import PLAN_ACTIVE, PLAN_PAUSED
 from lib.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
 from locales import t
-from main import MAX_RANGE_AYAHS, REPEAT_COUNT, get_translation, send_combined_audio, send_quran
 from modules import Quran
+from modules.quran import get_translation
 from services.plans import SEND_KIND
 from services.profile import as_time
 

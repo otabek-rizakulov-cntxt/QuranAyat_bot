@@ -11,13 +11,17 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
-import main
+import app.lifespan as lifespan
+import bot.dispatch as dispatch
+import bot.limits as limits
+import bot.media
+import domain.parsing as parsing
 from modules import Quran
 
 
 @pytest.fixture(scope="module")
 def data():
-    return main.build_data()
+    return lifespan.build_data()
 
 
 @pytest.fixture(scope="module")
@@ -46,7 +50,7 @@ def _no_network(monkeypatch):
         buf.name = name
         return buf
 
-    monkeypatch.setattr(main, "fetch_and_stitch", fake_stitch)
+    monkeypatch.setattr(bot.media, "fetch_and_stitch", fake_stitch)
 
 
 def _message(tg_bot, text, chat_id=771000, lang="en"):
@@ -132,45 +136,45 @@ class TestDivisionsTileTheQuran:
             len(Quran.ayahs_between(Quran.page_range(n)[:2], Quran.page_range(n)[2:]))
             for n in range(1, Quran.PAGE_COUNT + 1)
         )
-        assert longest <= main.MAX_RANGE_AYAHS
+        assert longest <= limits.MAX_RANGE_AYAHS
 
 
 class TestPageCommand:
     async def test_page_number_sends_that_page(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _message(tg_bot, "/page 255"))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/page 255"))
         caption = fake_bot.send_photo.await_args.kwargs["caption"]
         assert "255" in caption and "13:43" in caption and "14:5" in caption
 
     async def test_bare_page_opens_where_the_reader_already_is(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _message(tg_bot, "2:255", chat_id=771001))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "2:255", chat_id=771001))
         fake_bot.reset_mock()
-        await main.handle_update(fake_bot, data, _message(tg_bot, "/page", chat_id=771001))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/page", chat_id=771001))
         caption = fake_bot.send_photo.await_args.kwargs["caption"]
         assert str(Quran.page_of(2, 255)) in caption
 
     @pytest.mark.parametrize("text", ["/page 0", "/page 605", "/page abc"])
     async def test_out_of_range_page_explains_the_range(self, fake_bot, data, tg_bot, text):
-        await main.handle_update(fake_bot, data, _message(tg_bot, text))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, text))
         fake_bot.send_photo.assert_not_awaited()
         assert "604" in fake_bot.send_message.await_args.kwargs["text"]
 
 
 class TestJuzCommand:
     async def test_juz_opens_its_first_page(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _message(tg_bot, "/juz 30"))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/juz 30"))
         caption = fake_bot.send_photo.await_args.kwargs["caption"]
         assert str(Quran.page_of(78, 1)) in caption
 
     @pytest.mark.parametrize("text", ["/juz 0", "/juz 31", "/juz abc"])
     async def test_out_of_range_juz_explains_the_range(self, fake_bot, data, tg_bot, text):
-        await main.handle_update(fake_bot, data, _message(tg_bot, text))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, text))
         fake_bot.send_photo.assert_not_awaited()
         assert "30" in fake_bot.send_message.await_args.kwargs["text"]
 
 
 class TestSajdaCommand:
     async def test_lists_all_fifteen_as_verse_links(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _message(tg_bot, "/sajda"))
+        await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/sajda"))
         markup = fake_bot.send_message.await_args.kwargs["reply_markup"]
         buttons = [b for row in markup.inline_keyboard for b in row]
         assert len(buttons) == 15
@@ -187,8 +191,8 @@ class TestSajdaCommand:
 class TestCommandArguments:
     def test_a_bare_reference_is_not_swallowed_as_a_command(self):
         # "/2:255" must still parse as an ayah reference, not a "2:255" command
-        assert main.parse_ayah_range("/2:255") == (2, 255, 255)
+        assert parsing.parse_ayah_range("/2:255") == (2, 255, 255)
 
     def test_non_numeric_argument_is_rejected_rather_than_raising(self):
-        assert main._as_int("abc") is None
-        assert main._as_int("255") == 255
+        assert parsing.as_int("abc") is None
+        assert parsing.as_int("255") == 255

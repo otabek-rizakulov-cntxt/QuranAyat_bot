@@ -2,7 +2,7 @@
 
 Every other test file checks one unit against its own contract. This one walks
 the seven things the spec says must be true of the finished product, in the
-order a real user meets them, through the same seam `main.handle_update` uses.
+order a real user meets them, through the same seam `dispatch.handle_update` uses.
 
 It is deliberately end to end and deliberately slow-ish: it is the file that
 answers "is the feature actually built", and it is the one to run before a
@@ -403,7 +403,7 @@ class TestSevenTheCommandsExist:
 
     def test_the_scheduler_starts_at_boot(self):
         """A loop nobody starts is a feature nobody gets."""
-        source = open("src/main.py", encoding="utf-8").read()
+        source = open("src/app/lifespan.py", encoding="utf-8").read()  # boot sequence
         assert "run_scheduler" in source
         assert "hifz.load_features()" in source
         assert source.index("hifz.load_features()") < source.index("run_scheduler"), (

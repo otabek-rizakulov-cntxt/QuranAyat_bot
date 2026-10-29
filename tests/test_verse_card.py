@@ -12,7 +12,13 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
-import main
+import app.lifespan as lifespan
+import bot.dispatch as dispatch
+import bot.keyboards.language as language_kb
+import bot.keyboards.verse as verse_kb
+import bot.limits as limits
+import bot.text as bot_text
+import locales
 from locales import LANGUAGES, get_language
 
 
@@ -27,7 +33,7 @@ def _button(markup, predicate):
 
 @pytest.fixture(scope="module")
 def data():
-    return main.build_data()
+    return lifespan.build_data()
 
 
 @pytest.fixture(scope="module")
@@ -70,53 +76,55 @@ def _callback(tg_bot, data_str, chat_id=556000, message_kind="text"):
 
 class TestVerseKeyboard:
     def test_active_view_is_marked_with_a_dot(self):
-        rows = main.verse_keyboard(2, 255, "tafsir", "en").inline_keyboard
+        rows = verse_kb.verse_keyboard(2, 255, "tafsir", "en").inline_keyboard
         labels = [b.text for b in rows[0]]
         assert any(label.startswith("• ") and "Tafsir" in label for label in labels)
 
     def test_only_audio_carries_an_icon(self):
-        labels = [b.text for b in main.verse_keyboard(1, 1, "translation", "en").inline_keyboard[0]]
+        labels = [
+            b.text for b in verse_kb.verse_keyboard(1, 1, "translation", "en").inline_keyboard[0]
+        ]
         assert "🔊 Audio" in labels
         # The scripture views stay clean — no icon decorates translation/arabic/tafsir.
         assert "Translation" in [label.lstrip("• ") for label in labels]
 
     def test_nav_callbacks_point_at_neighbouring_ayat(self):
-        nav = main.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
+        nav = verse_kb.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
         assert nav[0].callback_data == "vc:tr:2:254"  # previous
         assert nav[1].callback_data == "vr:tr"  # random keeps the view
         assert nav[2].callback_data == "vc:tr:2:256"  # next
 
     def test_arrows_flip_for_rtl(self):
-        ltr = main.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
-        rtl = main.verse_keyboard(2, 255, "translation", "ar").inline_keyboard[1]
+        ltr = verse_kb.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
+        rtl = verse_kb.verse_keyboard(2, 255, "translation", "ar").inline_keyboard[1]
         assert ltr[0].text.startswith("‹")  # LTR: previous points left
         assert rtl[0].text.endswith("›")  # RTL: mirrored so "next" reads forward
 
     def test_share_uses_inline_mode(self):
         share = _button(
-            main.verse_keyboard(2, 255, "translation", "en"),
+            verse_kb.verse_keyboard(2, 255, "translation", "en"),
             lambda b: b.switch_inline_query is not None,
         )
         assert share.switch_inline_query == "2:255"
 
     def test_language_button_shows_current_language(self):
         util = _button(
-            main.verse_keyboard(2, 255, "translation", "uz"),
+            verse_kb.verse_keyboard(2, 255, "translation", "uz"),
             lambda b: b.callback_data == "showlang",
         )
         assert get_language("uz").native in util.text
 
     def test_repeat_button_replays_this_ayah(self):
         repeat = _button(
-            main.verse_keyboard(2, 255, "audio", "en"),
+            verse_kb.verse_keyboard(2, 255, "audio", "en"),
             lambda b: (b.callback_data or "").startswith("rep:"),
         )
         assert repeat.callback_data == "rep:2:255"
-        assert "×%d" % main.REPEAT_COUNT in repeat.text
+        assert "×%d" % limits.REPEAT_COUNT in repeat.text
 
     def test_repeat_label_is_localized(self):
         repeat = _button(
-            main.verse_keyboard(2, 255, "audio", "ru"),
+            verse_kb.verse_keyboard(2, 255, "audio", "ru"),
             lambda b: (b.callback_data or "").startswith("rep:"),
         )
         assert "Повтор" in repeat.text
@@ -127,21 +135,21 @@ class TestVerseKeyboard:
 
 class TestVerseText:
     async def test_has_bold_header_and_reference(self, data):
-        text = await main.build_verse_text(2, 255, "translation", "en", "en", data)
+        text = await bot_text.build_verse_text(2, 255, "translation", "en", "en", data)
         assert text.startswith("<b>")
         assert "(2:255)" in text
 
     async def test_tafsir_note_follows_ui_language_not_translation_language(self, data):
         # The tafsir corpus is English-only, so the note is bot UI text: it must
         # follow ui_lang even for a reader whose translations are in English.
-        text = await main.build_verse_text(1, 1, "tafsir", "ru", "en", data)
-        assert main.t("tafsir_en_note", "ru") in text
+        text = await bot_text.build_verse_text(1, 1, "tafsir", "ru", "en", data)
+        assert locales.t("tafsir_en_note", "ru") in text
 
     async def test_translation_body_follows_translation_language(self, data):
         # The whole point of splitting the settings: a Russian UI can render an
         # English translation, and the body must come from translation_lang.
-        ru = await main.build_verse_text(1, 2, "translation", "ru", "ru", data)
-        en = await main.build_verse_text(1, 2, "translation", "ru", "en", data)
+        ru = await bot_text.build_verse_text(1, 2, "translation", "ru", "ru", data)
+        en = await bot_text.build_verse_text(1, 2, "translation", "ru", "en", data)
         assert ru != en
 
 
@@ -150,7 +158,7 @@ class TestVerseText:
 
 class TestVerseCallbacks:
     async def test_text_view_edits_message_in_place(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _callback(tg_bot, "vc:tr:2:255"))
+        await dispatch.handle_update(fake_bot, data, _callback(tg_bot, "vc:tr:2:255"))
         kwargs = fake_bot.edit_message_text.await_args.kwargs
         assert "(2:255)" in kwargs["text"]
         assert kwargs["message_id"] == 10
@@ -160,24 +168,24 @@ class TestVerseCallbacks:
 
     async def test_switching_from_media_posts_a_fresh_card(self, fake_bot, data, tg_bot):
         # A photo message can't be edited into text, so we send a new text card.
-        await main.handle_update(
+        await dispatch.handle_update(
             fake_bot, data, _callback(tg_bot, "vc:tf:1:1", message_kind="photo")
         )
         fake_bot.send_message.assert_awaited()
         fake_bot.edit_message_text.assert_not_awaited()
 
     async def test_random_callback_turns_the_page(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _callback(tg_bot, "vr:tr"))
+        await dispatch.handle_update(fake_bot, data, _callback(tg_bot, "vr:tr"))
         fake_bot.edit_message_text.assert_awaited()
         fake_bot.answer_callback_query.assert_awaited()
 
     async def test_showlang_opens_the_picker(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _callback(tg_bot, "showlang"))
+        await dispatch.handle_update(fake_bot, data, _callback(tg_bot, "showlang"))
         markup = fake_bot.send_message.await_args.kwargs["reply_markup"]
         assert isinstance(markup, telegram.InlineKeyboardMarkup)
 
     async def test_nonexistent_ayah_only_acknowledges(self, fake_bot, data, tg_bot):
-        await main.handle_update(fake_bot, data, _callback(tg_bot, "vc:tr:2:999"))
+        await dispatch.handle_update(fake_bot, data, _callback(tg_bot, "vc:tr:2:999"))
         fake_bot.answer_callback_query.assert_awaited()
         fake_bot.edit_message_text.assert_not_awaited()
         fake_bot.send_message.assert_not_awaited()
@@ -192,6 +200,6 @@ class TestLanguageFlags:
         assert missing == []
 
     def test_picker_prefixes_the_flag(self):
-        first = main.language_keyboard().inline_keyboard[0][0].text
+        first = language_kb.language_keyboard().inline_keyboard[0][0].text
         english = get_language("en")
         assert english.flag in first and english.native in first

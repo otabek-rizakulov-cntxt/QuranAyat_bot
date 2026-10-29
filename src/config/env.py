@@ -38,3 +38,22 @@ def memory_store_allowed() -> bool:
     """Whether the in-memory stores may stand in for Postgres and Redis."""
     value = Environment.get_env("allow_memory_store") or ""
     return value.strip().lower() in ("1", "true", "yes")
+
+
+def webhook_base_url() -> str | None:
+    """Public HTTPS base URL this app is reachable at.
+
+    Telegram POSTs updates here, and it is also where Telegram fetches the
+    stitched range recitations from (see RANGE_AUDIO_PATH), so it is needed by
+    the bot logic and not only at startup.
+
+    Prefer an explicit WEBHOOK_URL; otherwise fall back to Railway's auto-injected
+    RAILWAY_PUBLIC_DOMAIN (host only, so we prepend https://).
+    """
+    explicit = os.getenv("WEBHOOK_URL")
+    if explicit:
+        return explicit.rstrip("/")
+    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+    if railway_domain:
+        return "https://" + railway_domain.rstrip("/")
+    return None

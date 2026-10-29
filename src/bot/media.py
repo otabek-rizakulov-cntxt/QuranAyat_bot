@@ -1,0 +1,275 @@
+"""Sending Quran media to a chat, through the Telegram file_id cache.
+
+Every sender tries the file_id Telegram gave us last time first and only
+uploads (and caches the new id) on a miss or a rejected id.
+"""
+
+from urllib.parse import urlencode
+
+import telegram
+
+from bot.keyboards.page import page_keyboard
+from bot.limits import REPEAT_COUNT
+from bot.text import build_verse_text, page_caption, reference
+from config.env import webhook_base_url
+from infra import audio as cdn_audio
+from lib.page_image import fetch_and_stitch
+from lib.utils import File
+from modules import Quran
+
+
+async def send_file(bot, filename, quran_type, **kwargs):
+    """Send a media file, preferring Telegram's cached file_id over a fresh upload.
+
+    On a cache miss (or if the cached file_id is rejected) we upload from the
+    filename/URL and persist the returned file_id in Redis for next time.
+    """
+    file = File()
+
+    async def send(source):
+        """`source` is either a cached file_id string or a filename/URL to upload."""
+        if quran_type == "arabic":
+            result = await bot.send_photo(photo=source, **kwargs)
+            return result.photo[-1].file_id
+        elif quran_type == "audio":
+            result = await bot.send_audio(audio=source, **kwargs)
+            return result.audio.file_id
+        return None
+
+    cached_id = file.get_file(filename)
+    if cached_id is not None:
+        try:
+            return await send(cached_id)
+        except telegram.error.TelegramError:
+            # cached file_id was rejected (e.g. expired); fall back to a fresh upload
+            pass
+
+    new_id = await send(filename)
+    file.save_file(filename, new_id)
+    return new_id
+
+
+def combined_audio_key(surah: int, start: int, end: int, performer: str) -> str:
+    """Telegram file_id cache key for a stitched range, shared by the in-chat send
+    that produces it and the inline result that replays it."""
+    return "combined:%d:%d-%d:%s" % (surah, start, end, performer)
+
+
+async def send_combined_audio(
+    bot,
+    surah: int,
+    start: int,
+    end: int,
+    chat_id: int,
+    performer: str,
+    reply_markup=None,
+    message_thread_id=None,
+) -> None:
+    """Send a range of ayahs as a single combined audio file, cached by Telegram file_id.
+
+    `message_thread_id` targets a forum topic (the group cluster's daily post);
+    left None it posts to the chat as before.
+    """
+    file = File()
+    cache_key = combined_audio_key(surah, start, end, performer)
+    title = "Quran %d:%d-%d" % (surah, start, end)
+    kwargs = dict(
+        chat_id=chat_id,
+        title=title,
+        performer=File.get_performer_name(performer),
+        reply_markup=reply_markup,
+    )
+    if message_thread_id is not None:
+        kwargs["message_thread_id"] = message_thread_id
+
+    cached_id = file.get_file(cache_key)
+    if cached_id is not None:
+        try:
+            await bot.send_audio(audio=cached_id, **kwargs)
+            await file.save_user(chat_id, (surah, end, "audio"))
+            return
+        except telegram.error.TelegramError:
+            pass  # cached file_id rejected; rebuild below
+
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    audio = await cdn_audio.download_combined_audio(surah, start, end, performer)
+    result = await bot.send_audio(audio=audio, **kwargs)
+    file.save_file(cache_key, result.audio.file_id)
+    await file.save_user(chat_id, (surah, end, "audio"))
+
+
+# Route (on this very app) that stitches a range of recitations on demand. An
+# inline audio result can only carry a file_id or a URL Telegram fetches itself —
+# never an upload — so a range nobody has sent in a chat yet needs a public place
+# to be fetched from, and this is it.
+RANGE_AUDIO_PATH = "/media/range.mp3"
+
+
+def range_audio_url(surah: int, start: int, end: int, performer: str) -> str | None:
+    """Public URL of the stitched recitation of `surah:start-end`, or None when we
+    have no public base URL to serve it from (local dev without WEBHOOK_URL)."""
+    base = webhook_base_url()
+    if not base or not base.startswith("https://"):
+        return None
+    query = urlencode({"surah": surah, "start": start, "end": end, "reciter": performer})
+    return base + RANGE_AUDIO_PATH + "?" + query
+
+
+async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
+    """Send mushaf page `page` as one stitched image.
+
+    Stitching is expensive (a few hundred KB of PNGs decoded and re-encoded), so
+    the upload is cached by Telegram file_id exactly like every other media file
+    the bot sends — the CDN and Pillow are touched once per page, not once per
+    reader.
+    """
+    file = File()
+    cache_key = "page:%d" % page
+    caption = page_caption(page, ui_lang)
+    kwargs = dict(chat_id=chat_id, caption=caption, reply_markup=page_keyboard(page, ui_lang))
+
+    cached_id = file.get_file(cache_key)
+    if cached_id is not None:
+        try:
+            await bot.send_photo(photo=cached_id, **kwargs)
+            return
+        except telegram.error.TelegramError:
+            pass  # cached file_id rejected; rebuild below
+
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_PHOTO)
+    start_s, start_a, end_s, end_a = Quran.page_range(page)
+    urls = [
+        file.get_page_image_filename(s, a)
+        for s, a in Quran.ayahs_between((start_s, start_a), (end_s, end_a))
+    ]
+    image = await fetch_and_stitch(urls, "page_%03d.jpg" % page)
+    result = await bot.send_photo(photo=image, **kwargs)
+    file.save_file(cache_key, result.photo[-1].file_id)
+
+
+async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang: str) -> None:
+    """Send the recitation of one mushaf page.
+
+    Most reciters have a single Page<NNN>.mp3 upstream; 19 of the 79 catalog
+    entries do not, and those are served by stitching the page's ayah recitations
+    together instead (the same machinery an ayah range uses, generalized to cross
+    surah boundaries — which a page routinely does).
+    """
+    file = File()
+    title = page_caption(page, ui_lang).replace("\n", " · ")
+    kwargs = dict(chat_id=chat_id, title=title, performer=File.get_performer_name(performer))
+    cache_key = "pageaudio:%d:%s" % (page, performer)
+
+    cached_id = file.get_file(cache_key)
+    if cached_id is not None:
+        try:
+            await bot.send_audio(audio=cached_id, **kwargs)
+            return
+        except telegram.error.TelegramError:
+            pass
+
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    if File.has_page_audio(performer):
+        source = file.get_page_audio_filename(page, performer)
+    else:
+        start_s, start_a, end_s, end_a = Quran.page_range(page)
+        source = await cdn_audio.download_stitched_audio(
+            Quran.ayahs_between((start_s, start_a), (end_s, end_a)),
+            performer,
+            "quran_page_%03d.mp3" % page,
+        )
+    result = await bot.send_audio(audio=source, **kwargs)
+    file.save_file(cache_key, result.audio.file_id)
+
+
+async def send_repeated_audio(
+    bot, surah: int, ayah: int, chat_id: int, performer: str, ui_lang: str, reply_markup=None
+) -> None:
+    """Send one ayah recited REPEAT_COUNT times back to back, for memorization.
+
+    No timing data is involved and none is needed: repeating an ayah is the same
+    concatenation an ayah range already does, with the same ayah listed more than
+    once. That also means it is exact for every reciter in the catalog rather than
+    only the ones an upstream timings file happens to cover.
+    """
+    file = File()
+    cache_key = "repeat:%d:%d:%d:%s" % (REPEAT_COUNT, surah, ayah, performer)
+    title = "%s ×%d" % (reference(surah, ayah, ui_lang), REPEAT_COUNT)
+    kwargs = dict(
+        chat_id=chat_id,
+        title=title,
+        performer=File.get_performer_name(performer),
+        reply_markup=reply_markup,
+    )
+
+    cached_id = file.get_file(cache_key)
+    if cached_id is not None:
+        try:
+            await bot.send_audio(audio=cached_id, **kwargs)
+            return
+        except telegram.error.TelegramError:
+            pass  # cached file_id rejected; rebuild below
+
+    await bot.send_chat_action(chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE)
+    audio = await cdn_audio.download_stitched_audio(
+        [(surah, ayah)] * REPEAT_COUNT,
+        performer,
+        "quran_%d_%d_x%d.mp3" % (surah, ayah, REPEAT_COUNT),
+    )
+    result = await bot.send_audio(audio=audio, **kwargs)
+    file.save_file(cache_key, result.audio.file_id)
+
+
+async def send_quran(
+    bot,
+    data: dict,
+    file,
+    surah: int,
+    ayah: int,
+    quran_type: str,
+    chat_id: int,
+    performer: str,
+    ui_lang: str,
+    translation_lang: str,
+    reply_markup=None,
+) -> None:
+    """Send one ayah in one representation, and remember it as the reader's position.
+
+    Module level rather than a closure inside `handle_update`: the scheduler
+    pushes a plan's daily portion outside any update, and the hifz drill reuses
+    this same send — neither has a `handle_update` frame to close over. `bot`,
+    `data` and `file` are therefore explicit leading parameters.
+    """
+    if quran_type in ("translation", "tafsir"):
+        text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
+        await bot.send_message(
+            chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=reply_markup
+        )
+    elif quran_type == "arabic":
+        await bot.send_chat_action(
+            chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_PHOTO
+        )
+        image = file.get_image_filename(surah, ayah)
+        await send_file(
+            bot,
+            image,
+            quran_type,
+            chat_id=chat_id,
+            caption=reference(surah, ayah, ui_lang),
+            reply_markup=reply_markup,
+        )
+    elif quran_type == "audio":
+        await bot.send_chat_action(
+            chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE
+        )
+        audio = file.get_audio_filename(surah, ayah, performer)
+        await send_file(
+            bot,
+            audio,
+            quran_type,
+            chat_id=chat_id,
+            performer=File.get_performer_name(performer),
+            title=reference(surah, ayah, ui_lang),
+            reply_markup=reply_markup,
+        )
+    await file.save_user(chat_id, (surah, ayah, quran_type))

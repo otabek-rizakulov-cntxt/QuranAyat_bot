@@ -11,14 +11,16 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
-import main
+import app.lifespan as lifespan
+import bot.dispatch as dispatch
+import locales
 from lib.user_settings import UserSettings
 
 
 @pytest.fixture(scope="module")
 def data():
     # Parses the real corpora once for the whole module (tafsir + index + inline defaults).
-    return main.build_data()
+    return lifespan.build_data()
 
 
 @pytest.fixture(scope="module")
@@ -66,56 +68,58 @@ def _callback(tg_bot, cb_data, chat_id=555000, update_id=2):
 
 
 async def test_start_sends_welcome(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _message(tg_bot, "/start", chat_id=555001))
+    await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/start", chat_id=555001))
     fake_bot.send_message.assert_awaited()
-    assert fake_bot.send_message.await_args.kwargs["text"] == main.welcome_text("en")
+    assert fake_bot.send_message.await_args.kwargs["text"] == locales.welcome_text("en")
 
 
 async def test_about_uses_html(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _message(tg_bot, "/about", chat_id=555002))
+    await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/about", chat_id=555002))
     kwargs = fake_bot.send_message.await_args.kwargs
     assert kwargs["parse_mode"] == "HTML"
-    assert kwargs["text"] == main.t("about", "en")
+    assert kwargs["text"] == locales.t("about", "en")
 
 
 async def test_index_sends_surah_index(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _message(tg_bot, "/index", chat_id=555003))
+    await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/index", chat_id=555003))
     assert fake_bot.send_message.await_args.kwargs["text"] == data["index"]
 
 
 async def test_language_shows_inline_keyboard(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _message(tg_bot, "/language", chat_id=555004))
+    await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/language", chat_id=555004))
     markup = fake_bot.send_message.await_args.kwargs["reply_markup"]
     assert isinstance(markup, telegram.InlineKeyboardMarkup)
 
 
 async def test_group_chats_are_ignored(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _message(tg_bot, "/start", chat_id=-100200300))
+    await dispatch.handle_update(fake_bot, data, _message(tg_bot, "/start", chat_id=-100200300))
     fake_bot.send_message.assert_not_awaited()
 
 
 async def test_translation_button_sends_ayah(fake_bot, data, tg_bot):
     # Default navigation state is (1, 1, "translation"); the canonical action word
     # resolves to the translation action in any language.
-    await main.handle_update(fake_bot, data, _message(tg_bot, "translation", chat_id=555005))
+    await dispatch.handle_update(fake_bot, data, _message(tg_bot, "translation", chat_id=555005))
     assert "(1:1)" in fake_bot.send_message.await_args.kwargs["text"]
 
 
 async def test_tafsir_appends_english_note_for_non_english(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _message(tg_bot, "tafsir", chat_id=555006, lang="ru"))
-    assert main.t("tafsir_en_note", "ru") in fake_bot.send_message.await_args.kwargs["text"]
+    await dispatch.handle_update(
+        fake_bot, data, _message(tg_bot, "tafsir", chat_id=555006, lang="ru")
+    )
+    assert locales.t("tafsir_en_note", "ru") in fake_bot.send_message.await_args.kwargs["text"]
 
 
 async def test_next_navigates_forward(fake_bot, data, tg_bot):
     # From default (1, 1) "next" advances to 1:2 and sends the translation.
-    await main.handle_update(fake_bot, data, _message(tg_bot, "next", chat_id=555007))
+    await dispatch.handle_update(fake_bot, data, _message(tg_bot, "next", chat_id=555007))
     assert "(1:2)" in fake_bot.send_message.await_args.kwargs["text"]
 
 
 async def test_setlang_callback_persists_ui_language(fake_bot, data, tg_bot):
     # The language preference is durable in UserSettings now, not in the old
     # single Redis `lang:` key — and it is the *UI* language only.
-    await main.handle_update(fake_bot, data, _callback(tg_bot, "setlang:ru", chat_id=555008))
+    await dispatch.handle_update(fake_bot, data, _callback(tg_bot, "setlang:ru", chat_id=555008))
     fake_bot.answer_callback_query.assert_awaited()
     settings = await UserSettings().get(555008, 555008)
     assert settings.ui_lang == "ru"
@@ -123,8 +127,12 @@ async def test_setlang_callback_persists_ui_language(fake_bot, data, tg_bot):
 
 
 async def test_settranslang_callback_persists_translation_language_only(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _callback(tg_bot, "setlang:uz-Cyrl", chat_id=555011))
-    await main.handle_update(fake_bot, data, _callback(tg_bot, "settranslang:en", chat_id=555011))
+    await dispatch.handle_update(
+        fake_bot, data, _callback(tg_bot, "setlang:uz-Cyrl", chat_id=555011)
+    )
+    await dispatch.handle_update(
+        fake_bot, data, _callback(tg_bot, "settranslang:en", chat_id=555011)
+    )
     settings = await UserSettings().get(555011, 555011)
     # The motivating combination: Uzbek Cyrillic UI over an English translation.
     assert settings.ui_lang == "uz-Cyrl"
@@ -132,8 +140,8 @@ async def test_settranslang_callback_persists_translation_language_only(fake_bot
 
 
 async def test_setreciter_callback_persists_reciter_only(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data, _callback(tg_bot, "setlang:ru", chat_id=555012))
-    await main.handle_update(
+    await dispatch.handle_update(fake_bot, data, _callback(tg_bot, "setlang:ru", chat_id=555012))
+    await dispatch.handle_update(
         fake_bot, data, _callback(tg_bot, "setreciter:Alafasy_128kbps", chat_id=555012)
     )
     settings = await UserSettings().get(555012, 555012)
@@ -151,7 +159,7 @@ async def test_inline_query_valid_ayah_returns_all_four_views(fake_bot, data, tg
             "offset": "",
         },
     }
-    await main.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
+    await dispatch.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
     fake_bot.answer_inline_query.assert_awaited()
     # A valid ayah yields a translation, a tafsir, the recitation and the Arabic image.
     results = fake_bot.answer_inline_query.await_args.kwargs["results"]
@@ -173,5 +181,5 @@ async def test_textless_message_is_ignored(fake_bot, data, tg_bot):
             "from": {"id": 555010, "is_bot": False, "first_name": "Tester"},
         },
     }
-    await main.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
+    await dispatch.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
     fake_bot.send_message.assert_not_awaited()

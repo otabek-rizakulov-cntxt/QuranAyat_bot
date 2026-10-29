@@ -11,6 +11,7 @@ their settings resetting every week or two.
 
 import pytest
 
+import app.routes.health as health_route
 from config import postgres
 from lib import store as store_module
 
@@ -209,45 +210,42 @@ class TestHealthReportsTheStores:
     async def test_memory_stores_are_visible_on_the_health_endpoint(self):
         from fastapi import Response
 
-        import main
-
         await store_module.get_store()
         response = Response()
-        assert await main.health(response) == {"status": "ok", "store": "memory", "cache": "memory"}
+        assert await health_route.health(response) == {
+            "status": "ok",
+            "store": "memory",
+            "cache": "memory",
+        }
         assert response.status_code == 200
 
     async def test_a_store_that_is_not_built_yet_is_pending_not_down(self, fresh_redis):
         from fastapi import Response
 
-        import main
-
         response = Response()
-        body = await main.health(response)
+        body = await health_route.health(response)
         assert (body["store"], body["cache"]) == ("pending", "pending")
         assert response.status_code == 200
 
     async def test_a_missing_database_fails_the_health_check(self, strict):
         from fastapi import Response
 
-        import main
-
         with pytest.raises(postgres.DatabaseUnavailable):
             await store_module.get_store()
         response = Response()
-        body = await main.health(response)
+        body = await health_route.health(response)
         assert body["status"] == "unavailable" and body["store"] == "unavailable"
         assert response.status_code == 503
 
     async def test_a_missing_redis_fails_the_health_check(self, strict, fresh_redis, monkeypatch):
         from fastapi import Response
 
-        import main
         from config.redis import CacheUnavailable
 
         monkeypatch.setenv("REDIS_HOST_URL", "")
         with pytest.raises(CacheUnavailable):
             fresh_redis()
         response = Response()
-        body = await main.health(response)
+        body = await health_route.health(response)
         assert body["cache"] == "unavailable"
         assert response.status_code == 503

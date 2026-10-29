@@ -1,6 +1,6 @@
 """Cross-surah reference parsing (`hifz.refs`).
 
-The reader's `main.parse_ayah_range` is single-surah by construction, which is
+The reader's `parsing.parse_ayah_range` is single-surah by construction, which is
 right for a verse card and wrong for a hifz target: a `range` plan may span
 surahs, and every juz target does. This module parses into a normalized
 (start_surah, start_ayah, end_surah, end_ayah) and validates both ends exist.
@@ -89,7 +89,7 @@ class TestAcrossSurahs:
         assert ref.is_single_surah() is False
 
     def test_the_reader_parser_cannot_express_this(self):
-        from main import parse_ayah_range
+        from domain.parsing import parse_ayah_range
 
         # main's parser reads "67:1-68:5" as surah 67 ayahs 1..68 — wrong, and
         # exactly why hifz has its own. Pinning it here so the difference is

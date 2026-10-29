@@ -250,7 +250,7 @@ class TestLeaderboardOptIn:
 
     async def test_a_name_containing_html_is_escaped_on_screen(self):
         # Rule 4: user text in an HTML message goes through html.escape, exactly
-        # as main.build_verse_text escapes corpus text. Unbalanced markup would
+        # as bot_text.build_verse_text escapes corpus text. Unbalanced markup would
         # make Telegram reject the whole message.
         bot = AsyncMock()
         ctx = await _ctx(bot)

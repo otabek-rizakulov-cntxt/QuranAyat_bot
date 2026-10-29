@@ -273,7 +273,7 @@ class TestDispatchCallback:
         bot.answer_callback_query.assert_awaited()
 
     async def test_forbidden_propagates_for_main_to_handle(self):
-        # main._process_update swallows Forbidden (user blocked the bot); the seam
+        # app.routes.webhook._process_update swallows Forbidden (user blocked the bot); the seam
         # must not turn it into a generic logged error.
         @hifz.callback("zz:")
         async def handler(ctx, cb_data):
@@ -464,10 +464,13 @@ class TestSchemaApplication:
         assert os.environ.get("DATABASE_URL") == ""
         await apply_schema()  # must not raise
 
-    def test_main_no_longer_dereferences_the_pool_for_the_schema(self):
+    def test_startup_no_longer_dereferences_the_pool_for_the_schema(self):
         source = open(
             os.path.join(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "main.py"
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "src",
+                "app",
+                "lifespan.py",
             ),
             encoding="utf-8",
         ).read()
