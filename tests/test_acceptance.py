@@ -403,7 +403,7 @@ class TestSevenTheCommandsExist:
 
     def test_the_scheduler_starts_at_boot(self):
         """A loop nobody starts is a feature nobody gets."""
-        source = open("src/main.py", encoding="utf-8").read()
+        source = open("src/app/lifespan.py", encoding="utf-8").read()  # boot sequence
         assert "run_scheduler" in source
         assert "hifz.load_features()" in source
         assert source.index("hifz.load_features()") < source.index("run_scheduler"), (

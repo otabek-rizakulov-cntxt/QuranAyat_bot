@@ -464,10 +464,13 @@ class TestSchemaApplication:
         assert os.environ.get("DATABASE_URL") == ""
         await apply_schema()  # must not raise
 
-    def test_main_no_longer_dereferences_the_pool_for_the_schema(self):
+    def test_startup_no_longer_dereferences_the_pool_for_the_schema(self):
         source = open(
             os.path.join(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "main.py"
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "src",
+                "app",
+                "lifespan.py",
             ),
             encoding="utf-8",
         ).read()
