@@ -2,7 +2,7 @@
 
 Dependencies point one way:
 
-    app, main  →  bot, api, hifz  →  services  →  infra, lib, modules  →  domain, config, locales
+    app, main  →  bot, api, hifz  →  services  →  infra, lib  →  domain, config, locales
 
 Nothing imports `main`. Only the presentation layer (app, bot, api, hifz, main)
 and infra, which wraps the Telegram client, may import Telegram or FastAPI.
@@ -26,19 +26,18 @@ SRC = os.path.join(os.path.dirname(__file__), "..", "src")
 PACKAGES = {
     "main", "app", "bot", "api", "hifz",
     "services",
-    "infra", "lib", "domain.quran",
+    "infra", "lib",
     "domain", "config", "locales",
 }  # fmt: skip
 
 _BASE = {"domain", "config", "locales"}
-_LOWER = _BASE | {"infra", "lib", "domain.quran"}
+_LOWER = _BASE | {"infra", "lib"}
 
 # Which project packages each package may import (itself included).
 ALLOWED = {
     "config": {"config"},
     "locales": {"locales"},
     "domain": {"domain", "config", "locales"},
-    "domain.quran": _BASE | {"domain.quran"},
     "lib": _LOWER,
     "infra": _LOWER,
     "services": _LOWER | {"services"},
@@ -53,7 +52,7 @@ ALLOWED = {
 
 FRAMEWORKS = {"telegram", "fastapi"}
 # Packages below the presentation layer: no Telegram, no FastAPI.
-FRAMEWORK_FREE = {"config", "locales", "domain", "domain.quran", "lib", "services"}
+FRAMEWORK_FREE = {"config", "locales", "domain", "lib", "services"}
 
 # (file relative to src/, imported module) -> the refactor step that removes it.
 KNOWN = {
