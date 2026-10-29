@@ -584,13 +584,37 @@ Measured after Phase 6:
 | Copies of row-chunking | 10 | 1 | **1** |
 | Offset pickers | 3 | 1 | **1** |
 | Places to edit to add a command | 2 | 1 | **1** handler (+ locale key) |
-| Largest source file | 1,512 | ~300 | **680**: `infra/scheduler.py` — **not met** (memorize.py, 971, is now split; see below) |
+| Largest source file | 1,512 | ~300 | **651**: `domain/recall_check.py` — **not met** (see below) |
 
-Still over ~300 lines: `infra/scheduler.py` (680), `domain/recall_check.py`
-(651) and `bot/features/group.py` (601). `bot/features/memorize.py` was split
-into an entry module (294 lines) and six `_plan_*` helpers, all under 300.
-Each is one cohesive feature, not a grab bag, so splitting them is ordinary
-feature-level refactoring. It's left for follow-up PRs, one file each.
+Split since Phase 6: `bot/features/memorize.py` (971) became an entry module
+plus six `_plan_*` helpers, and `infra/scheduler.py` (680) became the
+`infra/scheduler/` package (registry, enqueue, tick, runner).
+
+Still over ~300 lines (measured on main after those splits):
+
+| Lines | File | Kind |
+|---|---|---|
+| 651 | `domain/recall_check.py` | one algorithm, heavily documented |
+| 584 | `bot/features/group.py` | one feature: group setup, daily post, board |
+| 546 | `infra/store/groups.py` | a repository: Protocol + memory + Postgres |
+| 546 | `domain/hifz_progress.py` | interval arithmetic and summaries |
+| 497 | `domain/quran.py` | corpus parsing, divisions, translation registry |
+| 425 | `infra/store/plans.py` | a repository |
+| 392 | `services/plans.py` | plan use cases |
+| 389 | `infra/store/profiles.py` | a repository |
+| 365 | `infra/store/hifz.py` | a repository |
+| 355 | `bot/features/profile.py` | one feature |
+| 350 | `infra/store/schedule.py` | a repository |
+| 350 | `bot/router.py` | registry + dispatch |
+| 305 | `bot/features/memorize.py` | entry module after its split |
+| 305 | `api/plans.py` | routes |
+| 304 | `infra/store/sessions.py` | a repository |
+
+None is a grab bag the way `main.py` was. The repositories are long because
+each holds a Protocol plus an in-memory and a Postgres implementation, so
+splitting those three per file is the natural next step. The rest are one
+feature or one algorithm each, so ~300 lines is a guideline for them, not a
+defect. They're left for follow-up PRs, one file each.
 
 ## 9. Decisions and open questions
 
