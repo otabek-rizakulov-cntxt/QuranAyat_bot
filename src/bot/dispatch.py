@@ -21,6 +21,7 @@ from bot.inline import answer_inline_query
 from bot.keyboards.reciter import reciter_label
 from bot.keyboards.rows import button_rows
 from bot.settings import resolve_settings
+from infra import catalog, pending_input
 from lib.user_settings import UserSettings
 from lib.utils import File
 from locales import t
@@ -93,12 +94,12 @@ async def _on_text(bot, data: dict, message) -> None:
         name, _, argument = text[1:].split("@", 1)[0].partition(" ")
         # A command always wins over a pending free-text prompt: a /start typed
         # while the bot awaited a reciter name used to be swallowed as the name.
-        file.pop_awaiting_input(chat_id)
+        pending_input.take(chat_id)
         if router.handles(name):
             await router.dispatch_command(await ctx(argument=argument.strip()), name)
             return
 
-    if file.pop_awaiting_input(chat_id) == "reciter_search":
+    if pending_input.take(chat_id) == "reciter_search":
         await _search_reciters(bot, file, chat_id, raw, settings.ui_lang)
         return
 
@@ -112,10 +113,10 @@ async def _on_text(bot, data: dict, message) -> None:
 
 async def _search_reciters(bot, file, chat_id: int, query: str, ui_lang: str) -> None:
     """A name typed after tapping "🔍 Search reciter" — not an ayah reference."""
-    matches = File.search_performers(query)
+    matches = catalog.search(query)
     if not matches:
         await bot.send_message(chat_id=chat_id, text=t("reciter_search_no_matches", ui_lang))
-        file.set_awaiting_input(chat_id, "reciter_search")  # allow one retry
+        pending_input.expect(chat_id, "reciter_search")  # allow one retry
         return
     rows = button_rows(
         [

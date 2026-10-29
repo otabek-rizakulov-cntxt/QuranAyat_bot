@@ -17,7 +17,7 @@
 # and there is no string in the table to render it with anyway.
 #
 # The rendered PNG is cached by Telegram `file_id` per (user, local date) — see
-# `streak_image.cache_key` — through the same `File.save_file` / `File.get_file`
+# `streak_image.cache_key` — through the same `infra.media_cache`
 # pair `main.send_file` uses, so hammering /streak costs one render a day.
 import logging
 

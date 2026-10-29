@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.rows import button_rows
 from bot.text import nav_labels
-from lib.utils import File
+from infra import catalog
 from locales import t
 from services.reciters import (
     _KIND_WARNING_KEYS,
@@ -132,7 +132,7 @@ def reciter_set_confirmation(subfolder: str, ui_lang: str) -> str:
     Said at the moment of choosing rather than buried in the picker: this is the
     point where someone could otherwise silently stop hearing the Qur'an recited.
     """
-    text = t("reciter_set", ui_lang).format(reciter=File.get_performer_name(subfolder))
+    text = t("reciter_set", ui_lang).format(reciter=catalog.performer_name(subfolder))
     warning_key = _KIND_WARNING_KEYS.get(reciter_kind(subfolder))
     if warning_key is not None:
         text += "\n\n" + t(warning_key, ui_lang)

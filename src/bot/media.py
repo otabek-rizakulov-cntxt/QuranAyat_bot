@@ -12,10 +12,10 @@ import telegram
 from bot.keyboards.page import page_keyboard
 from bot.limits import REPEAT_COUNT
 from bot.text import build_verse_text, page_caption, reference
-from config.env import webhook_base_url
+from config.settings import get_settings
 from infra import audio as cdn_audio
+from infra import catalog, media_cache, nav_state
 from lib.page_image import fetch_and_stitch
-from lib.utils import File
 from modules import Quran
 
 logger = logging.getLogger(__name__)
@@ -47,8 +47,7 @@ async def send_cached(
     the chat sees "uploading…" first, unless `upload_action=False` (when the
     caller has shown it already).
     """
-    file = File()
-    cached_id = file.get_file(key)
+    cached_id = media_cache.get(key)
     if cached_id is not None:
         try:
             return await _send(bot, kind, cached_id, chat_id=chat_id, **kwargs)
@@ -59,7 +58,7 @@ async def send_cached(
     if upload_action:
         await bot.send_chat_action(chat_id=chat_id, action=_UPLOAD_ACTION[kind])
     file_id = await _send(bot, kind, await build(), chat_id=chat_id, **kwargs)
-    file.save_file(key, file_id)
+    media_cache.save(key, file_id)
     return file_id
 
 
@@ -96,7 +95,7 @@ async def send_combined_audio(
     """
     kwargs = dict(
         title="Quran %d:%d-%d" % (surah, start, end),
-        performer=File.get_performer_name(performer),
+        performer=catalog.performer_name(performer),
         reply_markup=reply_markup,
     )
     if message_thread_id is not None:
@@ -107,7 +106,7 @@ async def send_combined_audio(
 
     key = combined_audio_key(surah, start, end, performer)
     await send_cached(bot, "audio", key, stitch, chat_id=chat_id, **kwargs)
-    await File().save_user(chat_id, (surah, end, "audio"))
+    await nav_state.save(chat_id, surah, end, "audio")
 
 
 # Route (on this very app) that stitches a range of recitations on demand. An
@@ -120,7 +119,7 @@ RANGE_AUDIO_PATH = "/media/range.mp3"
 def range_audio_url(surah: int, start: int, end: int, performer: str) -> str | None:
     """Public URL of the stitched recitation of `surah:start-end`, or None when we
     have no public base URL to serve it from (local dev without WEBHOOK_URL)."""
-    base = webhook_base_url()
+    base = get_settings().webhook_base_url
     if not base or not base.startswith("https://"):
         return None
     query = urlencode({"surah": surah, "start": start, "end": end, "reciter": performer})
@@ -138,9 +137,8 @@ async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
 
     async def stitch():
         start_s, start_a, end_s, end_a = Quran.page_range(page)
-        file = File()
         urls = [
-            file.get_page_image_filename(s, a)
+            catalog.page_image_url(s, a)
             for s, a in Quran.ayahs_between((start_s, start_a), (end_s, end_a))
         ]
         return await fetch_and_stitch(urls, "page_%03d.jpg" % page)
@@ -166,8 +164,8 @@ async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang:
     """
 
     async def source():
-        if File.has_page_audio(performer):
-            return File().get_page_audio_filename(page, performer)
+        if catalog.has_page_audio(performer):
+            return catalog.page_audio_url(page, performer)
         start_s, start_a, end_s, end_a = Quran.page_range(page)
         return await cdn_audio.download_stitched_audio(
             Quran.ayahs_between((start_s, start_a), (end_s, end_a)),
@@ -182,7 +180,7 @@ async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang:
         source,
         chat_id=chat_id,
         title=page_caption(page, ui_lang).replace("\n", " · "),
-        performer=File.get_performer_name(performer),
+        performer=catalog.performer_name(performer),
     )
 
 
@@ -211,7 +209,7 @@ async def send_repeated_audio(
         stitch,
         chat_id=chat_id,
         title="%s ×%d" % (reference(surah, ayah, ui_lang), REPEAT_COUNT),
-        performer=File.get_performer_name(performer),
+        performer=catalog.performer_name(performer),
         reply_markup=reply_markup,
     )
 
@@ -219,7 +217,6 @@ async def send_repeated_audio(
 async def send_quran(
     bot,
     data: dict,
-    file,
     surah: int,
     ayah: int,
     quran_type: str,
@@ -233,8 +230,8 @@ async def send_quran(
 
     Module level rather than a closure inside `handle_update`: the scheduler
     pushes a plan's daily portion outside any update, and the hifz drill reuses
-    this same send — neither has a `handle_update` frame to close over. `bot`,
-    `data` and `file` are therefore explicit leading parameters.
+    this same send — neither has a `handle_update` frame to close over. `bot`
+    and `data` are therefore explicit leading parameters.
     """
     if quran_type in ("translation", "tafsir"):
         text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
@@ -245,7 +242,7 @@ async def send_quran(
         await bot.send_chat_action(
             chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_PHOTO
         )
-        image = file.get_image_filename(surah, ayah)
+        image = catalog.image_url(surah, ayah)
         await send_file(
             bot,
             image,
@@ -258,14 +255,14 @@ async def send_quran(
         await bot.send_chat_action(
             chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE
         )
-        audio = file.get_audio_filename(surah, ayah, performer)
+        audio = catalog.audio_url(surah, ayah, performer)
         await send_file(
             bot,
             audio,
             quran_type,
             chat_id=chat_id,
-            performer=File.get_performer_name(performer),
+            performer=catalog.performer_name(performer),
             title=reference(surah, ayah, ui_lang),
             reply_markup=reply_markup,
         )
-    await file.save_user(chat_id, (surah, ayah, quran_type))
+    await nav_state.save(chat_id, surah, ayah, quran_type)

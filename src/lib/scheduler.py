@@ -102,7 +102,7 @@ CATCH_UP_WINDOW = timedelta(hours=6)
 #         claimed = await ctx.store.plans.claim_plan_day(plan_day_id)
 #         if claimed is None:
 #             return                      # already delivered; nothing to do
-#         await send_quran(ctx.bot, ctx.data, ctx.file, ...)
+#         await send_quran(ctx.bot, ctx.data, ...)
 #
 # Contract for a handler:
 #   * it is `async def handler(ctx: SendCtx) -> None`,

@@ -7,7 +7,7 @@ from api import router as api_router
 from app.lifespan import lifespan
 from app.routes import health, media, webhook
 from app.state import AppState
-from config import Environment
+from config.settings import get_settings
 
 
 def create_app() -> FastAPI:
@@ -21,9 +21,7 @@ def create_app() -> FastAPI:
     # The Mini App is served from its own origin (docs/MINI_APP_PLAN.md §4.3), so
     # the browser needs CORS to reach /api/v1. Allow-list only, bearer header only —
     # no cookies. With no origins configured the middleware is not installed at all.
-    origins = [
-        o.strip() for o in (Environment.get_env("miniapp_origins") or "").split(",") if o.strip()
-    ]
+    origins = list(get_settings().miniapp_origins)
     if origins:
         app.add_middleware(
             CORSMiddleware,

@@ -9,7 +9,7 @@
 #     at import time, so this must be set BEFORE any app module is imported.
 #
 # Test environment is pinned here, before the first app import, so that:
-#   * `config.env` reads deterministic values, and
+#   * `config.settings` reads deterministic values, and
 #   * `main.load_dotenv()` (which does NOT override already-set vars) can never
 #     pull real secrets from a local `.env` into the test process.
 # An empty REDIS_HOST_URL forces the in-memory store (config/redis.py), so tests

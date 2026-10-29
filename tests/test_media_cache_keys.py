@@ -102,13 +102,13 @@ CASES = [
     ),
     (
         "single ayah audio (keyed by its URL)",
-        lambda b: bot_media.send_quran(b, {}, File(), 2, 255, "audio", 7, RECITER, "en", "en"),
+        lambda b: bot_media.send_quran(b, {}, 2, 255, "audio", 7, RECITER, "en", "en"),
         "https://cdn.test/audio/%s/002255.mp3" % RECITER,
         "send_audio",
     ),
     (
         "single ayah image (keyed by its URL)",
-        lambda b: bot_media.send_quran(b, {}, File(), 2, 255, "arabic", 7, RECITER, "en", "en"),
+        lambda b: bot_media.send_quran(b, {}, 2, 255, "arabic", 7, RECITER, "en", "en"),
         "https://cdn.test/images/2_255.png",
         "send_photo",
     ),

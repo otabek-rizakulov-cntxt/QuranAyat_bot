@@ -21,7 +21,7 @@
 #     testable without an event loop — the same shape as `page_image.stitch_images`.
 #
 # Wave 2C caches the resulting Telegram file_id per (user, local date) via
-# `File.save_file` / `File.get_file`; `cache_key` below is that key, and the
+# `infra.media_cache`; `cache_key` below is that key, and the
 # graph is a pure function of exactly those two things.
 
 import asyncio
@@ -206,7 +206,7 @@ def _semaphore() -> asyncio.Semaphore:
 
 
 def cache_key(user_id: int, today: date) -> str:
-    """The `File.save_file` / `File.get_file` key for a user's graph.
+    """The `infra.media_cache` key for a user's graph.
 
     The graph changes only when the day changes or a session lands, and a session
     lands at most a handful of times a day — so keying on (user, local date) and

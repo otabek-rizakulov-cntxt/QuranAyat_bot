@@ -29,11 +29,11 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from bot.keyboards.time_pickers import offset_keyboard
 from bot.media import send_combined_audio
 from hifz import Ctx, callback, wizard
+from infra import catalog
 from lib.localtime import DEFAULT_OFFSET
 from lib.page_image import fetch_and_stitch
 from lib.scheduler import send_handler
 from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
-from lib.utils import File
 from locales import t
 from modules.quran import get_translation
 
@@ -356,15 +356,12 @@ async def _post_portion(bot, config, day) -> None:
     flags = config.content_flags or {}
     thread = config.thread_id
     chat_id = config.chat_id
-    file = File()
     base = dict(chat_id=chat_id)
     if thread is not None:
         base["message_thread_id"] = thread
 
     if flags.get("image", True):
-        urls = [
-            file.get_image_filename(day.surah, a) for a in range(day.start_ayah, day.end_ayah + 1)
-        ]
+        urls = [catalog.image_url(day.surah, a) for a in range(day.start_ayah, day.end_ayah + 1)]
         try:
             image = await fetch_and_stitch(urls, name="portion.jpg")
             await bot.send_photo(photo=image, **base)
