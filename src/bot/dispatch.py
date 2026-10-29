@@ -11,6 +11,7 @@ import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 
 import hifz
+from bot.errors import ignore_not_modified
 from bot.inline import answer_inline_query
 from bot.keyboards.language import language_keyboard, translation_language_keyboard
 from bot.keyboards.reciter import (
@@ -120,15 +121,12 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
             await bot.answer_callback_query(cq.id)
             if cq.message is None:
                 return  # no message of ours to turn the page in
-            try:  # swap the keyboard, don't post a new list
+            with ignore_not_modified():  # swap the keyboard, don't post a new list
                 await bot.edit_message_reply_markup(
                     chat_id=chat_id,
                     message_id=cq.message.message_id,
                     reply_markup=reciter_keyboard(ui_lang, kind, int(page_s), current=reciter),
                 )
-            except telegram.error.BadRequest as err:
-                if "not modified" not in str(err).lower():
-                    raise
             return
 
         if cb_data == "reciter_search":  # the search button on the reciter picker
@@ -202,7 +200,9 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                         chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=markup
                     )
                 else:
-                    try:  # the common path: turn the page in place
+                    # the common path: turn the page in place; re-tapping the
+                    # current view yields an identical message, which is fine
+                    with ignore_not_modified():
                         await bot.edit_message_text(
                             text=text,
                             chat_id=chat_id,
@@ -210,10 +210,6 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
                             parse_mode="HTML",
                             reply_markup=markup,
                         )
-                    except telegram.error.BadRequest as err:
-                        # re-tapping the current view yields an identical message; ignore
-                        if "not modified" not in str(err).lower():
-                            raise
                 await file.save_user(chat_id, (surah, ayah, quran_type))
             else:  # arabic/audio arrive as fresh media messages
                 await send_quran(

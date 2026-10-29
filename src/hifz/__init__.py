@@ -40,6 +40,7 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 
 import telegram
 
+from bot.errors import ignore_not_modified
 from lib.wizard import Wizard
 from locales import t
 
@@ -173,20 +174,16 @@ class Ctx:
 
         Returns True if the message was edited. Re-tapping the view you are
         already in produces an identical message, and Telegram answers "message
-        is not modified" — that is a no-op, not an error (same idiom as the verse
-        card in main.py).
+        is not modified" — that is a no-op, not an error (bot.errors).
         """
         msg = getattr(self.callback_query, "message", None)
         if msg is None or msg.photo or msg.audio:
             await self.reply(text, **kwargs)
             return False
-        try:
+        with ignore_not_modified():
             await self.bot.edit_message_text(
                 text=text, chat_id=self.chat_id, message_id=msg.message_id, **kwargs
             )
-        except telegram.error.BadRequest as err:
-            if "not modified" not in str(err).lower():
-                raise
         return True
 
 
