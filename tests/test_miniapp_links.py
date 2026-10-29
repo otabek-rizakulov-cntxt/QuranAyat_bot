@@ -13,7 +13,7 @@ import app.lifespan as lifespan
 import bot.dispatch as dispatch
 import bot.keyboards.page as page_kb
 import bot.keyboards.verse as verse_kb
-from bot.features import memorize
+from bot.features import _plan_keyboards as memorize_keyboards
 from bot.miniapp import app_url, set_menu_button
 
 APP = "https://miniapp.test"
@@ -32,7 +32,7 @@ def test_off_by_default():
     assert app_url() is None
     assert _web_apps(verse_kb.verse_keyboard(2, 255, "translation", "en")) == []
     assert _web_apps(page_kb.page_keyboard(255, "en")) == []
-    assert _web_apps(memorize._drill_keyboard(9, 67, 1, "en")) == []
+    assert _web_apps(memorize_keyboards._drill_keyboard(9, 67, 1, "en")) == []
 
 
 def test_cards_and_drill_link_to_their_screens(app_on):
@@ -40,7 +40,7 @@ def test_cards_and_drill_link_to_their_screens(app_on):
         APP + "/read/2?a=255"
     ]
     assert _web_apps(page_kb.page_keyboard(255, "en")) == [APP + "/mushaf/255"]
-    assert _web_apps(memorize._drill_keyboard(9, 67, 1, "ru")) == [APP + "/drill"]
+    assert _web_apps(memorize_keyboards._drill_keyboard(9, 67, 1, "ru")) == [APP + "/drill"]
 
 
 def test_inline_messages_never_get_a_web_app_button(app_on):

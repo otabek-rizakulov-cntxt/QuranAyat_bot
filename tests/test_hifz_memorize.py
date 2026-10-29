@@ -16,6 +16,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 import bot.features as hifz
+import bot.features._plan_drill as plan_drill
 import bot.router as router
 from bot.features import Ctx
 from bot.features import memorize as memorize_feature
@@ -328,8 +329,8 @@ class TestDrill:
         async def fake_send_quran(*args, **kwargs):
             pass
 
-        monkeypatch.setattr(memorize_feature, "send_combined_audio", fake_combined)
-        monkeypatch.setattr(memorize_feature, "send_quran", fake_send_quran)
+        monkeypatch.setattr(plan_drill, "send_combined_audio", fake_combined)
+        monkeypatch.setattr(plan_drill, "send_quran", fake_send_quran)
 
         await _run_wizard()
         await _tap("hm:ok")
