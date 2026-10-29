@@ -141,7 +141,7 @@ src/
     state.py                 # AppState(bot, data) — replaces module globals
     tasks.py                 # spawn(): background tasks with strong refs
     routes/
-      webhook.py             # POST /webhook/{token}
+      webhook.py             # POST /webhook (secret header, not the token in the path)
       media.py               # GET /media/range.mp3
       health.py              # GET /
   bot/                       # Telegram presentation layer

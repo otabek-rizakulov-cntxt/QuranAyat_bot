@@ -13,10 +13,10 @@ from contextlib import asynccontextmanager
 from telegram import BotCommand
 
 import hifz
+from app.routes.webhook import WEBHOOK_PATH, webhook_secret
 from app.state import AppState
 from app.tasks import spawn
 from bot.inline import get_default_query_results
-from config import Environment
 from config.env import webhook_base_url
 from config.postgres import close_pool
 from config.redis import RedisSingleton, cache_backend
@@ -138,8 +138,7 @@ async def initialize(state: AppState) -> None:
     webhook_base = webhook_base_url()
     if bot and webhook_base:
         try:
-            token = Environment.get_env("token")
-            await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
+            await bot.set_webhook(url=webhook_base + WEBHOOK_PATH, secret_token=webhook_secret())
             logger.info("Webhook registered at %s", webhook_base)
         except Exception as e:
             logger.error("INIT ERROR (set_webhook): %s: %s", type(e).__name__, e)
