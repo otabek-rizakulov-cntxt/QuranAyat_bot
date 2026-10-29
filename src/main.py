@@ -27,12 +27,16 @@ Required env vars (see .env.example):
                          the webhook is registered as WEBHOOK_URL + "/webhook/" + TOKEN
 """
 
+import logging
 import os
 import re
 
 from dotenv import load_dotenv
 
+from config.logging import setup_logging
+
 load_dotenv()
+setup_logging()
 
 import asyncio
 import html
@@ -88,6 +92,8 @@ from services.reciters import (  # noqa: F401 — re-exported; tests and the pic
     reciter_group,
     reciter_kind,
 )
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Bot logic
@@ -1299,7 +1305,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     else:
         surah, ayah, quran_type = 1, 1, "translation"
 
-    print("%d:%.3f:%s" % (chat_id, time(), message.replace("\n", " ")))
+    logger.debug("%d:%.3f:%s" % (chat_id, time(), message.replace("\n", " ")))
 
     if chat_id < 0:
         # Group *text* is still ignored: the group cluster is driven entirely from
@@ -1596,7 +1602,7 @@ async def _set_bot_commands(bot) -> None:
     try:
         await bot.set_my_commands(_commands_for(DEFAULT_LANG))
     except Exception as e:
-        print("INIT ERROR (set_my_commands, default):", type(e).__name__, e)
+        logger.error("INIT ERROR (set_my_commands, default): %s: %s", type(e).__name__, e)
         return  # the API is unhappy; skip the per-language pass
     registered, rejected = 1, []
     for code in _COMMAND_MENU_LANGS:
@@ -1605,9 +1611,9 @@ async def _set_bot_commands(bot) -> None:
             registered += 1
         except Exception as e:
             rejected.append("%s (%s)" % (code, type(e).__name__))
-    print("Command menu registered for %d languages" % registered)
+    logger.info("Command menu registered for %d languages" % registered)
     if rejected:
-        print("Command menu not accepted for:", ", ".join(rejected))
+        logger.warning("Command menu not accepted for: %s", ", ".join(rejected))
 
 
 async def _initialize():
@@ -1626,8 +1632,8 @@ async def _initialize():
         # that points at a uniform set (everyayah's `quranpngs`) and produces ragged
         # pages when it does not (`images_png` varies 115-700px), so say so rather
         # than let /page quietly look broken.
-        print(
-            "WARNING: PAGE_IMAGE_BASE_URL is not set — /page will tile "
+        logger.warning(
+            "PAGE_IMAGE_BASE_URL is not set — /page will tile "
             "PHOTO_BASE_URL's images, which must be a uniform-width set "
             "(e.g. everyayah.com/data/quranpngs) or pages will render ragged."
         )
@@ -1635,7 +1641,7 @@ async def _initialize():
     try:
         bot = Bot.get_instance()
     except Exception as e:
-        print("INIT ERROR (bot — check TOKEN):", type(e).__name__, e)
+        logger.error("INIT ERROR (bot — check TOKEN): %s: %s", type(e).__name__, e)
 
     try:
         # Through the repository layer: it owns the schema file and knows that the
@@ -1643,51 +1649,51 @@ async def _initialize():
         # here raised AttributeError on every boot without DATABASE_URL, because
         # get_pool() answers None in that case.
         await apply_schema()
-        print("Settings store ready")
+        logger.info("Settings store ready")
     except Exception as e:
-        print("INIT ERROR (postgres):", type(e).__name__, e)
+        logger.error("INIT ERROR (postgres): %s: %s", type(e).__name__, e)
 
     try:
         # Connect now rather than on the first update, so a missing or
         # unreachable Redis shows on the health check straight after boot. In a
         # worker thread: the client is synchronous and a connect can block.
         await asyncio.to_thread(RedisSingleton)
-        print("Cache ready (%s)" % cache_backend())
+        logger.info("Cache ready (%s)" % cache_backend())
     except Exception as e:
-        print("INIT ERROR (redis):", type(e).__name__, e)
+        logger.error("INIT ERROR (redis): %s: %s", type(e).__name__, e)
 
     try:
         # run the blocking parse in a worker thread so the event loop stays responsive
         data = await asyncio.to_thread(build_data)
-        print("Corpora loaded; bot is ready")
+        logger.info("Corpora loaded; bot is ready")
     except Exception as e:
-        print("INIT ERROR (build_data — check corpus files):", type(e).__name__, e)
+        logger.error("INIT ERROR (build_data — check corpus files): %s: %s", type(e).__name__, e)
 
     webhook_base = _webhook_base_url()
     if bot and webhook_base:
         try:
             token = Environment.get_env("token")
             await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
-            print("Webhook registered at", webhook_base)
+            logger.info("Webhook registered at %s", webhook_base)
         except Exception as e:
-            print("INIT ERROR (set_webhook):", type(e).__name__, e)
+            logger.error("INIT ERROR (set_webhook): %s: %s", type(e).__name__, e)
     else:
-        print("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
+        logger.warning("Webhook NOT registered (bot=%s, base=%s)" % (bool(bot), webhook_base))
 
     if bot:
         await _set_bot_commands(bot)
         try:
             if await set_menu_button(bot):
-                print("Menu button opens the Mini App")
+                logger.info("Menu button opens the Mini App")
         except Exception as e:
-            print("INIT ERROR (set_chat_menu_button):", type(e).__name__, e)
+            logger.error("INIT ERROR (set_chat_menu_button): %s: %s", type(e).__name__, e)
 
     # Register the hifz features (src/hifz/*.py) — imported here, once the rest of
     # main is loaded, so a feature module may import from main without a cycle.
     try:
         hifz.load_features()
     except Exception as e:
-        print("INIT ERROR (hifz features):", type(e).__name__, e)
+        logger.error("INIT ERROR (hifz features): %s: %s", type(e).__name__, e)
 
     # --- SCHEDULER SLOT (Wave 1D) ---------------------------------------------
     # The due-queue loop. It goes last because it needs `bot` and `data`
@@ -1704,7 +1710,7 @@ async def _initialize():
         _background_tasks.add(task)  # strong ref: tasks are GC'd otherwise
         task.add_done_callback(_background_tasks.discard)
     except Exception as e:
-        print("INIT ERROR (scheduler):", type(e).__name__, e)
+        logger.error("INIT ERROR (scheduler): %s: %s", type(e).__name__, e)
 
 
 @app.on_event("startup")
@@ -1714,7 +1720,7 @@ async def on_startup():
     task = asyncio.create_task(_initialize())
     _background_tasks.add(task)
     task.add_done_callback(_background_tasks.discard)
-    print("Startup event returned — HTTP server is listening")
+    logger.info("Startup event returned — HTTP server is listening")
 
 
 @app.on_event("shutdown")
@@ -1723,11 +1729,11 @@ async def on_shutdown():
         try:
             await bot.delete_webhook()
         except Exception as e:
-            print("Shutdown: delete_webhook failed:", type(e).__name__, e)
+            logger.error("Shutdown: delete_webhook failed: %s: %s", type(e).__name__, e)
     try:
         await close_pool()
     except Exception as e:
-        print("Shutdown: close_pool failed:", type(e).__name__, e)
+        logger.error("Shutdown: close_pool failed: %s: %s", type(e).__name__, e)
 
 
 @app.get("/")
@@ -1762,7 +1768,7 @@ async def range_audio(surah: int, start: int, end: int, reciter: str):
     except ValueError:  # reciter is not in the catalog
         return Response(status_code=404)
     except httpx.HTTPError as e:  # the recitation CDN is unreachable
-        print("range_audio: upstream fetch failed:", type(e).__name__, e)
+        logger.error("range_audio: upstream fetch failed: %s: %s", type(e).__name__, e)
         return Response(status_code=502)
     return Response(
         content=audio.getvalue(),
@@ -1784,7 +1790,7 @@ async def _process_update(update: telegram.Update) -> None:
     except telegram.error.Forbidden:
         pass  # user has blocked or removed the bot; nothing to do
     except Exception as e:
-        print("Error handling update:", type(e).__name__, e)
+        logger.error("Error handling update: %s: %s", type(e).__name__, e)
 
 
 @app.post("/webhook/{token}")
@@ -1793,7 +1799,7 @@ async def telegram_webhook(token: str, request: Request):
         return Response(status_code=404)
     if bot is None or data is None:
         # still initializing (corpora parsing) — ack so Telegram doesn't retry-flood
-        print("Webhook hit before init finished; acking without processing")
+        logger.warning("Webhook hit before init finished; acking without processing")
         return {"ok": True}
 
     payload = await request.json()

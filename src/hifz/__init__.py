@@ -31,11 +31,10 @@
 # from `_initialize()` at boot), never at `import hifz` time. That means a
 # feature module may `from main import send_quran` at the top of the file without
 # a circular import, which is the mistake this package would otherwise invite.
-
 import importlib
+import logging
 import pkgutil
 import sys
-import traceback
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Dict, Optional
 
@@ -43,6 +42,8 @@ import telegram
 
 from lib.wizard import Wizard
 from locales import t
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "Ctx",
@@ -336,11 +337,12 @@ def load_features(force: bool = False) -> Dict[str, int]:
             else:
                 importlib.import_module("." + info.name, __name__)
         except Exception as e:
-            print("HIFZ: feature %r failed to load: %s: %s" % (info.name, type(e).__name__, e))
-            traceback.print_exc()
+            logger.exception(
+                "HIFZ: feature %r failed to load: %s: %s" % (info.name, type(e).__name__, e)
+            )
     _snapshot = (dict(COMMANDS), dict(CALLBACKS), dict(WIZARDS))
     counts = registered()
-    print(
+    logger.info(
         "HIFZ: %d commands, %d callback prefixes, %d wizards registered"
         % (counts["commands"], counts["callbacks"], counts["wizards"])
     )
@@ -428,8 +430,7 @@ async def dispatch_callback(ctx: Ctx, cb_data: str) -> bool:
     except telegram.error.Forbidden:
         raise  # user blocked the bot; main.py handles it
     except Exception as e:
-        print("HIFZ: callback %r failed: %s: %s" % (cb_data, type(e).__name__, e))
-        traceback.print_exc()
+        logger.exception("HIFZ: callback %r failed: %s: %s" % (cb_data, type(e).__name__, e))
         try:
             await ctx.answer()
         except Exception:
@@ -456,7 +457,7 @@ async def dispatch_wizard(ctx: Ctx, raw_message: str) -> bool:
     if handler is None:
         # a draft whose feature is gone (renamed kind, failed import): drop it
         # rather than trapping the user in a wizard nothing answers.
-        print("HIFZ: no handler for wizard kind %r; dropping the draft" % (draft["kind"],))
+        logger.warning("HIFZ: no handler for wizard kind %r; dropping the draft" % (draft["kind"],))
         ctx.wiz.clear(ctx.user_id)
         return False
     try:
@@ -464,8 +465,7 @@ async def dispatch_wizard(ctx: Ctx, raw_message: str) -> bool:
     except telegram.error.Forbidden:
         raise
     except Exception as e:
-        print("HIFZ: wizard %r failed: %s: %s" % (draft["kind"], type(e).__name__, e))
-        traceback.print_exc()
+        logger.exception("HIFZ: wizard %r failed: %s: %s" % (draft["kind"], type(e).__name__, e))
         ctx.wiz.clear(ctx.user_id)
         await ctx.reply(ctx.tr("wizard_invalid_input"))
     return True

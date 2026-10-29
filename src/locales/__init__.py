@@ -4,7 +4,7 @@
 # with a t(key, lang) helper that falls back to English per-key. Locale tables may
 # be partial — any key a locale omits is served from English, so a half-translated
 # language still works everywhere.
-
+import logging
 from functools import cache, lru_cache
 from importlib import import_module
 
@@ -19,6 +19,8 @@ from .languages import (  # re-exported for callers
     is_ui_language,
     normalize_lang,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _module_name(code: str) -> str:
@@ -44,7 +46,9 @@ def _load_locales() -> dict[str, dict]:
         try:
             module = import_module("." + _module_name(lang.code), __name__)
         except ImportError:
-            print("LOCALE MISSING: %s (%s) falls back to English" % (lang.code, lang.english))
+            logger.warning(
+                "LOCALE MISSING: %s (%s) falls back to English" % (lang.code, lang.english)
+            )
             continue
         tables[lang.code] = module.strings
     return tables

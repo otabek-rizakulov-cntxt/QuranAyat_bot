@@ -1,6 +1,9 @@
 import asyncio
+import logging
 
 from .env import Environment, memory_store_allowed
+
+logger = logging.getLogger(__name__)
 
 # Sentinel-free two-flag cache: `_pool` is the pool (or None when there isn't
 # one), `_pool_resolved` says whether we have already decided. Without the second
@@ -78,8 +81,8 @@ async def get_pool():
                 raise DatabaseUnavailable(
                     "DATABASE_URL is not set; set it, or ALLOW_MEMORY_STORE=1 for dev/tests"
                 )
-            print(
-                "WARNING: DATABASE_URL is not set — using the in-memory store. "
+            logger.warning(
+                "DATABASE_URL is not set — using the in-memory store. "
                 "Every user setting is lost on restart; never run production like this."
             )
             _pool_resolved = True
@@ -104,8 +107,8 @@ async def get_pool():
                 return _pool
             except Exception as e:
                 connect_error = e
-                print(
-                    "WARNING: Postgres connect attempt %d/%d failed (%s)"
+                logger.warning(
+                    "Postgres connect attempt %d/%d failed (%s)"
                     % (attempt, CONNECT_ATTEMPTS, type(e).__name__)
                 )
                 if attempt < CONNECT_ATTEMPTS:

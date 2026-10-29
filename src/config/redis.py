@@ -1,9 +1,12 @@
+import logging
 import threading
 import time
 
 from redis import StrictRedis
 
 from .env import Environment  # Importing the base Environment class
+
+logger = logging.getLogger(__name__)
 
 
 class MemoryStore:
@@ -86,8 +89,8 @@ class RedisSingleton(Environment):
         if not redis_url:
             if not memory_store_allowed():
                 raise CacheUnavailable("not configured")
-            print(
-                "WARNING: REDIS_HOST_URL is not set — falling back to in-memory store. "
+            logger.warning(
+                "REDIS_HOST_URL is not set — falling back to in-memory store. "
                 "User state and the media cache will be lost on restart."
             )
             return MemoryStore()
@@ -106,8 +109,8 @@ class RedisSingleton(Environment):
         except Exception as e:
             if not memory_store_allowed():
                 raise CacheUnavailable("unreachable (%s)" % type(e).__name__) from e
-            print(
-                "WARNING: Redis unreachable (%s: %s) — falling back to in-memory store."
+            logger.warning(
+                "Redis unreachable (%s: %s) — falling back to in-memory store."
                 % (type(e).__name__, e)
             )
             return MemoryStore()

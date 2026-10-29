@@ -14,7 +14,7 @@
 #       that won it.
 #   D5  a paused plan pushes nothing; `hifz.memorize.push_plan_day` re-reads the
 #       plan's status, and resuming re-arms the chain through `enqueue_next`.
-
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime, time, timezone
 from typing import List, Optional, Sequence
@@ -36,6 +36,8 @@ from lib.store.sessions import KIND_DRILL
 from lib.streaks import record_session
 from modules import Quran
 from services.profile import as_time
+
+logger = logging.getLogger(__name__)
 
 # The scheduler kind a plan day's push is queued under. hifz/memorize.py
 # registers the handler that delivers it.
@@ -163,7 +165,7 @@ async def save_plan(
 
     queued = await enqueue_next(store, user_id, chat_id, plan)
     first = local_date(queued.due_at, offset) if queued is not None else portions[0].scheduled_date
-    print(
+    logger.info(
         "HIFZ: plan #%d saved for %d — %d portion(s) over %d day(s), first push %s"
         % (plan.id, user_id, len(advancing(portions)), len(portions), first)
     )
@@ -194,7 +196,7 @@ async def enqueue_next(store, user_id: int, chat_id: int, plan, now: Optional[da
     profile = await store.profiles.get_profile(user_id)
     reminder = as_time(profile.reminder_time) if profile is not None else None
     if reminder is None:
-        print("HIFZ: plan #%d has no reminder time; nothing queued" % plan.id)
+        logger.info("HIFZ: plan #%d has no reminder time; nothing queued" % plan.id)
         return None
     offset = profile_offset(profile)
 
@@ -239,7 +241,7 @@ async def portions_of(store, plan) -> List[Portion]:
     try:
         return build_plan(plan_ref(plan), plan.pace, plan.days_of_week, days[0].scheduled_date)
     except ValueError as err:  # a plan with no weekdays cannot exist
-        print("HIFZ: cannot re-derive plan #%d: %s" % (plan.id, err))
+        logger.warning("HIFZ: cannot re-derive plan #%d: %s" % (plan.id, err))
         return []
 
 

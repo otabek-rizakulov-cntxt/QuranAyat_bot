@@ -290,7 +290,7 @@ class TestTheLoopSurvivesABadRow:
         assert (await store.schedule.get(orphan.id)).state == "failed"
         assert len(delivered) == 1
 
-    async def test_a_traceback_is_printed_when_a_send_fails(self, store, bot, capsys):
+    async def test_a_traceback_is_logged_when_a_send_fails(self, store, bot, caplog):
         @scheduler.send_handler("poison")
         async def poisoned(ctx):
             raise ValueError("bad payload")
@@ -298,8 +298,7 @@ class TestTheLoopSurvivesABadRow:
         await scheduler.enqueue(store, "poison", 501, _at(7), local_day="a")
         await scheduler.tick(bot, {}, now=_at(7), store=store)
 
-        captured = capsys.readouterr()
-        combined = captured.out + captured.err
+        combined = caplog.text  # the message plus the formatted traceback
         assert "ValueError: bad payload" in combined
         assert "Traceback" in combined  # not just the type and message
         assert "test_scheduler.py" in combined  # with the frame that raised

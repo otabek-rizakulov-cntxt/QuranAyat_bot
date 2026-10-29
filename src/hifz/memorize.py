@@ -44,8 +44,8 @@
 # can never collide on one day and a restart between enqueue and due time
 # re-delivers nothing: the row is already there, and `claim_plan_day` is a
 # conditional write on top of that.
-
 import html
+import logging
 from datetime import date, time
 from typing import Optional, Sequence
 
@@ -75,6 +75,8 @@ from main import MAX_RANGE_AYAHS, REPEAT_COUNT, get_translation, send_combined_a
 from modules import Quran
 from services.plans import SEND_KIND
 from services.profile import as_time
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["memorize", "on_tap", "plan_step", "push_plan_day", "SEND_KIND", "WIZARD_KIND"]
 
@@ -744,14 +746,14 @@ async def push_plan_day(ctx: SendCtx) -> None:
 
     day = await ctx.store.plans.get_plan_day(int(plan_day_id))
     if day is None:
-        print("HIFZ: plan day #%s is gone; nothing pushed" % (plan_day_id,))
+        logger.warning("HIFZ: plan day #%s is gone; nothing pushed" % (plan_day_id,))
         return
 
     plan = await ctx.store.plans.get_plan(day.plan_id)
     if plan is None or plan.status != PLAN_ACTIVE:
         # D5: a paused or abandoned plan produces no pushes. The chain stops here
         # and is restarted by `_lifecycle` on resume.
-        print(
+        logger.warning(
             "HIFZ: plan #%s is %s; day #%d not pushed"
             % (day.plan_id, getattr(plan, "status", "gone"), day.id)
         )
@@ -761,7 +763,7 @@ async def push_plan_day(ctx: SendCtx) -> None:
     if claimed is None:
         # A restart between claim and mark_sent can re-deliver the queued row;
         # this conditional write is what makes that a no-op.
-        print("HIFZ: plan day #%d was already delivered" % day.id)
+        logger.info("HIFZ: plan day #%d was already delivered" % day.id)
         return
 
     user_id = int(payload.get("user_id") or ctx.chat_id)
@@ -870,7 +872,7 @@ async def _send_drill(
             bot, day.surah, day.start_ayah, day.end_ayah, chat_id, reciter, reply_markup=markup
         )
     else:
-        print("HIFZ: portion %s is %d ayahs; audio skipped" % (format_ref(ref), ayahs))
+        logger.warning("HIFZ: portion %s is %d ayahs; audio skipped" % (format_ref(ref), ayahs))
         await bot.send_message(
             chat_id=chat_id,
             text=t("range_too_large", ui_lang).format(n=MAX_RANGE_AYAHS),

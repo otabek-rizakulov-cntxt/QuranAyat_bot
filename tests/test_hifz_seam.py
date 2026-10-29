@@ -183,7 +183,7 @@ class TestConflictFreeByConstruction:
         for name in sorted(advertised & hifz_owned):
             assert hifz.handles(name), name
 
-    def test_a_broken_feature_does_not_take_the_bot_down(self, capsys):
+    def test_a_broken_feature_does_not_take_the_bot_down(self, caplog):
         # One feature failing to import must be reported and skipped, not fatal —
         # otherwise a typo in one module costs the whole bot. The probe is named
         # without a leading underscore so discovery actually imports it.
@@ -193,7 +193,7 @@ class TestConflictFreeByConstruction:
                 fp.write("raise RuntimeError('boom')\n")
             hifz.reset_for_tests()
             hifz.load_features()  # must not raise
-            assert "zz_broken_probe" in capsys.readouterr().out
+            assert "zz_broken_probe" in caplog.text
             assert hifz.handles("cancel") is True  # the healthy ones still loaded
         finally:
             os.remove(broken)

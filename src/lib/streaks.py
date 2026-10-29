@@ -13,13 +13,15 @@
 #
 # The one genuinely contested piece of arithmetic is what "current" means before
 # the user has acted today — see `GRACE_DAYS`.
-
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Sequence, Tuple
 
 from lib.localtime import DEFAULT_OFFSET, local_date, parse_offset
 from lib.store import get_store
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "GRACE_DAYS",
@@ -219,7 +221,7 @@ def offset_of(profile) -> str:
     try:
         parse_offset(offset)
     except (ValueError, TypeError):
-        print("streaks: unparseable timezone %r, using UTC" % (offset,))
+        logger.warning("streaks: unparseable timezone %r, using UTC" % (offset,))
         return DEFAULT_OFFSET
     return offset
 

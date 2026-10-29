@@ -27,9 +27,8 @@
 # a thin loop over it. Every acceptance criterion is asserted against `tick()`
 # with an injected `now` and an injected store — no monkeypatched `asyncio.sleep`
 # anywhere in the suite.
-
 import asyncio
-import traceback
+import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone
 from typing import Any, Awaitable, Callable, Dict, Optional
@@ -38,6 +37,8 @@ import telegram
 
 from lib.localtime import local_date, next_due_utc
 from lib.store.schedule import ScheduledSend
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "POLL_INTERVAL_SECONDS",
@@ -429,11 +430,11 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
         _utcnow(release_before) if release_before is not None else now - CLAIM_TIMEOUT
     )
     if result.released:
-        print("Scheduler: released %d stale claim(s) from a previous run" % result.released)
+        logger.info("Scheduler: released %d stale claim(s) from a previous run" % result.released)
 
     result.dropped = await store.schedule.drop_stale(now - CATCH_UP_WINDOW)
     if result.dropped:
-        print(
+        logger.warning(
             "Scheduler: dropped %d send(s) overdue by more than %s"
             % (result.dropped, CATCH_UP_WINDOW)
         )
@@ -448,7 +449,7 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
                 # Claimed, then found to belong to a day that has passed. Marked
                 # rather than deleted: a 'failed' row is a record that the window
                 # was missed, and it can never be claimed again.
-                print(
+                logger.warning(
                     "Scheduler: skipping stale send #%d (%s -> %d, due %s)"
                     % (row.id, row.kind, row.target_chat_id, row.due_at)
                 )
@@ -468,7 +469,7 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
         except telegram.error.Forbidden as err:
             # The user blocked or removed the bot. Terminal for this row — there
             # is nothing to retry and no traceback worth printing.
-            print(
+            logger.warning(
                 "Scheduler: #%d (%s) not delivered — %d has blocked the bot"
                 % (row.id, row.kind, row.target_chat_id)
             )
@@ -478,11 +479,10 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
             # Caught *before* TRANSIENT_ERRORS on purpose: telegram.error.BadRequest
             # subclasses NetworkError, so the obvious "except NetworkError: retry"
             # would retry a malformed request every 60 s until drop_stale buried it.
-            print(
+            logger.exception(
                 "Scheduler: send #%d (%s -> %d) rejected: %s: %s"
                 % (row.id, row.kind, row.target_chat_id, type(err).__name__, err)
             )
-            traceback.print_exc()
             await _resolve(store, row, sent=False, result=result, error=err)
             continue
         except TRANSIENT_ERRORS as err:
@@ -492,7 +492,7 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
             # Bounded by drop_stale: once the row stops being same-day-relevant it
             # is deleted unsent. `attempts` does not cap the retrying — it only
             # makes a row retried unusually often visible in this log line.
-            print(
+            logger.warning(
                 "Scheduler: send #%d (%s -> %d) deferred (attempt %d): %s: %s — retrying"
                 % (row.id, row.kind, row.target_chat_id, row.attempts + 1, type(err).__name__, err)
             )
@@ -502,11 +502,10 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
             # F1: one poisoned payload must never stop the queue. Print the
             # traceback, not just the type and message — a bare
             # "Error: KeyError 'plan_day_id'" costs an afternoon.
-            print(
+            logger.exception(
                 "Scheduler: send #%d (%s -> %d) failed: %s: %s"
                 % (row.id, row.kind, row.target_chat_id, type(err).__name__, err)
             )
-            traceback.print_exc()
             await _resolve(store, row, sent=False, result=result, error=err)
             continue
         await _resolve(store, row, sent=True, result=result, error=None)
@@ -521,11 +520,10 @@ async def _release(store, row: ScheduledSend, result: TickResult, error) -> None
         result.deferred += 1
         result.errors.append((row.id, error))
     except Exception as err:
-        print(
+        logger.exception(
             "Scheduler: could not release #%d: %s: %s — left claimed for the "
             "next boot to recover" % (row.id, type(err).__name__, err)
         )
-        traceback.print_exc()
 
 
 async def _resolve(store, row: ScheduledSend, sent: bool, result: TickResult, error) -> None:
@@ -545,11 +543,10 @@ async def _resolve(store, row: ScheduledSend, sent: bool, result: TickResult, er
             result.failed += 1
             result.errors.append((row.id, error))
     except Exception as err:
-        print(
+        logger.exception(
             "Scheduler: could not mark #%d as %s: %s: %s — left claimed for the "
             "next boot to recover" % (row.id, "sent" if sent else "failed", type(err).__name__, err)
         )
-        traceback.print_exc()
 
 
 async def catch_up(
@@ -603,7 +600,7 @@ async def run_scheduler(
     down. Nothing is left half-done by a cancellation; an in-flight row stays
     'claimed' and the next boot recovers it.
     """
-    print(
+    logger.info(
         "Scheduler: started (poll every %ss, handlers: %s)"
         % (interval, ", ".join(sorted(SEND_HANDLERS)) or "none")
     )
@@ -618,8 +615,7 @@ async def run_scheduler(
             except asyncio.CancelledError:
                 raise
             except Exception as err:
-                print("Scheduler: tick failed: %s: %s" % (type(err).__name__, err))
-                traceback.print_exc()
+                logger.exception("Scheduler: tick failed: %s: %s" % (type(err).__name__, err))
             ticks += 1
             if stop_event is not None and stop_event.is_set():
                 break
@@ -629,9 +625,9 @@ async def run_scheduler(
             if stop_event is not None and stop_event.is_set():
                 break
     except asyncio.CancelledError:
-        print("Scheduler: cancelled after %d tick(s)" % ticks)
+        logger.info("Scheduler: cancelled after %d tick(s)" % ticks)
         raise
-    print("Scheduler: stopped after %d tick(s)" % ticks)
+    logger.info("Scheduler: stopped after %d tick(s)" % ticks)
 
 
 async def _wait(interval: float, stop_event: Optional[asyncio.Event]) -> None:

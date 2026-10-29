@@ -19,8 +19,8 @@
 # they are not commands, callbacks or wizards, because a chat-member change and a
 # `/start` payload are neither. The setup *steps* do use the seam: `@wizard` for
 # the typed topic name, `@callback` (prefix `gr:`) for the inline choices.
-
 import html
+import logging
 from typing import Optional
 
 import telegram
@@ -31,6 +31,8 @@ from lib.localtime import DEFAULT_OFFSET
 from lib.scheduler import send_handler
 from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
 from locales import t
+
+logger = logging.getLogger(__name__)
 
 WIZARD_KIND = "group_setup"
 
@@ -366,7 +368,9 @@ async def _post_portion(bot, config, day) -> None:
             image = await fetch_and_stitch(urls, name="portion.jpg")
             await bot.send_photo(photo=image, **base)
         except Exception as e:  # a CDN hiccup must not sink audio+text
-            print("HIFZ group: image post failed for %d: %s: %s" % (chat_id, type(e).__name__, e))
+            logger.error(
+                "HIFZ group: image post failed for %d: %s: %s" % (chat_id, type(e).__name__, e)
+            )
 
     if flags.get("translation", True):
         quran = await get_translation(config.translation_lang)

@@ -19,6 +19,7 @@
 # The rendered PNG is cached by Telegram `file_id` per (user, local date) — see
 # `streak_image.cache_key` — through the same `File.save_file` / `File.get_file`
 # pair `main.send_file` uses, so hammering /streak costs one render a day.
+import logging
 
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -26,6 +27,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from hifz import Ctx, callback, command
 from lib.streak_image import cache_key, render_streak_graph
 from lib.streaks import StreakSummary, streak_summary
+
+logger = logging.getLogger(__name__)
 
 # --- callback_data shapes ------------------------------------------------------
 # hs:grid   re-send the graph card (for other screens to link to) — 7 bytes
@@ -111,7 +114,7 @@ async def _send_graph(ctx: Ctx, summary: StreakSummary) -> None:
             )
             return
         except telegram.error.TelegramError:
-            print("streak: cached graph file_id rejected for %s; re-rendering" % (key,))
+            logger.warning("streak: cached graph file_id rejected for %s; re-rendering" % (key,))
 
     graph = await render_streak_graph(ctx.user_id, today=summary.today)
     message = await ctx.bot.send_photo(
