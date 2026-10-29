@@ -19,10 +19,11 @@ from bot.inline import get_default_query_results
 from config.postgres import close_pool
 from config.redis import RedisSingleton, cache_backend
 from config.settings import get_settings
+from infra.telegram import create_bot
 from lib.miniapp import set_menu_button
 from lib.store import apply_schema
 from locales import BOT_COMMANDS, DEFAULT_LANG, UI_LANGUAGES, t
-from modules import Bot, Quran, TranslationRegistry, make_index
+from modules import Quran, TranslationRegistry, make_index
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +105,7 @@ async def initialize(state: AppState) -> None:
         )
 
     try:
-        state.bot = bot = Bot.get_instance()
+        state.bot = bot = create_bot(get_settings())
     except Exception as e:
         logger.error("INIT ERROR (bot — check TOKEN): %s: %s", type(e).__name__, e)
 

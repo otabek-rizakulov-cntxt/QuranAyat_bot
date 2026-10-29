@@ -57,7 +57,6 @@ FRAMEWORK_FREE = {"config", "locales", "domain", "modules", "lib", "services"}
 
 # (file relative to src/, imported module) -> the refactor step that removes it.
 KNOWN = {
-    ("modules/bot.py", "telegram"): "4.3 bot client moves to infra/telegram.py",
     ("lib/miniapp.py", "telegram"): "5.3 app_row moves to bot/keyboards/",
     ("lib/scheduler.py", "telegram"): "5.2 scheduler moves to infra/",
     ("lib/plan_builder.py", "hifz.refs"): "5.1 refs moves to domain/",
