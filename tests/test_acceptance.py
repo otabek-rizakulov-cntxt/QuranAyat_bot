@@ -28,7 +28,7 @@ from lib.wizard import Wizard
 
 USER = 990001
 CHAT = 990001
-BOOK_LEARNER = 990002        # memorizes from a physical mushaf, never runs a drill
+BOOK_LEARNER = 990002  # memorizes from a physical mushaf, never runs a drill
 AL_MULK = 67
 OFFSET = "+05:00"
 
@@ -70,10 +70,10 @@ class _CallbackQuery:
 
 async def _ctx(bot=None, user=USER, argument="", tap=False) -> Ctx:
     from lib.utils import File
+
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}
-    return await Ctx.build(bot, {}, File(), user, user, _Settings(),
-                           argument=argument, **extra)
+    return await Ctx.build(bot, {}, File(), user, user, _Settings(), argument=argument, **extra)
 
 
 async def _cmd(name, bot=None, user=USER, argument=""):
@@ -101,14 +101,16 @@ def _texts(bot):
     new one, so a helper that only read `send_message` would quietly miss most of
     the flow — including the preview calendar.
     """
-    return ([c.kwargs.get("text", "") for c in bot.send_message.await_args_list]
-            + [c.kwargs.get("text", "") for c in bot.edit_message_text.await_args_list])
+    return [c.kwargs.get("text", "") for c in bot.send_message.await_args_list] + [
+        c.kwargs.get("text", "") for c in bot.edit_message_text.await_args_list
+    ]
 
 
 # --- 1. A plan is set up, and previewed before it is saved ----------------------
 
+
 class TestOneSetUpAPlan:
-    """"A user runs /memorize, picks Al-Mulk, a pace and a reminder time, and
+    """ "A user runs /memorize, picks Al-Mulk, a pace and a reminder time, and
     sees a day-by-day preview before saving.\""""
 
     async def test_the_preview_comes_before_anything_is_stored(self):
@@ -140,7 +142,7 @@ class TestOneSetUpAPlan:
         await _tap("hm:ok")
         plan = await store.plans.get_active_plan(USER)
         days = await store.plans.list_plan_days(plan.id)
-        assert len(days) == 18                      # 15 portions + 3 consolidation
+        assert len(days) == 18  # 15 portions + 3 consolidation
         # the calendar the user approved names its first and last day
         assert days[0].scheduled_date.isoformat() in shown
         assert days[-1].scheduled_date.isoformat() in shown
@@ -165,8 +167,9 @@ async def _save_plan(user=USER):
 
 # --- 2. The push fires unprompted, exactly once, across a restart ---------------
 
+
 class TestTwoTheDailyPush:
-    """"At their local reminder time the next day the bot pushes that day's
+    """ "At their local reminder time the next day the bot pushes that day's
     portion unprompted — verified by restarting the app between scheduling and
     firing, with no duplicate send.\""""
 
@@ -201,10 +204,8 @@ class TestTwoTheDailyPush:
 
         # Now it comes due, and every subsequent tick must be a no-op.
         await scheduler.tick(AsyncMock(), {}, now=row.due_at, store=store)
-        await scheduler.tick(AsyncMock(), {}, now=row.due_at + timedelta(minutes=1),
-                             store=store)
-        await scheduler.tick(AsyncMock(), {}, now=row.due_at + timedelta(minutes=2),
-                             store=store)
+        await scheduler.tick(AsyncMock(), {}, now=row.due_at + timedelta(minutes=1), store=store)
+        await scheduler.tick(AsyncMock(), {}, now=row.due_at + timedelta(minutes=2), store=store)
         assert len(delivered) == 1, "exactly once, across a restart"
 
     async def test_the_push_queues_the_following_day(self, monkeypatch):
@@ -214,6 +215,7 @@ class TestTwoTheDailyPush:
         would otherwise reach for the audio CDN. What is under test is the
         handler's own decision to queue tomorrow, so it must not be stubbed out.
         """
+
         async def no_network(*args, **kwargs):
             pass
 
@@ -226,29 +228,31 @@ class TestTwoTheDailyPush:
 
         await scheduler.tick(AsyncMock(), {}, now=row.due_at, store=store)
 
-        queued = [r for r in store.schedule._state.scheduled_send.values()
-                  if r.state == "pending"]
+        queued = [r for r in store.schedule._state.scheduled_send.values() if r.state == "pending"]
         assert queued, "the next portion should already be queued"
         assert queued[0].due_at > row.due_at
 
 
 # --- 3. A completed drill and a passed check tick the streak once ---------------
 
+
 class TestThreeTheStreak:
-    """"Completing that drill and passing the recall check ticks the streak
+    """ "Completing that drill and passing the recall check ticks the streak
     once; /streak shows 1.\""""
 
     async def test_two_sessions_in_one_local_day_tick_the_streak_once(self):
         store = await get_store()
         await store.profiles.ensure_profile(USER)
         await store.profiles.set_timezone(USER, OFFSET)
-        now = datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc)   # 11:00 local
+        now = datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc)  # 11:00 local
 
-        drill = await record_session(USER, KIND_DRILL, utc_now=now,
-                                     surah=AL_MULK, start_ayah=1, end_ayah=2)
-        check = await record_session(USER, KIND_RECALL_CHECK, utc_now=now,
-                                     surah=AL_MULK, start_ayah=1, end_ayah=2)
-        assert drill.logged and check.logged            # both are real sessions
+        drill = await record_session(
+            USER, KIND_DRILL, utc_now=now, surah=AL_MULK, start_ayah=1, end_ayah=2
+        )
+        check = await record_session(
+            USER, KIND_RECALL_CHECK, utc_now=now, surah=AL_MULK, start_ayah=1, end_ayah=2
+        )
+        assert drill.logged and check.logged  # both are real sessions
         assert drill.local_date == check.local_date
 
         summary = await streak_summary(USER, utc_now=now)
@@ -259,11 +263,13 @@ class TestThreeTheStreak:
         store = await get_store()
         await store.profiles.ensure_profile(USER)
         await store.profiles.set_timezone(USER, OFFSET)
-        await record_session(USER, KIND_DRILL,
-                             utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc))
+        await record_session(
+            USER, KIND_DRILL, utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc)
+        )
         bot = AsyncMock()
-        bot.send_photo.return_value = type("M", (), {"photo": [type("P", (), {
-            "file_id": "FID"})()]})()
+        bot.send_photo.return_value = type(
+            "M", (), {"photo": [type("P", (), {"file_id": "FID"})()]}
+        )()
         await _cmd("streak", bot)
         assert bot.send_photo.await_count == 1, "the contribution graph"
 
@@ -271,16 +277,18 @@ class TestThreeTheStreak:
         """Assumption 2: not until >=200 users have a streak."""
         store = await get_store()
         await store.profiles.ensure_profile(USER)
-        await record_session(USER, KIND_DRILL,
-                             utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc))
+        await record_session(
+            USER, KIND_DRILL, utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc)
+        )
         summary = await streak_summary(USER)
         assert summary.percentile is None
 
 
 # --- 4. Percentages are derived, and merging is visible in them -----------------
 
+
 class TestFourProgress:
-    """"Marking 67:1-8 memorized makes /progress report Al-Mulk 27%; re-marking
+    """ "Marking 67:1-8 memorized makes /progress report Al-Mulk 27%; re-marking
     67:5-10 reports 33%." And "/forgot 67:5-6 splits 67:1-10 into 67:1-4 and
     67:7-10.\""""
 
@@ -300,16 +308,15 @@ class TestFourProgress:
         store = await get_store()
         await store.hifz.add_interval(USER, AL_MULK, 1, 10)
         await _cmd("forgot", argument="67:5-6")
-        spans = [(i.start_ayah, i.end_ayah)
-                 for i in await store.hifz.list_intervals(USER, AL_MULK)]
+        spans = [(i.start_ayah, i.end_ayah) for i in await store.hifz.list_intervals(USER, AL_MULK)]
         assert spans == [(1, 4), (7, 10)]
 
     async def test_progress_reports_the_juz_in_pages_and_the_surah_in_ayahs(self):
         store = await get_store()
         await store.hifz.add_interval(USER, AL_MULK, 1, 8)
         summary = summarize(await store.hifz.list_intervals(USER), AL_MULK)
-        assert summary.focus.total == 30                      # ayahs
-        assert summary.focus_juz_pages.total_pages == 20.0    # pages, juz 29
+        assert summary.focus.total == 30  # ayahs
+        assert summary.focus_juz_pages.total_pages == 20.0  # pages, juz 29
         assert summary.quran_pages.total_pages == 604.0
 
     async def test_the_command_renders(self):
@@ -322,8 +329,9 @@ class TestFourProgress:
 
 # --- 5 & 6. The board, and the user who never runs a drill ----------------------
 
+
 class TestFiveAndSixTheBoard:
-    """"An opted-in user appears in /leaderboard; opting out removes them within
+    """ "An opted-in user appears in /leaderboard; opting out removes them within
     one command." And "a user who never runs a drill but passes a recall check
     still earns the session and appears on the board.\""""
 
@@ -332,16 +340,15 @@ class TestFiveAndSixTheBoard:
         await store.profiles.ensure_profile(USER)
         await store.profiles.set_display_name(USER, "Otabek")
         await store.profiles.set_leaderboard_opt_in(USER, True)
-        await record_session(USER, KIND_DRILL,
-                             utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc))
+        await record_session(
+            USER, KIND_DRILL, utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc)
+        )
 
-        board = await weekly_board(USER, utc_now=datetime(2026, 8, 3, 6, 0,
-                                                          tzinfo=timezone.utc))
+        board = await weekly_board(USER, utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc))
         assert any(e.user_id == USER for e in board.entries)
 
-        await _tap("hp:board:off")               # one command
-        board = await weekly_board(USER, utc_now=datetime(2026, 8, 3, 6, 0,
-                                                          tzinfo=timezone.utc))
+        await _tap("hp:board:off")  # one command
+        board = await weekly_board(USER, utc_now=datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc))
         assert not any(e.user_id == USER for e in board.entries)
         assert board.me is None
 
@@ -355,36 +362,41 @@ class TestFiveAndSixTheBoard:
 
         assert await store.plans.get_active_plan(BOOK_LEARNER) is None
 
-        outcome = await record_session(BOOK_LEARNER, KIND_RECALL_CHECK, utc_now=now,
-                                       surah=AL_MULK, start_ayah=1, end_ayah=1)
+        outcome = await record_session(
+            BOOK_LEARNER, KIND_RECALL_CHECK, utc_now=now, surah=AL_MULK, start_ayah=1, end_ayah=1
+        )
         assert outcome.logged is True
         assert outcome.streak.current == 1
 
         board = await weekly_board(BOOK_LEARNER, utc_now=now)
-        assert any(e.user_id == BOOK_LEARNER for e in board.entries), \
+        assert any(e.user_id == BOOK_LEARNER for e in board.entries), (
             "someone memorizing from a physical mushaf is a first-class citizen"
+        )
 
     async def test_a_recall_check_earns_at_most_one_session_a_day(self):
         store = await get_store()
         await store.profiles.ensure_profile(BOOK_LEARNER)
         now = datetime(2026, 8, 3, 6, 0, tzinfo=timezone.utc)
-        first = await record_session(BOOK_LEARNER, KIND_RECALL_CHECK, utc_now=now,
-                                     surah=AL_MULK, start_ayah=1, end_ayah=1)
-        again = await record_session(BOOK_LEARNER, KIND_RECALL_CHECK, utc_now=now,
-                                     surah=AL_MULK, start_ayah=1, end_ayah=1)
+        first = await record_session(
+            BOOK_LEARNER, KIND_RECALL_CHECK, utc_now=now, surah=AL_MULK, start_ayah=1, end_ayah=1
+        )
+        again = await record_session(
+            BOOK_LEARNER, KIND_RECALL_CHECK, utc_now=now, surah=AL_MULK, start_ayah=1, end_ayah=1
+        )
         assert first.logged is True
         assert again.logged is False, "the same portion twice is not two sessions"
 
 
 # --- 7. Everything is reachable -------------------------------------------------
 
+
 class TestSevenTheCommandsExist:
     def test_every_new_command_is_registered_and_advertised(self):
         from locales import BOT_COMMANDS, welcome_text
+
         hifz.load_features()
         welcome = welcome_text("en")
-        for name in ("memorize", "progress", "streak", "leaderboard", "profile",
-                     "check", "forgot"):
+        for name in ("memorize", "progress", "streak", "leaderboard", "profile", "check", "forgot"):
             assert hifz.handles(name), "%s has no handler" % name
             assert name in {c for c, _ in BOT_COMMANDS}, "%s is not in the menu" % name
             assert "/%s " % name in welcome, "%s is not in /start" % name
@@ -394,5 +406,6 @@ class TestSevenTheCommandsExist:
         source = open("src/main.py", encoding="utf-8").read()
         assert "run_scheduler" in source
         assert "hifz.load_features()" in source
-        assert source.index("hifz.load_features()") < source.index("run_scheduler"), \
+        assert source.index("hifz.load_features()") < source.index("run_scheduler"), (
             "handlers must be registered before the loop that dispatches to them"
+        )

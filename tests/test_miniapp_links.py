@@ -56,13 +56,19 @@ async def test_menu_button_off_without_url():
 
 
 def _app_command(tg_bot):
-    return telegram.Update.de_json({
-        "update_id": 1,
-        "message": {"message_id": 1, "date": 1700000000,
-                    "chat": {"id": 555000, "type": "private"},
-                    "from": {"id": 555000, "is_bot": False, "first_name": "T", "language_code": "en"},
-                    "text": "/app"},
-    }, tg_bot)
+    return telegram.Update.de_json(
+        {
+            "update_id": 1,
+            "message": {
+                "message_id": 1,
+                "date": 1700000000,
+                "chat": {"id": 555000, "type": "private"},
+                "from": {"id": 555000, "is_bot": False, "first_name": "T", "language_code": "en"},
+                "text": "/app",
+            },
+        },
+        tg_bot,
+    )
 
 
 @pytest.fixture(scope="module")

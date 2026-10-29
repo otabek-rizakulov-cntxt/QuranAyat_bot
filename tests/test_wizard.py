@@ -68,8 +68,12 @@ class TestAccumulation:
         wiz.update(USER, step="confirm", days=[1, 2, 3, 4, 5])
         draft = wiz.get(USER)
         assert draft["step"] == "confirm"
-        assert draft["data"] == {"target_kind": "surah", "surah": 67, "pace": 5,
-                                 "days": [1, 2, 3, 4, 5]}
+        assert draft["data"] == {
+            "target_kind": "surah",
+            "surah": 67,
+            "pace": 5,
+            "days": [1, 2, 3, 4, 5],
+        }
 
     def test_update_can_overwrite_an_answer(self, wiz):
         wiz.start(USER, "memorize", surah=67)
@@ -113,7 +117,7 @@ class TestOneDraftPerUser:
         wiz.start(USER, "memorize", step="pace", surah=67)
         wiz.start(USER, "profile_name")
         assert wiz.kind(USER) == "profile_name"
-        assert wiz.data(USER) == {}      # the old answers are gone, not merged
+        assert wiz.data(USER) == {}  # the old answers are gone, not merged
 
     def test_users_do_not_share_drafts(self, wiz):
         wiz.start(USER, "memorize", surah=67)
@@ -129,8 +133,7 @@ class TestCancel:
     def test_recognises_the_cancel_words(self, text):
         assert Wizard.is_cancel(text) is True
 
-    @pytest.mark.parametrize("text", ["/CANCEL", "  /cancel  ", "Cancel",
-                                      "/cancel@BismillahBot"])
+    @pytest.mark.parametrize("text", ["/CANCEL", "  /cancel  ", "Cancel", "/cancel@BismillahBot"])
     def test_cancel_is_case_space_and_botname_tolerant(self, text):
         # "/help@BotName" is already tolerated by the command parser; match it
         assert Wizard.is_cancel(text) is True
@@ -162,8 +165,8 @@ class TestCorruptState:
 
     def test_a_corrupt_draft_does_not_trap_the_user(self, wiz):
         wiz.redis.set(wiz._key(USER), "garbage")
-        wiz.get(USER)                      # reading it clears it
-        wiz.start(USER, "memorize")        # and a fresh wizard still starts
+        wiz.get(USER)  # reading it clears it
+        wiz.start(USER, "memorize")  # and a fresh wizard still starts
         assert wiz.kind(USER) == "memorize"
 
 
@@ -181,7 +184,7 @@ class TestCoexistsWithTheReciterFlow:
         f.set_awaiting_input(USER, "reciter_search")
         wiz.start(USER, "memorize", surah=67)
         assert f.pop_awaiting_input(USER) == "reciter_search"
-        assert wiz.kind(USER) == "memorize"      # untouched by the pop
+        assert wiz.kind(USER) == "memorize"  # untouched by the pop
 
     def test_they_use_different_keys(self, wiz):
         f = File()

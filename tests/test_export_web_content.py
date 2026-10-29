@@ -56,7 +56,7 @@ def test_arabic_has_every_ayah(content):
 def test_every_translation_has_every_ayah(content):
     out, meta = content
     assert "en" in meta["translations"] and "translit" in meta["translations"]
-    assert "ar" not in meta["translations"]          # served from ar/, not translations/
+    assert "ar" not in meta["translations"]  # served from ar/, not translations/
     for code in meta["translations"]:
         assert _count(os.path.join(out, "translations", code), code) == 6236, code
 
@@ -89,5 +89,5 @@ def test_basmalah_is_lifted_into_a_flag(content):
     basmalah = fatiha["ayahs"][0]
     assert not basmalah.startswith("﻿")
     assert fatiha["bismillah"] and baqara["bismillah"] and not tawba["bismillah"]
-    assert not baqara["ayahs"][0].startswith(basmalah)   # 2:1 is now just "الم"
+    assert not baqara["ayahs"][0].startswith(basmalah)  # 2:1 is now just "الم"
     assert len(baqara["ayahs"][0]) < 10

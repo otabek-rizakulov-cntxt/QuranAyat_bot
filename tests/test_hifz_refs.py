@@ -28,8 +28,8 @@ from hifz.refs import (
 )
 from modules import Quran
 
-AL_MULK = 67          # 30 ayahs
-AL_QALAM = 68         # 52 ayahs
+AL_MULK = 67  # 30 ayahs
+AL_QALAM = 68  # 52 ayahs
 
 
 class TestWholeSurah:
@@ -60,8 +60,9 @@ class TestWithinOneSurah:
         assert ref.as_tuple() == (67, 5, 67, 5)
         assert ref.count() == 1
 
-    @pytest.mark.parametrize("text", ["67:1-8", "67.1-8", "67;1-8", "67,1-8",
-                                      "67 1-8", "67:1 - 8", "/67:1-8"])
+    @pytest.mark.parametrize(
+        "text", ["67:1-8", "67.1-8", "67;1-8", "67,1-8", "67 1-8", "67:1 - 8", "/67:1-8"]
+    )
     def test_separator_and_whitespace_tolerance(self, text):
         assert parse_reference(text).as_tuple() == (67, 1, 67, 8)
 
@@ -89,6 +90,7 @@ class TestAcrossSurahs:
 
     def test_the_reader_parser_cannot_express_this(self):
         from main import parse_ayah_range
+
         # main's parser reads "67:1-68:5" as surah 67 ayahs 1..68 — wrong, and
         # exactly why hifz has its own. Pinning it here so the difference is
         # deliberate rather than discovered later.
@@ -99,7 +101,7 @@ class TestAcrossSurahs:
         assert parse_reference("68:5-67:1").as_tuple() == (67, 1, 68, 5)
 
     def test_cross_surah_with_a_nonexistent_end_is_rejected(self):
-        assert parse_reference("67:1-68:53") is None      # Al-Qalam has 52
+        assert parse_reference("67:1-68:53") is None  # Al-Qalam has 52
 
     def test_spanning_many_surahs(self):
         ref = parse_reference("112:1-114:6")
@@ -142,8 +144,9 @@ class TestJuzAndPage:
 
 
 class TestRejection:
-    @pytest.mark.parametrize("bad", ["", "   ", "hello", "surah 67", "67:", ":8",
-                                     "67:1-", "abc:def", "2:255:1", None])
+    @pytest.mark.parametrize(
+        "bad", ["", "   ", "hello", "surah 67", "67:", ":8", "67:1-", "abc:def", "2:255:1", None]
+    )
     def test_junk_is_none_not_an_exception(self, bad):
         assert parse_reference(bad) is None
 
@@ -162,8 +165,9 @@ class TestAyahCount:
         assert ayah_count(67, 1, 68, 5) == 35
 
     def test_across_three_surahs_includes_the_whole_middle_one(self):
-        expected = (Quran.get_surah_length(112) + Quran.get_surah_length(113)
-                    + Quran.get_surah_length(114))
+        expected = (
+            Quran.get_surah_length(112) + Quran.get_surah_length(113) + Quran.get_surah_length(114)
+        )
         assert ayah_count(112, 1, 114, Quran.get_surah_length(114)) == expected
 
     def test_inverted_span_is_zero_not_negative(self):
@@ -196,8 +200,9 @@ class TestFormatting:
 
     def test_round_trips_through_the_parser(self):
         for text in ("67:5", "67:1-8", "67:1-68:5"):
-            assert format_ref(parse_reference(format_ref(parse_reference(text)))) == \
-                format_ref(parse_reference(text))
+            assert format_ref(parse_reference(format_ref(parse_reference(text)))) == format_ref(
+                parse_reference(text)
+            )
 
 
 class TestContainsAndClamp:

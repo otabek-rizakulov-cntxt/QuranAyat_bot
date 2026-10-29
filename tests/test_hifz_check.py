@@ -58,8 +58,8 @@ def _callback_query(message_id: int = 11):
 
 async def _ctx(bot=None, **kwargs) -> Ctx:
     from lib.utils import File
-    return await Ctx.build(bot or AsyncMock(), {}, File(), USER, USER,
-                           _Settings(), **kwargs)
+
+    return await Ctx.build(bot or AsyncMock(), {}, File(), USER, USER, _Settings(), **kwargs)
 
 
 async def _ask(argument: str = "", bot=None):
@@ -94,7 +94,7 @@ async def _tap(cb_data: str, bot=None):
     assert await hifz.dispatch_callback(ctx, cb_data) is True
     if bot.edit_message_text.await_args is not None:
         return bot, bot.edit_message_text.await_args.kwargs["text"]
-    if bot.send_message.await_args is not None:        # media fallback path
+    if bot.send_message.await_args is not None:  # media fallback path
         return bot, bot.send_message.await_args.kwargs["text"]
     return bot, None
 
@@ -106,12 +106,13 @@ async def _sessions():
 
 # --- E3: the entry point -------------------------------------------------------
 
+
 class TestCheckEntryPoint:
     async def test_check_67_produces_a_question_from_al_mulk(self):
         _, text, markup = await _ask("67")
         surah, ayah, _ = _asked(markup)
         assert surah == 67
-        assert 1 <= ayah <= 30                       # Al-Mulk has 30 ayahs
+        assert 1 <= ayah <= 30  # Al-Mulk has 30 ayahs
         assert t("check_question", "en") in text
         assert len(_buttons(markup)) == OPTION_COUNT
 
@@ -134,26 +135,37 @@ class TestCheckEntryPoint:
         # must still put a question in front of them.
         _, text, markup = await _ask("")
         surah, ayah, _ = _asked(markup)
-        assert 78 <= surah <= 114                    # the juz 30 default
+        assert 78 <= surah <= 114  # the juz 30 default
         assert len(_buttons(markup)) == OPTION_COUNT
         # ...and it tells them they can name something else.
         assert t("check_usage", "en") in text
 
     async def test_bare_check_prefers_the_plan_portion_already_reached(self):
         from lib.store.plans import PlanDaySpec
+
         store = await get_store()
         today = await user_today(USER)
         await store.plans.create_plan(
-            USER, "surah", 67, 1, 67, 30, 5, [1, 2, 3, 4, 5, 6, 7],
-            [PlanDaySpec(today - timedelta(days=1), 67, 1, 5),
-             PlanDaySpec(today, 67, 6, 10),
-             PlanDaySpec(today + timedelta(days=1), 67, 11, 15)])
+            USER,
+            "surah",
+            67,
+            1,
+            67,
+            30,
+            5,
+            [1, 2, 3, 4, 5, 6, 7],
+            [
+                PlanDaySpec(today - timedelta(days=1), 67, 1, 5),
+                PlanDaySpec(today, 67, 6, 10),
+                PlanDaySpec(today + timedelta(days=1), 67, 11, 15),
+            ],
+        )
 
         _, text, markup = await _ask("")
         surah, ayah, _ = _asked(markup)
         assert surah == 67
         assert 1 <= ayah <= 10, "must not test a portion that has not been pushed"
-        assert t("check_usage", "en") not in text     # we did not have to guess
+        assert t("check_usage", "en") not in text  # we did not have to guess
 
     async def test_bare_check_falls_back_to_something_marked_as_known(self):
         store = await get_store()
@@ -171,6 +183,7 @@ class TestCheckEntryPoint:
 
 
 # --- E2: scoring ---------------------------------------------------------------
+
 
 class TestScoring:
     async def test_a_correct_answer_is_told_so_and_logs_a_session(self):
@@ -196,7 +209,7 @@ class TestScoring:
 
         _, text = await _tap(_answer_data(surah, ayah, day, wrong))
         assert t("check_correct", "en") not in text
-        assert question.correct in text                  # "It continues: ..."
+        assert question.correct in text  # "It continues: ..."
         assert await _sessions() == []
 
     async def test_a_user_with_no_plan_at_all_earns_the_day(self):
@@ -232,16 +245,15 @@ class TestScoring:
     async def test_the_milestone_line_fires_on_the_day_it_is_reached(self):
         store = await get_store()
         today = await user_today(USER)
-        for back in range(1, 7):                          # six days already earned
-            await store.sessions.log_session(USER, today - timedelta(days=back),
-                                             KIND_RECALL_CHECK)
+        for back in range(1, 7):  # six days already earned
+            await store.sessions.log_session(USER, today - timedelta(days=back), KIND_RECALL_CHECK)
 
         _, _, markup = await _ask("67")
         surah, ayah, day = _asked(markup)
         question = build_question(USER, surah, ayah, day)
         _, text = await _tap(_answer_data(surah, ayah, day, question.correct_index))
 
-        assert t("streak_milestone_7", "en") in text       # day seven, exactly
+        assert t("streak_milestone_7", "en") in text  # day seven, exactly
 
     async def test_answering_removes_the_keyboard(self):
         # Editing without a reply_markup drops it, so one message cannot be
@@ -253,6 +265,7 @@ class TestScoring:
 
 
 # --- Stale keyboards -----------------------------------------------------------
+
 
 class TestStaleButtons:
     """Telegram never expires a keyboard: yesterday's buttons are tappable today."""
@@ -294,6 +307,7 @@ class TestStaleButtons:
 
 # --- Defensive parsing ---------------------------------------------------------
 
+
 class TestCallbackDataDiscipline:
     async def test_no_option_text_ever_travels_in_the_callback(self):
         _, _, markup = await _ask("2")
@@ -310,24 +324,28 @@ class TestCallbackDataDiscipline:
         # ayah, a four-digit year and the last option index
         assert len(_answer_data(114, 286, _AnyDay(), 3).encode()) <= 64
 
-    @pytest.mark.parametrize("cb_data", [
-        "hc:",                          # bare prefix
-        "hc:a:",                        # no payload
-        "hc:a:67:1:20260731",           # truncated
-        "hc:a:67:1:20260731:0:9",       # over-long
-        "hc:a:sixtyseven:1:20260731:0",  # non-numeric surah
-        "hc:a:67:1:not-a-date:0",       # unparseable date
-        "hc:a:67:1:20261332:0",         # impossible date
-        "hc:a:67:99:20260731:0",        # no such ayah
-        "hc:a:0:0:20260731:0",          # no such surah
-        "hc:a:67:1:20260731:9",         # option index out of range
-        "hc:a:67:1:20260731:-1",        # negative index
-        "hc:whatever",                  # an unknown shape entirely
-    ])
+    @pytest.mark.parametrize(
+        "cb_data",
+        [
+            "hc:",  # bare prefix
+            "hc:a:",  # no payload
+            "hc:a:67:1:20260731",  # truncated
+            "hc:a:67:1:20260731:0:9",  # over-long
+            "hc:a:sixtyseven:1:20260731:0",  # non-numeric surah
+            "hc:a:67:1:not-a-date:0",  # unparseable date
+            "hc:a:67:1:20261332:0",  # impossible date
+            "hc:a:67:99:20260731:0",  # no such ayah
+            "hc:a:0:0:20260731:0",  # no such surah
+            "hc:a:67:1:20260731:9",  # option index out of range
+            "hc:a:67:1:20260731:-1",  # negative index
+            "hc:whatever",  # an unknown shape entirely
+        ],
+    )
     async def test_garbage_is_acknowledged_and_dropped(self, cb_data):
         # Called directly rather than through dispatch_callback, which would
         # swallow an exception and make a crash look like a clean drop.
         from hifz.check import on_check
+
         bot = AsyncMock()
         ctx = await _ctx(bot=bot, callback_query=_callback_query())
         await on_check(ctx, cb_data)
@@ -337,6 +355,7 @@ class TestCallbackDataDiscipline:
 
     def test_the_parser_round_trips_a_well_formed_tap(self):
         from datetime import date
+
         parsed = _parse_answer("hc:a:67:12:20260731:2")
         assert parsed == (67, 12, date(2026, 7, 31), 2)
 

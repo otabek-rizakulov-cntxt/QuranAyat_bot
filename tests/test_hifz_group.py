@@ -32,9 +32,12 @@ def _isolate_registries():
     saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), hifz._loaded)
     G._bot_username = None
     yield
-    hifz.COMMANDS.clear(); hifz.COMMANDS.update(saved[0])
-    hifz.CALLBACKS.clear(); hifz.CALLBACKS.update(saved[1])
-    hifz.WIZARDS.clear(); hifz.WIZARDS.update(saved[2])
+    hifz.COMMANDS.clear()
+    hifz.COMMANDS.update(saved[0])
+    hifz.CALLBACKS.clear()
+    hifz.CALLBACKS.update(saved[1])
+    hifz.WIZARDS.clear()
+    hifz.WIZARDS.update(saved[2])
     hifz._loaded = saved[3]
     G._bot_username = None
 
@@ -49,6 +52,7 @@ def _bot(**kw):
 
 async def _ctx(bot, user=ADMIN, chat=ADMIN):
     from lib.utils import File
+
     return await Ctx.build(bot, {}, File(), chat, user, _Settings())
 
 
@@ -57,13 +61,17 @@ def _member(status):
 
 
 def _added_update(status="member", adder=ADMIN, chat_type="supergroup"):
-    return SimpleNamespace(my_chat_member=SimpleNamespace(
-        chat=SimpleNamespace(id=CHAT, type=chat_type),
-        from_user=SimpleNamespace(id=adder),
-        new_chat_member=SimpleNamespace(status=status)))
+    return SimpleNamespace(
+        my_chat_member=SimpleNamespace(
+            chat=SimpleNamespace(id=CHAT, type=chat_type),
+            from_user=SimpleNamespace(id=adder),
+            new_chat_member=SimpleNamespace(status=status),
+        )
+    )
 
 
 # --- J2: the bot is added ------------------------------------------------------
+
 
 class TestAdded:
     async def test_adding_creates_config_and_posts_a_setup_link(self):
@@ -97,6 +105,7 @@ class TestAdded:
 
 # --- J2/J3: admin setup --------------------------------------------------------
 
+
 class TestSetup:
     async def test_non_admin_is_refused(self):
         store = await get_store()
@@ -125,8 +134,10 @@ class TestSetup:
     async def test_topic_name_creates_a_forum_topic(self):
         store = await get_store()
         await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
-        bot = _bot(get_chat_member=_member("administrator"),
-                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        bot = _bot(
+            get_chat_member=_member("administrator"),
+            create_forum_topic=SimpleNamespace(message_thread_id=77),
+        )
         ctx = await _ctx(bot)
         await G.handle_start_payload(ctx, "gs_%d" % CHAT)
         await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")
@@ -138,8 +149,7 @@ class TestSetup:
         store = await get_store()
         await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
         bot = _bot(get_chat_member=_member("administrator"))
-        bot.create_forum_topic.side_effect = telegram.error.BadRequest(
-            "the group is not a forum")
+        bot.create_forum_topic.side_effect = telegram.error.BadRequest("the group is not a forum")
         ctx = await _ctx(bot)
         await G.handle_start_payload(ctx, "gs_%d" % CHAT)
         await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")
@@ -149,15 +159,24 @@ class TestSetup:
     async def test_choosing_a_language_advances_to_the_target_step(self):
         store = await get_store()
         await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
-        bot = _bot(get_chat_member=_member("administrator"),
-                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        bot = _bot(
+            get_chat_member=_member("administrator"),
+            create_forum_topic=SimpleNamespace(message_thread_id=77),
+        )
         await G.handle_start_payload(await _ctx(bot), "gs_%d" % CHAT)
         await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")
 
         # the language pick is a gr: callback; it sets the language and moves the
         # wizard on to the plan target rather than finishing setup.
-        ctx = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN, _Settings(),
-                              callback_query=SimpleNamespace(id="cq", message=None))
+        ctx = await Ctx.build(
+            bot,
+            {},
+            (await _ctx(bot)).file,
+            ADMIN,
+            ADMIN,
+            _Settings(),
+            callback_query=SimpleNamespace(id="cq", message=None),
+        )
         await hifz.dispatch_callback(ctx, "gr:tl:ru")
 
         config = await store.groups.get_config(CHAT)
@@ -166,6 +185,7 @@ class TestSetup:
 
 
 # --- J6 entry: a member joins the board ----------------------------------------
+
 
 class TestBoardJoin:
     async def test_a_member_is_linked(self):
@@ -212,37 +232,56 @@ class TestRegistration:
 
 # --- J4: the plan wizard -------------------------------------------------------
 
+
 async def _run_setup_to_plan(store, bot):
     """Drive setup through language, leaving the wizard at the target step."""
     await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
     await G.handle_start_payload(await _ctx(bot), "gs_%d" % CHAT)
-    await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")       # topic
-    ctx = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN, _Settings(),
-                          callback_query=SimpleNamespace(id="cq", message=None))
-    await hifz.dispatch_callback(ctx, "gr:tl:en")                   # -> target step
+    await hifz.dispatch_wizard(await _ctx(bot), "Daily Hifz")  # topic
+    ctx = await Ctx.build(
+        bot,
+        {},
+        (await _ctx(bot)).file,
+        ADMIN,
+        ADMIN,
+        _Settings(),
+        callback_query=SimpleNamespace(id="cq", message=None),
+    )
+    await hifz.dispatch_callback(ctx, "gr:tl:en")  # -> target step
 
 
 class TestPlanWizard:
     async def test_full_wizard_saves_a_group_plan_and_queues_a_post(self):
         store = await get_store()
-        bot = _bot(get_chat_member=_member("administrator"),
-                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        bot = _bot(
+            get_chat_member=_member("administrator"),
+            create_forum_topic=SimpleNamespace(message_thread_id=77),
+        )
         await _run_setup_to_plan(store, bot)
 
-        await hifz.dispatch_wizard(await _ctx(bot), "67")           # target: Al-Mulk
+        await hifz.dispatch_wizard(await _ctx(bot), "67")  # target: Al-Mulk
 
         def tap(cb):
             ctx = None
+
             async def _do():
-                c = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN,
-                                    _Settings(),
-                                    callback_query=SimpleNamespace(id="cq", message=None))
+                c = await Ctx.build(
+                    bot,
+                    {},
+                    (await _ctx(bot)).file,
+                    ADMIN,
+                    ADMIN,
+                    _Settings(),
+                    callback_query=SimpleNamespace(id="cq", message=None),
+                )
                 await hifz.dispatch_callback(c, cb)
+
             return _do()
-        await tap("gr:pace:0")                                      # auto
-        await tap("gr:d:all")                                       # daily
+
+        await tap("gr:pace:0")  # auto
+        await tap("gr:d:all")  # daily
         await tap("gr:tz:+05:00")
-        await hifz.dispatch_wizard(await _ctx(bot), "07:00")        # post time -> save
+        await hifz.dispatch_wizard(await _ctx(bot), "07:00")  # post time -> save
 
         plan = await store.groups.get_active_plan(CHAT)
         assert plan is not None and plan.start_surah == 67
@@ -250,27 +289,37 @@ class TestPlanWizard:
         assert config.status == "active" and config.timezone == "+05:00"
         assert config.days_of_week == [1, 2, 3, 4, 5, 6, 7]
         # a daily post is queued into the topic (a weekly board too, see TestBoard)
-        posts = [r for r in store.schedule._state.scheduled_send.values()
-                 if r.kind == G.SEND_KIND]
+        posts = [r for r in store.schedule._state.scheduled_send.values() if r.kind == G.SEND_KIND]
         assert len(posts) == 1 and posts[0].thread_id == 77
 
     async def test_an_empty_offset_falls_back_to_the_default(self):
         # Regression: both fallbacks named DEFAULT_OFFSET without importing it,
         # so an offset-less tap crashed the wizard with a NameError.
         from lib.localtime import DEFAULT_OFFSET
+
         store = await get_store()
-        bot = _bot(get_chat_member=_member("administrator"),
-                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        bot = _bot(
+            get_chat_member=_member("administrator"),
+            create_forum_topic=SimpleNamespace(message_thread_id=77),
+        )
         await _run_setup_to_plan(store, bot)
         await hifz.dispatch_wizard(await _ctx(bot), "67")
 
         async def tap(cb):
-            c = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN, _Settings(),
-                                callback_query=SimpleNamespace(id="cq", message=None))
+            c = await Ctx.build(
+                bot,
+                {},
+                (await _ctx(bot)).file,
+                ADMIN,
+                ADMIN,
+                _Settings(),
+                callback_query=SimpleNamespace(id="cq", message=None),
+            )
             await hifz.dispatch_callback(c, cb)
+
         await tap("gr:pace:0")
         await tap("gr:d:all")
-        await tap("gr:tz:")                                         # no offset in the payload
+        await tap("gr:tz:")  # no offset in the payload
         await hifz.dispatch_wizard(await _ctx(bot), "07:00")
 
         config = await store.groups.get_config(CHAT)
@@ -278,8 +327,10 @@ class TestPlanWizard:
 
     async def test_a_bad_target_is_rejected_without_advancing(self):
         store = await get_store()
-        bot = _bot(get_chat_member=_member("administrator"),
-                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        bot = _bot(
+            get_chat_member=_member("administrator"),
+            create_forum_topic=SimpleNamespace(message_thread_id=77),
+        )
         await _run_setup_to_plan(store, bot)
         await hifz.dispatch_wizard(await _ctx(bot), "not a surah")
         assert G.WIZARD_KIND == (await _ctx(bot)).wiz.kind(ADMIN)
@@ -288,112 +339,152 @@ class TestPlanWizard:
 
 # --- J5: the daily post --------------------------------------------------------
 
+
 class TestDailyPost:
     async def _saved_plan(self, store):
         from lib.store.plans import PlanDaySpec
         from datetime import date
+
         await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
         from datetime import time as _time
+
         await store.groups.update_config(
-            CHAT, thread_id=77, translation_lang="en", timezone="+05:00",
-            post_time=_time(7, 0), status="active",
-            content_flags={"image": False, "audio": True, "translation": True})
+            CHAT,
+            thread_id=77,
+            translation_lang="en",
+            timezone="+05:00",
+            post_time=_time(7, 0),
+            status="active",
+            content_flags={"image": False, "audio": True, "translation": True},
+        )
         return await store.groups.create_plan(
-            CHAT, "surah", 67, 1, 67, 30, 2, [1, 2, 3, 4, 5, 6, 7],
-            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2),
-                  PlanDaySpec(date(2026, 8, 4), 67, 3, 4)])
+            CHAT,
+            "surah",
+            67,
+            1,
+            67,
+            30,
+            2,
+            [1, 2, 3, 4, 5, 6, 7],
+            days=[PlanDaySpec(date(2026, 8, 3), 67, 1, 2), PlanDaySpec(date(2026, 8, 4), 67, 3, 4)],
+        )
 
     async def test_a_post_delivers_to_the_topic_and_queues_the_next(self, monkeypatch):
         from lib import scheduler
         from lib.scheduler import SendCtx
+
         store = await get_store()
         plan = await self._saved_plan(store)
         day = (await store.groups.list_plan_days(plan.id))[0]
 
         posted = {}
-        async def fake_audio(bot, s, a, b, chat_id, performer, reply_markup=None,
-                             message_thread_id=None):
+
+        async def fake_audio(
+            bot, s, a, b, chat_id, performer, reply_markup=None, message_thread_id=None
+        ):
             posted["audio"] = (s, a, b, chat_id, message_thread_id)
+
         monkeypatch.setattr("main.send_combined_audio", fake_audio)
 
         bot = AsyncMock()
-        row = SimpleNamespace(id=1, kind=G.SEND_KIND, target_chat_id=CHAT,
-                              thread_id=77,
-                              payload={"group_plan_day_id": day.id,
-                                       "group_plan_id": plan.id, "chat_id": CHAT})
+        row = SimpleNamespace(
+            id=1,
+            kind=G.SEND_KIND,
+            target_chat_id=CHAT,
+            thread_id=77,
+            payload={"group_plan_day_id": day.id, "group_plan_id": plan.id, "chat_id": CHAT},
+        )
         ctx = SendCtx(bot=bot, data={}, file=None, store=store, send=row)
         await scheduler.SEND_HANDLERS[G.SEND_KIND](ctx)
 
         # translation posted into the thread
         assert bot.send_message.await_args.kwargs["message_thread_id"] == 77
-        assert posted["audio"][4] == 77                    # audio into the thread
+        assert posted["audio"][4] == 77  # audio into the thread
         # the day is claimed and the next is queued
         assert (await store.groups.get_plan_day(day.id)).state == "sent"
-        pending = [r for r in store.schedule._state.scheduled_send.values()
-                   if r.state == "pending"]
+        pending = [r for r in store.schedule._state.scheduled_send.values() if r.state == "pending"]
         assert pending, "next portion queued"
 
     async def test_a_second_delivery_of_the_same_day_is_a_no_op(self, monkeypatch):
         from lib import scheduler
         from lib.scheduler import SendCtx
+
         store = await get_store()
         plan = await self._saved_plan(store)
         day = (await store.groups.list_plan_days(plan.id))[0]
-        await store.groups.claim_plan_day(day.id)          # already sent
+        await store.groups.claim_plan_day(day.id)  # already sent
 
         monkeypatch.setattr("main.send_combined_audio", AsyncMock())
         bot = AsyncMock()
-        row = SimpleNamespace(id=1, kind=G.SEND_KIND, target_chat_id=CHAT,
-                              thread_id=77,
-                              payload={"group_plan_day_id": day.id,
-                                       "group_plan_id": plan.id, "chat_id": CHAT})
-        await scheduler.SEND_HANDLERS[G.SEND_KIND](SendCtx(
-            bot=bot, data={}, file=None, store=store, send=row))
-        bot.send_message.assert_not_awaited()              # nothing re-posted
+        row = SimpleNamespace(
+            id=1,
+            kind=G.SEND_KIND,
+            target_chat_id=CHAT,
+            thread_id=77,
+            payload={"group_plan_day_id": day.id, "group_plan_id": plan.id, "chat_id": CHAT},
+        )
+        await scheduler.SEND_HANDLERS[G.SEND_KIND](
+            SendCtx(bot=bot, data={}, file=None, store=store, send=row)
+        )
+        bot.send_message.assert_not_awaited()  # nothing re-posted
 
     async def test_a_paused_group_posts_nothing(self, monkeypatch):
         from lib import scheduler
         from lib.scheduler import SendCtx
+
         store = await get_store()
         plan = await self._saved_plan(store)
         day = (await store.groups.list_plan_days(plan.id))[0]
         await store.groups.update_config(CHAT, status="paused")
 
         bot = AsyncMock()
-        row = SimpleNamespace(id=1, kind=G.SEND_KIND, target_chat_id=CHAT,
-                              thread_id=77,
-                              payload={"group_plan_day_id": day.id,
-                                       "group_plan_id": plan.id, "chat_id": CHAT})
-        await scheduler.SEND_HANDLERS[G.SEND_KIND](SendCtx(
-            bot=bot, data={}, file=None, store=store, send=row))
+        row = SimpleNamespace(
+            id=1,
+            kind=G.SEND_KIND,
+            target_chat_id=CHAT,
+            thread_id=77,
+            payload={"group_plan_day_id": day.id, "group_plan_id": plan.id, "chat_id": CHAT},
+        )
+        await scheduler.SEND_HANDLERS[G.SEND_KIND](
+            SendCtx(bot=bot, data={}, file=None, store=store, send=row)
+        )
         bot.send_message.assert_not_awaited()
         assert (await store.groups.get_plan_day(day.id)).state == "pending"
 
 
 # --- J6: the weekly board ------------------------------------------------------
 
+
 class TestBoard:
     async def _group(self, store, offset="+05:00"):
         from datetime import time as _time
+
         await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
         await store.groups.update_config(
-            CHAT, thread_id=77, translation_lang="en", timezone=offset,
-            post_time=_time(20, 0), status="active")
+            CHAT,
+            thread_id=77,
+            translation_lang="en",
+            timezone=offset,
+            post_time=_time(20, 0),
+            status="active",
+        )
 
     async def test_board_ranks_linked_members_by_sessions(self, monkeypatch):
         from datetime import datetime, timezone, date
         from lib.store.sessions import KIND_DRILL
+
         store = await get_store()
         await self._group(store)
-        now = datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)   # a Wednesday
+        now = datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)  # a Wednesday
         today = date(2026, 8, 5)
 
         for uid, name, n in [(1, "Aisha", 3), (2, "Bilal", 5), (3, "Zayd", 1)]:
             await store.groups.link_member(uid, CHAT)
             await store.profiles.set_display_name(uid, name)
             for i in range(n):
-                await store.sessions.log_session(uid, today, KIND_DRILL,
-                                                 surah=67, start_ayah=i + 1, end_ayah=i + 1)
+                await store.sessions.log_session(
+                    uid, today, KIND_DRILL, surah=67, start_ayah=i + 1, end_ayah=i + 1
+                )
 
         bot = _bot(get_chat_member=_member("member"))
         entries = await G.group_board_entries(store, bot, CHAT, utc_now=now)
@@ -402,26 +493,30 @@ class TestBoard:
     async def test_a_member_who_left_is_dropped(self, monkeypatch):
         from datetime import datetime, timezone, date
         from lib.store.sessions import KIND_DRILL
+
         store = await get_store()
         await self._group(store)
         now = datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)
         await store.groups.link_member(1, CHAT)
-        await store.sessions.log_session(1, date(2026, 8, 5), KIND_DRILL,
-                                         surah=67, start_ayah=1, end_ayah=1)
+        await store.sessions.log_session(
+            1, date(2026, 8, 5), KIND_DRILL, surah=67, start_ayah=1, end_ayah=1
+        )
 
         bot = AsyncMock()
-        bot.get_chat_member.return_value = _member("left")   # consented, then left
+        bot.get_chat_member.return_value = _member("left")  # consented, then left
         entries = await G.group_board_entries(store, bot, CHAT, utc_now=now)
         assert entries == []
 
     async def test_someone_with_no_sessions_is_absent(self):
         from datetime import datetime, timezone
+
         store = await get_store()
         await self._group(store)
         await store.groups.link_member(1, CHAT)
         bot = _bot(get_chat_member=_member("member"))
         entries = await G.group_board_entries(
-            store, bot, CHAT, utc_now=datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc))
+            store, bot, CHAT, utc_now=datetime(2026, 8, 5, 6, 0, tzinfo=timezone.utc)
+        )
         assert entries == []
 
     async def test_post_board_writes_into_the_topic(self):
@@ -434,17 +529,28 @@ class TestBoard:
     async def test_saving_a_plan_queues_a_board(self):
         # the board chain is armed at setup alongside the daily-post chain
         store = await get_store()
-        bot = _bot(get_chat_member=_member("administrator"),
-                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        bot = _bot(
+            get_chat_member=_member("administrator"),
+            create_forum_topic=SimpleNamespace(message_thread_id=77),
+        )
         await _run_setup_to_plan(store, bot)
         await hifz.dispatch_wizard(await _ctx(bot), "67")
 
         async def tap(cb):
-            c = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN,
-                                _Settings(),
-                                callback_query=SimpleNamespace(id="cq", message=None))
+            c = await Ctx.build(
+                bot,
+                {},
+                (await _ctx(bot)).file,
+                ADMIN,
+                ADMIN,
+                _Settings(),
+                callback_query=SimpleNamespace(id="cq", message=None),
+            )
             await hifz.dispatch_callback(c, cb)
-        await tap("gr:pace:0"); await tap("gr:d:all"); await tap("gr:tz:+05:00")
+
+        await tap("gr:pace:0")
+        await tap("gr:d:all")
+        await tap("gr:tz:+05:00")
         await hifz.dispatch_wizard(await _ctx(bot), "07:00")
 
         kinds = {r.kind for r in store.schedule._state.scheduled_send.values()}
@@ -453,13 +559,17 @@ class TestBoard:
     async def test_board_send_handler_reposts_weekly(self):
         from lib import scheduler
         from lib.scheduler import SendCtx
+
         store = await get_store()
         await self._group(store)
         bot = _bot(get_chat_member=_member("member"))
-        row = SimpleNamespace(id=1, kind=G.BOARD_KIND, target_chat_id=CHAT,
-                              thread_id=77, payload={"chat_id": CHAT})
+        row = SimpleNamespace(
+            id=1, kind=G.BOARD_KIND, target_chat_id=CHAT, thread_id=77, payload={"chat_id": CHAT}
+        )
         await scheduler.SEND_HANDLERS[G.BOARD_KIND](
-            SendCtx(bot=bot, data={}, file=None, store=store, send=row))
-        bot.send_message.assert_awaited()                # board posted
-        assert any(r.kind == G.BOARD_KIND for r in
-                   store.schedule._state.scheduled_send.values())   # next queued
+            SendCtx(bot=bot, data={}, file=None, store=store, send=row)
+        )
+        bot.send_message.assert_awaited()  # board posted
+        assert any(
+            r.kind == G.BOARD_KIND for r in store.schedule._state.scheduled_send.values()
+        )  # next queued

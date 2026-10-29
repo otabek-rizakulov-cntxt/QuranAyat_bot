@@ -98,12 +98,13 @@ class TestAlMulkAcceptance:
         # Al-Mulk occupies pages 562 (67:1-12) and 563 (67:13-26); page 564 runs
         # on into surah 68, so the plan never finishes it and no page day fires.
         assert [(p.unit, p.surah, p.start_ayah, p.end_ayah) for p in pages] == [
-            (562, 67, 1, 12), (563, 67, 13, 26)]
+            (562, 67, 1, 12),
+            (563, 67, 13, 26),
+        ]
 
     def test_a_consolidation_day_at_the_surah_boundary(self, plan):
         surahs = [p for p in plan if p.drill == DRILL_SURAH]
-        assert [(p.unit, p.surah, p.start_ayah, p.end_ayah) for p in surahs] == [
-            (67, 67, 1, 30)]
+        assert [(p.unit, p.surah, p.start_ayah, p.end_ayah) for p in surahs] == [(67, 67, 1, 30)]
 
     def test_consolidation_follows_the_day_that_finished_the_unit(self, plan):
         # The page day sits immediately after the day ending on 67:12, and the
@@ -129,21 +130,25 @@ class TestAlMulkAcceptance:
 
 class TestAutoPace:
     def test_zero_means_auto(self):
-        assert build_plan(surah_ref(67), AUTO_PACE, WEEKDAYS, MONDAY) == \
-            build_plan(surah_ref(67), 2, WEEKDAYS, MONDAY)
+        assert build_plan(surah_ref(67), AUTO_PACE, WEEKDAYS, MONDAY) == build_plan(
+            surah_ref(67), 2, WEEKDAYS, MONDAY
+        )
 
     def test_al_mulk_auto_paces_to_two_a_day(self):
         # A fifth of a mushaf page: al-Mulk is 30 ayahs over 3 pages.
         assert auto_pace(surah_ref(67)) == 2
 
-    @pytest.mark.parametrize("surah, expected", [
-        (1, 1),      # al-Fatihah: 7 ayahs on one page
-        (2, 1),      # al-Baqarah: long ayahs, ~6 to a page
-        (18, 2),     # al-Kahf
-        (36, 3),     # Ya-Sin
-        (78, 4),     # an-Naba': 40 short ayahs over 2 pages
-        (112, 1),    # al-Ikhlas: 4 ayahs
-    ])
+    @pytest.mark.parametrize(
+        "surah, expected",
+        [
+            (1, 1),  # al-Fatihah: 7 ayahs on one page
+            (2, 1),  # al-Baqarah: long ayahs, ~6 to a page
+            (18, 2),  # al-Kahf
+            (36, 3),  # Ya-Sin
+            (78, 4),  # an-Naba': 40 short ayahs over 2 pages
+            (112, 1),  # al-Ikhlas: 4 ayahs
+        ],
+    )
     def test_density_based_pace(self, surah, expected):
         assert auto_pace(surah_ref(surah)) == expected
 
@@ -162,8 +167,9 @@ class TestAutoPace:
 
     def test_a_negative_pace_is_treated_as_auto(self):
         # Defensive: the wizard only ever sends 0 or a positive integer.
-        assert build_plan(surah_ref(67), -3, WEEKDAYS, MONDAY) == \
-            build_plan(surah_ref(67), AUTO_PACE, WEEKDAYS, MONDAY)
+        assert build_plan(surah_ref(67), -3, WEEKDAYS, MONDAY) == build_plan(
+            surah_ref(67), AUTO_PACE, WEEKDAYS, MONDAY
+        )
 
     def test_a_pace_larger_than_the_target_is_clamped(self):
         plan = build_plan(parse_reference("67:1-67:5"), 100, EVERY_DAY, MONDAY)
@@ -203,13 +209,13 @@ class TestCrossSurahTargets:
         assert spans(advancing(plan))[0] == (2, 280, 283)
 
     def test_a_juz_that_starts_mid_surah(self):
-        target = juz_ref(2)          # 2:142 - 2:252
+        target = juz_ref(2)  # 2:142 - 2:252
         plan = build_plan(target, 3, EVERY_DAY, MONDAY)
         assert_well_formed(target, plan)
         assert advancing(plan)[0].start_ayah == 142
 
     def test_a_page_target(self):
-        target = page_ref(604)       # 112:1 - 114:6
+        target = page_ref(604)  # 112:1 - 114:6
         plan = build_plan(target, 2, EVERY_DAY, MONDAY)
         assert_well_formed(target, plan)
         assert {p.surah for p in plan} == {112, 113, 114}
@@ -264,7 +270,7 @@ class TestDayOfWeekFiltering:
         assert plan[0].scheduled_date == MONDAY
 
     def test_a_single_day_a_week_spaces_portions_seven_days_apart(self):
-        plan = build_plan(surah_ref(67), 10, [5], MONDAY)      # Fridays only
+        plan = build_plan(surah_ref(67), 10, [5], MONDAY)  # Fridays only
         dates = [p.scheduled_date for p in plan]
         assert all(d.isoweekday() == 5 for d in dates)
         assert all(b - a == timedelta(days=7) for a, b in zip(dates, dates[1:]))
@@ -277,7 +283,7 @@ class TestDayOfWeekFiltering:
     def test_weekend_only(self):
         plan = build_plan(surah_ref(67), 5, [6, 7], MONDAY)
         assert all(p.scheduled_date.isoweekday() in (6, 7) for p in plan)
-        assert plan[0].scheduled_date == date(2026, 8, 8)      # the Saturday
+        assert plan[0].scheduled_date == date(2026, 8, 8)  # the Saturday
 
     def test_days_are_iso_numbered_monday_is_one(self):
         plan = build_plan(surah_ref(112), 1, [1], MONDAY)
@@ -295,8 +301,9 @@ class TestDayOfWeekFiltering:
         assert next_scheduled_date(MONDAY, [7]) == date(2026, 8, 9)
 
     def test_duplicate_days_are_harmless(self):
-        assert build_plan(surah_ref(67), 2, [1, 1, 3, 3], MONDAY) == \
-            build_plan(surah_ref(67), 2, [1, 3], MONDAY)
+        assert build_plan(surah_ref(67), 2, [1, 1, 3, 3], MONDAY) == build_plan(
+            surah_ref(67), 2, [1, 3], MONDAY
+        )
 
 
 class TestConsolidationDays:
@@ -341,14 +348,12 @@ class TestConsolidationDays:
     def test_a_page_day_is_clamped_to_the_target(self):
         # The plan never showed the user 67:1-4, so the page day must not either.
         plan = build_plan(parse_reference("67:5-67:30"), 2, EVERY_DAY, MONDAY)
-        pages = [(p.unit, p.start_ayah, p.end_ayah)
-                 for p in plan if p.drill == DRILL_PAGE]
+        pages = [(p.unit, p.start_ayah, p.end_ayah) for p in plan if p.drill == DRILL_PAGE]
         assert pages == [(562, 5, 12), (563, 13, 26)]
 
     def test_a_surah_day_is_clamped_to_the_target(self):
         plan = build_plan(parse_reference("67:5-68:5"), 3, EVERY_DAY, MONDAY)
-        surahs = [(p.unit, p.start_ayah, p.end_ayah)
-                  for p in plan if p.drill == DRILL_SURAH]
+        surahs = [(p.unit, p.start_ayah, p.end_ayah) for p in plan if p.drill == DRILL_SURAH]
         assert surahs == [(67, 5, 30)]
 
     def test_a_page_day_straddling_a_surah_is_clamped_to_the_later_surah(self):
@@ -375,8 +380,8 @@ class TestPortionShape:
 
     def test_as_ref_round_trips_through_format(self):
         from hifz.refs import format_ref
-        assert format_ref(Portion(MONDAY, 67, 1, 12, DRILL_PAGE, 562).as_ref()) \
-            == "67:1-12"
+
+        assert format_ref(Portion(MONDAY, 67, 1, 12, DRILL_PAGE, 562).as_ref()) == "67:1-12"
         assert format_ref(Portion(MONDAY, 67, 5, 5).as_ref()) == "67:5"
 
     def test_as_ref_is_a_range_not_a_page_claim(self):
@@ -401,9 +406,12 @@ class TestStorageShape:
         specs = to_day_specs(plan)
         assert len(specs) == len(plan)
         for spec, portion in zip(specs, plan):
-            assert (spec.scheduled_date, spec.surah, spec.start_ayah, spec.end_ayah) \
-                == (portion.scheduled_date, portion.surah,
-                    portion.start_ayah, portion.end_ayah)
+            assert (spec.scheduled_date, spec.surah, spec.start_ayah, spec.end_ayah) == (
+                portion.scheduled_date,
+                portion.surah,
+                portion.start_ayah,
+                portion.end_ayah,
+            )
 
     def test_specs_are_ordered_by_date(self):
         specs = to_day_specs(build_plan(juz_ref(30), 5, WEEKDAYS, SATURDAY))

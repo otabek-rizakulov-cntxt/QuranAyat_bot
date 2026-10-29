@@ -29,8 +29,12 @@ from lib.streaks import refresh_streaks, user_today
 from locales import t
 
 USER = 900_601
-MILESTONES = ("streak_milestone_7", "streak_milestone_30",
-              "streak_milestone_100", "streak_milestone_365")
+MILESTONES = (
+    "streak_milestone_7",
+    "streak_milestone_30",
+    "streak_milestone_100",
+    "streak_milestone_365",
+)
 
 
 class _Settings:
@@ -60,6 +64,7 @@ def _photo_message(file_id: str = "FILEID"):
 
 async def _ctx(bot=None, **kwargs) -> Ctx:
     from lib.utils import File
+
     bot = bot or AsyncMock()
     bot.send_photo.return_value = _photo_message()
     return await Ctx.build(bot, {}, File(), USER, USER, _Settings(), **kwargs)
@@ -89,20 +94,21 @@ def _caption(bot) -> str:
 
 # --- The card ------------------------------------------------------------------
 
+
 class TestStreakCard:
     async def test_a_user_with_no_sessions_gets_the_invitation_not_a_graph(self):
         bot = await _streak()
         text = bot.send_message.await_args.kwargs["text"]
         assert t("streak_title", "en") in text
         assert t("streak_none", "en") in text
-        bot.send_photo.assert_not_awaited()          # nothing to render yet
+        bot.send_photo.assert_not_awaited()  # nothing to render yet
 
     async def test_the_invitation_offers_a_way_to_earn_today(self):
         bot = await _streak()
         markup = bot.send_message.await_args.kwargs["reply_markup"]
         button = markup.inline_keyboard[0][0]
         assert button.text == t("btn_check_start", "en")
-        assert button.callback_data == "hc:start"    # hifz.PREFIXES: the check module
+        assert button.callback_data == "hc:start"  # hifz.PREFIXES: the check module
 
     async def test_a_streak_sends_the_graph_with_both_counters(self):
         await _earn((2, 1, 0))
@@ -121,13 +127,13 @@ class TestStreakCard:
         assert bot.send_photo.await_args.kwargs["reply_markup"] is None
 
     async def test_a_streak_at_risk_still_offers_the_check(self):
-        await _earn((1,))                            # yesterday, not today
+        await _earn((1,))  # yesterday, not today
         bot = await _streak()
         markup = bot.send_photo.await_args.kwargs["reply_markup"]
         assert markup.inline_keyboard[0][0].callback_data == "hc:start"
 
     async def test_a_broken_streak_still_shows_the_lifetime_best(self):
-        await _earn((9, 8, 7))                       # long over
+        await _earn((9, 8, 7))  # long over
         bot = await _streak()
         caption = _caption(bot)
         assert t("streak_current", "en").format(n=0) in caption
@@ -136,11 +142,17 @@ class TestStreakCard:
 
 # --- G3: milestones, and the percentile that never appears ----------------------
 
+
 class TestMilestones:
-    @pytest.mark.parametrize("days,key", [(7, "streak_milestone_7"),
-                                          (30, "streak_milestone_30"),
-                                          (100, "streak_milestone_100"),
-                                          (365, "streak_milestone_365")])
+    @pytest.mark.parametrize(
+        "days,key",
+        [
+            (7, "streak_milestone_7"),
+            (30, "streak_milestone_30"),
+            (100, "streak_milestone_100"),
+            (365, "streak_milestone_365"),
+        ],
+    )
     async def test_the_milestone_copy_fires_at_the_exact_day(self, days, key):
         await _earn(range(days))
         bot = await _streak()
@@ -201,9 +213,9 @@ class TestMilestones:
 
 # --- The file_id cache ---------------------------------------------------------
 
+
 class TestGraphCache:
-    async def test_the_graph_is_rendered_once_a_day_and_re_sent_from_the_file_id(
-            self, monkeypatch):
+    async def test_the_graph_is_rendered_once_a_day_and_re_sent_from_the_file_id(self, monkeypatch):
         from lib.utils import File
         import hifz.streak as streak_module
 
@@ -227,6 +239,7 @@ class TestGraphCache:
 
     async def test_the_cache_is_keyed_per_user_and_per_local_day(self):
         from lib.utils import File
+
         today = await _earn((0,))
         await _streak()
         assert File().get_file(cache_key(USER, today)) == "FILEID"
@@ -236,12 +249,15 @@ class TestGraphCache:
 
     async def test_a_rejected_file_id_falls_back_to_a_fresh_upload(self):
         from lib.utils import File
+
         today = await _earn((0,))
         File().save_file(cache_key(USER, today), "STALE")
 
         bot = AsyncMock()
-        bot.send_photo.side_effect = [telegram.error.BadRequest("wrong file identifier"),
-                                      _photo_message("FRESH")]
+        bot.send_photo.side_effect = [
+            telegram.error.BadRequest("wrong file identifier"),
+            _photo_message("FRESH"),
+        ]
         await _streak(bot=bot)
 
         assert bot.send_photo.await_count == 2
@@ -251,6 +267,7 @@ class TestGraphCache:
 
 
 # --- The callback --------------------------------------------------------------
+
 
 class TestCallback:
     async def test_the_grid_tap_re_sends_the_card(self):
@@ -266,6 +283,7 @@ class TestCallback:
     @pytest.mark.parametrize("cb_data", ["hs:", "hs:grid:extra", "hs:garbage"])
     async def test_an_unknown_shape_is_acknowledged_and_ignored(self, cb_data):
         from hifz.streak import on_streak
+
         bot = AsyncMock()
         cq = type("CQ", (), {"id": "cq-1", "message": None})()
         ctx = await _ctx(bot=bot, callback_query=cq)
@@ -279,6 +297,7 @@ class TestCallback:
 
 
 # --- What a session is ---------------------------------------------------------
+
 
 class TestWhatTicksADay:
     async def test_a_recall_check_ticks_the_day_just_like_a_drill(self):

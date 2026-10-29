@@ -36,16 +36,18 @@ async def default_span(store, user_id: int, today: date) -> Tuple[Ref, bool]:
         days = await store.plans.list_plan_days(plan.id, on_or_before=today)
         if days:
             reached = days[-1]
-            return Ref(KIND_RANGE, plan.start_surah, plan.start_ayah,
-                       reached.surah, reached.end_ayah), False
+            return Ref(
+                KIND_RANGE, plan.start_surah, plan.start_ayah, reached.surah, reached.end_ayah
+            ), False
 
     intervals = await store.hifz.list_intervals(user_id)
     if intervals:
         # Cycles through what they know, one interval a day: deterministic, so
         # asking twice in a day is not a way to shop for an easier question.
         chosen = intervals[today.toordinal() % len(intervals)]
-        return Ref(KIND_RANGE, chosen.surah, chosen.start_ayah,
-                   chosen.surah, chosen.end_ayah), False
+        return Ref(
+            KIND_RANGE, chosen.surah, chosen.start_ayah, chosen.surah, chosen.end_ayah
+        ), False
 
     return juz_ref(DEFAULT_JUZ), True
 
@@ -55,7 +57,7 @@ async def ask(user_id: int, ref: Ref, today: date) -> Optional[RecallQuestion]:
     picked = pick_ayah(user_id, ref, today)
     if picked is None:
         return None
-    await preload_corpus()                  # 1.3 MB parse, once, off the loop
+    await preload_corpus()  # 1.3 MB parse, once, off the loop
     return await asyncio.to_thread(build_question, user_id, picked[0], picked[1], today)
 
 
@@ -73,8 +75,8 @@ async def rebuild(user_id: int, surah: int, ayah: int, day: date) -> Optional[Re
 class Score:
     correct: bool
     correct_option: str
-    logged: bool = False                  # a recall_check session was written today
-    milestone_key: Optional[str] = None   # streak milestone reached by this pass
+    logged: bool = False  # a recall_check session was written today
+    milestone_key: Optional[str] = None  # streak milestone reached by this pass
 
 
 async def score(user_id: int, question: RecallQuestion, choice: int) -> Score:
@@ -83,6 +85,7 @@ async def score(user_id: int, question: RecallQuestion, choice: int) -> Score:
     if not question.is_correct(choice):
         return Score(False, question.correct)
     outcome = await record_session(user_id, KIND_RECALL_CHECK)
-    key = outcome.milestone.key if outcome.logged and outcome.milestone.reached is not None \
-        else None
+    key = (
+        outcome.milestone.key if outcome.logged and outcome.milestone.reached is not None else None
+    )
     return Score(True, question.correct, outcome.logged, key)

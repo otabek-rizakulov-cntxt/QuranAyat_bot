@@ -61,10 +61,12 @@ class _CallbackQuery:
 
 async def _ctx(bot=None, user_id=USER_ID, argument="", tap=False) -> Ctx:
     from lib.utils import File
+
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}
-    return await Ctx.build(bot, {}, File(), user_id, user_id, _Settings(),
-                           argument=argument, **extra)
+    return await Ctx.build(
+        bot, {}, File(), user_id, user_id, _Settings(), argument=argument, **extra
+    )
 
 
 def _sent(bot) -> str:
@@ -80,8 +82,9 @@ async def _join(store, user_id: int, name: str):
 async def _earn(store, user_id: int, sessions: int, day: date = TODAY):
     """`sessions` distinct logged sessions inside the current week."""
     for n in range(sessions):
-        await store.sessions.log_session(user_id, day, KIND_DRILL,
-                                         surah=67, start_ayah=n + 1, end_ayah=n + 1)
+        await store.sessions.log_session(
+            user_id, day, KIND_DRILL, surah=67, start_ayah=n + 1, end_ayah=n + 1
+        )
 
 
 class TestBoard:
@@ -97,6 +100,7 @@ class TestBoard:
     async def test_an_opted_out_user_is_absent_from_the_query_not_just_the_render(self):
         """H1's done-when, asserted at the source rather than in the text."""
         from lib.leaderboard import weekly_board
+
         store = await get_store()
         await _join(store, USER_ID, "Otabek")
         await _earn(store, USER_ID, 3)
@@ -111,8 +115,9 @@ class TestBoard:
         assert board.opted_in is False
 
     async def test_a_user_outside_the_top_ten_still_sees_their_own_rank(self):
-        """"a user ranked 400th sees rows 1-10 plus their own row"."""
+        """ "a user ranked 400th sees rows 1-10 plus their own row"."""
         from lib.leaderboard import weekly_board
+
         store = await get_store()
         # twenty people ahead of the caller
         for n in range(20):
@@ -131,6 +136,7 @@ class TestBoard:
 
     async def test_a_user_inside_the_top_is_not_drawn_twice(self):
         from lib.leaderboard import weekly_board
+
         store = await get_store()
         await _join(store, USER_ID, "Otabek")
         await _earn(store, USER_ID, 9)
@@ -157,15 +163,17 @@ class TestBoard:
 
     async def test_the_window_is_monday_to_sunday(self):
         from lib.leaderboard import week_window
+
         start, end = week_window(NOW, "+00:00")
         assert start.weekday() == 0 and end.weekday() == 6
         assert (end - start).days == 6
 
     async def test_a_session_from_last_week_does_not_count(self):
         from lib.leaderboard import weekly_board
+
         store = await get_store()
         await _join(store, USER_ID, "Otabek")
-        await _earn(store, USER_ID, 2, day=date(2026, 7, 20))   # previous week
+        await _earn(store, USER_ID, 2, day=date(2026, 7, 20))  # previous week
         board = await weekly_board(USER_ID, utc_now=NOW)
         assert board.me is None or board.me.sessions == 0
 

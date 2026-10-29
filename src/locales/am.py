@@ -60,7 +60,6 @@ strings = {
     "cmd_reciter": "አንባቢ ቀይር",
     "cmd_about": "ምንጮችና ምስጋና",
     "quran_name": "ቁርኣን",
-
     # --- Hifz platform ---------------------------------------------------------
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "የሒፍዝ እቅድ ጀምር",
@@ -70,7 +69,6 @@ strings = {
     "cmd_streak": "ዕለታዊ ተከታታይነት",
     "cmd_leaderboard": "የዚህ ሳምንት ቀዳሚዎች",
     "cmd_profile": "መገለጫና ቅንብሮች",
-
     # Shared wizard controls
     "wizard_cancelled": "ተሰርዟል።",
     "wizard_nothing_to_cancel": "የሚሰረዝ ነገር የለም።",
@@ -79,7 +77,6 @@ strings = {
     "btn_cancel": "ሰርዝ",
     "btn_back": "ተመለስ",
     "btn_confirm": "አረጋግጥ",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "ሰኞ",
     "day_tue": "ማክሰ",
@@ -88,7 +85,6 @@ strings = {
     "day_fri": "ዓርብ",
     "day_sat": "ቅዳሜ",
     "day_sun": "እሁድ",
-
     # Profile (B1-B3)
     "profile_title": "የእርስዎ መገለጫ",
     "profile_name_set": "ስም፦ {name}",
@@ -112,8 +108,7 @@ strings = {
     "board_joined": "አሁን በደረጃ ሰሌዳው ላይ ነዎት።",
     "board_left": "ከደረጃ ሰሌዳው ተነስተዋል።",
     "timezone_prompt": (
-        "የUTC ልዩነትዎን ይምረጡ። ለተከታታይነት ቀንዎ መቼ እንደሚጀምርና ዕለታዊ ድርሻዎ መቼ እንደሚደርስዎ "
-        "የሚወስነው ይህ ነው።"
+        "የUTC ልዩነትዎን ይምረጡ። ለተከታታይነት ቀንዎ መቼ እንደሚጀምርና ዕለታዊ ድርሻዎ መቼ እንደሚደርስዎ የሚወስነው ይህ ነው።"
     ),
     "timezone_saved": "የሰዓት ክልል ወደ UTC{offset} ተቀናብሯል።",
     "reminder_prompt": "ዕለታዊ ድርሻዎ እንዲደርስዎ የሚፈልጉትን ሰዓት በ24 ሰዓት አቆጣጠር ይላኩ፣ ለምሳሌ 07:30።",
@@ -121,20 +116,17 @@ strings = {
     "reminder_saved": "ዕለታዊ አስታዋሽ ለ{time} ተቀናብሯል።",
     "btn_reminder_off": "አስታዋሽ አጥፋ",
     "reminder_off": "ዕለታዊ አስታዋሾች ጠፍተዋል።",
-
     # Progress and /forgot (C3)
     "progress_title": "በቃል ያጠኑት",
     "progress_surah_line": "{name}፦ {done}/{total} አያቶች — {pct}%",
     "progress_juz_line": "ጁዝእ {n}፦ {pct}%",
     "progress_quran_line": "ሙሉ ቁርኣን፦ {pct}%",
     "progress_empty": (
-        "እስካሁን ምንም አልተመዘገበም። አንድ ድርሻ ጨርሰው «በቃል አውቀዋለሁ» ይንኩ፣ ወይም በ /memorize "
-        "እቅድ ይጀምሩ።"
+        "እስካሁን ምንም አልተመዘገበም። አንድ ድርሻ ጨርሰው «በቃል አውቀዋለሁ» ይንኩ፣ ወይም በ /memorize እቅድ ይጀምሩ።"
     ),
     "forgot_usage": "ምልክቱ የሚነሳበትን ይላኩ፣ ለምሳሌ /forgot 67:5-6።",
     "forgot_done": "የ{ref} ምልክት ተነስቷል።",
     "forgot_nothing": "ያንን በቃል እንዳጠኑት ምልክት አላደረጉም ነበር።",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "ምን በቃል ማጥናት ይፈልጋሉ?",
     "btn_target_surah": "ሱራ",
@@ -170,18 +162,15 @@ strings = {
     "btn_know_by_heart": "✅ በቃል አውቀዋለሁ",
     "know_confirmed": "{ref} በቃል እንደተጠና ተመዝግቧል። {pct}% ላይ ደርሰዋል።",
     "know_already": "ያንን አስቀድመው ምልክት አድርገውታል።",
-
     # Recall check (E2, E3)
     "check_question": "ይህ እንዴት ይቀጥላል?",
     "check_usage": "የሚፈተነውን ይላኩ፣ ለምሳሌ /check 67።",
     "check_correct": "ትክክል።",
     "check_wrong": "ትክክል አይደለም። እንዲህ ይቀጥላል፦ {correct}",
     "check_already_today": (
-        "የዛሬውን ክፍለ ጊዜ አስቀድመው በማስታወስ ፈተና አግኝተዋል — እንደፈለጉ ራስዎን ይፈትኑ፤ "
-        "ነገር ግን ሁለት ጊዜ አይቆጠርም።"
+        "የዛሬውን ክፍለ ጊዜ አስቀድመው በማስታወስ ፈተና አግኝተዋል — እንደፈለጉ ራስዎን ይፈትኑ፤ ነገር ግን ሁለት ጊዜ አይቆጠርም።"
     ),
     "btn_check_start": "ፈትነኝ",
-
     # Streaks (G2, G3)
     "streak_title": "የእርስዎ ተከታታይነት",
     "streak_current": "የአሁኑ ተከታታይነት፣ ቀናት፦ {n}",
@@ -192,7 +181,6 @@ strings = {
     "streak_milestone_30": "ሠላሳ ቀናት። አሁን ጽናት ከጎንዎ ነው።",
     "streak_milestone_100": "መቶ ቀናት። እዚህ ድረስ የሚደርሱ በጣም ጥቂቶች ናቸው።",
     "streak_milestone_365": "ሙሉ ዓመት፣ በየቀኑ። አላህ የተማሩትን ይጠብቅልዎ።",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "የዚህ ሳምንት የደረጃ ሰሌዳ",
     "leaderboard_row": "{rank}. {name} — {sessions}",

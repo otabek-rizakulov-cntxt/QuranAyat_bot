@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Команды:",
     "welcome_inline": (
-        "Меня можно использовать в любом чате: наберите <b>@QuranAyat_bot</b> и ссылку на "
-        "аят."
+        "Меня можно использовать в любом чате: наберите <b>@QuranAyat_bot</b> и ссылку на аят."
     ),
     "about": (
         "Этот бот позволяет читать Священный Коран в Telegram на многих языках.\n\n"
@@ -62,9 +61,7 @@ strings = {
     "cmd_reciter": "Сменить чтеца",
     "cmd_about": "Источники и благодарности",
     "quran_name": "Коран",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Начать план заучивания",
     "cmd_progress": "Что вы выучили",
@@ -73,7 +70,6 @@ strings = {
     "cmd_streak": "Ваша серия дней",
     "cmd_leaderboard": "Лучшие за эту неделю",
     "cmd_profile": "Ваш профиль и настройки",
-
     # Shared wizard controls
     "wizard_cancelled": "Отменено.",
     "wizard_nothing_to_cancel": "Отменять нечего.",
@@ -82,7 +78,6 @@ strings = {
     "btn_cancel": "Отмена",
     "btn_back": "Назад",
     "btn_confirm": "Подтвердить",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Пн",
     "day_tue": "Вт",
@@ -91,7 +86,6 @@ strings = {
     "day_fri": "Пт",
     "day_sat": "Сб",
     "day_sun": "Вс",
-
     # Profile (B1-B3)
     "profile_title": "Ваш профиль",
     "profile_name_set": "Имя: {name}",
@@ -124,7 +118,6 @@ strings = {
     "reminder_saved": "Ежедневное напоминание установлено на {time}.",
     "btn_reminder_off": "Выключить напоминания",
     "reminder_off": "Ежедневные напоминания выключены.",
-
     # Progress and /forgot (C3)
     "progress_title": "Что вы выучили",
     "progress_surah_line": "{name}: {done}/{total} аятов — {pct}%",
@@ -137,7 +130,6 @@ strings = {
     "forgot_usage": "Отправьте, с чего снять отметку, например /forgot 67:5-6.",
     "forgot_done": "Отметка снята: {ref}.",
     "forgot_nothing": "Это не было отмечено как выученное.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Что вы хотите выучить наизусть?",
     "btn_target_surah": "Суру",
@@ -173,7 +165,6 @@ strings = {
     "btn_know_by_heart": "✅ Знаю наизусть",
     "know_confirmed": "{ref} отмечено как выученное. Ваш прогресс: {pct}%.",
     "know_already": "Это уже было отмечено.",
-
     # Recall check (E2, E3)
     "check_question": "Как это продолжается?",
     "check_usage": "Отправьте, что проверить, например /check 67.",
@@ -184,7 +175,6 @@ strings = {
         "сколько угодно, просто дважды это не засчитается."
     ),
     "btn_check_start": "Проверить меня",
-
     # Streaks (G2, G3)
     "streak_title": "Ваша серия",
     "streak_current": "Текущая серия, дней: {n}",
@@ -195,42 +185,40 @@ strings = {
     "streak_milestone_30": "Тридцать дней. Постоянство теперь на вашей стороне.",
     "streak_milestone_100": "Сто дней. Так далеко доходят очень немногие.",
     "streak_milestone_365": "Целый год, каждый день без пропусков. Да сохранит Аллах то, что вы выучили.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Рейтинг этой недели",
     "leaderboard_row": "{rank}. {name} — {sessions}",
     "leaderboard_you_row": "Вы: {rank}. — {sessions}",
     "leaderboard_empty": "На этой неделе ещё никто не завершил занятие. Будьте первым.",
     "leaderboard_not_opted_in": "Вас нет в рейтинге. Присоединиться можно через /profile.",
-
     # --- Phase 2: group cluster (en/ru/uz/uz-Cyrl only) ---  # phase2
-    'group_added': 'Ассаляму алейкум! Я могу вести ежедневный кружок заучивания в этой группе. Администратор, нажмите ниже для настройки.',
-    'group_btn_setup': '⚙️ Настроить кружок',
-    'group_setup_unknown': 'Я не знаю эту группу. Сначала добавьте меня в неё, затем нажмите ссылку настройки там.',
-    'group_setup_not_admin': 'Настроить меня может только администратор этой группы.',
-    'group_topic_prompt': 'Как назвать ежедневную тему? Пришлите название.',
-    'group_topic_created': 'Тема <b>{name}</b> создана. Буду публиковать там каждый день.',
-    'group_topic_fallback': 'В этой группе нет тем, поэтому буду публиковать в основном чате.',
-    'group_translation_prompt': 'Какой перевод использовать в ежедневных публикациях?',
-    'group_board_unknown': 'Этого кружка больше не существует.',
-    'group_board_not_member': 'Чтобы попасть в таблицу, нужно быть участником этой группы.',
-    'group_board_joined': 'Вы теперь в недельной таблице группы.',
+    "group_added": "Ассаляму алейкум! Я могу вести ежедневный кружок заучивания в этой группе. Администратор, нажмите ниже для настройки.",
+    "group_btn_setup": "⚙️ Настроить кружок",
+    "group_setup_unknown": "Я не знаю эту группу. Сначала добавьте меня в неё, затем нажмите ссылку настройки там.",
+    "group_setup_not_admin": "Настроить меня может только администратор этой группы.",
+    "group_topic_prompt": "Как назвать ежедневную тему? Пришлите название.",
+    "group_topic_created": "Тема <b>{name}</b> создана. Буду публиковать там каждый день.",
+    "group_topic_fallback": "В этой группе нет тем, поэтому буду публиковать в основном чате.",
+    "group_translation_prompt": "Какой перевод использовать в ежедневных публикациях?",
+    "group_board_unknown": "Этого кружка больше не существует.",
+    "group_board_not_member": "Чтобы попасть в таблицу, нужно быть участником этой группы.",
+    "group_board_joined": "Вы теперь в недельной таблице группы.",
     # --- Phase 2 J4/J5 ---  # phase2
-    'group_target_prompt': 'Что учить кружку? Пришлите суру (67), джуз (джуз 30) или диапазон (2:1-10).',
-    'group_target_invalid': 'Не удалось распознать. Попробуйте номер суры, «джуз 30» или «2:1-10».',
-    'group_pace_prompt': 'Сколько аятов в день?',
-    'group_btn_pace_auto': 'Авто',
-    'group_days_prompt': 'В какие дни публиковать?',
-    'group_btn_daily': 'Каждый день',
-    'group_btn_weekdays': 'Будни',
-    'group_timezone_prompt': 'Какой у группы часовой пояс (UTC)?',
-    'group_post_time_prompt': 'В какое местное время публиковать каждый день? (напр. 07:00)',
-    'group_post_time_invalid': 'Пришлите время в формате 07:00.',
-    'group_setup_done': 'Готово — {days} частей за {total} дней. Участники могут присоединиться к таблице здесь: {board_link}',
+    "group_target_prompt": "Что учить кружку? Пришлите суру (67), джуз (джуз 30) или диапазон (2:1-10).",
+    "group_target_invalid": "Не удалось распознать. Попробуйте номер суры, «джуз 30» или «2:1-10».",
+    "group_pace_prompt": "Сколько аятов в день?",
+    "group_btn_pace_auto": "Авто",
+    "group_days_prompt": "В какие дни публиковать?",
+    "group_btn_daily": "Каждый день",
+    "group_btn_weekdays": "Будни",
+    "group_timezone_prompt": "Какой у группы часовой пояс (UTC)?",
+    "group_post_time_prompt": "В какое местное время публиковать каждый день? (напр. 07:00)",
+    "group_post_time_invalid": "Пришлите время в формате 07:00.",
+    "group_setup_done": "Готово — {days} частей за {total} дней. Участники могут присоединиться к таблице здесь: {board_link}",
     # --- Phase 2 J6 board ---  # phase2
-    'group_board_title': '📿 Кружок на этой неделе',
-    'group_board_row': '{rank}. {name} — {sessions}',
-    'group_board_empty': 'На этой неделе ещё никто не завершил занятие. Будьте первым!',
+    "group_board_title": "📿 Кружок на этой неделе",
+    "group_board_row": "{rank}. {name} — {sessions}",
+    "group_board_empty": "На этой неделе ещё никто не завершил занятие. Будьте первым!",
     # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
     "web_loading": "Загрузка…",
     "web_open_in_telegram": "Откройте это приложение из Telegram, чтобы продолжить.",

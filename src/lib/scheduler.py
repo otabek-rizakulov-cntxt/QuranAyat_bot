@@ -40,11 +40,22 @@ from lib.localtime import local_date, next_due_utc
 from lib.store.schedule import ScheduledSend
 
 __all__ = [
-    "POLL_INTERVAL_SECONDS", "CLAIM_LIMIT", "CLAIM_TIMEOUT", "CATCH_UP_WINDOW",
-    "SEND_HANDLERS", "SendCtx", "TickResult",
-    "send_handler", "register_send_handler", "registered_kinds",
-    "idempotency_key", "enqueue", "schedule_daily",
-    "tick", "catch_up", "run_scheduler",
+    "POLL_INTERVAL_SECONDS",
+    "CLAIM_LIMIT",
+    "CLAIM_TIMEOUT",
+    "CATCH_UP_WINDOW",
+    "SEND_HANDLERS",
+    "SendCtx",
+    "TickResult",
+    "send_handler",
+    "register_send_handler",
+    "registered_kinds",
+    "idempotency_key",
+    "enqueue",
+    "schedule_daily",
+    "tick",
+    "catch_up",
+    "run_scheduler",
 ]
 
 
@@ -118,14 +129,14 @@ SendHandler = Callable[["SendCtx"], Awaitable[None]]
 # does not change that cap — it exists purely so a row retried unusually often
 # is observable instead of only visible in scrolled-past logs.
 PERMANENT_ERRORS = (
-    telegram.error.BadRequest,      # malformed request — retrying cannot help
+    telegram.error.BadRequest,  # malformed request — retrying cannot help
     telegram.error.InvalidToken,
     telegram.error.ChatMigrated,
 )
 TRANSIENT_ERRORS = (
-    telegram.error.RetryAfter,      # rate limited; not a NetworkError subclass
+    telegram.error.RetryAfter,  # rate limited; not a NetworkError subclass
     telegram.error.TimedOut,
-    telegram.error.NetworkError,    # must come after BadRequest is excluded
+    telegram.error.NetworkError,  # must come after BadRequest is excluded
 )
 
 SEND_HANDLERS: Dict[str, SendHandler] = {}
@@ -138,10 +149,11 @@ def register_send_handler(kind: str, handler: SendHandler) -> SendHandler:
     sends, so this fails at import time instead — same rule as `hifz.command`.
     """
     existing = SEND_HANDLERS.get(kind)
-    if existing is not None and existing is not handler \
-            and not _same_origin(existing, handler):
-        raise ValueError("scheduled kind %r is already handled by %s"
-                         % (kind, getattr(existing, "__module__", "?")))
+    if existing is not None and existing is not handler and not _same_origin(existing, handler):
+        raise ValueError(
+            "scheduled kind %r is already handled by %s"
+            % (kind, getattr(existing, "__module__", "?"))
+        )
     SEND_HANDLERS[kind] = handler
     return handler
 
@@ -156,14 +168,17 @@ def _same_origin(a, b) -> bool:
     stable across a reload and still distinct between two real features, which is
     the collision this guard exists to catch.
     """
-    return (getattr(a, "__module__", None) == getattr(b, "__module__", None)
-            and getattr(a, "__qualname__", None) == getattr(b, "__qualname__", None))
+    return getattr(a, "__module__", None) == getattr(b, "__module__", None) and getattr(
+        a, "__qualname__", None
+    ) == getattr(b, "__qualname__", None)
 
 
 def send_handler(kind: str):
     """Decorator form: `@send_handler("plan_day")`."""
+
     def decorate(handler: SendHandler) -> SendHandler:
         return register_send_handler(kind, handler)
+
     return decorate
 
 
@@ -173,6 +188,7 @@ def registered_kinds() -> Dict[str, str]:
 
 
 # --- The handler context -------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class SendCtx:
@@ -185,11 +201,11 @@ class SendCtx:
     admin-chosen language possible in Phase 2.
     """
 
-    bot: Any                  # telegram.Bot (an AsyncMock under test)
-    data: dict                # the shared corpora dict built by main.build_data
-    file: Any                 # lib.utils.File — media cache + nav state
-    store: Any                # lib.store.Store
-    send: ScheduledSend       # the row being delivered
+    bot: Any  # telegram.Bot (an AsyncMock under test)
+    data: dict  # the shared corpora dict built by main.build_data
+    file: Any  # lib.utils.File — media cache + nav state
+    store: Any  # lib.store.Store
+    send: ScheduledSend  # the row being delivered
 
     @property
     def kind(self) -> str:
@@ -217,6 +233,7 @@ class SendCtx:
 
 # --- Enqueueing (F2) -----------------------------------------------------------
 
+
 def idempotency_key(kind: str, target_chat_id: int, local_day) -> str:
     """The canonical `(kind, target, local_date)` key, e.g. `plan_day:42:2026-08-01`.
 
@@ -228,10 +245,16 @@ def idempotency_key(kind: str, target_chat_id: int, local_day) -> str:
     return "%s:%d:%s" % (kind, target_chat_id, day)
 
 
-async def enqueue(store, kind: str, target_chat_id: int, due_at: datetime,
-                  local_day=None, payload: Optional[Dict[str, Any]] = None,
-                  thread_id: Optional[int] = None,
-                  key: Optional[str] = None) -> Optional[ScheduledSend]:
+async def enqueue(
+    store,
+    kind: str,
+    target_chat_id: int,
+    due_at: datetime,
+    local_day=None,
+    payload: Optional[Dict[str, Any]] = None,
+    thread_id: Optional[int] = None,
+    key: Optional[str] = None,
+) -> Optional[ScheduledSend]:
     """Queue one send. Returns the row, or None if that key is already queued.
 
     Enqueueing the same key twice inserts one row and raises nothing — that is
@@ -243,14 +266,21 @@ async def enqueue(store, kind: str, target_chat_id: int, due_at: datetime,
         if local_day is None:
             raise ValueError("enqueue needs either local_day or an explicit key")
         key = idempotency_key(kind, target_chat_id, local_day)
-    return await store.schedule.enqueue(kind, target_chat_id, due_at, key,
-                                        payload=payload, thread_id=thread_id)
+    return await store.schedule.enqueue(
+        kind, target_chat_id, due_at, key, payload=payload, thread_id=thread_id
+    )
 
 
-async def schedule_daily(store, kind: str, target_chat_id: int, reminder_time: time,
-                         offset: str, now: Optional[datetime] = None,
-                         payload: Optional[Dict[str, Any]] = None,
-                         thread_id: Optional[int] = None) -> Optional[ScheduledSend]:
+async def schedule_daily(
+    store,
+    kind: str,
+    target_chat_id: int,
+    reminder_time: time,
+    offset: str,
+    now: Optional[datetime] = None,
+    payload: Optional[Dict[str, Any]] = None,
+    thread_id: Optional[int] = None,
+) -> Optional[ScheduledSend]:
     """Queue the next occurrence of a daily push at the user's local `reminder_time`.
 
     `offset` is a fixed UTC offset (`"+05:00"`); all the arithmetic goes through
@@ -268,11 +298,13 @@ async def schedule_daily(store, kind: str, target_chat_id: int, reminder_time: t
     day = local_date(due_at, offset)
     body = dict(payload or {})
     body.setdefault("offset", offset)
-    return await enqueue(store, kind, target_chat_id, due_at, local_day=day,
-                         payload=body, thread_id=thread_id)
+    return await enqueue(
+        store, kind, target_chat_id, due_at, local_day=day, payload=body, thread_id=thread_id
+    )
 
 
 # --- The loop (F1, F3) ---------------------------------------------------------
+
 
 @dataclass
 class TickResult:
@@ -282,10 +314,10 @@ class TickResult:
     claimed: int = 0
     sent: int = 0
     failed: int = 0
-    dropped: int = 0        # too late to be worth delivering
-    released: int = 0       # claims recovered from a dead process
-    deferred: int = 0       # transient failure, back on the queue for the next tick
-    errors: list = field(default_factory=list)   # (send_id, exception) per failure
+    dropped: int = 0  # too late to be worth delivering
+    released: int = 0  # claims recovered from a dead process
+    deferred: int = 0  # transient failure, back on the queue for the next tick
+    errors: list = field(default_factory=list)  # (send_id, exception) per failure
 
     def __bool__(self) -> bool:
         return bool(self.claimed or self.dropped or self.released)
@@ -339,7 +371,7 @@ def _is_stale(row: ScheduledSend, now: datetime) -> bool:
         try:
             return local_date(now, offset) != local_date(due_at, offset)
         except (ValueError, TypeError):
-            return False        # unparseable offset: fall back to the window alone
+            return False  # unparseable offset: fall back to the window alone
     return False
 
 
@@ -349,13 +381,19 @@ async def _deliver(ctx: SendCtx) -> None:
     if handler is None:
         raise LookupError(
             "no handler registered for scheduled kind %r (registered: %s)"
-            % (ctx.kind, ", ".join(sorted(SEND_HANDLERS)) or "none"))
+            % (ctx.kind, ", ".join(sorted(SEND_HANDLERS)) or "none")
+        )
     await handler(ctx)
 
 
-async def tick(bot, data: Optional[dict] = None, now: Optional[datetime] = None,
-               store=None, limit: int = CLAIM_LIMIT,
-               release_before: Optional[datetime] = None) -> TickResult:
+async def tick(
+    bot,
+    data: Optional[dict] = None,
+    now: Optional[datetime] = None,
+    store=None,
+    limit: int = CLAIM_LIMIT,
+    release_before: Optional[datetime] = None,
+) -> TickResult:
     """One complete pass: recover, prune, claim, send.
 
     In order, because the order is the correctness argument:
@@ -388,15 +426,17 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
     result = TickResult()
 
     result.released = await store.schedule.release_stale_claims(
-        _utcnow(release_before) if release_before is not None else now - CLAIM_TIMEOUT)
+        _utcnow(release_before) if release_before is not None else now - CLAIM_TIMEOUT
+    )
     if result.released:
-        print("Scheduler: released %d stale claim(s) from a previous run"
-              % result.released)
+        print("Scheduler: released %d stale claim(s) from a previous run" % result.released)
 
     result.dropped = await store.schedule.drop_stale(now - CATCH_UP_WINDOW)
     if result.dropped:
-        print("Scheduler: dropped %d send(s) overdue by more than %s"
-              % (result.dropped, CATCH_UP_WINDOW))
+        print(
+            "Scheduler: dropped %d send(s) overdue by more than %s"
+            % (result.dropped, CATCH_UP_WINDOW)
+        )
 
     rows = await store.schedule.claim_due(now, limit=limit)
     result.claimed = len(rows)
@@ -408,13 +448,18 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
                 # Claimed, then found to belong to a day that has passed. Marked
                 # rather than deleted: a 'failed' row is a record that the window
                 # was missed, and it can never be claimed again.
-                print("Scheduler: skipping stale send #%d (%s -> %d, due %s)"
-                      % (row.id, row.kind, row.target_chat_id, row.due_at))
+                print(
+                    "Scheduler: skipping stale send #%d (%s -> %d, due %s)"
+                    % (row.id, row.kind, row.target_chat_id, row.due_at)
+                )
                 await store.schedule.mark_failed(row.id)
                 result.dropped += 1
                 continue
-            await _deliver(SendCtx(bot=bot, data=data if data is not None else {},
-                                   file=file, store=store, send=row))
+            await _deliver(
+                SendCtx(
+                    bot=bot, data=data if data is not None else {}, file=file, store=store, send=row
+                )
+            )
         except asyncio.CancelledError:
             # Shutdown mid-send. Leave the row 'claimed'; the next boot's
             # catch_up() releases it, and _is_stale decides whether it is still
@@ -423,16 +468,20 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
         except telegram.error.Forbidden as err:
             # The user blocked or removed the bot. Terminal for this row — there
             # is nothing to retry and no traceback worth printing.
-            print("Scheduler: #%d (%s) not delivered — %d has blocked the bot"
-                  % (row.id, row.kind, row.target_chat_id))
+            print(
+                "Scheduler: #%d (%s) not delivered — %d has blocked the bot"
+                % (row.id, row.kind, row.target_chat_id)
+            )
             await _resolve(store, row, sent=False, result=result, error=err)
             continue
         except PERMANENT_ERRORS as err:
             # Caught *before* TRANSIENT_ERRORS on purpose: telegram.error.BadRequest
             # subclasses NetworkError, so the obvious "except NetworkError: retry"
             # would retry a malformed request every 60 s until drop_stale buried it.
-            print("Scheduler: send #%d (%s -> %d) rejected: %s: %s"
-                  % (row.id, row.kind, row.target_chat_id, type(err).__name__, err))
+            print(
+                "Scheduler: send #%d (%s -> %d) rejected: %s: %s"
+                % (row.id, row.kind, row.target_chat_id, type(err).__name__, err)
+            )
             traceback.print_exc()
             await _resolve(store, row, sent=False, result=result, error=err)
             continue
@@ -443,17 +492,20 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
             # Bounded by drop_stale: once the row stops being same-day-relevant it
             # is deleted unsent. `attempts` does not cap the retrying — it only
             # makes a row retried unusually often visible in this log line.
-            print("Scheduler: send #%d (%s -> %d) deferred (attempt %d): %s: %s — retrying"
-                  % (row.id, row.kind, row.target_chat_id, row.attempts + 1,
-                     type(err).__name__, err))
+            print(
+                "Scheduler: send #%d (%s -> %d) deferred (attempt %d): %s: %s — retrying"
+                % (row.id, row.kind, row.target_chat_id, row.attempts + 1, type(err).__name__, err)
+            )
             await _release(store, row, result=result, error=err)
             continue
         except Exception as err:
             # F1: one poisoned payload must never stop the queue. Print the
             # traceback, not just the type and message — a bare
             # "Error: KeyError 'plan_day_id'" costs an afternoon.
-            print("Scheduler: send #%d (%s -> %d) failed: %s: %s"
-                  % (row.id, row.kind, row.target_chat_id, type(err).__name__, err))
+            print(
+                "Scheduler: send #%d (%s -> %d) failed: %s: %s"
+                % (row.id, row.kind, row.target_chat_id, type(err).__name__, err)
+            )
             traceback.print_exc()
             await _resolve(store, row, sent=False, result=result, error=err)
             continue
@@ -469,13 +521,14 @@ async def _release(store, row: ScheduledSend, result: TickResult, error) -> None
         result.deferred += 1
         result.errors.append((row.id, error))
     except Exception as err:
-        print("Scheduler: could not release #%d: %s: %s — left claimed for the "
-              "next boot to recover" % (row.id, type(err).__name__, err))
+        print(
+            "Scheduler: could not release #%d: %s: %s — left claimed for the "
+            "next boot to recover" % (row.id, type(err).__name__, err)
+        )
         traceback.print_exc()
 
 
-async def _resolve(store, row: ScheduledSend, sent: bool, result: TickResult,
-                   error) -> None:
+async def _resolve(store, row: ScheduledSend, sent: bool, result: TickResult, error) -> None:
     """Move a row out of 'claimed', and never let *that* raise out of the loop.
 
     If the mark itself fails (the connection died between the send and the
@@ -492,14 +545,16 @@ async def _resolve(store, row: ScheduledSend, sent: bool, result: TickResult,
             result.failed += 1
             result.errors.append((row.id, error))
     except Exception as err:
-        print("Scheduler: could not mark #%d as %s: %s: %s — left claimed for the "
-              "next boot to recover" % (row.id, "sent" if sent else "failed",
-                                        type(err).__name__, err))
+        print(
+            "Scheduler: could not mark #%d as %s: %s: %s — left claimed for the "
+            "next boot to recover" % (row.id, "sent" if sent else "failed", type(err).__name__, err)
+        )
         traceback.print_exc()
 
 
-async def catch_up(bot, data: Optional[dict] = None, now: Optional[datetime] = None,
-                   store=None) -> TickResult:
+async def catch_up(
+    bot, data: Optional[dict] = None, now: Optional[datetime] = None, store=None
+) -> TickResult:
     """The first pass after boot (F3).
 
     Identical to `tick`, except that *every* outstanding claim is released rather
@@ -528,10 +583,14 @@ async def catch_up(bot, data: Optional[dict] = None, now: Optional[datetime] = N
     return await tick(bot, data, now=now, store=store, release_before=_utcnow(now))
 
 
-async def run_scheduler(bot, data: Optional[dict] = None,
-                        interval: float = POLL_INTERVAL_SECONDS, store=None,
-                        stop_event: Optional[asyncio.Event] = None,
-                        max_ticks: Optional[int] = None) -> None:
+async def run_scheduler(
+    bot,
+    data: Optional[dict] = None,
+    interval: float = POLL_INTERVAL_SECONDS,
+    store=None,
+    stop_event: Optional[asyncio.Event] = None,
+    max_ticks: Optional[int] = None,
+) -> None:
     """Poll the due-queue forever. Started from `_initialize()` in `src/main.py`.
 
     The first pass is `catch_up` (boot recovery), every later one is a plain
@@ -544,8 +603,10 @@ async def run_scheduler(bot, data: Optional[dict] = None,
     down. Nothing is left half-done by a cancellation; an in-flight row stays
     'claimed' and the next boot recovers it.
     """
-    print("Scheduler: started (poll every %ss, handlers: %s)"
-          % (interval, ", ".join(sorted(SEND_HANDLERS)) or "none"))
+    print(
+        "Scheduler: started (poll every %ss, handlers: %s)"
+        % (interval, ", ".join(sorted(SEND_HANDLERS)) or "none")
+    )
     ticks = 0
     try:
         while max_ticks is None or ticks < max_ticks:
@@ -589,6 +650,7 @@ async def _wait(interval: float, stop_event: Optional[asyncio.Event]) -> None:
 
 
 # --- Built-in kinds ------------------------------------------------------------
+
 
 @send_handler("message")
 async def _send_plain_message(ctx: SendCtx) -> None:

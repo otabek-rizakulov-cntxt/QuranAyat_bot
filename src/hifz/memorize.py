@@ -52,12 +52,24 @@ from typing import Optional, Sequence
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from hifz import Ctx, callback, command, wizard
-from hifz.profile import format_reminder_time, offset_from_callback, offset_keyboard, \
-    parse_reminder_time, reminder_keyboard, save_reminder_time, save_timezone
+from hifz.profile import (
+    format_reminder_time,
+    offset_from_callback,
+    offset_keyboard,
+    parse_reminder_time,
+    reminder_keyboard,
+    save_reminder_time,
+    save_timezone,
+)
 from hifz.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
 from lib.miniapp import app_row
-from lib.localtime import DEFAULT_OFFSET, OFFSET_CHOICES, is_valid_offset, \
-    local_date, normalize_offset
+from lib.localtime import (
+    DEFAULT_OFFSET,
+    OFFSET_CHOICES,
+    is_valid_offset,
+    local_date,
+    normalize_offset,
+)
 from lib.plan_builder import AUTO_PACE, Portion, build_plan
 from lib.scheduler import SendCtx, send_handler
 from lib.store.plans import PLAN_ACTIVE, PLAN_PAUSED
@@ -66,8 +78,7 @@ from services.plans import SEND_KIND
 from services.profile import as_time
 from lib.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
 from locales import t
-from main import MAX_RANGE_AYAHS, REPEAT_COUNT, get_translation, send_combined_audio, \
-    send_quran
+from main import MAX_RANGE_AYAHS, REPEAT_COUNT, get_translation, send_combined_audio, send_quran
 from modules import Quran
 
 __all__ = ["memorize", "on_tap", "plan_step", "push_plan_day", "SEND_KIND", "WIZARD_KIND"]
@@ -94,9 +105,9 @@ WIZARD_KIND = "plan_setup"
 
 # The scheduled-send kind. `lib.scheduler` dispatches on it; nothing else uses it.
 
-STEP_TARGET = "target"          # which kind of target (buttons)
+STEP_TARGET = "target"  # which kind of target (buttons)
 STEP_TARGET_TEXT = "target_text"  # the surah / juz / range itself (typed)
-STEP_PACE = "pace"              # auto, a preset, or "type one"
+STEP_PACE = "pace"  # auto, a preset, or "type one"
 STEP_PACE_TEXT = "pace_text"
 STEP_DAYS = "days"
 STEP_DAYS_CUSTOM = "days_custom"
@@ -145,8 +156,7 @@ def _ref_from_draft(data: dict) -> Optional[Ref]:
     raw = (data or {}).get("ref")
     try:
         kind, s1, a1, s2, a2, n = raw
-        return Ref(str(kind), int(s1), int(a1), int(s2), int(a2),
-                   None if n is None else int(n))
+        return Ref(str(kind), int(s1), int(a1), int(s2), int(a2), None if n is None else int(n))
     except (TypeError, ValueError):
         return None
 
@@ -158,37 +168,44 @@ def _ref_from_draft(data: dict) -> Optional[Ref]:
 # it all lives in the draft, because callback_data is neither private nor
 # reliably fresh.
 
+
 def _cancel_row(ui_lang: str) -> list:
     return [InlineKeyboardButton(t("btn_cancel", ui_lang), callback_data="hm:x")]
 
 
 def _target_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton(t("btn_target_surah", ui_lang), callback_data="hm:t:s")],
-        [InlineKeyboardButton(t("btn_target_juz", ui_lang), callback_data="hm:t:j")],
-        [InlineKeyboardButton(t("btn_target_range", ui_lang), callback_data="hm:t:r")],
-        _cancel_row(ui_lang),
-    ])
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton(t("btn_target_surah", ui_lang), callback_data="hm:t:s")],
+            [InlineKeyboardButton(t("btn_target_juz", ui_lang), callback_data="hm:t:j")],
+            [InlineKeyboardButton(t("btn_target_range", ui_lang), callback_data="hm:t:r")],
+            _cancel_row(ui_lang),
+        ]
+    )
 
 
 def _pace_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton(t("btn_pace_auto", ui_lang), callback_data="hm:p:0")],
-        [InlineKeyboardButton(str(n), callback_data="hm:p:%d" % n) for n in PACE_CHOICES],
-        # No `btn_pace_custom` exists in the frozen manifest, so the "type your
-        # own" affordance is a pencil rather than an invented word.
-        [InlineKeyboardButton("✏️", callback_data="hm:p:c")],
-        _cancel_row(ui_lang),
-    ])
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton(t("btn_pace_auto", ui_lang), callback_data="hm:p:0")],
+            [InlineKeyboardButton(str(n), callback_data="hm:p:%d" % n) for n in PACE_CHOICES],
+            # No `btn_pace_custom` exists in the frozen manifest, so the "type your
+            # own" affordance is a pencil rather than an invented word.
+            [InlineKeyboardButton("✏️", callback_data="hm:p:c")],
+            _cancel_row(ui_lang),
+        ]
+    )
 
 
 def _days_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton(t("btn_days_daily", ui_lang), callback_data="hm:d:all")],
-        [InlineKeyboardButton(t("btn_days_weekdays", ui_lang), callback_data="hm:d:wk")],
-        [InlineKeyboardButton(t("btn_days_custom", ui_lang), callback_data="hm:d:pick")],
-        _cancel_row(ui_lang),
-    ])
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton(t("btn_days_daily", ui_lang), callback_data="hm:d:all")],
+            [InlineKeyboardButton(t("btn_days_weekdays", ui_lang), callback_data="hm:d:wk")],
+            [InlineKeyboardButton(t("btn_days_custom", ui_lang), callback_data="hm:d:pick")],
+            _cancel_row(ui_lang),
+        ]
+    )
 
 
 def _custom_days_keyboard(selected: Sequence[int], ui_lang: str) -> InlineKeyboardMarkup:
@@ -196,13 +213,19 @@ def _custom_days_keyboard(selected: Sequence[int], ui_lang: str) -> InlineKeyboa
     row = []
     for index, key in enumerate(_DAY_KEYS, start=1):
         label = t(key, ui_lang)
-        row.append(InlineKeyboardButton(("✅ " if index in chosen else "") + label,
-                                        callback_data="hm:dt:%d" % index))
-    return InlineKeyboardMarkup([
-        row[:4], row[4:],
-        [InlineKeyboardButton(t("btn_confirm", ui_lang), callback_data="hm:dok")],
-        _cancel_row(ui_lang),
-    ])
+        row.append(
+            InlineKeyboardButton(
+                ("✅ " if index in chosen else "") + label, callback_data="hm:dt:%d" % index
+            )
+        )
+    return InlineKeyboardMarkup(
+        [
+            row[:4],
+            row[4:],
+            [InlineKeyboardButton(t("btn_confirm", ui_lang), callback_data="hm:dok")],
+            _cancel_row(ui_lang),
+        ]
+    )
 
 
 # --- INTEGRATION NOTE (Wave 2A) ------------------------------------------------
@@ -215,67 +238,80 @@ def _custom_days_keyboard(selected: Sequence[int], ui_lang: str) -> InlineKeyboa
 # module's own callback prefix — when Wave 2A lands its public helpers, delete
 # `_offset_keyboard` / `_reminder_keyboard` and call theirs with an `hm:` prefix.
 
+
 def _offset_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
     """The UTC-offset picker. Labels are the offsets, which need no translation."""
-    buttons = [InlineKeyboardButton("UTC" + offset, callback_data="hm:tz:" + offset)
-               for offset in OFFSET_CHOICES]
-    rows = [buttons[i:i + 4] for i in range(0, len(buttons), 4)]
+    buttons = [
+        InlineKeyboardButton("UTC" + offset, callback_data="hm:tz:" + offset)
+        for offset in OFFSET_CHOICES
+    ]
+    rows = [buttons[i : i + 4] for i in range(0, len(buttons), 4)]
     rows.append(_cancel_row(ui_lang))
     return InlineKeyboardMarkup(rows)
 
 
 def _reminder_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
     """Preset reminder times, with free text as the escape for anything else."""
-    buttons = [InlineKeyboardButton(choice, callback_data="hm:rt:" + choice)
-               for choice in REMINDER_CHOICES]
-    rows = [buttons[i:i + 3] for i in range(0, len(buttons), 3)]
+    buttons = [
+        InlineKeyboardButton(choice, callback_data="hm:rt:" + choice) for choice in REMINDER_CHOICES
+    ]
+    rows = [buttons[i : i + 3] for i in range(0, len(buttons), 3)]
     rows.append(_cancel_row(ui_lang))
     return InlineKeyboardMarkup(rows)
+
 
 # --- end of the Wave 2A duplication -------------------------------------------
 
 
 def _preview_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton(t("btn_confirm_plan", ui_lang), callback_data="hm:ok")],
-        _cancel_row(ui_lang),
-    ])
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton(t("btn_confirm_plan", ui_lang), callback_data="hm:ok")],
+            _cancel_row(ui_lang),
+        ]
+    )
 
 
 def _plan_keyboard(plan, ui_lang: str) -> InlineKeyboardMarkup:
     """The lifecycle controls for a plan the user already has (D5)."""
     rows = []
     if plan.status == PLAN_ACTIVE:
-        rows.append([InlineKeyboardButton(t("btn_start_drill", ui_lang),
-                                          callback_data="hm:go")])
-        rows.append([InlineKeyboardButton(t("btn_pause_plan", ui_lang),
-                                          callback_data="hm:ps")])
+        rows.append([InlineKeyboardButton(t("btn_start_drill", ui_lang), callback_data="hm:go")])
+        rows.append([InlineKeyboardButton(t("btn_pause_plan", ui_lang), callback_data="hm:ps")])
     elif plan.status == PLAN_PAUSED:
-        rows.append([InlineKeyboardButton(t("btn_resume_plan", ui_lang),
-                                          callback_data="hm:rs")])
-    rows.append([InlineKeyboardButton(t("btn_abandon_plan", ui_lang),
-                                      callback_data="hm:ab")])
+        rows.append([InlineKeyboardButton(t("btn_resume_plan", ui_lang), callback_data="hm:rs")])
+    rows.append([InlineKeyboardButton(t("btn_abandon_plan", ui_lang), callback_data="hm:ab")])
     return InlineKeyboardMarkup(rows)
 
 
-def _drill_keyboard(plan_day_id: int, surah: int, ayah: int,
-                    ui_lang: str) -> InlineKeyboardMarkup:
+def _drill_keyboard(plan_day_id: int, surah: int, ayah: int, ui_lang: str) -> InlineKeyboardMarkup:
     """The drill controls: mark it known, hear it again, or stop the plan.
 
     The repeat button carries the reader's own `rep:` callback_data on purpose —
     "🔁 Repeat ×3" already exists in `main.verse_keyboard` and is handled by
     main.py's chain, so the drill reuses the behaviour instead of copying it.
     """
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton(t("btn_know_by_heart", ui_lang),
-                              callback_data="hm:kn:%d" % plan_day_id)],
-        [InlineKeyboardButton("🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
-                              callback_data="rep:%d:%d" % (surah, ayah))],
-        [InlineKeyboardButton(t("btn_pause_plan", ui_lang), callback_data="hm:ps")],
-    ] + app_row("📱 " + t("web_btn_open_app", ui_lang), "/drill"))
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    t("btn_know_by_heart", ui_lang), callback_data="hm:kn:%d" % plan_day_id
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
+                    callback_data="rep:%d:%d" % (surah, ayah),
+                )
+            ],
+            [InlineKeyboardButton(t("btn_pause_plan", ui_lang), callback_data="hm:ps")],
+        ]
+        + app_row("📱 " + t("web_btn_open_app", ui_lang), "/drill")
+    )
 
 
 # --- The wizard ----------------------------------------------------------------
+
 
 @command("memorize")
 async def memorize(ctx: Ctx) -> None:
@@ -294,8 +330,7 @@ async def memorize(ctx: Ctx) -> None:
 
     paused = await ctx.store.plans.list_plans(ctx.user_id, PLAN_PAUSED)
     if paused:
-        await ctx.reply(ctx.tr("plan_paused"),
-                        reply_markup=_plan_keyboard(paused[0], ctx.ui_lang))
+        await ctx.reply(ctx.tr("plan_paused"), reply_markup=_plan_keyboard(paused[0], ctx.ui_lang))
         return
 
     ctx.wiz.start(ctx.user_id, WIZARD_KIND, step=STEP_TARGET)
@@ -308,8 +343,7 @@ async def memorize(ctx: Ctx) -> None:
         await _ask_pace(ctx)
         return
 
-    await ctx.reply(ctx.tr("memorize_choose_target"),
-                    reply_markup=_target_keyboard(ctx.ui_lang))
+    await ctx.reply(ctx.tr("memorize_choose_target"), reply_markup=_target_keyboard(ctx.ui_lang))
 
 
 async def _ask_pace(ctx: Ctx) -> None:
@@ -349,20 +383,25 @@ async def _after_days(ctx: Ctx) -> None:
         await ctx.edit(ctx.tr("timezone_prompt"), reply_markup=_offset_keyboard(ctx.ui_lang))
         return
 
-    reminder = draft.get("time") or (_as_time(profile.reminder_time)
-                                     if profile is not None else None)
+    reminder = draft.get("time") or (
+        _as_time(profile.reminder_time) if profile is not None else None
+    )
     if not reminder:
-        if ctx.wiz.update(ctx.user_id, step=STEP_REMINDER,
-                          offset=normalize_offset(offset)) is None:
+        if ctx.wiz.update(ctx.user_id, step=STEP_REMINDER, offset=normalize_offset(offset)) is None:
             await _expired(ctx)
             return
-        await ctx.edit(ctx.tr("reminder_prompt"),
-                       reply_markup=_reminder_keyboard(ctx.ui_lang))
+        await ctx.edit(ctx.tr("reminder_prompt"), reply_markup=_reminder_keyboard(ctx.ui_lang))
         return
 
-    if ctx.wiz.update(ctx.user_id, step=STEP_PREVIEW, offset=normalize_offset(offset),
-                      time=reminder if isinstance(reminder, str)
-                      else format_reminder_time(reminder)) is None:
+    if (
+        ctx.wiz.update(
+            ctx.user_id,
+            step=STEP_PREVIEW,
+            offset=normalize_offset(offset),
+            time=reminder if isinstance(reminder, str) else format_reminder_time(reminder),
+        )
+        is None
+    ):
         await _expired(ctx)
         return
     await _show_preview(ctx)
@@ -390,8 +429,9 @@ async def _show_preview(ctx: Ctx) -> None:
         return
 
     portions = build_plan(ref, int(data.get("pace") or AUTO_PACE), days, start_date)
-    await ctx.edit(_preview_text(portions, ctx.ui_lang),
-                   reply_markup=_preview_keyboard(ctx.ui_lang))
+    await ctx.edit(
+        _preview_text(portions, ctx.ui_lang), reply_markup=_preview_keyboard(ctx.ui_lang)
+    )
 
 
 def _preview_text(portions: Sequence[Portion], ui_lang: str) -> str:
@@ -404,13 +444,16 @@ def _preview_text(portions: Sequence[Portion], ui_lang: str) -> str:
     docs/HIFZ_STRINGS_GAPS.md.
     """
     header = t("memorize_preview_title", ui_lang).format(
-        days=len(portions), start=portions[0].scheduled_date.isoformat(),
-        end=portions[-1].scheduled_date.isoformat())
+        days=len(portions),
+        start=portions[0].scheduled_date.isoformat(),
+        end=portions[-1].scheduled_date.isoformat(),
+    )
     row = t("memorize_preview_row", ui_lang)
     lines = [header]
     for portion in portions[:PREVIEW_MAX_ROWS]:
-        lines.append(row.format(date=portion.scheduled_date.isoformat(),
-                                ref=_portion_label(portion)))
+        lines.append(
+            row.format(date=portion.scheduled_date.isoformat(), ref=_portion_label(portion))
+        )
     hidden = len(portions) - PREVIEW_MAX_ROWS
     if hidden > 0:
         lines.append("… +%d" % hidden)
@@ -418,7 +461,7 @@ def _preview_text(portions: Sequence[Portion], ui_lang: str) -> str:
 
 
 def _portion_label(portion: Portion) -> str:
-    """"67:1-2", or "🔁 67:1-12" when the day consolidates ground already covered."""
+    """ "67:1-2", or "🔁 67:1-12" when the day consolidates ground already covered."""
     label = format_ref(portion.as_ref())
     return (REVIEW_MARK + label) if portion.is_consolidation else label
 
@@ -495,6 +538,7 @@ async def _read_reminder(ctx: Ctx, text: str) -> None:
 
 # --- Taps ----------------------------------------------------------------------
 
+
 @callback("hm:")
 async def on_tap(ctx: Ctx, cb_data: str) -> None:
     """Every `hm:` button. Parsed defensively — callback_data comes off the wire.
@@ -508,7 +552,7 @@ async def on_tap(ctx: Ctx, cb_data: str) -> None:
         hm:kn:<id>      "I know this by heart"
         hm:ps hm:rs hm:ab                    pause / resume / abandon
     """
-    action, _, arg = cb_data[len("hm:"):].partition(":")
+    action, _, arg = cb_data[len("hm:") :].partition(":")
 
     if action == "x":
         ctx.wiz.clear(ctx.user_id)
@@ -537,12 +581,15 @@ async def on_tap(ctx: Ctx, cb_data: str) -> None:
     elif action in ("ps", "rs", "ab"):
         await _lifecycle(ctx, action)
     else:
-        await ctx.answer()          # stale or forged: acknowledge, do nothing
+        await ctx.answer()  # stale or forged: acknowledge, do nothing
 
 
 async def _tap_target(ctx: Ctx, arg: str) -> None:
-    prompts = {"s": "memorize_surah_prompt", "j": "memorize_juz_prompt",
-               "r": "memorize_range_prompt"}
+    prompts = {
+        "s": "memorize_surah_prompt",
+        "j": "memorize_juz_prompt",
+        "r": "memorize_range_prompt",
+    }
     if arg not in prompts:
         await ctx.answer()
         return
@@ -550,8 +597,9 @@ async def _tap_target(ctx: Ctx, arg: str) -> None:
     if ctx.wiz.update(ctx.user_id, step=STEP_TARGET_TEXT, tk=arg) is None:
         await _expired(ctx)
         return
-    await ctx.edit(ctx.tr(prompts[arg]),
-                   reply_markup=InlineKeyboardMarkup([_cancel_row(ctx.ui_lang)]))
+    await ctx.edit(
+        ctx.tr(prompts[arg]), reply_markup=InlineKeyboardMarkup([_cancel_row(ctx.ui_lang)])
+    )
 
 
 async def _tap_pace(ctx: Ctx, arg: str) -> None:
@@ -560,8 +608,10 @@ async def _tap_pace(ctx: Ctx, arg: str) -> None:
         if ctx.wiz.set_step(ctx.user_id, STEP_PACE_TEXT) is None:
             await _expired(ctx)
             return
-        await ctx.edit(ctx.tr("memorize_pace_prompt"),
-                       reply_markup=InlineKeyboardMarkup([_cancel_row(ctx.ui_lang)]))
+        await ctx.edit(
+            ctx.tr("memorize_pace_prompt"),
+            reply_markup=InlineKeyboardMarkup([_cancel_row(ctx.ui_lang)]),
+        )
         return
     pace = int(arg) if arg.isdigit() else AUTO_PACE
     if pace and not PACE_MIN <= pace <= PACE_MAX:
@@ -578,8 +628,10 @@ async def _tap_days(ctx: Ctx, arg: str) -> None:
         if ctx.wiz.update(ctx.user_id, step=STEP_DAYS_CUSTOM, days=list(WEEKDAYS)) is None:
             await _expired(ctx)
             return
-        await ctx.edit(ctx.tr("memorize_days_prompt"),
-                       reply_markup=_custom_days_keyboard(WEEKDAYS, ctx.ui_lang))
+        await ctx.edit(
+            ctx.tr("memorize_days_prompt"),
+            reply_markup=_custom_days_keyboard(WEEKDAYS, ctx.ui_lang),
+        )
         return
     days = list(DAILY) if arg == "all" else list(WEEKDAYS)
     if ctx.wiz.update(ctx.user_id, days=days) is None:
@@ -598,8 +650,10 @@ async def _tap_day_toggle(ctx: Ctx, arg: str) -> None:
     if ctx.wiz.update(ctx.user_id, days=sorted(chosen)) is None:
         await _expired(ctx)
         return
-    await ctx.edit(ctx.tr("memorize_days_prompt"),
-                   reply_markup=_custom_days_keyboard(sorted(chosen), ctx.ui_lang))
+    await ctx.edit(
+        ctx.tr("memorize_days_prompt"),
+        reply_markup=_custom_days_keyboard(sorted(chosen), ctx.ui_lang),
+    )
 
 
 async def _tap_days_confirm(ctx: Ctx) -> None:
@@ -608,8 +662,9 @@ async def _tap_days_confirm(ctx: Ctx) -> None:
     if not data.get("days"):
         # An empty week cannot be materialized at all (build_plan raises), so the
         # picker simply stays open.
-        await ctx.edit(ctx.tr("memorize_days_prompt"),
-                       reply_markup=_custom_days_keyboard((), ctx.ui_lang))
+        await ctx.edit(
+            ctx.tr("memorize_days_prompt"), reply_markup=_custom_days_keyboard((), ctx.ui_lang)
+        )
         return
     await _after_days(ctx)
 
@@ -640,6 +695,7 @@ async def _tap_reminder(ctx: Ctx, arg: str) -> None:
 
 # --- Saving ---------------------------------------------------------------------
 
+
 async def _save_plan(ctx: Ctx) -> None:
     """Write the plan the user just approved, and queue its first push.
 
@@ -657,13 +713,22 @@ async def _save_plan(ctx: Ctx) -> None:
         return
 
     saved = await plans_service.save_plan(
-        ctx.store, ctx.user_id, ctx.chat_id, ref, int(data.get("pace") or AUTO_PACE), days,
-        date.fromisoformat(start), data.get("offset") or DEFAULT_OFFSET,
-        parse_reminder_time(data.get("time") or "") or time(7, 0))
+        ctx.store,
+        ctx.user_id,
+        ctx.chat_id,
+        ref,
+        int(data.get("pace") or AUTO_PACE),
+        days,
+        date.fromisoformat(start),
+        data.get("offset") or DEFAULT_OFFSET,
+        parse_reminder_time(data.get("time") or "") or time(7, 0),
+    )
     plan, first = saved.plan, saved.first_date
     ctx.wiz.clear(ctx.user_id)
-    await ctx.reply(ctx.tr("plan_saved").format(first_date=first.isoformat()),
-                    reply_markup=_plan_keyboard(plan, ctx.ui_lang))
+    await ctx.reply(
+        ctx.tr("plan_saved").format(first_date=first.isoformat()),
+        reply_markup=_plan_keyboard(plan, ctx.ui_lang),
+    )
 
 
 # --- The enqueue chain ----------------------------------------------------------
@@ -691,8 +756,10 @@ async def push_plan_day(ctx: SendCtx) -> None:
     if plan is None or plan.status != PLAN_ACTIVE:
         # D5: a paused or abandoned plan produces no pushes. The chain stops here
         # and is restarted by `_lifecycle` on resume.
-        print("HIFZ: plan #%s is %s; day #%d not pushed"
-              % (day.plan_id, getattr(plan, "status", "gone"), day.id))
+        print(
+            "HIFZ: plan #%s is %s; day #%d not pushed"
+            % (day.plan_id, getattr(plan, "status", "gone"), day.id)
+        )
         return
 
     claimed = await ctx.store.plans.claim_plan_day(day.id)
@@ -708,8 +775,18 @@ async def push_plan_day(ctx: SendCtx) -> None:
     translation_lang = getattr(settings, "translation_lang", None) or DEFAULT_TRANSLATION_LANG
     reciter = getattr(settings, "reciter", None) or DEFAULT_RECITER
 
-    await _send_drill(ctx.bot, ctx.data, ctx.file, ctx.store, ctx.chat_id, plan, claimed,
-                      ui_lang, translation_lang, reciter)
+    await _send_drill(
+        ctx.bot,
+        ctx.data,
+        ctx.file,
+        ctx.store,
+        ctx.chat_id,
+        plan,
+        claimed,
+        ui_lang,
+        translation_lang,
+        reciter,
+    )
     await _enqueue_next(ctx.store, user_id, ctx.chat_id, plan)
 
 
@@ -728,8 +805,18 @@ async def _translation_text(surah: int, start: int, end: int, translation_lang: 
     return (header + "\n\n" + html.escape(body))[:4096]
 
 
-async def _send_drill(bot, data, file, store, chat_id: int, plan, day,
-                      ui_lang: str, translation_lang: str, reciter: str) -> None:
+async def _send_drill(
+    bot,
+    data,
+    file,
+    store,
+    chat_id: int,
+    plan,
+    day,
+    ui_lang: str,
+    translation_lang: str,
+    reciter: str,
+) -> None:
     """One portion: header, Arabic, translation, and **one** audio with controls.
 
     The audio is the acceptance criterion: `send_combined_audio` stitches a range
@@ -744,35 +831,60 @@ async def _send_drill(bot, data, file, store, chat_id: int, plan, day,
     ref = Ref(KIND_RANGE, day.surah, day.start_ayah, day.surah, day.end_ayah)
     label = _portion_label(portion) if portion is not None else format_ref(ref)
 
-    await bot.send_message(chat_id=chat_id,
-                           text=t("drill_title", ui_lang).format(ref=label, day=index,
-                                                                 total=total))
+    await bot.send_message(
+        chat_id=chat_id, text=t("drill_title", ui_lang).format(ref=label, day=index, total=total)
+    )
     # The Arabic image is the portion's opening ayah: `send_quran` renders one
     # ayah per photo, and a fifty-photo album is not a drill.
-    await send_quran(bot, data, file, day.surah, day.start_ayah, "arabic", chat_id,
-                     reciter, ui_lang, translation_lang)
-    await bot.send_message(chat_id=chat_id,
-                           text=await _translation_text(day.surah, day.start_ayah,
-                                                        day.end_ayah, translation_lang),
-                           parse_mode="HTML")
+    await send_quran(
+        bot,
+        data,
+        file,
+        day.surah,
+        day.start_ayah,
+        "arabic",
+        chat_id,
+        reciter,
+        ui_lang,
+        translation_lang,
+    )
+    await bot.send_message(
+        chat_id=chat_id,
+        text=await _translation_text(day.surah, day.start_ayah, day.end_ayah, translation_lang),
+        parse_mode="HTML",
+    )
 
     markup = _drill_keyboard(day.id, day.surah, day.start_ayah, ui_lang)
     ayahs = day.end_ayah - day.start_ayah + 1
     if ayahs == 1:
-        await send_quran(bot, data, file, day.surah, day.start_ayah, "audio", chat_id,
-                         reciter, ui_lang, translation_lang, reply_markup=markup)
+        await send_quran(
+            bot,
+            data,
+            file,
+            day.surah,
+            day.start_ayah,
+            "audio",
+            chat_id,
+            reciter,
+            ui_lang,
+            translation_lang,
+            reply_markup=markup,
+        )
     elif ayahs <= MAX_RANGE_AYAHS:
-        await send_combined_audio(bot, day.surah, day.start_ayah, day.end_ayah, chat_id,
-                                  reciter, reply_markup=markup)
+        await send_combined_audio(
+            bot, day.surah, day.start_ayah, day.end_ayah, chat_id, reciter, reply_markup=markup
+        )
     else:
         print("HIFZ: portion %s is %d ayahs; audio skipped" % (format_ref(ref), ayahs))
-        await bot.send_message(chat_id=chat_id,
-                               text=t("range_too_large", ui_lang).format(n=MAX_RANGE_AYAHS),
-                               reply_markup=markup)
+        await bot.send_message(
+            chat_id=chat_id,
+            text=t("range_too_large", ui_lang).format(n=MAX_RANGE_AYAHS),
+            reply_markup=markup,
+        )
 
 
 async def _start_drill(ctx: Ctx) -> None:
-    """"Start today's portion" — the manual entry point beside the daily push.
+    """ "Start today's portion" — the manual entry point beside the daily push.
 
     The push creates the habit; this respects the user who is ready now. It takes
     the earliest portion not yet completed and due today or earlier, and claims
@@ -783,8 +895,9 @@ async def _start_drill(ctx: Ctx) -> None:
     if plan is None:
         paused = await ctx.store.plans.list_plans(ctx.user_id, PLAN_PAUSED)
         if paused:
-            await ctx.reply(ctx.tr("plan_paused"),
-                            reply_markup=_plan_keyboard(paused[0], ctx.ui_lang))
+            await ctx.reply(
+                ctx.tr("plan_paused"), reply_markup=_plan_keyboard(paused[0], ctx.ui_lang)
+            )
         else:
             await ctx.reply(ctx.tr("drill_none_today"))
         return
@@ -795,12 +908,23 @@ async def _start_drill(ctx: Ctx) -> None:
         return
 
     day = due[0]
-    await ctx.store.plans.claim_plan_day(day.id)     # pending -> sent, once
-    await _send_drill(ctx.bot, ctx.data, ctx.file, ctx.store, ctx.chat_id, plan, day,
-                      ctx.ui_lang, ctx.translation_lang, ctx.reciter)
+    await ctx.store.plans.claim_plan_day(day.id)  # pending -> sent, once
+    await _send_drill(
+        ctx.bot,
+        ctx.data,
+        ctx.file,
+        ctx.store,
+        ctx.chat_id,
+        plan,
+        day,
+        ctx.ui_lang,
+        ctx.translation_lang,
+        ctx.reciter,
+    )
 
 
 # --- "I know this by heart" (D4) ------------------------------------------------
+
 
 async def _know_by_heart(ctx: Ctx, arg: str) -> None:
     """End the drill: mark the day done, write the interval, log the session.
@@ -817,8 +941,7 @@ async def _know_by_heart(ctx: Ctx, arg: str) -> None:
         return
     plan_day_id = int(arg)
 
-    result = await plans_service.complete_day(ctx.store, ctx.user_id, ctx.chat_id,
-                                              plan_day_id)
+    result = await plans_service.complete_day(ctx.store, ctx.user_id, ctx.chat_id, plan_day_id)
     if result.status != plans_service.DONE:
         await ctx.answer(ctx.tr("know_already"))
         return
@@ -826,13 +949,13 @@ async def _know_by_heart(ctx: Ctx, arg: str) -> None:
 
     day = result.day
     ref = Ref(KIND_RANGE, day.surah, day.start_ayah, day.surah, day.end_ayah)
-    await ctx.reply(ctx.tr("know_confirmed").format(ref=format_ref(ref),
-                                                    pct=result.percent_text))
+    await ctx.reply(ctx.tr("know_confirmed").format(ref=format_ref(ref), pct=result.percent_text))
     if result.plan_completed:
         await ctx.reply(ctx.tr("plan_complete").format(target=_target_label(result.plan)))
 
 
 # --- Lifecycle (D5) -------------------------------------------------------------
+
 
 async def _lifecycle(ctx: Ctx, action: str) -> None:
     """Pause, resume or abandon the caller's plan.
@@ -849,7 +972,8 @@ async def _lifecycle(ctx: Ctx, action: str) -> None:
     """
     await ctx.answer()
     action = {"ps": plans_service.PAUSE, "rs": plans_service.RESUME}.get(
-        action, plans_service.ABANDON)
+        action, plans_service.ABANDON
+    )
     plan = await plans_service.change_status(ctx.store, ctx.user_id, ctx.chat_id, action)
     if plan is None:
         await ctx.reply(ctx.tr("drill_none_today"))

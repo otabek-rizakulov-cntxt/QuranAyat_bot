@@ -42,12 +42,17 @@ async def reciters(_: int = Depends(require_user)) -> RecitersOut:
     return RecitersOut(
         kinds=list(RECITER_KINDS),
         audio_base_url=(Environment.get_env("audio_base_url") or "").rstrip("/"),
-        reciters=[Reciter(subfolder=p["subfolder"], name=p["name"],
-                          bitrate=p.get("bitrate", ""),
-                          kind=p.get("kind", RECITER_KINDS[0]),
-                          page_audio=bool(p.get("page_audio")),
-                          warning_key=_KIND_WARNING_KEYS.get(p.get("kind", RECITER_KINDS[0])))
-                  for p in reciter_catalog()],
+        reciters=[
+            Reciter(
+                subfolder=p["subfolder"],
+                name=p["name"],
+                bitrate=p.get("bitrate", ""),
+                kind=p.get("kind", RECITER_KINDS[0]),
+                page_audio=bool(p.get("page_audio")),
+                warning_key=_KIND_WARNING_KEYS.get(p.get("kind", RECITER_KINDS[0])),
+            )
+            for p in reciter_catalog()
+        ],
     )
 
 
@@ -65,17 +70,19 @@ class LanguagesOut(BaseModel):
 
 
 def _lang(lang) -> LanguageOut:
-    return LanguageOut(code=lang.code, native=lang.native, english=lang.english,
-                       rtl=lang.rtl, flag=lang.flag)
+    return LanguageOut(
+        code=lang.code, native=lang.native, english=lang.english, rtl=lang.rtl, flag=lang.flag
+    )
 
 
 @router.get("/catalog/languages", response_model=LanguagesOut)
 async def languages(_: int = Depends(require_user)) -> LanguagesOut:
     """The /language and /translation pickers' choices, in picker order."""
     available = TranslationRegistry.available()
-    return LanguagesOut(ui=[_lang(lang) for lang in UI_LANGUAGES],
-                        translation=[_lang(lang) for lang in LANGUAGES
-                                     if lang.code in available])
+    return LanguagesOut(
+        ui=[_lang(lang) for lang in UI_LANGUAGES],
+        translation=[_lang(lang) for lang in LANGUAGES if lang.code in available],
+    )
 
 
 # The bot's reader views. Its next/previous buttons continue from this position.
@@ -100,16 +107,19 @@ async def get_position(user_id: int = Depends(require_user)) -> Optional[ReaderP
         return None
     if not Quran.exists(surah, ayah):
         return None
-    return ReaderPosition(surah=surah, ayah=ayah,
-                          type=kind if kind in _READER_TYPES else "translation")
+    return ReaderPosition(
+        surah=surah, ayah=ayah, type=kind if kind in _READER_TYPES else "translation"
+    )
 
 
 @router.put("/reader/position", response_model=ReaderPosition)
-async def put_position(body: ReaderPosition,
-                       user_id: int = Depends(require_user)) -> ReaderPosition:
+async def put_position(
+    body: ReaderPosition, user_id: int = Depends(require_user)
+) -> ReaderPosition:
     """Save the position where the bot's next/previous read it."""
     if not Quran.exists(body.surah, body.ayah) or body.type not in _READER_TYPES:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="invalid position")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="invalid position"
+        )
     await File().save_user(user_id, (body.surah, body.ayah, body.type))
     return body

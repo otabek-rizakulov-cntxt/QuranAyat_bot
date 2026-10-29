@@ -44,15 +44,18 @@ def _spans(count: int, range_of) -> list:
 
 
 def build_meta(translation_codes: list) -> dict:
-    surahs = [{
-        "n": int(s.attrib["index"]),
-        "ayahs": int(s.attrib["ayas"]),
-        "name": s.attrib["name"],
-        "tname": s.attrib["tname"],
-        "ename": s.attrib["ename"],
-        "type": s.attrib["type"],
-        "order": int(s.attrib["order"]),
-    } for s in _QURAN_DATA.find("suras")]
+    surahs = [
+        {
+            "n": int(s.attrib["index"]),
+            "ayahs": int(s.attrib["ayas"]),
+            "name": s.attrib["name"],
+            "tname": s.attrib["tname"],
+            "ename": s.attrib["ename"],
+            "type": s.attrib["type"],
+            "order": int(s.attrib["order"]),
+        }
+        for s in _QURAN_DATA.find("suras")
+    ]
     return {
         "surahs": surahs,
         # [start_surah, start_ayah, end_surah, end_ayah] per page / juz, 1-based
@@ -76,7 +79,7 @@ def split_basmalah(text: list) -> list:
         ayahs[0] = ayahs[0].lstrip("﻿")
         has = n != 1 and ayahs[0].startswith(basmalah + " ")
         if has:
-            ayahs[0] = ayahs[0][len(basmalah) + 1:]
+            ayahs[0] = ayahs[0][len(basmalah) + 1 :]
         out.append((ayahs, n == 1 or has))
     return out
 
@@ -87,14 +90,17 @@ def export(out_dir: str = DEFAULT_OUT_DIR) -> dict:
 
     arabic = Quran.from_file(os.path.join(ROOT, "translations", "ar.txt")).text
     for n, (ayahs, bismillah) in enumerate(split_basmalah(arabic), start=1):
-        _write(os.path.join(out_dir, ARABIC, "%d.json" % n),
-               {"n": n, "bismillah": bismillah, "ayahs": ayahs})
+        _write(
+            os.path.join(out_dir, ARABIC, "%d.json" % n),
+            {"n": n, "bismillah": bismillah, "ayahs": ayahs},
+        )
 
     for code in codes:
         quran = Quran.from_file(os.path.join(ROOT, "translations", "%s.txt" % code))
         for n, ayahs in enumerate(quran.text, start=1):
-            _write(os.path.join(out_dir, "translations", code, "%d.json" % n),
-                   {"n": n, "ayahs": ayahs})
+            _write(
+                os.path.join(out_dir, "translations", code, "%d.json" % n), {"n": n, "ayahs": ayahs}
+            )
 
     tafsir = Quran.from_tafsir(os.path.join(ROOT, "Al_Jalalain_Eng.txt"))
     for n, ayahs in enumerate(tafsir.text, start=1):
@@ -108,8 +114,10 @@ def export(out_dir: str = DEFAULT_OUT_DIR) -> dict:
 def main() -> int:
     out_dir = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_OUT_DIR
     meta = export(out_dir)
-    print("Exported %d surahs, Arabic + %d translations + tafsir to %s"
-          % (len(meta["surahs"]), len(meta["translations"]), out_dir))
+    print(
+        "Exported %d surahs, Arabic + %d translations + tafsir to %s"
+        % (len(meta["surahs"]), len(meta["translations"]), out_dir)
+    )
     return 0
 
 

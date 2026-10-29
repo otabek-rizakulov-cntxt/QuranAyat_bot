@@ -63,7 +63,6 @@ strings = {
     "cmd_reciter": "Ganti qari",
     "cmd_about": "Sumber & kredit",
     "quran_name": "Al-Qur'an",
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Mulai rencana hafalan",
     "cmd_progress": "Yang sudah Anda hafal",
@@ -72,7 +71,6 @@ strings = {
     "cmd_streak": "Hari beruntun Anda",
     "cmd_leaderboard": "Penghafal terbaik pekan ini",
     "cmd_profile": "Profil dan pengaturan Anda",
-
     # Shared wizard controls
     "wizard_cancelled": "Dibatalkan.",
     "wizard_nothing_to_cancel": "Tidak ada yang perlu dibatalkan.",
@@ -81,7 +79,6 @@ strings = {
     "btn_cancel": "Batal",
     "btn_back": "Kembali",
     "btn_confirm": "Konfirmasi",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Sen",
     "day_tue": "Sel",
@@ -90,7 +87,6 @@ strings = {
     "day_fri": "Jum",
     "day_sat": "Sab",
     "day_sun": "Min",
-
     # Profile (B1-B3)
     "profile_title": "Profil Anda",
     "profile_name_set": "Nama: {name}",
@@ -123,7 +119,6 @@ strings = {
     "reminder_saved": "Pengingat harian diatur pada {time}.",
     "btn_reminder_off": "Matikan pengingat",
     "reminder_off": "Pengingat harian dimatikan.",
-
     # Progress and /forgot (C3)
     "progress_title": "Yang sudah Anda hafal",
     "progress_surah_line": "{name}: {done}/{total} ayat — {pct}%",
@@ -136,7 +131,6 @@ strings = {
     "forgot_usage": "Kirim bagian yang tandanya ingin dihapus, misalnya /forgot 67:5-6.",
     "forgot_done": "Tanda hafalan {ref} dihapus.",
     "forgot_nothing": "Anda belum pernah menandainya sebagai hafalan.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Apa yang ingin Anda hafal?",
     "btn_target_surah": "Satu surah",
@@ -172,7 +166,6 @@ strings = {
     "btn_know_by_heart": "✅ Saya hafal ini",
     "know_confirmed": "{ref} ditandai sebagai hafalan. Anda kini di {pct}%.",
     "know_already": "Anda sudah menandainya.",
-
     # Recall check (E2, E3)
     "check_question": "Bagaimana lanjutannya?",
     "check_usage": "Kirim bagian yang ingin diuji, misalnya /check 67.",
@@ -183,7 +176,6 @@ strings = {
         "sesering yang Anda mau, hanya saja tidak dihitung dua kali."
     ),
     "btn_check_start": "Uji saya",
-
     # Streaks (G2, G3)
     "streak_title": "Hari beruntun Anda",
     "streak_current": "Beruntun saat ini: {n} hari",
@@ -194,7 +186,6 @@ strings = {
     "streak_milestone_30": "Tiga puluh hari. Kini keistiqamahan berpihak kepada Anda.",
     "streak_milestone_100": "Seratus hari. Sangat sedikit orang yang sampai sejauh ini.",
     "streak_milestone_365": "Satu tahun penuh, setiap hari tanpa putus. Semoga Allah menjaga apa yang telah Anda pelajari.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Papan peringkat pekan ini",
     "leaderboard_row": "{rank}. {name} — {sessions}",

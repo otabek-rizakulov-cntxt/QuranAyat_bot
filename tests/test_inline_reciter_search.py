@@ -34,8 +34,7 @@ def _inline_query(tg_bot, query, user_id=556000, lang="en"):
         "update_id": 1,
         "inline_query": {
             "id": "iq-%d" % user_id,
-            "from": {"id": user_id, "is_bot": False, "first_name": "Tester",
-                     "language_code": lang},
+            "from": {"id": user_id, "is_bot": False, "first_name": "Tester", "language_code": lang},
             "query": query,
             "offset": "",
         },
@@ -62,8 +61,11 @@ def _inline_callback(tg_bot, cb_data, user_id=556100):
 def _audio_result(fake_bot):
     """The single audio result in the last answer, whatever position it sits in."""
     results = fake_bot.answer_inline_query.await_args.kwargs["results"]
-    audio = [r for r in results if isinstance(r, (telegram.InlineQueryResultAudio,
-                                                  telegram.InlineQueryResultCachedAudio))]
+    audio = [
+        r
+        for r in results
+        if isinstance(r, (telegram.InlineQueryResultAudio, telegram.InlineQueryResultCachedAudio))
+    ]
     assert len(audio) == 1
     return audio[0]
 
@@ -71,10 +73,12 @@ def _audio_result(fake_bot):
 async def test_ayah_query_returns_translation_tafsir_audio_and_image(fake_bot, data, tg_bot):
     await main.handle_update(fake_bot, data, _inline_query(tg_bot, "2:255", user_id=556001))
     kwargs = fake_bot.answer_inline_query.await_args.kwargs
-    assert [r.title for r in kwargs["results"]] == [main.t("btn_translation", "en"),
-                                                    main.t("btn_tafsir", "en"),
-                                                    main._reference(2, 255, "en"),
-                                                    main.t("btn_arabic", "en")]
+    assert [r.title for r in kwargs["results"]] == [
+        main.t("btn_translation", "en"),
+        main.t("btn_tafsir", "en"),
+        main._reference(2, 255, "en"),
+        main.t("btn_arabic", "en"),
+    ]
 
 
 async def test_ayah_query_is_personal_and_briefly_cached(fake_bot, data, tg_bot):
@@ -97,7 +101,7 @@ async def test_ayah_audio_uses_callers_reciter(fake_bot, data, tg_bot):
     assert audio.performer == "Alafasy"
     # keyed by reciter too, so a pre-change answer can't be replayed after it
     assert audio.id == "au:2:255:Alafasy_128kbps"
-    assert len(audio.id.encode()) <= 64   # Telegram's hard limit on result ids
+    assert len(audio.id.encode()) <= 64  # Telegram's hard limit on result ids
 
 
 async def test_ayah_audio_dropped_for_unknown_reciter(fake_bot, data, tg_bot):
@@ -108,9 +112,11 @@ async def test_ayah_audio_dropped_for_unknown_reciter(fake_bot, data, tg_bot):
 
     results = fake_bot.answer_inline_query.await_args.kwargs["results"]
     assert not any(isinstance(r, telegram.InlineQueryResultAudio) for r in results)
-    assert [r.title for r in results] == [main.t("btn_translation", "en"),
-                                          main.t("btn_tafsir", "en"),
-                                          main.t("btn_arabic", "en")]
+    assert [r.title for r in results] == [
+        main.t("btn_translation", "en"),
+        main.t("btn_tafsir", "en"),
+        main.t("btn_arabic", "en"),
+    ]
 
 
 async def test_ayah_audio_dropped_without_public_base_url(fake_bot, data, tg_bot, monkeypatch):
@@ -146,8 +152,9 @@ async def test_reciter_query_is_personal_and_uncached(fake_bot, data, tg_bot):
 
 
 async def test_reciter_results_are_localized(fake_bot, data, tg_bot):
-    await main.handle_update(fake_bot, data,
-                             _inline_query(tg_bot, "sudais", user_id=556004, lang="ru"))
+    await main.handle_update(
+        fake_bot, data, _inline_query(tg_bot, "sudais", user_id=556004, lang="ru")
+    )
     result = fake_bot.answer_inline_query.await_args.kwargs["results"][0]
     assert result.description == main.t("reciter_inline_description", "ru")
     assert result.reply_markup.inline_keyboard[0][0].text == main.t("btn_set_reciter", "ru")
@@ -157,7 +164,7 @@ async def test_no_match_falls_back_to_defaults(fake_bot, data, tg_bot):
     await main.handle_update(fake_bot, data, _inline_query(tg_bot, "zzqqxx", user_id=556005))
     kwargs = fake_bot.answer_inline_query.await_args.kwargs
     assert kwargs["results"] is data["default_query_results"]
-    assert kwargs["cache_time"] == 66 * (60 ** 2 * 24)
+    assert kwargs["cache_time"] == 66 * (60**2 * 24)
 
 
 async def test_empty_query_falls_back_to_defaults(fake_bot, data, tg_bot):
@@ -178,8 +185,9 @@ async def test_setreciter_from_inline_message_persists(fake_bot, data, tg_bot):
 async def test_setreciter_from_inline_message_confirms_without_dm(fake_bot, data, tg_bot):
     # No chat exists, so a DM could be rejected with Forbidden: confirm in the
     # callback answer itself instead.
-    await main.handle_update(fake_bot, data,
-                             _inline_callback(tg_bot, "setreciter:Ghamadi_40kbps", user_id=556008))
+    await main.handle_update(
+        fake_bot, data, _inline_callback(tg_bot, "setreciter:Ghamadi_40kbps", user_id=556008)
+    )
     fake_bot.send_message.assert_not_awaited()
     kwargs = fake_bot.answer_callback_query.await_args.kwargs
     assert kwargs["text"] == main.t("reciter_set", "en").format(reciter="Ghamadi")
@@ -201,6 +209,7 @@ async def test_setreciter_in_chat_still_sends_confirmation(fake_bot, data, tg_bo
         },
     }
     await main.handle_update(fake_bot, data, telegram.Update.de_json(payload, tg_bot))
-    assert fake_bot.send_message.await_args.kwargs["text"] == \
-        main.t("reciter_set", "en").format(reciter="Alafasy")
+    assert fake_bot.send_message.await_args.kwargs["text"] == main.t("reciter_set", "en").format(
+        reciter="Alafasy"
+    )
     assert (await UserSettings().get(556009)).reciter == "Alafasy_128kbps"

@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Kommandoer:",
     "welcome_inline": (
-        "Du kan bruke meg i alle chatter: skriv <b>@QuranAyat_bot</b> etterfulgt av en "
-        "henvisning."
+        "Du kan bruke meg i alle chatter: skriv <b>@QuranAyat_bot</b> etterfulgt av en henvisning."
     ),
     "about": (
         "Med denne boten kan du lese den hellige Koranen på Telegram på mange "
@@ -64,7 +63,6 @@ strings = {
     "cmd_reciter": "Bytt resitatør",
     "cmd_about": "Kilder og takk",
     "quran_name": "Koranen",
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Start en memoreringsplan",
     "cmd_progress": "Det du kan utenat",
@@ -73,7 +71,6 @@ strings = {
     "cmd_streak": "Din daglige rekke",
     "cmd_leaderboard": "Ukens beste",
     "cmd_profile": "Profilen og innstillingene dine",
-
     # Shared wizard controls
     "wizard_cancelled": "Avbrutt.",
     "wizard_nothing_to_cancel": "Det er ingenting å avbryte.",
@@ -82,7 +79,6 @@ strings = {
     "btn_cancel": "Avbryt",
     "btn_back": "Tilbake",
     "btn_confirm": "Bekreft",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "man",
     "day_tue": "tir",
@@ -91,7 +87,6 @@ strings = {
     "day_fri": "fre",
     "day_sat": "lør",
     "day_sun": "søn",
-
     # Profile (B1-B3)
     "profile_title": "Profilen din",
     "profile_name_set": "Navn: {name}",
@@ -124,7 +119,6 @@ strings = {
     "reminder_saved": "Daglig påminnelse satt til {time}.",
     "btn_reminder_off": "Slå av påminnelser",
     "reminder_off": "Daglige påminnelser er av.",
-
     # Progress and /forgot (C3)
     "progress_title": "Det du kan utenat",
     "progress_surah_line": "{name}: {done}/{total} vers — {pct} %",
@@ -137,7 +131,6 @@ strings = {
     "forgot_usage": "Send hva som skal avmerkes, for eksempel /forgot 67:5-6.",
     "forgot_done": "{ref} er avmerket.",
     "forgot_nothing": "Du hadde ikke merket det som memorert.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Hva vil du lære utenat?",
     "btn_target_surah": "En sura",
@@ -173,7 +166,6 @@ strings = {
     "btn_know_by_heart": "✅ Dette kan jeg utenat",
     "know_confirmed": "{ref} er merket som memorert. Du er på {pct} %.",
     "know_already": "Den hadde du allerede merket.",
-
     # Recall check (E2, E3)
     "check_question": "Hvordan fortsetter dette?",
     "check_usage": "Send hva som skal testes, for eksempel /check 67.",
@@ -184,7 +176,6 @@ strings = {
         "ofte du vil, det telles bare ikke to ganger."
     ),
     "btn_check_start": "Test meg",
-
     # Streaks (G2, G3)
     "streak_title": "Rekken din",
     "streak_current": "Dager på rad nå: {n}",
@@ -195,7 +186,6 @@ strings = {
     "streak_milestone_30": "Tretti dager. Nå har du jevnheten på din side.",
     "streak_milestone_100": "Hundre dager. Svært få kommer så langt.",
     "streak_milestone_365": "Et helt år, hver eneste dag. Måtte Allah bevare det du har lært.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Ukens ledertavle",
     "leaderboard_row": "{rank}. {name} — {sessions}",

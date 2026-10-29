@@ -38,6 +38,7 @@ async def set_menu_button(bot) -> bool:
     url = app_url("/")
     if url is None:
         return False
-    await bot.set_chat_menu_button(menu_button=MenuButtonWebApp(text="📖 Open",
-                                                                web_app=WebAppInfo(url=url)))
+    await bot.set_chat_menu_button(
+        menu_button=MenuButtonWebApp(text="📖 Open", web_app=WebAppInfo(url=url))
+    )
     return True

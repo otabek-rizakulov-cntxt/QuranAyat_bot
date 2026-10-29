@@ -111,8 +111,7 @@ strings = {
     ),
     "timezone_saved": "Saat qurşağı UTC{offset} olaraq təyin edildi.",
     "reminder_prompt": (
-        "Gündəlik payınızı istədiyiniz vaxtı 24 saatlıq formada göndərin, "
-        "məsələn 07:30."
+        "Gündəlik payınızı istədiyiniz vaxtı 24 saatlıq formada göndərin, məsələn 07:30."
     ),
     "reminder_invalid": "Vaxtı 24 saatlıq formada göndərin, məsələn 07:30.",
     "reminder_saved": "Gündəlik xatırlatma {time} üçün təyin edildi.",

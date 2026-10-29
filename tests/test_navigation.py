@@ -29,8 +29,8 @@ def tg_bot():
 def fake_bot():
     bot = AsyncMock()
     bot.send_photo.return_value = telegram.Message(
-        1, None, telegram.Chat(1, "private"),
-        photo=[telegram.PhotoSize("fid", "uid", 100, 100)])
+        1, None, telegram.Chat(1, "private"), photo=[telegram.PhotoSize("fid", "uid", 100, 100)]
+    )
     return bot
 
 
@@ -38,11 +38,14 @@ def fake_bot():
 def _no_network(monkeypatch):
     """Page sends stitch real images off a CDN; the navigation tests only care
     which page was chosen, so the stitch is stubbed out here."""
+
     async def fake_stitch(urls, name="page.jpg"):
         from io import BytesIO
+
         buf = BytesIO(b"jpegbytes")
         buf.name = name
         return buf
+
     monkeypatch.setattr(main, "fetch_and_stitch", fake_stitch)
 
 
@@ -53,8 +56,7 @@ def _message(tg_bot, text, chat_id=771000, lang="en"):
             "message_id": 1,
             "date": 1700000000,
             "chat": {"id": chat_id, "type": "private"},
-            "from": {"id": chat_id, "is_bot": False, "first_name": "Tester",
-                     "language_code": lang},
+            "from": {"id": chat_id, "is_bot": False, "first_name": "Tester", "language_code": lang},
             "text": text,
         },
     }
@@ -62,16 +64,18 @@ def _message(tg_bot, text, chat_id=771000, lang="en"):
 
 
 class TestDivisionsTileTheQuran:
-
     def test_there_are_the_expected_number_of_each(self):
         assert (Quran.PAGE_COUNT, Quran.JUZ_COUNT) == (604, 30)
         assert (len(Quran.hizbs), len(Quran.manzils), len(Quran.rukus)) == (240, 7, 556)
         assert len(Quran.sajdas) == 15
 
-    @pytest.mark.parametrize("marks_name,count,ranger", [
-        ("pages", 604, Quran.page_range),
-        ("juzs", 30, Quran.juz_range),
-    ])
+    @pytest.mark.parametrize(
+        "marks_name,count,ranger",
+        [
+            ("pages", 604, Quran.page_range),
+            ("juzs", 30, Quran.juz_range),
+        ],
+    )
     def test_divisions_cover_every_ayah_exactly_once(self, marks_name, count, ranger):
         total, previous_end = 0, None
         for n in range(1, count + 1):
@@ -82,7 +86,7 @@ class TestDivisionsTileTheQuran:
             previous_end = (end_s, end_a)
             total += len(Quran.ayahs_between((start_s, start_a), (end_s, end_a)))
         assert total == 6236
-        assert previous_end == (114, 6)         # ...and the last one ends the Qur'an
+        assert previous_end == (114, 6)  # ...and the last one ends the Qur'an
 
     def test_first_and_last_page(self):
         assert Quran.page_range(1) == (1, 1, 1, 7)
@@ -92,8 +96,14 @@ class TestDivisionsTileTheQuran:
         # 96 of the 604 pages do this; page 255 runs from the end of Ar-Ra'd into
         # the start of Ibrahim, which is why page media works in (surah, ayah) pairs.
         assert Quran.page_range(255) == (13, 43, 14, 5)
-        assert Quran.ayahs_between((13, 43), (14, 5)) == \
-            [(13, 43), (14, 1), (14, 2), (14, 3), (14, 4), (14, 5)]
+        assert Quran.ayahs_between((13, 43), (14, 5)) == [
+            (13, 43),
+            (14, 1),
+            (14, 2),
+            (14, 3),
+            (14, 4),
+            (14, 5),
+        ]
 
     def test_out_of_range_divisions_return_none(self):
         assert Quran.page_range(0) is None
@@ -109,7 +119,7 @@ class TestDivisionsTileTheQuran:
 
     def test_juz_lookup(self):
         assert Quran.juz_of(1, 1) == 1
-        assert Quran.juz_of(78, 1) == 30        # juz 'Amma starts at An-Naba
+        assert Quran.juz_of(78, 1) == 30  # juz 'Amma starts at An-Naba
         assert Quran.juz_range(30) == (78, 1, 114, 6)
 
     def test_ayahs_between_rejects_a_reversed_span(self):
@@ -118,14 +128,14 @@ class TestDivisionsTileTheQuran:
     def test_no_page_exceeds_the_stitching_cap(self):
         # A page with no upstream Page<NNN>.mp3 is assembled from its ayah files,
         # which is only safe while every page stays inside MAX_RANGE_AYAHS.
-        longest = max(len(Quran.ayahs_between(Quran.page_range(n)[:2],
-                                              Quran.page_range(n)[2:]))
-                      for n in range(1, Quran.PAGE_COUNT + 1))
+        longest = max(
+            len(Quran.ayahs_between(Quran.page_range(n)[:2], Quran.page_range(n)[2:]))
+            for n in range(1, Quran.PAGE_COUNT + 1)
+        )
         assert longest <= main.MAX_RANGE_AYAHS
 
 
 class TestPageCommand:
-
     async def test_page_number_sends_that_page(self, fake_bot, data, tg_bot):
         await main.handle_update(fake_bot, data, _message(tg_bot, "/page 255"))
         caption = fake_bot.send_photo.await_args.kwargs["caption"]
@@ -146,7 +156,6 @@ class TestPageCommand:
 
 
 class TestJuzCommand:
-
     async def test_juz_opens_its_first_page(self, fake_bot, data, tg_bot):
         await main.handle_update(fake_bot, data, _message(tg_bot, "/juz 30"))
         caption = fake_bot.send_photo.await_args.kwargs["caption"]
@@ -160,7 +169,6 @@ class TestJuzCommand:
 
 
 class TestSajdaCommand:
-
     async def test_lists_all_fifteen_as_verse_links(self, fake_bot, data, tg_bot):
         await main.handle_update(fake_bot, data, _message(tg_bot, "/sajda"))
         markup = fake_bot.send_message.await_args.kwargs["reply_markup"]
@@ -177,7 +185,6 @@ class TestSajdaCommand:
 
 
 class TestCommandArguments:
-
     def test_a_bare_reference_is_not_swallowed_as_a_command(self):
         # "/2:255" must still parse as an ayah reference, not a "2:255" command
         assert main.parse_ayah_range("/2:255") == (2, 255, 255)

@@ -61,9 +61,7 @@ strings = {
     "cmd_reciter": "Změnit recitátora",
     "cmd_about": "Zdroje a poděkování",
     "quran_name": "Korán",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Založit plán memorování",
     "cmd_progress": "Co už umíš zpaměti",
@@ -72,7 +70,6 @@ strings = {
     "cmd_streak": "Tvá denní série",
     "cmd_leaderboard": "Nejlepší tento týden",
     "cmd_profile": "Tvůj profil a nastavení",
-
     # Shared wizard controls
     "wizard_cancelled": "Zrušeno.",
     "wizard_nothing_to_cancel": "Není co rušit.",
@@ -81,7 +78,6 @@ strings = {
     "btn_cancel": "Zrušit",
     "btn_back": "Zpět",
     "btn_confirm": "Potvrdit",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Po",
     "day_tue": "Út",
@@ -90,7 +86,6 @@ strings = {
     "day_fri": "Pá",
     "day_sat": "So",
     "day_sun": "Ne",
-
     # Profile (B1-B3)
     "profile_title": "Tvůj profil",
     "profile_name_set": "Jméno: {name}",
@@ -114,8 +109,7 @@ strings = {
     "board_joined": "Nyní jsi v žebříčku.",
     "board_left": "Byl jsi odebrán ze žebříčku.",
     "timezone_prompt": (
-        "Vyber svůj posun oproti UTC. Určuje, kdy ti pro série začíná den a kdy "
-        "dorazí denní porce."
+        "Vyber svůj posun oproti UTC. Určuje, kdy ti pro série začíná den a kdy dorazí denní porce."
     ),
     "timezone_saved": "Časové pásmo nastaveno na UTC{offset}.",
     "reminder_prompt": "Pošli čas, kdy chceš denní porci, ve 24hodinovém tvaru, např. 07:30.",
@@ -123,7 +117,6 @@ strings = {
     "reminder_saved": "Denní připomínka nastavena na {time}.",
     "btn_reminder_off": "Vypnout připomínky",
     "reminder_off": "Denní připomínky jsou vypnuté.",
-
     # Progress and /forgot (C3)
     "progress_title": "Co už umíš zpaměti",
     "progress_surah_line": "{name}: {done}/{total} veršů — {pct}%",
@@ -136,7 +129,6 @@ strings = {
     "forgot_usage": "Pošli, co mám odznačit, například /forgot 67:5-6.",
     "forgot_done": "Označení zrušeno: {ref}.",
     "forgot_nothing": "To jsi jako naučené neoznačil.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Co by ses chtěl naučit zpaměti?",
     "btn_target_surah": "Súru",
@@ -172,7 +164,6 @@ strings = {
     "btn_know_by_heart": "✅ Umím zpaměti",
     "know_confirmed": "{ref} označeno jako naučené. Jsi na {pct}%.",
     "know_already": "To jsi už označil.",
-
     # Recall check (E2, E3)
     "check_question": "Jak to pokračuje?",
     "check_usage": "Pošli, co mám vyzkoušet, například /check 67.",
@@ -183,7 +174,6 @@ strings = {
         "chceš, jen se to nezapočítá dvakrát."
     ),
     "btn_check_start": "Vyzkoušej mě",
-
     # Streaks (G2, G3)
     "streak_title": "Tvá série",
     "streak_current": "Aktuální série, dnů: {n}",
@@ -194,7 +184,6 @@ strings = {
     "streak_milestone_30": "Třicet dní. Vytrvalost je teď na tvé straně.",
     "streak_milestone_100": "Sto dní. Tak daleko dojde jen málokdo.",
     "streak_milestone_365": "Celý rok, každý jediný den. Kéž Alláh uchová, co ses naučil.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Žebříček tohoto týdne",
     "leaderboard_row": "{rank}. {name} — {sessions}",

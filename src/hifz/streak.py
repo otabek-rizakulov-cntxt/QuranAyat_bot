@@ -40,13 +40,15 @@ CB_CHECK_START = "hc:start"
 @command("streak")
 async def streak(ctx: Ctx) -> None:
     """`/streak` — current, longest, milestone copy, and the 12-week graph."""
-    summary = await streak_summary(ctx.user_id)     # no population: G3 stays dark
+    summary = await streak_summary(ctx.user_id)  # no population: G3 stays dark
 
     if summary.current == 0 and summary.longest == 0:
         # Nothing has ever been logged. An all-grey card is an honest picture but
         # a discouraging one, and it costs a render; the invitation is better.
-        await ctx.reply("%s\n\n%s" % (ctx.tr("streak_title"), ctx.tr("streak_none")),
-                        reply_markup=_keyboard(ctx, summary))
+        await ctx.reply(
+            "%s\n\n%s" % (ctx.tr("streak_title"), ctx.tr("streak_none")),
+            reply_markup=_keyboard(ctx, summary),
+        )
         return
 
     await _send_graph(ctx, summary)
@@ -66,9 +68,11 @@ def _caption(ctx: Ctx, summary: StreakSummary) -> str:
     `milestone.reached` is set only when the streak *equals* a milestone, so the
     congratulation fires once instead of every day after day seven.
     """
-    lines = [ctx.tr("streak_title"),
-             ctx.tr("streak_current", n=summary.current),
-             ctx.tr("streak_longest", n=summary.longest)]
+    lines = [
+        ctx.tr("streak_title"),
+        ctx.tr("streak_current", n=summary.current),
+        ctx.tr("streak_longest", n=summary.longest),
+    ]
     if summary.milestone.reached is not None:
         lines.append(ctx.tr(summary.milestone.key))
     lines.append(ctx.tr("streak_graph_caption"))
@@ -84,7 +88,8 @@ def _keyboard(ctx: Ctx, summary: StreakSummary):
     if summary.active_today:
         return None
     return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(ctx.tr("btn_check_start"), callback_data=CB_CHECK_START)]])
+        [[InlineKeyboardButton(ctx.tr("btn_check_start"), callback_data=CB_CHECK_START)]]
+    )
 
 
 async def _send_graph(ctx: Ctx, summary: StreakSummary) -> None:
@@ -101,15 +106,17 @@ async def _send_graph(ctx: Ctx, summary: StreakSummary) -> None:
     cached = ctx.file.get_file(key)
     if cached is not None:
         try:
-            await ctx.bot.send_photo(chat_id=ctx.chat_id, photo=cached,
-                                     caption=caption, reply_markup=markup)
+            await ctx.bot.send_photo(
+                chat_id=ctx.chat_id, photo=cached, caption=caption, reply_markup=markup
+            )
             return
         except telegram.error.TelegramError:
             print("streak: cached graph file_id rejected for %s; re-rendering" % (key,))
 
     graph = await render_streak_graph(ctx.user_id, today=summary.today)
-    message = await ctx.bot.send_photo(chat_id=ctx.chat_id, photo=graph,
-                                       caption=caption, reply_markup=markup)
+    message = await ctx.bot.send_photo(
+        chat_id=ctx.chat_id, photo=graph, caption=caption, reply_markup=markup
+    )
 
     photo = getattr(message, "photo", None)
     if photo:

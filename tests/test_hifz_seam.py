@@ -48,10 +48,12 @@ def _isolate_registries():
 async def _ctx(**kwargs) -> Ctx:
     bot = kwargs.pop("bot", None) or AsyncMock()
     from lib.utils import File
+
     return await Ctx.build(bot, {}, File(), 900001, 900001, _Settings(), **kwargs)
 
 
 # --- Registration --------------------------------------------------------------
+
 
 class TestRegistration:
     async def test_command_decorator_claims_a_slash_command(self):
@@ -62,8 +64,8 @@ class TestRegistration:
             calls.append(ctx)
 
         assert hifz.handles("dummycmd") is True
-        assert hifz.handles("/dummycmd") is True      # leading slash tolerated
-        assert hifz.handles("DUMMYCMD") is True       # main.py lowercases anyway
+        assert hifz.handles("/dummycmd") is True  # leading slash tolerated
+        assert hifz.handles("DUMMYCMD") is True  # main.py lowercases anyway
         assert await hifz.dispatch_command(await _ctx(), "dummycmd") is True
         assert len(calls) == 1
 
@@ -80,6 +82,7 @@ class TestRegistration:
             pass
 
         with pytest.raises(ValueError, match="already registered"):
+
             @hifz.command("clash")
             async def second(ctx):
                 pass
@@ -99,6 +102,7 @@ class TestRegistration:
             pass
 
         with pytest.raises(ValueError, match="already registered"):
+
             @hifz.callback("zz:")
             async def second(ctx, cb):
                 pass
@@ -109,6 +113,7 @@ class TestRegistration:
             pass
 
         with pytest.raises(ValueError, match="already registered"):
+
             @hifz.wizard("zzkind")
             async def second(ctx, text):
                 pass
@@ -124,17 +129,17 @@ class TestConflictFreeByConstruction:
     def test_the_package_has_no_shared_import_list(self):
         # If __init__.py named the feature modules, every agent adding a feature
         # would edit the same line — the merge point this design exists to avoid.
-        source = open(os.path.join(os.path.dirname(hifz.__file__), "__init__.py"),
-                      encoding="utf-8").read()
-        for feature in ("profile", "progress", "memorize", "check", "streak",
-                        "leaderboard"):
+        source = open(
+            os.path.join(os.path.dirname(hifz.__file__), "__init__.py"), encoding="utf-8"
+        ).read()
+        for feature in ("profile", "progress", "memorize", "check", "streak", "leaderboard"):
             assert "import %s" % feature not in source, feature
             assert "from .%s" % feature not in source, feature
 
     def test_discovery_walks_the_directory(self):
         hifz.reset_for_tests()
         counts = hifz.load_features()
-        assert counts["commands"] >= 1          # at least the seam's own /cancel
+        assert counts["commands"] >= 1  # at least the seam's own /cancel
         assert hifz.handles("cancel") is True
 
     def test_load_features_is_idempotent(self):
@@ -170,11 +175,12 @@ class TestConflictFreeByConstruction:
         """BOT_COMMANDS drives Telegram's menu and the /start text alike, so a
         command listed there with no handler is a menu entry that does nothing."""
         from locales import BOT_COMMANDS
+
         hifz.load_features()
         import main
+
         advertised = {name for name, _ in BOT_COMMANDS}
-        hifz_owned = {"memorize", "progress", "streak", "leaderboard", "profile",
-                      "check", "forgot"}
+        hifz_owned = {"memorize", "progress", "streak", "leaderboard", "profile", "check", "forgot"}
         for name in sorted(advertised & hifz_owned):
             assert hifz.handles(name), name
 
@@ -187,9 +193,9 @@ class TestConflictFreeByConstruction:
             with open(broken, "w", encoding="utf-8") as fp:
                 fp.write("raise RuntimeError('boom')\n")
             hifz.reset_for_tests()
-            hifz.load_features()                    # must not raise
+            hifz.load_features()  # must not raise
             assert "zz_broken_probe" in capsys.readouterr().out
-            assert hifz.handles("cancel") is True   # the healthy ones still loaded
+            assert hifz.handles("cancel") is True  # the healthy ones still loaded
         finally:
             os.remove(broken)
 
@@ -200,12 +206,13 @@ class TestConflictFreeByConstruction:
             with open(probe, "w", encoding="utf-8") as fp:
                 fp.write("raise RuntimeError('discovery must not import this')\n")
             hifz.reset_for_tests()
-            hifz.load_features()                    # must not raise
+            hifz.load_features()  # must not raise
         finally:
             os.remove(probe)
 
 
 # --- Dispatch ------------------------------------------------------------------
+
 
 class TestDispatchCommand:
     async def test_unclaimed_command_returns_false(self):
@@ -231,7 +238,7 @@ class TestDispatchCallback:
             seen["cb"] = cb_data
 
         assert await hifz.dispatch_callback(await _ctx(), "zz:board:on") is True
-        assert seen["cb"] == "zz:board:on"      # full data, prefix included
+        assert seen["cb"] == "zz:board:on"  # full data, prefix included
 
     async def test_unclaimed_callback_returns_false(self):
         assert await hifz.dispatch_callback(await _ctx(), "unclaimed:1") is False
@@ -293,7 +300,7 @@ class TestDispatchWizard:
         ctx = await _ctx()
         ctx.wiz.start(ctx.user_id, "zzflow")
         assert await hifz.dispatch_wizard(ctx, "Abu Bakr") is True
-        assert seen["text"] == "Abu Bakr"       # raw, not lowercased
+        assert seen["text"] == "Abu Bakr"  # raw, not lowercased
 
     async def test_cancel_ends_any_wizard_without_the_feature_handling_it(self):
         @hifz.wizard("zzflow")
@@ -322,7 +329,7 @@ class TestDispatchWizard:
         ctx = await _ctx(bot=bot)
         ctx.wiz.start(ctx.user_id, "zzflow")
         assert await hifz.dispatch_wizard(ctx, "garbage") is True
-        assert ctx.wiz.is_active(ctx.user_id) is False   # not stuck forever
+        assert ctx.wiz.is_active(ctx.user_id) is False  # not stuck forever
         bot.send_message.assert_awaited()
 
     async def test_has_wizard_gates_the_slot(self):
@@ -334,6 +341,7 @@ class TestDispatchWizard:
 
 
 # --- Ctx -----------------------------------------------------------------------
+
 
 class TestCtx:
     async def test_carries_the_resolved_settings(self):
@@ -375,8 +383,7 @@ class TestCtx:
     async def test_edit_treats_not_modified_as_success(self):
         # re-tapping the view you are already in is a no-op, not an error
         bot = AsyncMock()
-        bot.edit_message_text.side_effect = telegram.error.BadRequest(
-            "Message is not modified")
+        bot.edit_message_text.side_effect = telegram.error.BadRequest("Message is not modified")
         msg = type("M", (), {"message_id": 7, "photo": None, "audio": None})()
         cq = type("CQ", (), {"id": "cq1", "message": msg})()
         ctx = await _ctx(bot=bot, callback_query=cq)
@@ -403,15 +410,26 @@ class TestCtx:
 
 # --- The callback-data namespace -----------------------------------------------
 
-READER_PREFIXES = ("vc:", "vr:", "rep:", "pg:", "pga:", "recgrp:", "setlang:",
-                   "settranslang:", "setreciter:", "showlang", "reciter_search",
-                   "recpage_noop", "pgnoop")
+READER_PREFIXES = (
+    "vc:",
+    "vr:",
+    "rep:",
+    "pg:",
+    "pga:",
+    "recgrp:",
+    "setlang:",
+    "settranslang:",
+    "setreciter:",
+    "showlang",
+    "reciter_search",
+    "recpage_noop",
+    "pgnoop",
+)
 
 
 class TestPrefixNamespace:
     def test_every_feature_has_a_prefix(self):
-        for feature in ("profile", "progress", "memorize", "check", "streak",
-                        "leaderboard"):
+        for feature in ("profile", "progress", "memorize", "check", "streak", "leaderboard"):
             assert feature in hifz.PREFIXES, feature
 
     def test_prefixes_are_unique(self):
@@ -433,6 +451,7 @@ class TestPrefixNamespace:
 
 # --- The _initialize() schema path ---------------------------------------------
 
+
 class TestSchemaApplication:
     """Regression: Wave 0a made get_pool() return None when DATABASE_URL is unset,
     while main.py still called pool.execute() on it. The AttributeError was
@@ -442,16 +461,22 @@ class TestSchemaApplication:
 
     async def test_apply_schema_survives_an_unset_database_url(self):
         from lib.store import apply_schema
+
         assert os.environ.get("DATABASE_URL") == ""
-        await apply_schema()          # must not raise
+        await apply_schema()  # must not raise
 
     def test_main_no_longer_dereferences_the_pool_for_the_schema(self):
-        source = open(os.path.join(os.path.dirname(os.path.dirname(
-            os.path.abspath(__file__))), "src", "main.py"), encoding="utf-8").read()
+        source = open(
+            os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "main.py"
+            ),
+            encoding="utf-8",
+        ).read()
         assert "pool.execute" not in source
         assert "apply_schema" in source
 
     async def test_schema_application_is_idempotent(self):
         from lib.store import apply_schema
+
         await apply_schema()
-        await apply_schema()          # a restart re-applies it; must stay clean
+        await apply_schema()  # a restart re-applies it; must stay clean

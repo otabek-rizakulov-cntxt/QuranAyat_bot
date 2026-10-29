@@ -65,9 +65,7 @@ strings = {
     "cmd_reciter": "ஓதுபவரை மாற்று",
     "cmd_about": "ஆதாரங்கள் மற்றும் நன்றி",
     "quran_name": "குர்ஆன்",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "ஹிஃப்ழ் திட்டத்தைத் தொடங்கு",
     "cmd_progress": "நீங்கள் மனனம் செய்தவை",
@@ -76,7 +74,6 @@ strings = {
     "cmd_streak": "உங்கள் தினசரி தொடர்ச்சி",
     "cmd_leaderboard": "இந்த வாரம் அதிகம் மனனம் செய்தவர்கள்",
     "cmd_profile": "உங்கள் சுயவிவரமும் அமைப்புகளும்",
-
     # Shared wizard controls
     "wizard_cancelled": "ரத்து செய்யப்பட்டது.",
     "wizard_nothing_to_cancel": "ரத்து செய்ய எதுவும் இல்லை.",
@@ -85,7 +82,6 @@ strings = {
     "btn_cancel": "ரத்து",
     "btn_back": "பின்",
     "btn_confirm": "உறுதி",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "திங்",
     "day_tue": "செவ்",
@@ -94,7 +90,6 @@ strings = {
     "day_fri": "வெள்",
     "day_sat": "சனி",
     "day_sun": "ஞாயி",
-
     # Profile
     "profile_title": "உங்கள் சுயவிவரம்",
     "profile_name_set": "பெயர்: {name}",
@@ -128,7 +123,6 @@ strings = {
     "reminder_saved": "தினசரி நினைவூட்டல் {time} க்கு அமைக்கப்பட்டது.",
     "btn_reminder_off": "நினைவூட்டலை அணை",
     "reminder_off": "தினசரி நினைவூட்டல்கள் அணைக்கப்பட்டன.",
-
     # Progress and /forgot
     "progress_title": "நீங்கள் மனனம் செய்தவை",
     "progress_surah_line": "{name}: {done}/{total} வசனங்கள் — {pct}%",
@@ -141,7 +135,6 @@ strings = {
     "forgot_usage": "எதை நீக்க வேண்டும் என்பதை அனுப்புங்கள், எடுத்துக்காட்டு /forgot 67:5-6.",
     "forgot_done": "{ref} குறியிலிருந்து நீக்கப்பட்டது.",
     "forgot_nothing": "அதை நீங்கள் மனனமாகக் குறிக்கவில்லை.",
-
     # Memorization plans and drills
     "memorize_choose_target": "எதை மனனம் செய்ய விரும்புகிறீர்கள்?",
     "btn_target_surah": "ஒரு சூரா",
@@ -177,7 +170,6 @@ strings = {
     "btn_know_by_heart": "✅ இது மனனமாகிவிட்டது",
     "know_confirmed": "{ref} மனனமாகக் குறிக்கப்பட்டது. நீங்கள் {pct}% அடைந்துள்ளீர்கள்.",
     "know_already": "அதை நீங்கள் ஏற்கனவே குறித்துவிட்டீர்கள்.",
-
     # Recall check
     "check_question": "இது எப்படித் தொடர்கிறது?",
     "check_usage": "எதைச் சோதிக்க வேண்டும் என்பதை அனுப்புங்கள், எடுத்துக்காட்டு /check 67.",
@@ -188,7 +180,6 @@ strings = {
         "அளவு சோதித்துக் கொள்ளுங்கள், ஆனால் அது இரண்டாவது முறையாகக் கணக்கிடப்படாது."
     ),
     "btn_check_start": "என்னைச் சோதி",
-
     # Streaks
     "streak_title": "உங்கள் தொடர்ச்சி",
     "streak_current": "தற்போதைய தொடர்ச்சி: {n} நாட்கள்",
@@ -199,7 +190,6 @@ strings = {
     "streak_milestone_30": "முப்பது நாட்கள். நிலைத்தன்மை இப்போது உங்கள் பக்கம் உள்ளது.",
     "streak_milestone_100": "நூறு நாட்கள். இவ்வளவு தூரம் வருபவர்கள் மிகச் சிலரே.",
     "streak_milestone_365": "ஒரு முழு ஆண்டு, ஒவ்வொரு நாளும். நீங்கள் கற்றதை அல்லாஹ் பாதுகாப்பானாக.",
-
     # Leaderboard
     "leaderboard_title": "இந்த வாரத்தின் தரவரிசை",
     "leaderboard_row": "{rank}. {name} — {sessions}",

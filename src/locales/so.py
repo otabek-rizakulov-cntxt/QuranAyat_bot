@@ -64,7 +64,6 @@ strings = {
     "cmd_reciter": "Bedel akhristaha",
     "cmd_about": "Ilaha iyo mahadnaqa",
     "quran_name": "Qur'aan",
-
     # --- Hifz platform ---------------------------------------------------------
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Bilow qorshe xifdi",
@@ -74,7 +73,6 @@ strings = {
     "cmd_streak": "Taxanahaaga maalinlaha ah",
     "cmd_leaderboard": "Kuwa ugu xifdiga badan toddobaadkan",
     "cmd_profile": "Xogtaada iyo dejintaada",
-
     # Shared wizard controls
     "wizard_cancelled": "Waa la joojiyey.",
     "wizard_nothing_to_cancel": "Wax la joojiyo ma jiraan.",
@@ -83,7 +81,6 @@ strings = {
     "btn_cancel": "Jooji",
     "btn_back": "Dib u noqo",
     "btn_confirm": "Xaqiiji",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Isn",
     "day_tue": "Tal",
@@ -92,7 +89,6 @@ strings = {
     "day_fri": "Jim",
     "day_sat": "Sab",
     "day_sun": "Axa",
-
     # Profile (B1-B3)
     "profile_title": "Xogtaada",
     "profile_name_set": "Magac: {name}",
@@ -126,7 +122,6 @@ strings = {
     "reminder_saved": "Xasuusinta maalinlaha ah waxaa loo dhigay {time}.",
     "btn_reminder_off": "Dami xasuusinta",
     "reminder_off": "Xasuusinta maalinlaha ah waa damisan tahay.",
-
     # Progress and /forgot (C3)
     "progress_title": "Waxaad xifdisay",
     "progress_surah_line": "{name}: {done}/{total} aayad — {pct}%",
@@ -139,7 +134,6 @@ strings = {
     "forgot_usage": "Soo dir waxa calaamadda laga saarayo, tusaale /forgot 67:5-6.",
     "forgot_done": "Calaamaddii {ref} waa laga saaray.",
     "forgot_nothing": "Taas uma aadan calaamadin mid aad xifdisay.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Maxaad rabtaa inaad xifdiso?",
     "btn_target_surah": "Suurad",
@@ -175,7 +169,6 @@ strings = {
     "btn_know_by_heart": "✅ Waan xifdiyey",
     "know_confirmed": "{ref} waxaa loo calaamadiyey mid la xifdiyey. Waxaad maraysaa {pct}%.",
     "know_already": "Horeba taas waad u calaamadisay.",
-
     # Recall check (E2, E3)
     "check_question": "Sidee bay u sii socotaa?",
     "check_usage": "Soo dir waxa la tijaabinayo, tusaale /check 67.",
@@ -186,7 +179,6 @@ strings = {
         "isku tijaabi, laakiin laba jeer lama tirinayo."
     ),
     "btn_check_start": "I tijaabi",
-
     # Streaks (G2, G3)
     "streak_title": "Taxanahaaga",
     "streak_current": "Taxanaha hadda, maalmo: {n}",
@@ -197,7 +189,6 @@ strings = {
     "streak_milestone_30": "Soddon maalmood. Hadda joogtaynta ayaa dhinacaaga ah.",
     "streak_milestone_100": "Boqol maalmood. Dad aad u yar ayaa halkan gaadha.",
     "streak_milestone_365": "Sannad dhan, maalin walba. Alle ha kuu ilaaliyo waxaad barantay.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Liiska hormuudka toddobaadkan",
     "leaderboard_row": "{rank}. {name} — {sessions}",

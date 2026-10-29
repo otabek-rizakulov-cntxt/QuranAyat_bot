@@ -67,10 +67,12 @@ class _CallbackQuery:
 
 async def _ctx(bot=None, argument="", tap=False) -> Ctx:
     from lib.utils import File
+
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}
-    return await Ctx.build(bot, {}, File(), CHAT_ID, USER_ID, _Settings(),
-                           argument=argument, **extra)
+    return await Ctx.build(
+        bot, {}, File(), CHAT_ID, USER_ID, _Settings(), argument=argument, **extra
+    )
 
 
 async def _tap(cb_data: str, bot=None):
@@ -93,12 +95,13 @@ async def _run_wizard(target="67", pace="2", offset="+05:00", reminder="07:00"):
     await _tap("hm:t:s")
     await _type(target)
     await _tap("hm:p:" + pace)
-    await _tap("hm:d:wk")                       # weekdays
+    await _tap("hm:d:wk")  # weekdays
     await _tap("hm:tz:" + offset)
     await _tap("hm:rt:" + reminder)
 
 
 # --- The wizard ----------------------------------------------------------------
+
 
 class TestWizard:
     async def test_memorize_opens_the_target_chooser(self):
@@ -124,10 +127,14 @@ class TestWizard:
         await _run_wizard()
         draft = hifz.Ctx.build  # noqa: F841 - keep the import obvious
         from lib.wizard import Wizard
+
         data = Wizard().data(USER_ID)
-        previewed = build_plan(surah_ref(AL_MULK), int(data["pace"]),
-                               [int(d) for d in data["days"]],
-                               date.fromisoformat(data["start"]))
+        previewed = build_plan(
+            surah_ref(AL_MULK),
+            int(data["pace"]),
+            [int(d) for d in data["days"]],
+            date.fromisoformat(data["start"]),
+        )
 
         await _tap("hm:ok")
         store = await get_store()
@@ -137,8 +144,11 @@ class TestWizard:
         assert len(stored) == len(previewed)
         for saved, portion in zip(stored, previewed):
             assert saved.scheduled_date == portion.scheduled_date
-            assert (saved.surah, saved.start_ayah, saved.end_ayah) == \
-                   (portion.surah, portion.start_ayah, portion.end_ayah)
+            assert (saved.surah, saved.start_ayah, saved.end_ayah) == (
+                portion.surah,
+                portion.start_ayah,
+                portion.end_ayah,
+            )
 
     async def test_al_mulk_over_weekdays_is_fifteen_portions_over_eighteen_days(self):
         """The number the preview copy quotes, asserted rather than assumed."""
@@ -158,7 +168,8 @@ class TestWizard:
         bot, handled = await _type("not a surah")
         assert handled is True
         from lib.wizard import Wizard
-        assert Wizard().is_active(USER_ID) is True      # still in the wizard
+
+        assert Wizard().is_active(USER_ID) is True  # still in the wizard
 
     async def test_cancel_ends_the_wizard(self):
         await hifz.dispatch_command(await _ctx(), "memorize")
@@ -166,21 +177,24 @@ class TestWizard:
         bot, handled = await _type("/cancel")
         assert handled is True
         from lib.wizard import Wizard
+
         assert Wizard().is_active(USER_ID) is False
 
     async def test_the_cancel_button_ends_the_wizard(self):
         await hifz.dispatch_command(await _ctx(), "memorize")
         await _tap("hm:x")
         from lib.wizard import Wizard
+
         assert Wizard().is_active(USER_ID) is False
 
     async def test_a_draft_expiring_mid_wizard_does_not_crash(self):
         """A draft can expire between two taps; every step must survive it."""
         await hifz.dispatch_command(await _ctx(), "memorize")
         from lib.wizard import Wizard
+
         Wizard().clear(USER_ID)
         for cb in ("hm:p:2", "hm:d:wk", "hm:tz:+05:00", "hm:rt:07:00", "hm:ok"):
-            bot = await _tap(cb)                        # must not raise
+            bot = await _tap(cb)  # must not raise
             assert bot.answer_callback_query.await_count >= 1
 
     async def test_a_second_memorize_while_a_plan_is_active_is_handled(self):
@@ -197,6 +211,7 @@ class TestWizard:
 
 
 # --- The enqueue chain ----------------------------------------------------------
+
 
 class TestEnqueueChain:
     """Wave F drains the queue; nothing else fills it. If this is wrong, the
@@ -220,7 +235,7 @@ class TestEnqueueChain:
         plan = await store.plans.get_active_plan(USER_ID)
         before = len(store.schedule._state.scheduled_send)
         again = await memorize_feature._enqueue_next(store, USER_ID, CHAT_ID, plan)
-        assert again is None                     # already queued for that day
+        assert again is None  # already queued for that day
         assert len(store.schedule._state.scheduled_send) == before
 
     async def test_pausing_stops_the_chain_and_resuming_restarts_it(self):
@@ -262,6 +277,7 @@ class TestEnqueueChain:
 
 
 # --- The drill ------------------------------------------------------------------
+
 
 class TestDrill:
     async def test_know_by_heart_writes_an_interval_and_logs_a_session(self):
@@ -305,8 +321,7 @@ class TestDrill:
         """D3's done-when: one combined file, not N."""
         calls = []
 
-        async def fake_combined(bot, surah, start, end, chat_id, performer,
-                                reply_markup=None):
+        async def fake_combined(bot, surah, start, end, chat_id, performer, reply_markup=None):
             calls.append((surah, start, end))
 
         async def fake_send_quran(*args, **kwargs):
@@ -323,8 +338,10 @@ class TestDrill:
         assert day.end_ayah > day.start_ayah, "need a multi-ayah portion to test this"
 
         from lib.utils import File
-        await memorize_feature._send_drill(AsyncMock(), {}, File(), store, CHAT_ID,
-                                           plan, day, "en", "en", "Husary_128kbps")
+
+        await memorize_feature._send_drill(
+            AsyncMock(), {}, File(), store, CHAT_ID, plan, day, "en", "en", "Husary_128kbps"
+        )
         assert len(calls) == 1
         assert calls[0] == (day.surah, day.start_ayah, day.end_ayah)
 
@@ -337,7 +354,20 @@ class TestRegistration:
         assert "hm:" in hifz.CALLBACKS
 
     def test_callback_data_fits_telegrams_cap(self):
-        for cb in ("hm:t:s", "hm:p:12", "hm:d:wk", "hm:dt:7", "hm:dok",
-                   "hm:tz:+05:00", "hm:rt:07:00", "hm:ok", "hm:x", "hm:go",
-                   "hm:kn:%d" % 2 ** 31, "hm:ps", "hm:rs", "hm:ab"):
+        for cb in (
+            "hm:t:s",
+            "hm:p:12",
+            "hm:d:wk",
+            "hm:dt:7",
+            "hm:dok",
+            "hm:tz:+05:00",
+            "hm:rt:07:00",
+            "hm:ok",
+            "hm:x",
+            "hm:go",
+            "hm:kn:%d" % 2**31,
+            "hm:ps",
+            "hm:rs",
+            "hm:ab",
+        ):
             assert len(cb.encode()) <= 64, cb

@@ -56,8 +56,9 @@ class TestParseOffset:
         assert parse_offset("+05:45") == timedelta(hours=5, minutes=45)
         assert parse_offset("+09:30") == timedelta(hours=9, minutes=30)
 
-    @pytest.mark.parametrize("bad", ["", "   ", "abc", "+99:00", "-13:00", "+15:00",
-                                     "Asia/Tashkent", "+05:99", "five"])
+    @pytest.mark.parametrize(
+        "bad", ["", "   ", "abc", "+99:00", "-13:00", "+15:00", "Asia/Tashkent", "+05:99", "five"]
+    )
     def test_rejects_junk_and_out_of_range(self, bad):
         with pytest.raises(ValueError):
             parse_offset(bad)
@@ -103,8 +104,8 @@ class TestLocalDate:
 
     def test_2359_and_0001_local_are_different_dates(self):
         # G1: "a session at 23:59 followed by one at 00:01 local ticks it twice"
-        before = _utc(2026, 7, 31, 18, 59)   # 23:59 local at +05:00
-        after = _utc(2026, 7, 31, 19, 1)     # 00:01 local, next day
+        before = _utc(2026, 7, 31, 18, 59)  # 23:59 local at +05:00
+        after = _utc(2026, 7, 31, 19, 1)  # 00:01 local, next day
         assert local_time(before, "+05:00") == time(23, 59)
         assert local_time(after, "+05:00") == time(0, 1)
         assert local_date(before, "+05:00") == date(2026, 7, 31)
@@ -113,7 +114,7 @@ class TestLocalDate:
 
     def test_same_instant_is_two_dates_for_two_users(self):
         instant = _utc(2026, 7, 31, 22, 0)
-        assert local_date(instant, "+05:00") == date(2026, 8, 1)   # already tomorrow
+        assert local_date(instant, "+05:00") == date(2026, 8, 1)  # already tomorrow
         assert local_date(instant, "-05:00") == date(2026, 7, 31)  # still today
 
     def test_negative_offset_can_roll_backwards(self):
@@ -135,7 +136,7 @@ class TestNextDueUtc:
         assert next_due_utc(time(10, 0), "+05:00", after) == _utc(2026, 7, 31, 5, 0)
 
     def test_rolls_to_tomorrow_once_passed(self):
-        after = _utc(2026, 7, 31, 6, 0)      # 11:00 local, reminder already gone
+        after = _utc(2026, 7, 31, 6, 0)  # 11:00 local, reminder already gone
         assert next_due_utc(time(10, 0), "+05:00", after) == _utc(2026, 8, 1, 5, 0)
 
     def test_strictly_after_so_rescheduling_on_fire_advances_a_day(self):

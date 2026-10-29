@@ -35,10 +35,18 @@ from hifz.refs import KIND_RANGE, Ref
 from modules import Quran
 
 __all__ = [
-    "AUTO_PACE", "DRILL_RANGE", "DRILL_PAGE", "DRILL_SURAH",
-    "CONSOLIDATION_DRILLS", "AUTO_PACE_PAGE_FRACTION",
-    "Portion", "auto_pace", "build_plan",
-    "to_day_specs", "advancing", "next_scheduled_date",
+    "AUTO_PACE",
+    "DRILL_RANGE",
+    "DRILL_PAGE",
+    "DRILL_SURAH",
+    "CONSOLIDATION_DRILLS",
+    "AUTO_PACE_PAGE_FRACTION",
+    "Portion",
+    "auto_pace",
+    "build_plan",
+    "to_day_specs",
+    "advancing",
+    "next_scheduled_date",
 ]
 
 # `plan.pace = 0` is the wizard's "let the bot decide" — see `auto_pace`.
@@ -46,9 +54,9 @@ AUTO_PACE = 0
 
 # What a day drills. `DRILL_RANGE` advances into new ground; the other two are
 # consolidation days that re-drill ground already covered.
-DRILL_RANGE = "range"    # the day's new portion
-DRILL_PAGE = "page"      # the mushaf page just finished
-DRILL_SURAH = "surah"    # the surah just finished
+DRILL_RANGE = "range"  # the day's new portion
+DRILL_PAGE = "page"  # the mushaf page just finished
+DRILL_SURAH = "surah"  # the surah just finished
 
 CONSOLIDATION_DRILLS = (DRILL_PAGE, DRILL_SURAH)
 
@@ -96,8 +104,7 @@ class Portion:
         ref would claim a span it may not actually be. The page number lives in
         `unit`, where it cannot be mistaken for the span itself.
         """
-        return Ref(KIND_RANGE, self.surah, self.start_ayah,
-                   self.surah, self.end_ayah)
+        return Ref(KIND_RANGE, self.surah, self.start_ayah, self.surah, self.end_ayah)
 
 
 def next_scheduled_date(start: date, days_of_week: Sequence[int]) -> date:
@@ -141,8 +148,9 @@ def auto_pace(target: Ref) -> int:
     return max(1, min(pace, total))
 
 
-def build_plan(target: Ref, pace: int, days_of_week: Sequence[int],
-               start_date: date) -> List[Portion]:
+def build_plan(
+    target: Ref, pace: int, days_of_week: Sequence[int], start_date: date
+) -> List[Portion]:
     """Materialize `target` into the daily portions of a plan.
 
     `pace` is ayahs per advancing day, or `AUTO_PACE` (0) to let `auto_pace`
@@ -209,7 +217,7 @@ def _consolidations(target: Ref, surah: int, first: int, last: int):
 
     Yields `(start_ayah, end_ayah, drill, unit)`, all within `surah`.
     """
-    lower = first                      # widest rung emitted so far
+    lower = first  # widest rung emitted so far
     floor = target.start_ayah if target.start_surah == surah else 1
 
     page = Quran.page_of(surah, last)
@@ -232,8 +240,8 @@ def to_day_specs(portions: Sequence[Portion]) -> list:
     asyncpg): the preview path needs the arithmetic, not a database.
     """
     from lib.store.plans import PlanDaySpec
-    return [PlanDaySpec(p.scheduled_date, p.surah, p.start_ayah, p.end_ayah)
-            for p in portions]
+
+    return [PlanDaySpec(p.scheduled_date, p.surah, p.start_ayah, p.end_ayah) for p in portions]
 
 
 def advancing(portions: Sequence[Portion]) -> List[Portion]:

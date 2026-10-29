@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Commando's:",
     "welcome_inline": (
-        "Je kunt me in elke chat gebruiken: typ <b>@QuranAyat_bot</b> gevolgd door een "
-        "verwijzing."
+        "Je kunt me in elke chat gebruiken: typ <b>@QuranAyat_bot</b> gevolgd door een verwijzing."
     ),
     "about": (
         "Met deze bot kun je de Heilige Koran op Telegram in veel talen lezen.\n\n"
@@ -63,9 +62,7 @@ strings = {
     "cmd_reciter": "Reciteerder wijzigen",
     "cmd_about": "Bronnen en dankwoord",
     "quran_name": "Koran",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Een hifz-plan starten",
     "cmd_progress": "Wat je uit het hoofd kent",
@@ -74,7 +71,6 @@ strings = {
     "cmd_streak": "Je dagelijkse reeks",
     "cmd_leaderboard": "De besten van deze week",
     "cmd_profile": "Je profiel en instellingen",
-
     # Shared wizard controls
     "wizard_cancelled": "Geannuleerd.",
     "wizard_nothing_to_cancel": "Er is niets om te annuleren.",
@@ -83,7 +79,6 @@ strings = {
     "btn_cancel": "Annuleren",
     "btn_back": "Terug",
     "btn_confirm": "Bevestigen",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "ma",
     "day_tue": "di",
@@ -92,7 +87,6 @@ strings = {
     "day_fri": "vr",
     "day_sat": "za",
     "day_sun": "zo",
-
     # Profile (B1-B3)
     "profile_title": "Je profiel",
     "profile_name_set": "Naam: {name}",
@@ -125,7 +119,6 @@ strings = {
     "reminder_saved": "Dagelijkse herinnering ingesteld op {time}.",
     "btn_reminder_off": "Herinneringen uit",
     "reminder_off": "Dagelijkse herinneringen staan uit.",
-
     # Progress and /forgot (C3)
     "progress_title": "Wat je uit het hoofd kent",
     "progress_surah_line": "{name}: {done}/{total} verzen — {pct}%",
@@ -138,7 +131,6 @@ strings = {
     "forgot_usage": "Stuur welke markering je wilt wissen, bijvoorbeeld /forgot 67:5-6.",
     "forgot_done": "Markering van {ref} gewist.",
     "forgot_nothing": "Dat had je niet als uit het hoofd gemarkeerd.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Wat wil je uit het hoofd leren?",
     "btn_target_surah": "Een soera",
@@ -174,7 +166,6 @@ strings = {
     "btn_know_by_heart": "✅ Ik ken dit uit het hoofd",
     "know_confirmed": "{ref} gemarkeerd als geleerd. Je zit op {pct}%.",
     "know_already": "Die had je al gemarkeerd.",
-
     # Recall check (E2, E3)
     "check_question": "Hoe gaat dit verder?",
     "check_usage": "Stuur wat je wilt testen, bijvoorbeeld /check 67.",
@@ -185,7 +176,6 @@ strings = {
         "jezelf zo vaak je wilt, het telt alleen niet dubbel."
     ),
     "btn_check_start": "Test mij",
-
     # Streaks (G2, G3)
     "streak_title": "Je reeks",
     "streak_current": "Huidige reeks: {n}",
@@ -196,7 +186,6 @@ strings = {
     "streak_milestone_30": "Dertig dagen. De regelmaat staat nu aan jouw kant.",
     "streak_milestone_100": "Honderd dagen. Maar heel weinig mensen komen zo ver.",
     "streak_milestone_365": "Een heel jaar, elke dag opnieuw. Moge Allah bewaren wat je hebt geleerd.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "De ranglijst van deze week",
     "leaderboard_row": "{rank}. {name} — {sessions}",

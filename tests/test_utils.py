@@ -37,6 +37,7 @@ class TestStateStore:
         # The old Redis key expired after two days; the store keeps it until it
         # is overwritten, so a reader who pauses for weeks resumes where they were.
         import time as time_module
+
         await File().save_user(900003, (36, 12, "arabic"))
         real = time_module.time()
         monkeypatch.setattr(time_module, "time", lambda: real + 60 * 60 * 24 * 30)
@@ -44,12 +45,14 @@ class TestStateStore:
 
     async def test_legacy_redis_position_is_still_read(self):
         import ujson as json
+
         file = File()
         file.redis.set(file.redis_namespace + "900004", json.dumps([18, 10, "translation"]))
         assert await file.get_user(900004) == [18, 10, "translation"]
 
     async def test_store_position_wins_over_legacy_redis(self):
         import ujson as json
+
         file = File()
         file.redis.set(file.redis_namespace + "900005", json.dumps([1, 1, "translation"]))
         await file.save_user(900005, (2, 5, "audio"))
@@ -72,7 +75,7 @@ class TestLegacyLanguageKey:
 
     def test_legacy_language_is_readable_then_deletable(self):
         file = File()
-        file.redis.set(file._lang_key(900003), "ru")   # as the retired save_lang wrote it
+        file.redis.set(file._lang_key(900003), "ru")  # as the retired save_lang wrote it
         assert file.get_lang(900003) == "ru"
         file.delete_lang(900003)
         assert file.get_lang(900003) is None
@@ -81,5 +84,5 @@ class TestLegacyLanguageKey:
         assert File().get_lang(900004) is None
 
     def test_deleting_an_absent_language_is_a_no_op(self):
-        File().delete_lang(900005)   # migration runs unconditionally; must not raise
+        File().delete_lang(900005)  # migration runs unconditionally; must not raise
         assert File().get_lang(900005) is None

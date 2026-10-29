@@ -64,9 +64,7 @@ strings = {
     "cmd_reciter": "Byt recitatör",
     "cmd_about": "Källor och tack",
     "quran_name": "Koranen",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Starta en hifz-plan",
     "cmd_progress": "Det du kan utantill",
@@ -75,7 +73,6 @@ strings = {
     "cmd_streak": "Din dagliga svit",
     "cmd_leaderboard": "Veckans bästa",
     "cmd_profile": "Din profil och dina inställningar",
-
     # Shared wizard controls
     "wizard_cancelled": "Avbrutet.",
     "wizard_nothing_to_cancel": "Det finns inget att avbryta.",
@@ -84,7 +81,6 @@ strings = {
     "btn_cancel": "Avbryt",
     "btn_back": "Tillbaka",
     "btn_confirm": "Bekräfta",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "mån",
     "day_tue": "tis",
@@ -93,7 +89,6 @@ strings = {
     "day_fri": "fre",
     "day_sat": "lör",
     "day_sun": "sön",
-
     # Profile (B1-B3)
     "profile_title": "Din profil",
     "profile_name_set": "Namn: {name}",
@@ -126,7 +121,6 @@ strings = {
     "reminder_saved": "Daglig påminnelse inställd på {time}.",
     "btn_reminder_off": "Stäng av påminnelser",
     "reminder_off": "Dagliga påminnelser är avstängda.",
-
     # Progress and /forgot (C3)
     "progress_title": "Det du kan utantill",
     "progress_surah_line": "{name}: {done}/{total} verser — {pct} %",
@@ -139,7 +133,6 @@ strings = {
     "forgot_usage": "Skicka vad som ska avmarkeras, till exempel /forgot 67:5-6.",
     "forgot_done": "{ref} är avmarkerad.",
     "forgot_nothing": "Du hade inte markerat det som memorerat.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Vad vill du lära dig utantill?",
     "btn_target_surah": "En sura",
@@ -175,7 +168,6 @@ strings = {
     "btn_know_by_heart": "✅ Detta kan jag utantill",
     "know_confirmed": "{ref} är markerad som memorerad. Du är på {pct} %.",
     "know_already": "Den hade du redan markerat.",
-
     # Recall check (E2, E3)
     "check_question": "Hur fortsätter det här?",
     "check_usage": "Skicka vad som ska testas, till exempel /check 67.",
@@ -186,7 +178,6 @@ strings = {
         "hur ofta du vill, det räknas bara inte två gånger."
     ),
     "btn_check_start": "Testa mig",
-
     # Streaks (G2, G3)
     "streak_title": "Din svit",
     "streak_current": "Nuvarande svit: {n}",
@@ -197,7 +188,6 @@ strings = {
     "streak_milestone_30": "Trettio dagar. Nu har du uthålligheten på din sida.",
     "streak_milestone_100": "Hundra dagar. Väldigt få kommer så här långt.",
     "streak_milestone_365": "Ett helt år, varenda dag. Må Allah bevara det du har lärt dig.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Veckans topplista",
     "leaderboard_row": "{rank}. {name} — {sessions}",

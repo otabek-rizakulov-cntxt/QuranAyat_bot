@@ -8,8 +8,7 @@ strings = {
     ),
     "welcome_commands_header": "Naredbe:",
     "welcome_inline": (
-        "Možeš me koristiti u bilo kojem chatu: upiši <b>@QuranAyat_bot</b> i zatim "
-        "referencu."
+        "Možeš me koristiti u bilo kojem chatu: upiši <b>@QuranAyat_bot</b> i zatim referencu."
     ),
     "about": (
         "Ovaj bot ti omogućava da čitaš Časni Kur'an na Telegramu na mnogim "
@@ -63,9 +62,7 @@ strings = {
     "cmd_reciter": "Promijeni učača",
     "cmd_about": "Izvori i zahvale",
     "quran_name": "Kur'an",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Pokreni plan hifza",
     "cmd_progress": "Šta si naučio napamet",
@@ -74,7 +71,6 @@ strings = {
     "cmd_streak": "Tvoj niz dana",
     "cmd_leaderboard": "Najbolji ove sedmice",
     "cmd_profile": "Tvoj profil i postavke",
-
     # Shared wizard controls
     "wizard_cancelled": "Otkazano.",
     "wizard_nothing_to_cancel": "Nema ničega za otkazati.",
@@ -83,7 +79,6 @@ strings = {
     "btn_cancel": "Otkaži",
     "btn_back": "Nazad",
     "btn_confirm": "Potvrdi",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Pon",
     "day_tue": "Uto",
@@ -92,7 +87,6 @@ strings = {
     "day_fri": "Pet",
     "day_sat": "Sub",
     "day_sun": "Ned",
-
     # Profile (B1-B3)
     "profile_title": "Tvoj profil",
     "profile_name_set": "Ime: {name}",
@@ -125,7 +119,6 @@ strings = {
     "reminder_saved": "Dnevni podsjetnik postavljen na {time}.",
     "btn_reminder_off": "Isključi podsjetnike",
     "reminder_off": "Dnevni podsjetnici su isključeni.",
-
     # Progress and /forgot (C3)
     "progress_title": "Šta si naučio napamet",
     "progress_surah_line": "{name}: {done}/{total} ajeta — {pct}%",
@@ -138,7 +131,6 @@ strings = {
     "forgot_usage": "Pošalji šta da odznačim, na primjer /forgot 67:5-6.",
     "forgot_done": "Oznaka uklonjena: {ref}.",
     "forgot_nothing": "To nisi ni označio kao naučeno.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Šta želiš naučiti napamet?",
     "btn_target_surah": "Suru",
@@ -174,7 +166,6 @@ strings = {
     "btn_know_by_heart": "✅ Znam napamet",
     "know_confirmed": "{ref} označeno kao naučeno. Sada si na {pct}%.",
     "know_already": "To si već bio označio.",
-
     # Recall check (E2, E3)
     "check_question": "Kako se ovo nastavlja?",
     "check_usage": "Pošalji šta da provjerim, na primjer /check 67.",
@@ -185,7 +176,6 @@ strings = {
         "koliko god želiš, samo se neće brojati dvaput."
     ),
     "btn_check_start": "Provjeri me",
-
     # Streaks (G2, G3)
     "streak_title": "Tvoj niz",
     "streak_current": "Trenutni niz, dana: {n}",
@@ -196,7 +186,6 @@ strings = {
     "streak_milestone_30": "Trideset dana. Dosljednost je sada na tvojoj strani.",
     "streak_milestone_100": "Stotinu dana. Vrlo malo ljudi stigne dovde.",
     "streak_milestone_365": "Cijela godina, svaki jedan dan. Neka Allah sačuva ono što si naučio.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Rang-lista ove sedmice",
     "leaderboard_row": "{rank}. {name} — {sessions}",

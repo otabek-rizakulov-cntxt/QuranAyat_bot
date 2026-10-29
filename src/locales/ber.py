@@ -10,8 +10,7 @@ strings = {
     ),
     "welcome_commands_header": "Tiludna:",
     "welcome_inline": (
-        "Tzemreḍ ad tesqedceḍ-iyi deg yal adiwenni: aru <b>@QuranAyat_bot</b> sakin uṭṭun "
-        "n aya."
+        "Tzemreḍ ad tesqedceḍ-iyi deg yal adiwenni: aru <b>@QuranAyat_bot</b> sakin uṭṭun n aya."
     ),
     "about": (
         "Aboṭ-agi ad ak-yeǧǧ aɣ tɣreḍ Leqran deg Telegram s waṭas n tutlayin.\n\n"

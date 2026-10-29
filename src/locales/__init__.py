@@ -9,8 +9,15 @@ from functools import lru_cache
 from importlib import import_module
 
 from .languages import (  # re-exported for callers
-    LANGUAGES, LANGUAGES_BY_CODE, UI_LANGUAGES, DEFAULT_LANG, Language,
-    get_language, is_supported, is_ui_language, normalize_lang,
+    LANGUAGES,
+    LANGUAGES_BY_CODE,
+    UI_LANGUAGES,
+    DEFAULT_LANG,
+    Language,
+    get_language,
+    is_supported,
+    is_ui_language,
+    normalize_lang,
 )
 
 
@@ -37,8 +44,7 @@ def _load_locales() -> dict[str, dict]:
         try:
             module = import_module("." + _module_name(lang.code), __name__)
         except ImportError:
-            print("LOCALE MISSING: %s (%s) falls back to English"
-                  % (lang.code, lang.english))
+            print("LOCALE MISSING: %s (%s) falls back to English" % (lang.code, lang.english))
             continue
         tables[lang.code] = module.strings
     return tables
@@ -79,10 +85,12 @@ def missing_keys(lang: str) -> list[str]:
     prefix's set — those are supposed to be absent there, not a translation gap.
     """
     table = LOCALES.get(lang, {})
-    excused = tuple(prefix for prefix, langs in PARTIAL_KEY_PREFIXES.items()
-                    if lang not in langs)
-    return [key for key in LOCALES[DEFAULT_LANG]
-            if key not in table and not (excused and key.startswith(excused))]
+    excused = tuple(prefix for prefix, langs in PARTIAL_KEY_PREFIXES.items() if lang not in langs)
+    return [
+        key
+        for key in LOCALES[DEFAULT_LANG]
+        if key not in table and not (excused and key.startswith(excused))
+    ]
 
 
 def t(key: str, lang: str = DEFAULT_LANG) -> str:
@@ -130,17 +138,18 @@ BOT_COMMANDS = (
 
 def command_lines(lang: str) -> str:
     """The "/command — description" block, one line per registered command."""
-    return "\n".join("/%s — %s" % (command, t(key, lang))
-                     for command, key in BOT_COMMANDS)
+    return "\n".join("/%s — %s" % (command, t(key, lang)) for command, key in BOT_COMMANDS)
 
 
 def welcome_text(lang: str) -> str:
     """The /start message: localized prose around a generated command list."""
-    return "\n\n".join((
-        t("welcome_intro", lang),
-        t("welcome_commands_header", lang) + "\n" + command_lines(lang),
-        t("welcome_inline", lang),
-    ))
+    return "\n\n".join(
+        (
+            t("welcome_intro", lang),
+            t("welcome_commands_header", lang) + "\n" + command_lines(lang),
+            t("welcome_inline", lang),
+        )
+    )
 
 
 # --- Reply-keyboard localization -----------------------------------------------
@@ -163,7 +172,12 @@ ACTION_BUTTON_KEYS = {
 def keyboard_rows(lang: str) -> list[list[str]]:
     """The reply-keyboard layout with localized labels, in display order."""
     return [
-        [t("btn_arabic", lang), t("btn_audio", lang), t("btn_translation", lang), t("btn_tafsir", lang)],
+        [
+            t("btn_arabic", lang),
+            t("btn_audio", lang),
+            t("btn_translation", lang),
+            t("btn_tafsir", lang),
+        ],
         [t("btn_previous", lang), t("btn_random", lang), t("btn_next", lang)],
     ]
 
@@ -173,9 +187,9 @@ def _reverse_button_map(lang: str) -> dict[str, str]:
     """{lowercased label -> canonical action} for `lang`, English, and canonical words."""
     m: dict[str, str] = {}
     for action, btn_key in ACTION_BUTTON_KEYS.items():
-        m[action] = action                                     # canonical word ("next")
-        m[t(btn_key, DEFAULT_LANG).strip().lower()] = action   # English label
-        m[t(btn_key, lang).strip().lower()] = action           # localized label
+        m[action] = action  # canonical word ("next")
+        m[t(btn_key, DEFAULT_LANG).strip().lower()] = action  # English label
+        m[t(btn_key, lang).strip().lower()] = action  # localized label
     m["english"] = "translation"  # legacy: old label and stored state value
     return m
 

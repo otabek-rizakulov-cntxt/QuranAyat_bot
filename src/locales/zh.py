@@ -59,9 +59,7 @@ strings = {
     "cmd_reciter": "更改誦讀者",
     "cmd_about": "來源與致謝",
     "quran_name": "古蘭經",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "開始背誦計劃",
     "cmd_progress": "你已背誦的內容",
@@ -70,7 +68,6 @@ strings = {
     "cmd_streak": "你的每日連續紀錄",
     "cmd_leaderboard": "本週背誦最多的人",
     "cmd_profile": "你的個人資料與設定",
-
     # Shared wizard controls
     "wizard_cancelled": "已取消。",
     "wizard_nothing_to_cancel": "目前沒有可取消的操作。",
@@ -79,7 +76,6 @@ strings = {
     "btn_cancel": "取消",
     "btn_back": "返回",
     "btn_confirm": "確認",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "週一",
     "day_tue": "週二",
@@ -88,7 +84,6 @@ strings = {
     "day_fri": "週五",
     "day_sat": "週六",
     "day_sun": "週日",
-
     # Profile
     "profile_title": "你的個人資料",
     "profile_name_set": "名稱：{name}",
@@ -120,7 +115,6 @@ strings = {
     "reminder_saved": "每日提醒已設為 {time}。",
     "btn_reminder_off": "關閉提醒",
     "reminder_off": "每日提醒已關閉。",
-
     # Progress and /forgot
     "progress_title": "你已背誦的內容",
     "progress_surah_line": "{name}：{done}/{total} 節 — {pct}%",
@@ -132,7 +126,6 @@ strings = {
     "forgot_usage": "請發送要取消標記的範圍，例如 /forgot 67:5-6。",
     "forgot_done": "已取消 {ref} 的標記。",
     "forgot_nothing": "你並未把那一段標記為已背誦。",
-
     # Memorization plans and drills
     "memorize_choose_target": "你想背誦什麼？",
     "btn_target_surah": "一章蘇拉",
@@ -168,7 +161,6 @@ strings = {
     "btn_know_by_heart": "✅ 我已背熟",
     "know_confirmed": "{ref} 已標記為背熟。你已達到 {pct}%。",
     "know_already": "那一段你已經標記過了。",
-
     # Recall check
     "check_question": "接下來是什麼？",
     "check_usage": "請發送要測驗的範圍，例如 /check 67。",
@@ -178,7 +170,6 @@ strings = {
         "你今天的紀錄已經透過一次記憶測驗完成了——你可以隨意多測幾次，只是不會重複計算。"
     ),
     "btn_check_start": "測驗我",
-
     # Streaks
     "streak_title": "你的連續紀錄",
     "streak_current": "目前連續：{n} 天",
@@ -189,7 +180,6 @@ strings = {
     "streak_milestone_30": "三十天。堅持已經站在你這一邊了。",
     "streak_milestone_100": "一百天。很少有人能走到這一步。",
     "streak_milestone_365": "整整一年，一天也沒斷。願安拉護佑你所學的一切。",
-
     # Leaderboard
     "leaderboard_title": "本週排行榜",
     "leaderboard_row": "{rank}. {name} — {sessions}",

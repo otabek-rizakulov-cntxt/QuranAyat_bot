@@ -21,7 +21,7 @@ from lib.streaks import (
     streak_summary,
 )
 
-TODAY = date(2026, 3, 18)                       # a Wednesday
+TODAY = date(2026, 3, 18)  # a Wednesday
 
 
 def days_back(*offsets):
@@ -138,10 +138,10 @@ class TestPercentile:
         assert percentile_band(500, population) == 1
 
     def test_the_band_widens_as_the_streak_shortens(self):
-        population = list(range(1, PERCENTILE_MIN_USERS + 1))     # 200 users, 1..200
-        assert percentile_band(200, population) == 1              # nobody ahead
-        assert percentile_band(180, population) == 10             # 20 ahead -> 10%
-        assert percentile_band(101, population) == 50             # 99 ahead -> 49.5%
+        population = list(range(1, PERCENTILE_MIN_USERS + 1))  # 200 users, 1..200
+        assert percentile_band(200, population) == 1  # nobody ahead
+        assert percentile_band(180, population) == 10  # 20 ahead -> 10%
+        assert percentile_band(101, population) == 50  # 99 ahead -> 49.5%
 
     def test_the_bottom_half_gets_no_line(self):
         population = list(range(1, PERCENTILE_MIN_USERS + 1))
@@ -163,15 +163,16 @@ class TestRecordSession:
         await self._profile(1, "+05:00")
         # 20:30 UTC is already the next day at UTC+5.
         outcome = await record_session(
-            1, KIND_DRILL, utc_now=datetime(2026, 3, 17, 20, 30, tzinfo=timezone.utc))
+            1, KIND_DRILL, utc_now=datetime(2026, 3, 17, 20, 30, tzinfo=timezone.utc)
+        )
         assert outcome.local_date == date(2026, 3, 18)
         assert outcome.logged is True
         assert outcome.streak.current == 1
 
     async def test_two_sessions_on_one_local_date_tick_the_streak_once(self):
         await self._profile(1, "+05:00")
-        morning = datetime(2026, 3, 18, 4, 0, tzinfo=timezone.utc)     # 09:00 local
-        evening = datetime(2026, 3, 18, 15, 0, tzinfo=timezone.utc)    # 20:00 local
+        morning = datetime(2026, 3, 18, 4, 0, tzinfo=timezone.utc)  # 09:00 local
+        evening = datetime(2026, 3, 18, 15, 0, tzinfo=timezone.utc)  # 20:00 local
         first = await record_session(1, KIND_DRILL, utc_now=morning)
         second = await record_session(1, KIND_RECALL_CHECK, utc_now=evening)
         assert first.local_date == second.local_date
@@ -181,9 +182,11 @@ class TestRecordSession:
         await self._profile(1, "+05:00")
         # 18:59 UTC = 23:59 local; 19:01 UTC = 00:01 local the next day.
         before = await record_session(
-            1, KIND_DRILL, utc_now=datetime(2026, 3, 17, 18, 59, tzinfo=timezone.utc))
+            1, KIND_DRILL, utc_now=datetime(2026, 3, 17, 18, 59, tzinfo=timezone.utc)
+        )
         after = await record_session(
-            1, KIND_DRILL, utc_now=datetime(2026, 3, 17, 19, 1, tzinfo=timezone.utc))
+            1, KIND_DRILL, utc_now=datetime(2026, 3, 17, 19, 1, tzinfo=timezone.utc)
+        )
         assert before.local_date == date(2026, 3, 17)
         assert after.local_date == date(2026, 3, 18)
         assert before.streak.current == 1
@@ -192,19 +195,21 @@ class TestRecordSession:
     async def test_the_same_two_minutes_are_one_day_for_a_utc_user(self):
         await self._profile(2, "+00:00")
         first = await record_session(
-            2, KIND_DRILL, utc_now=datetime(2026, 3, 17, 18, 59, tzinfo=timezone.utc))
+            2, KIND_DRILL, utc_now=datetime(2026, 3, 17, 18, 59, tzinfo=timezone.utc)
+        )
         second = await record_session(
-            2, KIND_DRILL, utc_now=datetime(2026, 3, 17, 19, 1, tzinfo=timezone.utc))
+            2, KIND_DRILL, utc_now=datetime(2026, 3, 17, 19, 1, tzinfo=timezone.utc)
+        )
         assert first.local_date == second.local_date
         assert second.streak.current == 1
 
     async def test_a_duplicate_session_is_reported_but_still_counts_once(self):
         await self._profile(1)
         when = datetime(2026, 3, 18, 6, 0, tzinfo=timezone.utc)
-        first = await record_session(1, KIND_DRILL, utc_now=when, surah=2,
-                                     start_ayah=1, end_ayah=5)
-        second = await record_session(1, KIND_DRILL, utc_now=when, surah=2,
-                                      start_ayah=1, end_ayah=5)
+        first = await record_session(1, KIND_DRILL, utc_now=when, surah=2, start_ayah=1, end_ayah=5)
+        second = await record_session(
+            1, KIND_DRILL, utc_now=when, surah=2, start_ayah=1, end_ayah=5
+        )
         assert first.logged is True
         assert second.logged is False
         assert second.streak.current == 1
@@ -213,21 +218,23 @@ class TestRecordSession:
         store = await self._profile(1, "+00:00")
         for day in range(3):
             await record_session(
-                1, KIND_DRILL,
-                utc_now=datetime(2026, 3, 16 + day, 9, 0, tzinfo=timezone.utc))
+                1, KIND_DRILL, utc_now=datetime(2026, 3, 16 + day, 9, 0, tzinfo=timezone.utc)
+            )
         profile = await store.profiles.get_profile(1)
         assert (profile.current_streak, profile.longest_streak) == (3, 3)
 
     async def test_a_missing_profile_falls_back_to_utc(self):
         outcome = await record_session(
-            99, KIND_DRILL, utc_now=datetime(2026, 3, 18, 23, 0, tzinfo=timezone.utc))
+            99, KIND_DRILL, utc_now=datetime(2026, 3, 18, 23, 0, tzinfo=timezone.utc)
+        )
         assert outcome.local_date == date(2026, 3, 18)
 
     async def test_an_unparseable_stored_offset_falls_back_to_utc(self):
         store = await get_store()
         await store.profiles.set_timezone(1, "Mars/Olympus")
         outcome = await record_session(
-            1, KIND_DRILL, utc_now=datetime(2026, 3, 18, 23, 0, tzinfo=timezone.utc))
+            1, KIND_DRILL, utc_now=datetime(2026, 3, 18, 23, 0, tzinfo=timezone.utc)
+        )
         assert outcome.local_date == date(2026, 3, 18)
 
     async def test_a_milestone_comes_back_with_the_outcome(self):
@@ -235,8 +242,8 @@ class TestRecordSession:
         await store.profiles.set_timezone(1, "+00:00")
         for day in range(7):
             outcome = await record_session(
-                1, KIND_DRILL,
-                utc_now=datetime(2026, 3, 12 + day, 9, 0, tzinfo=timezone.utc))
+                1, KIND_DRILL, utc_now=datetime(2026, 3, 12 + day, 9, 0, tzinfo=timezone.utc)
+            )
         assert outcome.streak.current == 7
         assert outcome.milestone.reached == 7
         assert outcome.milestone.key == "streak_milestone_7"
@@ -261,8 +268,8 @@ class TestRefreshAndSummary:
         store = await self._log(1, 10, 9, 8, 7, 6)
         await refresh_streaks(1, today=TODAY)
         profile = await store.profiles.get_profile(1)
-        assert profile.current_streak == 0            # broken: last active 6 days ago
-        assert profile.longest_streak == 5            # but the record stands
+        assert profile.current_streak == 0  # broken: last active 6 days ago
+        assert profile.longest_streak == 5  # but the record stands
 
     async def test_a_stored_longest_is_never_lowered(self):
         store = await self._log(1, 0)
@@ -275,8 +282,8 @@ class TestRefreshAndSummary:
         await self._log(1, 2, 1)
         await refresh_streaks(1, today=TODAY)
         summary = await streak_summary(
-            1, utc_now=datetime(TODAY.year, TODAY.month, TODAY.day, 9, 0,
-                                tzinfo=timezone.utc))
+            1, utc_now=datetime(TODAY.year, TODAY.month, TODAY.day, 9, 0, tzinfo=timezone.utc)
+        )
         assert summary.current == 2
         assert summary.active_today is False
         assert summary.at_risk is True
@@ -286,8 +293,8 @@ class TestRefreshAndSummary:
         await self._log(1, 1, 0)
         await refresh_streaks(1, today=TODAY)
         summary = await streak_summary(
-            1, utc_now=datetime(TODAY.year, TODAY.month, TODAY.day, 9, 0,
-                                tzinfo=timezone.utc))
+            1, utc_now=datetime(TODAY.year, TODAY.month, TODAY.day, 9, 0, tzinfo=timezone.utc)
+        )
         assert summary.active_today is True
         assert summary.at_risk is False
 

@@ -62,5 +62,4 @@ def reciter_kind(subfolder: str) -> str:
 
 def reciter_group(kind: str) -> list:
     """The catalog entries of one kind, in the catalog's own order."""
-    return [p for p in reciter_catalog()
-            if p.get("kind", DEFAULT_RECITER_KIND) == kind]
+    return [p for p in reciter_catalog() if p.get("kind", DEFAULT_RECITER_KIND) == kind]

@@ -43,9 +43,9 @@ from lib.store.hifz import HifzInterval
 from modules import Quran
 
 USER = 1
-AL_MULK = 67          # 30 ayahs, juz 29
-AL_BAQARAH = 2        # 286 ayahs, spread over juz 1, 2 and 3
-AN_NAS = 114          # 6 ayahs, juz 30
+AL_MULK = 67  # 30 ayahs, juz 29
+AL_BAQARAH = 2  # 286 ayahs, spread over juz 1, 2 and 3
+AN_NAS = 114  # 6 ayahs, juz 30
 
 
 def _at(minute: int) -> datetime:
@@ -55,12 +55,13 @@ def _at(minute: int) -> datetime:
 
 # --- The two numbers the spec names --------------------------------------------
 
+
 class TestSpecAcceptance:
     async def test_marking_67_1_8_reports_al_mulk_at_27_percent(self):
         store = await get_store()
         await store.hifz.add_interval(USER, AL_MULK, 1, 8)
         progress = surah_progress(await store.hifz.list_intervals(USER), AL_MULK)
-        assert (progress.done, progress.total) == (8, 30)      # 26.67%
+        assert (progress.done, progress.total) == (8, 30)  # 26.67%
         assert progress.percent_text == "27"
 
     async def test_re_marking_67_5_10_reports_33_percent_not_47(self):
@@ -75,7 +76,7 @@ class TestSpecAcceptance:
         await store.hifz.add_interval(USER, AL_MULK, 1, 8)
         await store.hifz.add_interval(USER, AL_MULK, 5, 10)
         progress = surah_progress(await store.hifz.list_intervals(USER), AL_MULK)
-        assert (progress.done, progress.total) == (10, 30)      # 33.33%
+        assert (progress.done, progress.total) == (10, 30)  # 33.33%
         assert progress.percent_text == "33"
 
     async def test_forgetting_the_middle_lowers_the_percentage_by_exactly_what_was_removed(self):
@@ -89,6 +90,7 @@ class TestSpecAcceptance:
 
 # --- The rounding rule ---------------------------------------------------------
 
+
 class TestRounding:
     def test_the_spec_percentages_land_on_27_and_33(self):
         assert round_percent(8 / 30) == 27.0
@@ -101,7 +103,7 @@ class TestRounding:
         denominators, and "rounds down half the time for reasons involving
         floating point parity" is not something a user will ever be told.
         """
-        assert round(26.5) == 26            # what we are deliberately not doing
+        assert round(26.5) == 26  # what we are deliberately not doing
         assert round_percent(0.265) == 27.0
         assert round_percent(0.255) == 26.0
 
@@ -139,6 +141,7 @@ class TestRounding:
 
 
 # --- Per-surah -----------------------------------------------------------------
+
 
 class TestSurahProgress:
     def test_totals_come_from_the_corpus(self):
@@ -187,14 +190,14 @@ class TestSurahProgress:
 
     def test_started_surahs_lists_only_started_ones_in_mushaf_order(self):
         intervals = [(AN_NAS, 1, 6), (AL_MULK, 1, 8), (AL_BAQARAH, 1, 3)]
-        assert [s.surah for s in started_surahs(intervals)] == [AL_BAQARAH, AL_MULK,
-                                                               AN_NAS]
+        assert [s.surah for s in started_surahs(intervals)] == [AL_BAQARAH, AL_MULK, AN_NAS]
 
     def test_started_surahs_is_empty_for_a_new_user(self):
         assert started_surahs([]) == []
 
 
 # --- Per-juz (the cross-surah case) --------------------------------------------
+
 
 class TestJuzProgress:
     def test_the_thirty_juz_partition_the_quran(self):
@@ -209,10 +212,10 @@ class TestJuzProgress:
         """
         whole_baqarah = [(AL_BAQARAH, 1, 286)]
         first = juz_progress(whole_baqarah, 1)
-        assert (first.done, first.total) == (141, 148)     # missing Al-Fatihah's 7
+        assert (first.done, first.total) == (141, 148)  # missing Al-Fatihah's 7
         assert not first.is_complete
         assert juz_progress(whole_baqarah, 2) == JuzProgress(juz=2, done=111, total=111)
-        assert juz_progress(whole_baqarah, 3).done == 34   # 2:253-2:286
+        assert juz_progress(whole_baqarah, 3).done == 34  # 2:253-2:286
 
     def test_a_juz_is_complete_only_when_every_surah_it_touches_is(self):
         intervals = [(1, 1, 7), (AL_BAQARAH, 1, 141)]
@@ -228,8 +231,8 @@ class TestJuzProgress:
         """Juz 2 is 2:142-2:252 — both ends of the juz fall inside one surah."""
         assert juz_progress([(AL_BAQARAH, 150, 160)], 2).done == 11
         assert juz_progress([(AL_BAQARAH, 100, 130)], 2).done == 0
-        assert juz_progress([(AL_BAQARAH, 130, 150)], 2).done == 9    # 142-150
-        assert juz_progress([(AL_BAQARAH, 250, 260)], 2).done == 3    # 250-252
+        assert juz_progress([(AL_BAQARAH, 130, 150)], 2).done == 9  # 142-150
+        assert juz_progress([(AL_BAQARAH, 250, 260)], 2).done == 3  # 250-252
 
     def test_a_juz_that_does_not_exist_is_zero_of_zero(self):
         assert juz_progress([(AL_MULK, 1, 8)], 0) == JuzProgress(juz=0, done=0, total=0)
@@ -245,6 +248,7 @@ class TestJuzProgress:
 
 # --- Whole Qur'an --------------------------------------------------------------
 
+
 class TestQuranProgress:
     def test_the_total_is_the_corpus_size(self):
         assert TOTAL_AYAHS == 6236
@@ -252,16 +256,14 @@ class TestQuranProgress:
         assert quran_progress([]).percent_text == "0"
 
     def test_memorizing_everything_is_one_hundred_percent(self):
-        everything = [(surah, 1, Quran.get_surah_length(surah))
-                      for surah in range(1, 115)]
+        everything = [(surah, 1, Quran.get_surah_length(surah)) for surah in range(1, 115)]
         progress = quran_progress(everything)
         assert (progress.done, progress.total) == (6236, 6236)
         assert progress.percent_text == "100"
 
     def test_it_equals_the_sum_of_the_surahs_and_of_the_juz(self):
         """Three routes to the same number; if they ever disagree, one is wrong."""
-        intervals = [(1, 1, 7), (AL_BAQARAH, 100, 200), (AL_MULK, 1, 8),
-                     (AN_NAS, 1, 6)]
+        intervals = [(1, 1, 7), (AL_BAQARAH, 100, 200), (AL_MULK, 1, 8), (AN_NAS, 1, 6)]
         total = quran_progress(intervals).done
         assert sum(s.done for s in started_surahs(intervals)) == total
         assert sum(juz_progress(intervals, n).done for n in range(1, 31)) == total
@@ -296,9 +298,10 @@ class TestQuranProgress:
 
 # --- The summary `/progress` renders -------------------------------------------
 
+
 class TestSummarize:
     def test_it_carries_every_number_the_motivation_line_needs(self):
-        """"Al-Mulk 8/30 · 27% · juz 29 4% · Qur'an 0.4%" as structured data.
+        """ "Al-Mulk 8/30 · 27% · juz 29 4% · Qur'an 0.4%" as structured data.
 
         The renderer supplies the surah name, the separators and the percent sign
         from the string table; everything numeric in that line comes from here.
@@ -341,7 +344,7 @@ class TestSummarize:
         """`/progress 2` after only marking Al-Mulk should say "0/286", not nothing."""
         summary = summarize([(AL_MULK, 1, 8)], focus_surah=AL_BAQARAH)
         assert summary.focus == SurahProgress(surah=2, done=0, total=286)
-        assert summary.focus_juz is None      # no marked ayah to locate a juz from
+        assert summary.focus_juz is None  # no marked ayah to locate a juz from
 
     def test_a_focus_on_a_surah_that_does_not_exist_is_dropped(self):
         summary = summarize([(AL_MULK, 1, 8)], focus_surah=999)
@@ -358,7 +361,7 @@ class TestSummarize:
         older = HifzInterval(1, USER, AL_BAQARAH, 1, 20, _at(9))
         newer = HifzInterval(2, USER, AL_MULK, 1, 8, _at(10))
         assert summarize([older, newer]).focus.surah == AL_MULK
-        assert summarize([newer, older]).focus.surah == AL_MULK    # order-independent
+        assert summarize([newer, older]).focus.surah == AL_MULK  # order-independent
 
     def test_identical_timestamps_break_toward_the_higher_row_id(self):
         """The clock is only good to a microsecond and ties are common.
@@ -403,6 +406,7 @@ class TestSummarize:
 
 # --- Reading it straight out of the store ---------------------------------------
 
+
 class TestLoadSummary:
     async def test_it_summarizes_everything_the_user_has_marked(self):
         store = await get_store()
@@ -432,14 +436,14 @@ class TestLoadSummary:
 
 # --- Input shapes ---------------------------------------------------------------
 
+
 class TestInputHandling:
     async def test_store_rows_and_plain_tuples_give_the_same_answer(self):
         """Tuples are accepted so a plan preview can be costed before it is saved."""
         store = await get_store()
         await store.hifz.add_interval(USER, AL_MULK, 1, 8)
         rows = await store.hifz.list_intervals(USER)
-        assert surah_progress(rows, AL_MULK) == surah_progress([(AL_MULK, 1, 8)],
-                                                               AL_MULK)
+        assert surah_progress(rows, AL_MULK) == surah_progress([(AL_MULK, 1, 8)], AL_MULK)
 
     def test_a_reversed_tuple_is_normalized_rather_than_counted_as_nothing(self):
         assert surah_progress([(AL_MULK, 8, 1)], AL_MULK).done == 8
@@ -455,6 +459,7 @@ class TestInputHandling:
 # juz and whole-Qur'an figures are quoted in mushaf pages because that is how a
 # hafiz measures them. A juz is "twenty pages", never "431 ayahs".
 
+
 class TestPageProgress:
     def test_a_juz_is_about_twenty_pages(self):
         """604 pages over 30 juz averages 20.1, and none strays far from it.
@@ -468,7 +473,7 @@ class TestPageProgress:
         for juz, total in enumerate(totals, start=1):
             assert 19 <= total <= 23, (juz, total)
         assert round(sum(totals) / 30, 1) == 20.1
-        assert totals[29] == max(totals)      # juz 30, the longest in pages
+        assert totals[29] == max(totals)  # juz 30, the longest in pages
 
     def test_juz_29_is_exactly_twenty_pages(self):
         assert juz_page_progress([], 29).total_pages == 20.0
@@ -539,7 +544,7 @@ class TestPageProgress:
     def test_summary_carries_both_units(self):
         summary = summarize([(67, 1, 8)])
         assert summary.focus.done == 8 and summary.focus.total == 30
-        assert summary.focus.percent_text == "27"          # ayahs, per the done-when
+        assert summary.focus.percent_text == "27"  # ayahs, per the done-when
         assert isinstance(summary.quran_pages, PageProgress)
         assert isinstance(summary.focus_juz_pages, PageProgress)
         assert summary.focus_juz_pages.total_pages == 20.0  # juz 29

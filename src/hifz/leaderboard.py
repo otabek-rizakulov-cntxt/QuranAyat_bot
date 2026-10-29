@@ -65,21 +65,28 @@ async def _board_message(ctx: Ctx):
     if not board.entries:
         lines.append(ctx.tr("leaderboard_empty"))
     else:
-        lines.extend(ctx.tr("leaderboard_row", rank=entry.position,
-                            name=entry.display_name or ANONYMOUS,
-                            sessions=entry.sessions)
-                     for entry in board.entries)
+        lines.extend(
+            ctx.tr(
+                "leaderboard_row",
+                rank=entry.position,
+                name=entry.display_name or ANONYMOUS,
+                sessions=entry.sessions,
+            )
+            for entry in board.entries
+        )
 
     # H2: always show where the caller stands — but only once. `me_in_top` is
     # exactly the "did I already draw this row" answer.
     if board.me is not None and not board.me_in_top:
-        lines.append(ctx.tr("leaderboard_you_row", rank=board.me.position,
-                            sessions=board.me.sessions))
+        lines.append(
+            ctx.tr("leaderboard_you_row", rank=board.me.position, sessions=board.me.sessions)
+        )
 
     markup = None
     if not board.opted_in:
         lines.append(ctx.tr("leaderboard_not_opted_in"))
         markup = InlineKeyboardMarkup(
-            [[InlineKeyboardButton(ctx.tr("btn_join_board"), callback_data=CB_JOIN)]])
+            [[InlineKeyboardButton(ctx.tr("btn_join_board"), callback_data=CB_JOIN)]]
+        )
 
     return "\n".join(lines), markup

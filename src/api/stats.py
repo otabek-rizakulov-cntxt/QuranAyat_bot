@@ -54,12 +54,21 @@ async def streak(user_id: int = Depends(require_user)) -> StreakOut:
         counts[row.local_date] = counts.get(row.local_date, 0) + 1
     m = summary.milestone
     return StreakOut(
-        today=summary.today, current=summary.current, longest=summary.longest,
-        active_today=summary.active_today, at_risk=summary.at_risk,
-        milestone=MilestoneOut(reached=m.reached, key=m.key, next=m.next,
-                               next_key=m.next_key, days_to_next=m.days_to_next),
+        today=summary.today,
+        current=summary.current,
+        longest=summary.longest,
+        active_today=summary.active_today,
+        at_risk=summary.at_risk,
+        milestone=MilestoneOut(
+            reached=m.reached,
+            key=m.key,
+            next=m.next,
+            next_key=m.next_key,
+            days_to_next=m.days_to_next,
+        ),
         window_start=start,
-        activity=[DayCount(date=d, sessions=n) for d, n in sorted(counts.items())])
+        activity=[DayCount(date=d, sessions=n) for d, n in sorted(counts.items())],
+    )
 
 
 class BoardEntry(BaseModel):
@@ -91,10 +100,21 @@ async def leaderboard(user_id: int = Depends(require_user)) -> LeaderboardOut:
     never sent. The caller's own rank is attached when they are opted in."""
     board = await weekly_board(user_id)
     return LeaderboardOut(
-        week_start=board.week_start, week_end=board.week_end,
-        entries=[BoardEntry(position=e.position, display_name=e.display_name,
-                            sessions=e.sessions, current_streak=e.current_streak,
-                            is_me=e.user_id == user_id) for e in board.entries],
+        week_start=board.week_start,
+        week_end=board.week_end,
+        entries=[
+            BoardEntry(
+                position=e.position,
+                display_name=e.display_name,
+                sessions=e.sessions,
+                current_streak=e.current_streak,
+                is_me=e.user_id == user_id,
+            )
+            for e in board.entries
+        ],
         me=BoardMe(position=board.me.position, sessions=board.me.sessions)
-        if board.me is not None else None,
-        me_in_top=board.me_in_top, opted_in=board.opted_in)
+        if board.me is not None
+        else None,
+        me_in_top=board.me_in_top,
+        opted_in=board.opted_in,
+    )

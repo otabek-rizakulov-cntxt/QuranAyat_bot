@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Comenzi:",
     "welcome_inline": (
-        "Mă poți folosi în orice conversație: scrie <b>@QuranAyat_bot</b> urmat de o "
-        "referință."
+        "Mă poți folosi în orice conversație: scrie <b>@QuranAyat_bot</b> urmat de o referință."
     ),
     "about": (
         "Acest bot îți permite să citești Sfântul Coran pe Telegram în multe "
@@ -64,9 +63,7 @@ strings = {
     "cmd_reciter": "Schimbă recitatorul",
     "cmd_about": "Surse și mulțumiri",
     "quran_name": "Coran",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Începe un plan de memorare",
     "cmd_progress": "Ce ai memorat",
@@ -75,7 +72,6 @@ strings = {
     "cmd_streak": "Seria ta zilnică",
     "cmd_leaderboard": "Cei mai buni din această săptămână",
     "cmd_profile": "Profilul și setările tale",
-
     # Shared wizard controls
     "wizard_cancelled": "Anulat.",
     "wizard_nothing_to_cancel": "Nu este nimic de anulat.",
@@ -84,7 +80,6 @@ strings = {
     "btn_cancel": "Anulează",
     "btn_back": "Înapoi",
     "btn_confirm": "Confirmă",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Lun",
     "day_tue": "Mar",
@@ -93,7 +88,6 @@ strings = {
     "day_fri": "Vin",
     "day_sat": "Sâm",
     "day_sun": "Dum",
-
     # Profile (B1-B3)
     "profile_title": "Profilul tău",
     "profile_name_set": "Nume: {name}",
@@ -126,7 +120,6 @@ strings = {
     "reminder_saved": "Reamintirea zilnică a fost setată la {time}.",
     "btn_reminder_off": "Oprește reamintirile",
     "reminder_off": "Reamintirile zilnice sunt oprite.",
-
     # Progress and /forgot (C3)
     "progress_title": "Ce ai memorat",
     "progress_surah_line": "{name}: {done}/{total} versete — {pct}%",
@@ -139,7 +132,6 @@ strings = {
     "forgot_usage": "Trimite ce să anulez, de exemplu /forgot 67:5-6.",
     "forgot_done": "Marcaj anulat: {ref}.",
     "forgot_nothing": "Nu marcaseși asta ca memorată.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Ce ai vrea să memorezi?",
     "btn_target_surah": "O sură",
@@ -175,7 +167,6 @@ strings = {
     "btn_know_by_heart": "✅ Știu pe de rost",
     "know_confirmed": "{ref} a fost marcat ca memorat. Ești la {pct}%.",
     "know_already": "Asta era deja marcată.",
-
     # Recall check (E2, E3)
     "check_question": "Cum continuă?",
     "check_usage": "Trimite ce să testez, de exemplu /check 67.",
@@ -186,7 +177,6 @@ strings = {
         "testează-te cât vrei, doar că nu se va număra de două ori."
     ),
     "btn_check_start": "Testează-mă",
-
     # Streaks (G2, G3)
     "streak_title": "Seria ta",
     "streak_current": "Serie curentă, zile: {n}",
@@ -197,7 +187,6 @@ strings = {
     "streak_milestone_30": "Treizeci de zile. Consecvența este acum de partea ta.",
     "streak_milestone_100": "O sută de zile. Foarte puțini ajung atât de departe.",
     "streak_milestone_365": "Un an întreg, zi de zi. Fie ca Allah să păstreze ceea ce ai învățat.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Clasamentul acestei săptămâni",
     "leaderboard_row": "{rank}. {name} — {sessions}",

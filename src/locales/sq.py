@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "Komandat:",
     "welcome_inline": (
-        "Mund të më përdorësh në çdo bisedë: shkruaj <b>@QuranAyat_bot</b> e më pas "
-        "referencën."
+        "Mund të më përdorësh në çdo bisedë: shkruaj <b>@QuranAyat_bot</b> e më pas referencën."
     ),
     "about": (
         "Ky bot të mundëson të lexosh Kuranin Famëlartë në Telegram në shumë "
@@ -64,9 +63,7 @@ strings = {
     "cmd_reciter": "Ndrysho recituesin",
     "cmd_about": "Burimet dhe falënderimet",
     "quran_name": "Kurani",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Nis një plan hifzi",
     "cmd_progress": "Çfarë ke mësuar përmendsh",
@@ -75,7 +72,6 @@ strings = {
     "cmd_streak": "Vargu yt ditor",
     "cmd_leaderboard": "Më të mirët e kësaj jave",
     "cmd_profile": "Profili dhe cilësimet e tua",
-
     # Shared wizard controls
     "wizard_cancelled": "U anulua.",
     "wizard_nothing_to_cancel": "Nuk ka asgjë për të anuluar.",
@@ -84,7 +80,6 @@ strings = {
     "btn_cancel": "Anulo",
     "btn_back": "Prapa",
     "btn_confirm": "Konfirmo",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "Hën",
     "day_tue": "Mar",
@@ -93,7 +88,6 @@ strings = {
     "day_fri": "Pre",
     "day_sat": "Sht",
     "day_sun": "Die",
-
     # Profile (B1-B3)
     "profile_title": "Profili yt",
     "profile_name_set": "Emri: {name}",
@@ -126,7 +120,6 @@ strings = {
     "reminder_saved": "Kujtesa ditore u caktua për orën {time}.",
     "btn_reminder_off": "Çaktivizo kujtesat",
     "reminder_off": "Kujtesat ditore janë të çaktivizuara.",
-
     # Progress and /forgot (C3)
     "progress_title": "Çfarë ke mësuar përmendsh",
     "progress_surah_line": "{name}: {done}/{total} ajete — {pct}%",
@@ -139,7 +132,6 @@ strings = {
     "forgot_usage": "Dërgo çfarë të heq, për shembull /forgot 67:5-6.",
     "forgot_done": "Shënimi u hoq: {ref}.",
     "forgot_nothing": "Këtë nuk e kishe shënuar si të memorizuar.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Çfarë dëshiron të mësosh përmendsh?",
     "btn_target_surah": "Një sure",
@@ -175,7 +167,6 @@ strings = {
     "btn_know_by_heart": "✅ E di përmendsh",
     "know_confirmed": "{ref} u shënua si e memorizuar. Je në {pct}%.",
     "know_already": "Këtë e kishe shënuar tashmë.",
-
     # Recall check (E2, E3)
     "check_question": "Si vazhdon ky ajet?",
     "check_usage": "Dërgo çfarë të provoj, për shembull /check 67.",
@@ -186,7 +177,6 @@ strings = {
         "herë të duash, thjesht nuk do të numërohet dy herë."
     ),
     "btn_check_start": "Provomë",
-
     # Streaks (G2, G3)
     "streak_title": "Vargu yt",
     "streak_current": "Vargu aktual, ditë: {n}",
@@ -197,7 +187,6 @@ strings = {
     "streak_milestone_30": "Tridhjetë ditë. Qëndrueshmëria tani është me ty.",
     "streak_milestone_100": "Njëqind ditë. Shumë pak veta arrijnë kaq larg.",
     "streak_milestone_365": "Një vit i tërë, çdo ditë pa përjashtim. Allahu e ruajtë atë që ke mësuar.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Renditja e kësaj jave",
     "leaderboard_row": "{rank}. {name} — {sessions}",

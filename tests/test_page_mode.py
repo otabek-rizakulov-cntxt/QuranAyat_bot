@@ -42,16 +42,18 @@ def tg_bot():
 def fake_bot():
     bot = AsyncMock()
     bot.send_photo.return_value = telegram.Message(
-        1, None, telegram.Chat(1, "private"),
-        photo=[telegram.PhotoSize("photo-file-id", "uid", 100, 100)])
+        1,
+        None,
+        telegram.Chat(1, "private"),
+        photo=[telegram.PhotoSize("photo-file-id", "uid", 100, 100)],
+    )
     bot.send_audio.return_value = telegram.Message(
-        1, None, telegram.Chat(1, "private"),
-        audio=telegram.Audio("audio-file-id", "uid", 120))
+        1, None, telegram.Chat(1, "private"), audio=telegram.Audio("audio-file-id", "uid", 120)
+    )
     return bot
 
 
 class TestStitching:
-
     def test_strips_are_concatenated_top_to_bottom(self):
         out = page_image.stitch_images([_png(1500, 100), _png(1500, 250), _png(1500, 40)])
         assert Image.open(out).size == (1500, 390)
@@ -89,7 +91,6 @@ class TestStitching:
 
 
 class TestPageCard:
-
     async def test_sends_the_stitched_image_with_a_pager(self, fake_bot, monkeypatch):
         monkeypatch.setattr(main, "fetch_and_stitch", _stub_stitch())
         await main.send_page(fake_bot, 255, 4001, "en")
@@ -99,8 +100,7 @@ class TestPageCard:
         rows = kwargs["reply_markup"].inline_keyboard
         assert rows[0][1].text == "255/604"
 
-    async def test_caption_names_both_surahs_when_the_page_crosses(self, fake_bot,
-                                                                   monkeypatch):
+    async def test_caption_names_both_surahs_when_the_page_crosses(self, fake_bot, monkeypatch):
         monkeypatch.setattr(main, "fetch_and_stitch", _stub_stitch())
         await main.send_page(fake_bot, 255, 4002, "en")
         caption = fake_bot.send_photo.await_args.kwargs["caption"]
@@ -115,12 +115,13 @@ class TestPageCard:
 
         monkeypatch.setattr(main, "fetch_and_stitch", capture)
         await main.send_page(fake_bot, 255, 4003, "en")
-        assert len(seen["urls"]) == 6           # 13:43 plus 14:1-14:5
+        assert len(seen["urls"]) == 6  # 13:43 plus 14:1-14:5
         assert seen["urls"][0].endswith("/13_43.png")
         assert seen["urls"][-1].endswith("/14_5.png")
 
     async def test_the_page_is_stitched_once_and_then_replayed_from_cache(
-            self, fake_bot, monkeypatch):
+        self, fake_bot, monkeypatch
+    ):
         calls = []
 
         async def counting(urls, name="page.jpg"):
@@ -131,7 +132,7 @@ class TestPageCard:
         await main.send_page(fake_bot, 100, 4004, "en")
         await main.send_page(fake_bot, 100, 4005, "en")
 
-        assert len(calls) == 1                  # second reader pays nothing
+        assert len(calls) == 1  # second reader pays nothing
         assert fake_bot.send_photo.await_count == 2
         assert fake_bot.send_photo.await_args.kwargs["photo"] == "photo-file-id"
 
@@ -140,15 +141,18 @@ class TestPageCard:
         File().save_file("page:7", "stale-file-id")
         fake_bot.send_photo.side_effect = [
             telegram.error.BadRequest("wrong file identifier"),
-            telegram.Message(1, None, telegram.Chat(1, "private"),
-                             photo=[telegram.PhotoSize("fresh", "uid", 10, 10)]),
+            telegram.Message(
+                1,
+                None,
+                telegram.Chat(1, "private"),
+                photo=[telegram.PhotoSize("fresh", "uid", 10, 10)],
+            ),
         ]
         await main.send_page(fake_bot, 7, 4006, "en")
         assert fake_bot.send_photo.await_count == 2
 
 
 class TestPageKeyboard:
-
     def test_pages_wrap_at_both_ends(self):
         first = main.page_keyboard(1, "en").inline_keyboard[0]
         last = main.page_keyboard(604, "en").inline_keyboard[0]
@@ -175,15 +179,13 @@ class TestPageKeyboard:
 
 
 class TestPageAudio:
-
     async def test_uses_the_single_page_file_when_the_reciter_has_one(self, fake_bot):
         assert File.has_page_audio("Husary_128kbps")
         await main.send_page_audio(fake_bot, 255, 4007, "Husary_128kbps", "en")
         source = fake_bot.send_audio.await_args.kwargs["audio"]
         assert source.endswith("/Husary_128kbps/PageMp3s/Page255.mp3")
 
-    async def test_falls_back_to_stitching_when_the_reciter_has_none(self, fake_bot,
-                                                                     monkeypatch):
+    async def test_falls_back_to_stitching_when_the_reciter_has_none(self, fake_bot, monkeypatch):
         reciter = "Nasser_Alqatami_128kbps"
         assert not File.has_page_audio(reciter)
         seen = {}
@@ -208,7 +210,8 @@ class TestPageAudio:
         # a different reciter must not be served the first one's recording
         fake_bot.reset_mock()
         fake_bot.send_audio.return_value = telegram.Message(
-            1, None, telegram.Chat(1, "private"), audio=telegram.Audio("other", "u", 1))
+            1, None, telegram.Chat(1, "private"), audio=telegram.Audio("other", "u", 1)
+        )
         await main.send_page_audio(fake_bot, 300, 4011, "Alafasy_128kbps", "en")
         assert fake_bot.send_audio.await_args.kwargs["audio"] != "audio-file-id"
 
@@ -218,8 +221,7 @@ class TestRepeatForMemorization:
     listed more than once — so it needs no timing data and works for every
     reciter in the catalog, not only the ones upstream published timings for."""
 
-    async def test_it_sends_the_ayah_the_configured_number_of_times(self, fake_bot,
-                                                                    monkeypatch):
+    async def test_it_sends_the_ayah_the_configured_number_of_times(self, fake_bot, monkeypatch):
         seen = {}
 
         async def capture(ayahs, performer, name):
@@ -238,8 +240,7 @@ class TestRepeatForMemorization:
         title = fake_bot.send_audio.await_args.kwargs["title"]
         assert title == "Qur'an 2:255 ×%d" % main.REPEAT_COUNT
 
-    async def test_it_is_built_once_and_then_replayed_from_cache(self, fake_bot,
-                                                                 monkeypatch):
+    async def test_it_is_built_once_and_then_replayed_from_cache(self, fake_bot, monkeypatch):
         calls = []
 
         async def counting(ayahs, performer, name):
@@ -253,18 +254,17 @@ class TestRepeatForMemorization:
         assert len(calls) == 1
         assert fake_bot.send_audio.await_args.kwargs["audio"] == "audio-file-id"
 
-    async def test_a_different_reciter_gets_its_own_recording(self, fake_bot,
-                                                              monkeypatch):
+    async def test_a_different_reciter_gets_its_own_recording(self, fake_bot, monkeypatch):
         monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
         await main.send_repeated_audio(fake_bot, 2, 255, 5005, "Husary_128kbps", "en")
         fake_bot.reset_mock()
         fake_bot.send_audio.return_value = telegram.Message(
-            1, None, telegram.Chat(1, "private"), audio=telegram.Audio("other", "u", 1))
+            1, None, telegram.Chat(1, "private"), audio=telegram.Audio("other", "u", 1)
+        )
         await main.send_repeated_audio(fake_bot, 2, 255, 5006, "Alafasy_128kbps", "en")
         assert fake_bot.send_audio.await_args.kwargs["audio"] != "audio-file-id"
 
-    async def test_it_works_for_a_reciter_with_no_upstream_timings(self, fake_bot,
-                                                                   monkeypatch):
+    async def test_it_works_for_a_reciter_with_no_upstream_timings(self, fake_bot, monkeypatch):
         # the point of dropping the timings files: coverage is the whole catalog
         monkeypatch.setattr(main, "_download_stitched_audio", _stub_audio())
         await main.send_repeated_audio(fake_bot, 36, 1, 5007, "Yaser_Salamah_128kbps", "en")
@@ -272,7 +272,6 @@ class TestRepeatForMemorization:
 
 
 class TestStitchedAudioAcrossSurahs:
-
     async def test_a_range_within_one_surah_keeps_its_filename(self, monkeypatch):
         captured = {}
 
@@ -295,6 +294,7 @@ def _buffer(name="page.jpg"):
 def _stub_stitch():
     async def stub(urls, name="page.jpg"):
         return _buffer(name)
+
     return stub
 
 
@@ -303,4 +303,5 @@ def _stub_audio():
         buf = BytesIO(b"mp3")
         buf.name = name
         return buf
+
     return stub

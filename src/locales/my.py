@@ -9,8 +9,7 @@ strings = {
     ),
     "welcome_commands_header": "အမိန့်များ:",
     "welcome_inline": (
-        "မည်သည့်စကားဝိုင်းတွင်မဆို ကျွန်ုပ်ကို အသုံးပြုနိုင်သည်: <b>@QuranAyat_bot</b> ဟု "
-        "ရိုက်ပြီး အာယသ်နံပါတ်ကို ထည့်ပါ။"
+        "မည်သည့်စကားဝိုင်းတွင်မဆို ကျွန်ုပ်ကို အသုံးပြုနိုင်သည်: <b>@QuranAyat_bot</b> ဟု ရိုက်ပြီး အာယသ်နံပါတ်ကို ထည့်ပါ။"
     ),
     "about": (
         "ဤဘော့သည် Telegram ပေါ်တွင် ဘာသာစကားများစွာဖြင့် "
@@ -65,7 +64,6 @@ strings = {
     "cmd_reciter": "ရွတ်ဖတ်သူ ပြောင်းရန်",
     "cmd_about": "အရင်းအမြစ်နှင့် ကျေးဇူးတင်လွှာ",
     "quran_name": "ကုရ်အာန်",
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "အလွတ်ကျက်မှတ်ရေး အစီအစဉ် စတင်ရန်",
     "cmd_progress": "သင် အလွတ်ရပြီးသည်များ",
@@ -74,7 +72,6 @@ strings = {
     "cmd_streak": "သင့်နေ့စဉ် ဆက်တိုက်ရက်များ",
     "cmd_leaderboard": "ဤအပတ်၏ ထိပ်တန်း အလွတ်ကျက်သူများ",
     "cmd_profile": "သင့်ပရိုဖိုင်နှင့် ဆက်တင်များ",
-
     # Shared wizard controls
     "wizard_cancelled": "ပယ်ဖျက်လိုက်ပါပြီ။",
     "wizard_nothing_to_cancel": "ပယ်ဖျက်စရာ မရှိပါ။",
@@ -83,7 +80,6 @@ strings = {
     "btn_cancel": "ပယ်ဖျက်",
     "btn_back": "နောက်သို့",
     "btn_confirm": "အတည်ပြု",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "လာ",
     "day_tue": "ဂါ",
@@ -92,7 +88,6 @@ strings = {
     "day_fri": "သော",
     "day_sat": "နေ",
     "day_sun": "နွေ",
-
     # Profile (B1-B3)
     "profile_title": "သင့်ပရိုဖိုင်",
     "profile_name_set": "အမည်: {name}",
@@ -126,7 +121,6 @@ strings = {
     "reminder_saved": "နေ့စဉ် သတိပေးချက်ကို {time} တွင် သတ်မှတ်လိုက်ပါပြီ။",
     "btn_reminder_off": "သတိပေးချက် ပိတ်ရန်",
     "reminder_off": "နေ့စဉ် သတိပေးချက်များ ပိတ်ထားပါသည်။",
-
     # Progress and /forgot (C3)
     "progress_title": "သင် အလွတ်ရပြီးသည်များ",
     "progress_surah_line": "{name}: အာယသ် {done}/{total} — {pct}%",
@@ -140,7 +134,6 @@ strings = {
     "forgot_usage": "ဖယ်ရှားလိုသည့် အပိုင်းကို ပို့ပါ၊ ဥပမာ /forgot 67:5-6။",
     "forgot_done": "{ref} ၏ အမှတ်အသားကို ဖယ်ရှားလိုက်ပါပြီ။",
     "forgot_nothing": "ထိုအပိုင်းကို အလွတ်ရပြီးဟု သင် အမှတ်အသား မပြုထားပါ။",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "ဘာကို အလွတ်ကျက်လိုပါသလဲ။",
     "btn_target_surah": "စူရာတစ်ခု",
@@ -176,18 +169,15 @@ strings = {
     "btn_know_by_heart": "✅ ဤအပိုင်းကို အလွတ်ရပါပြီ",
     "know_confirmed": "{ref} ကို အလွတ်ရပြီးဟု အမှတ်အသားပြုလိုက်ပါပြီ။ သင် ယခု {pct}% ရောက်ရှိပါပြီ။",
     "know_already": "ထိုအပိုင်းကို သင် အမှတ်အသားပြုပြီးဖြစ်သည်။",
-
     # Recall check (E2, E3)
     "check_question": "ဤအပိုဒ် မည်သို့ ဆက်သွားပါသလဲ။",
     "check_usage": "စမ်းသပ်လိုသည့် အပိုင်းကို ပို့ပါ၊ ဥပမာ /check 67။",
     "check_correct": "မှန်ပါသည်။",
     "check_wrong": "မမှန်သေးပါ။ ဤသို့ ဆက်သွားသည်: {correct}",
     "check_already_today": (
-        "ယနေ့အတွက် ရမှတ်ကို မှတ်ဉာဏ်စမ်းသပ်မှုဖြင့် ရရှိပြီးဖြစ်သည် — "
-        "လိုသလောက် ထပ်စမ်းနိုင်သည်၊ သို့သော် နှစ်ကြိမ် ရေတွက်မည် မဟုတ်ပါ။"
+        "ယနေ့အတွက် ရမှတ်ကို မှတ်ဉာဏ်စမ်းသပ်မှုဖြင့် ရရှိပြီးဖြစ်သည် — လိုသလောက် ထပ်စမ်းနိုင်သည်၊ သို့သော် နှစ်ကြိမ် ရေတွက်မည် မဟုတ်ပါ။"
     ),
     "btn_check_start": "ကျွန်ုပ်ကို စမ်းသပ်ပါ",
-
     # Streaks (G2, G3)
     "streak_title": "သင့်ဆက်တိုက်ရက်များ",
     "streak_current": "လက်ရှိ ဆက်တိုက်: {n} ရက်",
@@ -198,7 +188,6 @@ strings = {
     "streak_milestone_30": "ရက်ပေါင်း သုံးဆယ်။ ယခု ဇွဲသည် သင့်ဘက်တွင် ရှိနေပါပြီ။",
     "streak_milestone_100": "ရက်ပေါင်း တစ်ရာ။ ဤအထိ ရောက်သူ အလွန်နည်းပါသည်။",
     "streak_milestone_365": "တစ်နှစ်ပြည့်၊ တစ်ရက်မှ မလွတ်ပါ။ သင်သင်ယူထားသည်များကို အလ္လာဟ်အရှင်မြတ် ထိန်းသိမ်းပေးတော်မူပါစေ။",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "ဤအပတ်၏ ဦးဆောင်ဇယား",
     "leaderboard_row": "{rank}. {name} — {sessions}",

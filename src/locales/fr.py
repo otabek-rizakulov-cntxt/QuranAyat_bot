@@ -64,9 +64,7 @@ strings = {
     "cmd_reciter": "Changer de récitateur",
     "cmd_about": "Sources et remerciements",
     "quran_name": "Coran",
-
     # --- Hifz platform ---------------------------------------------------------
-
     # Command descriptions (the Telegram menu and the /start list)
     "cmd_memorize": "Commencer un plan de hifz",
     "cmd_progress": "Ce que vous avez mémorisé",
@@ -75,7 +73,6 @@ strings = {
     "cmd_streak": "Votre série quotidienne",
     "cmd_leaderboard": "Les meilleurs de la semaine",
     "cmd_profile": "Votre profil et vos réglages",
-
     # Shared wizard controls
     "wizard_cancelled": "Annulé.",
     "wizard_nothing_to_cancel": "Il n'y a rien à annuler.",
@@ -84,7 +81,6 @@ strings = {
     "btn_cancel": "Annuler",
     "btn_back": "Retour",
     "btn_confirm": "Confirmer",
-
     # Days of the week — the plan's day picker, and the streak grid's header
     "day_mon": "lun",
     "day_tue": "mar",
@@ -93,7 +89,6 @@ strings = {
     "day_fri": "ven",
     "day_sat": "sam",
     "day_sun": "dim",
-
     # Profile (B1-B3)
     "profile_title": "Votre profil",
     "profile_name_set": "Nom : {name}",
@@ -126,7 +121,6 @@ strings = {
     "reminder_saved": "Rappel quotidien réglé à {time}.",
     "btn_reminder_off": "Désactiver les rappels",
     "reminder_off": "Les rappels quotidiens sont désactivés.",
-
     # Progress and /forgot (C3)
     "progress_title": "Ce que vous avez mémorisé",
     "progress_surah_line": "{name} : {done}/{total} versets — {pct} %",
@@ -139,7 +133,6 @@ strings = {
     "forgot_usage": "Envoyez ce qu'il faut retirer, par exemple /forgot 67:5-6.",
     "forgot_done": "{ref} retiré.",
     "forgot_nothing": "Vous n'aviez pas marqué cela comme mémorisé.",
-
     # Memorization plans and drills (D1, D3-D5)
     "memorize_choose_target": "Que souhaitez-vous mémoriser ?",
     "btn_target_surah": "Une sourate",
@@ -175,7 +168,6 @@ strings = {
     "btn_know_by_heart": "✅ Je le sais par cœur",
     "know_confirmed": "{ref} marqué comme mémorisé. Vous êtes à {pct} %.",
     "know_already": "Vous l'aviez déjà marqué.",
-
     # Recall check (E2, E3)
     "check_question": "Comment cela continue-t-il ?",
     "check_usage": "Envoyez ce qu'il faut tester, par exemple /check 67.",
@@ -186,7 +178,6 @@ strings = {
         "testez-vous autant que vous voulez, cela ne comptera simplement pas deux fois."
     ),
     "btn_check_start": "Me tester",
-
     # Streaks (G2, G3)
     "streak_title": "Votre série",
     "streak_current": "Série actuelle : {n}",
@@ -197,7 +188,6 @@ strings = {
     "streak_milestone_30": "Trente jours. La régularité est désormais de votre côté.",
     "streak_milestone_100": "Cent jours. Très peu de gens vont aussi loin.",
     "streak_milestone_365": "Une année entière, chaque jour. Qu'Allah préserve ce que vous avez appris.",
-
     # Leaderboard (H1, H2)
     "leaderboard_title": "Classement de la semaine",
     "leaderboard_row": "{rank}. {name} — {sessions}",
