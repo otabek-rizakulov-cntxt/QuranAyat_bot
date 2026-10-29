@@ -1,5 +1,7 @@
 # BismillahBot — Multilingual Support Plan
 
+> Written before the refactor (docs/REFACTOR_PLAN.md): the text names the files as they were then, and the links point to where that code lives now.
+
 > A phased plan to make the bot speak the user's language: both its **interface**
 > (menus, help, errors) and its **content** (Qur'an translations, and where
 > possible tafsir and translated audio).
@@ -33,17 +35,17 @@ fruit later.
 
 Everything that must become language-aware, by location:
 
-- **UI strings** in [src/main.py](src/main.py):
+- **UI strings** in [src/main.py](../src/main.py):
   - `/start` & `/help` text, `/about` text — English prose.
   - Reply keyboard labels: `Arabic`, `Audio`, `English`, `Tafsir`, `Previous`, `Random`, `Next` (in `build_data`).
   - `"Ayah does not exist!"` and the range-too-large message.
   - The button-matching logic (`if message in ("english","tafsir","audio","arabic")`, `("next","previous","random")`) — **matches English words**, so translating the buttons breaks it (see §7).
-- **Content loading** in [src/modules/quran.py](src/modules/quran.py):
+- **Content loading** in [src/modules/quran.py](../src/domain/quran.py):
   - `Quran("translation")` hardcodes `en.ahmedraza`; `Quran("tafsir")` hardcodes `Al_Jalalain_Eng.txt`.
   - `surah_names` uses the `tname` (transliteration) attribute from `quran-data.xml` — note that file **also has `name` (Arabic) and `ename` (English)**, so localized surah names are partly free.
-- **User state** in [src/lib/utils.py](src/lib/utils.py):
+- **User state** in [src/lib/utils.py](../src/services/user_settings.py):
   - `save_user(chat_id, (surah, ayah, type))` — **no language field**.
-- **Inline queries** in [src/main.py](src/main.py): always return English + Tafsir.
+- **Inline queries** in [src/main.py](../src/main.py): always return English + Tafsir.
 - **Telegram command menu**: not set per-language (`setMyCommands` unused).
 
 ---
@@ -84,7 +86,7 @@ preference while `(surah, ayah, type)` resets after 2 days:
 | `lang:{chat_id}` | ISO-639-1 code (`en`, `ur`, `tr`, …) | none / long |
 | `{chat_id}` (existing) | `[surah, ayah, type]` | 2 days (unchanged) |
 
-New helpers in [src/lib/utils.py](src/lib/utils.py): `save_lang(chat_id, code)` /
+New helpers in [src/lib/utils.py](../src/services/user_settings.py): `save_lang(chat_id, code)` /
 `get_lang(chat_id)`. (Both work with the in-memory fallback store already in place.)
 
 ### Detection & selection flow
@@ -276,9 +278,9 @@ while still showing the English translation), so it's a good first ship.
 | File | Change |
 |------|--------|
 | `src/locales/` (new) | UI string tables + `t(key, lang)` |
-| [src/lib/utils.py](src/lib/utils.py) | `save_lang` / `get_lang`; keep nav state separate |
-| [src/modules/quran.py](src/modules/quran.py) | `Quran.from_file(path)` classmethod; `TranslationRegistry`; optional localized surah names |
-| [src/main.py](src/main.py) | resolve `lang` per update; wrap UI strings in `t()`; `/language` + `callback_query` handling; localized keyboard + reverse-map; `setMyCommands` per language at startup; inline query in user's language |
+| [src/lib/utils.py](../src/services/user_settings.py) | `save_lang` / `get_lang`; keep nav state separate |
+| [src/modules/quran.py](../src/domain/quran.py) | `Quran.from_file(path)` classmethod; `TranslationRegistry`; optional localized surah names |
+| [src/main.py](../src/main.py) | resolve `lang` per update; wrap UI strings in `t()`; `/language` + `callback_query` handling; localized keyboard + reverse-map; `setMyCommands` per language at startup; inline query in user's language |
 | `translations/` (new) | bundled tanzil translation files |
 | `ATTRIBUTIONS.md` (new) | per-translation license/attribution; linked from `/about` |
 | `.env.example` | `DEFAULT_LANG` (optional), `SUPPORTED_LANGS` (optional) |

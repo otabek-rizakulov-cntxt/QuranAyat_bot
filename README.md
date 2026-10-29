@@ -226,6 +226,10 @@ git pull
 pip install -r requirements.txt -U
 ```
 
+# Documentation
+
+Design notes, plans and reports live in [`docs/`](docs/README.md): how the bot behaves ([BUSINESS_LOGIC.md](docs/BUSINESS_LOGIC.md)), how to run the tests ([TESTING.md](docs/TESTING.md)), and how the code is laid out ([REFACTOR_PLAN.md](docs/REFACTOR_PLAN.md)).
+
 # License
 
 This program is free software: you can redistribute it and/or modify it under
