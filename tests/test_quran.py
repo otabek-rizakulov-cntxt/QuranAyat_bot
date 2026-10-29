@@ -1,6 +1,6 @@
 """Quran corpus model: bounds, navigation wraparound, and corpus integrity."""
 
-from modules import Quran, TranslationRegistry
+from domain.quran import Quran, TranslationRegistry
 
 
 class TestStructure:

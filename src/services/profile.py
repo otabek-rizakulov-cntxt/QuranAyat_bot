@@ -6,10 +6,10 @@ import re
 from datetime import datetime, time, timezone
 from typing import Optional
 
-from hifz.refs import KIND_RANGE, Ref, format_ref
-from lib.localtime import is_valid_offset, next_due_utc, normalize_offset
+from domain.localtime import is_valid_offset, next_due_utc, normalize_offset
+from domain.quran import Quran
+from domain.refs import KIND_RANGE, Ref, format_ref
 from lib.store.plans import DAY_COMPLETED
-from modules import Quran
 
 NAME_MIN = 2
 NAME_MAX = 32
@@ -63,7 +63,7 @@ async def save_timezone(store, user_id: int, offset: str):
     Returns the updated `ProfileRow` (created if this is their first write).
     Raises ValueError if `offset` is not a UTC offset — validate a tap with
     `hifz.profile.offset_from_callback` and typed text with
-    `lib.localtime.is_valid_offset`.
+    `domain.localtime.is_valid_offset`.
     """
     return await store.profiles.set_timezone(user_id, normalize_offset(offset))
 

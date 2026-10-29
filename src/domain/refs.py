@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from modules import Quran
+from domain.quran import Quran
 
 __all__ = [
     "Ref",

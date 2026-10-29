@@ -26,19 +26,19 @@ SRC = os.path.join(os.path.dirname(__file__), "..", "src")
 PACKAGES = {
     "main", "app", "bot", "api", "hifz",
     "services",
-    "infra", "lib", "modules",
+    "infra", "lib", "domain.quran",
     "domain", "config", "locales",
 }  # fmt: skip
 
 _BASE = {"domain", "config", "locales"}
-_LOWER = _BASE | {"infra", "lib", "modules"}
+_LOWER = _BASE | {"infra", "lib", "domain.quran"}
 
 # Which project packages each package may import (itself included).
 ALLOWED = {
     "config": {"config"},
     "locales": {"locales"},
     "domain": {"domain", "config", "locales"},
-    "modules": _BASE | {"modules"},
+    "domain.quran": _BASE | {"domain.quran"},
     "lib": _LOWER,
     "infra": _LOWER,
     "services": _LOWER | {"services"},
@@ -53,20 +53,12 @@ ALLOWED = {
 
 FRAMEWORKS = {"telegram", "fastapi"}
 # Packages below the presentation layer: no Telegram, no FastAPI.
-FRAMEWORK_FREE = {"config", "locales", "domain", "modules", "lib", "services"}
+FRAMEWORK_FREE = {"config", "locales", "domain", "domain.quran", "lib", "services"}
 
 # (file relative to src/, imported module) -> the refactor step that removes it.
 KNOWN = {
     ("lib/miniapp.py", "telegram"): "5.3 app_row moves to bot/keyboards/",
     ("lib/scheduler.py", "telegram"): "5.2 scheduler moves to infra/",
-    ("lib/plan_builder.py", "hifz.refs"): "5.1 refs moves to domain/",
-    ("lib/hifz_progress.py", "hifz.refs"): "5.1 refs moves to domain/",
-    ("services/check.py", "hifz.refs"): "5.1 refs moves to domain/",
-    ("services/plans.py", "hifz.refs"): "5.1 refs moves to domain/",
-    ("services/profile.py", "hifz.refs"): "5.1 refs moves to domain/",
-    ("services/progress.py", "hifz.refs"): "5.1 refs moves to domain/",
-    ("api/common.py", "hifz.refs"): "5.1 refs moves to domain/",
-    ("api/plans.py", "hifz.refs"): "5.1 refs moves to domain/",
 }
 
 

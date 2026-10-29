@@ -6,8 +6,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from domain.localtime import week_bounds
 from lib.leaderboard import weekly_board
-from lib.localtime import week_bounds
 from lib.store import get_store
 from lib.streak_image import GRID_WEEKS
 from lib.streaks import streak_summary

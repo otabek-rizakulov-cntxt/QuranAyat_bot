@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from typing import Optional, Tuple
 
-from lib.localtime import local_date, week_bounds
+from domain.localtime import local_date, week_bounds
 from lib.store import get_store
 from lib.store.sessions import LeaderboardEntry
 from lib.streaks import offset_of, user_offset

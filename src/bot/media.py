@@ -13,10 +13,10 @@ from bot.keyboards.page import page_keyboard
 from bot.limits import REPEAT_COUNT
 from bot.text import build_verse_text, page_caption, reference
 from config.settings import get_settings
+from domain.quran import Quran
 from infra import audio as cdn_audio
 from infra import catalog, media_cache, nav_state
 from lib.page_image import fetch_and_stitch
-from modules import Quran
 
 logger = logging.getLogger(__name__)
 

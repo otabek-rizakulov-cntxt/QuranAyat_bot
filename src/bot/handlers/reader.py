@@ -12,9 +12,9 @@ from bot.media import send_combined_audio, send_quran, send_repeated_audio
 from bot.router import callback, command
 from bot.text import build_verse_text
 from domain.parsing import parse_ayah_range
+from domain.quran import Quran
 from infra import nav_state
 from locales import button_action, t
-from modules import Quran
 
 
 async def reader_position(ctx: Ctx) -> tuple:

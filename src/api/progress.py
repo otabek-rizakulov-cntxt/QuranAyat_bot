@@ -1,5 +1,5 @@
 # Progress: GET /progress, GET /progress/surah/{n}, POST /progress/forget.
-# Everything is derived by lib.hifz_progress from the interval store — the same
+# Everything is derived by domain.hifz_progress from the interval store — the same
 # numbers /progress shows in chat.
 
 from typing import List, Optional
@@ -7,9 +7,9 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from lib.hifz_progress import load_summary, surah_progress
+from domain.hifz_progress import load_summary, surah_progress
+from domain.quran import Quran
 from lib.store import get_store
-from modules import Quran
 from services import progress as progress_service
 
 from .auth import require_user

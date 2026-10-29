@@ -10,8 +10,8 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Optional, Tuple
 
-from hifz.refs import KIND_RANGE, Ref, juz_ref
-from lib.recall_check import RecallQuestion, build_question, pick_ayah, preload_corpus
+from domain.recall_check import RecallQuestion, build_question, pick_ayah, preload_corpus
+from domain.refs import KIND_RANGE, Ref, juz_ref
 from lib.store.sessions import KIND_RECALL_CHECK
 from lib.streaks import record_session
 

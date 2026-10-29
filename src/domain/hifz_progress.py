@@ -23,8 +23,8 @@ import math
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Sequence, Tuple
 
-from hifz.refs import Ref, contains, juz_ref, page_ref, surah_ref
-from modules import Quran
+from domain.quran import Quran
+from domain.refs import Ref, contains, juz_ref, page_ref, surah_ref
 
 __all__ = [
     "TOTAL_AYAHS",
@@ -285,7 +285,7 @@ def _clip(ref: Ref, surah: int, start: int, end: int) -> Optional[Tuple[int, int
     This is the only piece of real geometry in the module, and it is here because
     a juz is a cross-surah span while an interval is per-surah: juz 1 runs
     1:1-2:141, so the user's single 2:1-286 row contributes 141 ayahs to juz 1 and
-    the rest to juz 2 and 3. Membership is asked of `hifz.refs.contains` rather
+    the rest to juz 2 and 3. Membership is asked of `domain.refs.contains` rather
     than re-derived, so mushaf ordering is defined in exactly one place.
 
     Clipping through here also makes the module robust to a row that runs past the

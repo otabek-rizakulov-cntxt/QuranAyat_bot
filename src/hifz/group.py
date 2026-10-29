@@ -28,14 +28,14 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.time_pickers import offset_keyboard
 from bot.media import send_combined_audio
+from domain.localtime import DEFAULT_OFFSET
+from domain.quran import get_translation
 from hifz import Ctx, callback, wizard
 from infra import catalog
-from lib.localtime import DEFAULT_OFFSET
 from lib.page_image import fetch_and_stitch
 from lib.scheduler import send_handler
 from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
 from locales import t
-from modules.quran import get_translation
 
 logger = logging.getLogger(__name__)
 
@@ -201,7 +201,7 @@ async def _step_topic(ctx: Ctx, draft, text: str) -> None:
 
 
 async def _step_target(ctx: Ctx, draft, text: str) -> None:
-    from hifz.refs import parse_reference
+    from domain.refs import parse_reference
 
     ref = parse_reference(text)
     if ref is None:
@@ -227,9 +227,10 @@ async def _step_post_time(ctx: Ctx, draft, text: str) -> None:
 
 async def _save_group_plan(ctx: Ctx, data: dict, post_time) -> None:
     """Build the plan (same pure generator as the personal plan) and queue day one."""
-    from hifz.refs import Ref
-    from lib.localtime import local_date, normalize_offset
-    from lib.plan_builder import advancing, build_plan, to_day_specs
+    from domain.localtime import local_date, normalize_offset
+    from domain.plan_builder import advancing, build_plan
+    from domain.refs import Ref
+    from services.plans import to_day_specs
 
     chat_id = data.get("chat_id")
     kind, s_s, s_a, e_s, e_a = data["target"]
@@ -288,7 +289,7 @@ async def _enqueue_next_group(store, chat_id: int, plan, now=None):
     """
     from datetime import datetime, timezone
 
-    from lib.localtime import local_date, next_due_utc, normalize_offset, to_utc
+    from domain.localtime import local_date, next_due_utc, normalize_offset, to_utc
     from lib.scheduler import enqueue
     from lib.store.groups import GDAY_PENDING, GPLAN_ACTIVE
 
@@ -403,8 +404,8 @@ async def group_board_entries(store, bot, chat_id: int, utc_now=None):
     """
     from datetime import datetime, timezone
 
+    from domain.localtime import DEFAULT_OFFSET, normalize_offset
     from lib.leaderboard import week_window
-    from lib.localtime import DEFAULT_OFFSET, normalize_offset
 
     config = await store.groups.get_config(chat_id)
     if config is None:
@@ -478,8 +479,8 @@ async def _enqueue_next_board(store, chat_id: int, now=None):
     from datetime import datetime as _dt
     from datetime import time as _time
 
+    from domain.localtime import DEFAULT_OFFSET, normalize_offset, to_utc
     from lib.leaderboard import week_window
-    from lib.localtime import DEFAULT_OFFSET, normalize_offset, to_utc
     from lib.scheduler import enqueue
     from lib.store.groups import CONFIG_ACTIVE as _ACTIVE
 

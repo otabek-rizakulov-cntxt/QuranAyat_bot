@@ -21,9 +21,9 @@ import telegram
 
 import bot.router as router
 import hifz
+from domain.recall_check import OPTION_COUNT, build_question
 from hifz import Ctx
 from hifz.check import CB_ANSWER, CB_START, _parse_answer
-from lib.recall_check import OPTION_COUNT, build_question
 from lib.store import get_store
 from lib.store.sessions import KIND_RECALL_CHECK
 from lib.streaks import streak_summary, user_today

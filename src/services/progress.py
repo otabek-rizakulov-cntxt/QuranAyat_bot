@@ -3,8 +3,8 @@
 
 from typing import List, Tuple
 
-from hifz.refs import Ref
-from modules import Quran
+from domain.quran import Quran
+from domain.refs import Ref
 
 
 def surah_spans(ref: Ref) -> List[Tuple[int, int, int]]:

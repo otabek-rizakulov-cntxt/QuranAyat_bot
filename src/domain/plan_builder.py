@@ -31,8 +31,8 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import List, Optional, Sequence, Tuple
 
-from hifz.refs import KIND_RANGE, Ref
-from modules import Quran
+from domain.quran import Quran
+from domain.refs import KIND_RANGE, Ref
 
 __all__ = [
     "AUTO_PACE",
@@ -44,7 +44,6 @@ __all__ = [
     "Portion",
     "auto_pace",
     "build_plan",
-    "to_day_specs",
     "advancing",
     "next_scheduled_date",
 ]
@@ -163,7 +162,7 @@ def build_plan(
     Consolidation days are interleaved (see `_consolidations`), so the returned
     list is longer than the number of advancing days. It is ordered by date,
     one portion per date, and is the exact preview calendar: pass it through
-    `to_day_specs` to store it.
+    `services.plans.to_day_specs` to store it.
     """
     allowed = _validated_days(days_of_week)
     total = target.count()
@@ -230,18 +229,6 @@ def _consolidations(target: Ref, surah: int, first: int, last: int):
 
     if last == Quran.get_surah_length(surah) and floor < lower:
         yield floor, last, DRILL_SURAH, surah
-
-
-def to_day_specs(portions: Sequence[Portion]) -> list:
-    """`Portion`s as `PlanDaySpec`s, ready for `store.plans.create_plan`.
-
-    The store type is imported here rather than at module scope so that
-    importing the generator stays free of the repository layer (and of
-    asyncpg): the preview path needs the arithmetic, not a database.
-    """
-    from lib.store.plans import PlanDaySpec
-
-    return [PlanDaySpec(p.scheduled_date, p.surah, p.start_ayah, p.end_ayah) for p in portions]
 
 
 def advancing(portions: Sequence[Portion]) -> List[Portion]:

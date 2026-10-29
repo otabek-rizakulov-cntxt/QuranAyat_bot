@@ -1,4 +1,4 @@
-"""Cross-surah reference parsing (`hifz.refs`).
+"""Cross-surah reference parsing (`domain.refs`).
 
 The reader's `parsing.parse_ayah_range` is single-surah by construction, which is
 right for a verse card and wrong for a hifz target: a `range` plan may span
@@ -11,7 +11,8 @@ tests/test_parsing.py and by every reader path in main.py.
 
 import pytest
 
-from hifz.refs import (
+from domain.quran import Quran
+from domain.refs import (
     KIND_JUZ,
     KIND_PAGE,
     KIND_RANGE,
@@ -26,7 +27,6 @@ from hifz.refs import (
     parse_reference,
     surah_ref,
 )
-from modules import Quran
 
 AL_MULK = 67  # 30 ayahs
 AL_QALAM = 68  # 52 ayahs

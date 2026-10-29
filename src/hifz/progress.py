@@ -21,10 +21,10 @@ from typing import Optional, Tuple
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.rows import button_rows
+from domain.hifz_progress import load_summary
+from domain.quran import Quran
+from domain.refs import format_ref, parse_reference
 from hifz import Ctx, callback, command
-from hifz.refs import format_ref, parse_reference
-from lib.hifz_progress import load_summary
-from modules import Quran
 from services.progress import surah_spans, unmark  # noqa: F401 — re-exported
 
 __all__ = [

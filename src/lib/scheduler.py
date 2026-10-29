@@ -35,7 +35,7 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 
 import telegram
 
-from lib.localtime import local_date, next_due_utc
+from domain.localtime import local_date, next_due_utc
 from lib.store.schedule import ScheduledSend
 
 logger = logging.getLogger(__name__)
@@ -289,7 +289,7 @@ async def schedule_daily(
     """Queue the next occurrence of a daily push at the user's local `reminder_time`.
 
     `offset` is a fixed UTC offset (`"+05:00"`); all the arithmetic goes through
-    `lib.localtime`, never through hand-rolled timedeltas. The due instant is the
+    `domain.localtime`, never through hand-rolled timedeltas. The due instant is the
     first one strictly after `now` at which the recipient's wall clock reads
     `reminder_time`, and the key is keyed on the *local* date of that instant —
     so scheduling twice in the same local day is a no-op, and the row for

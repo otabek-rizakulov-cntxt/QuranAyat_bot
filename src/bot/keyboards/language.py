@@ -3,8 +3,8 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.rows import button_rows
+from domain.quran import TranslationRegistry
 from locales import LANGUAGES, UI_LANGUAGES
-from modules import TranslationRegistry
 
 
 def language_picker(languages, callback_prefix: str) -> InlineKeyboardMarkup:

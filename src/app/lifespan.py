@@ -19,11 +19,11 @@ from bot.inline import get_default_query_results
 from config.postgres import close_pool
 from config.redis import RedisSingleton, cache_backend
 from config.settings import get_settings
+from domain.quran import Quran, TranslationRegistry, make_index
 from infra.telegram import create_bot
 from lib.miniapp import set_menu_button
 from lib.store import apply_schema
 from locales import BOT_COMMANDS, DEFAULT_LANG, UI_LANGUAGES, t
-from modules import Quran, TranslationRegistry, make_index
 
 logger = logging.getLogger(__name__)
 

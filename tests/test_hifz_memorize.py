@@ -17,11 +17,11 @@ import pytest
 
 import bot.router as router
 import hifz
+from domain.plan_builder import advancing, build_plan
+from domain.refs import surah_ref
 from hifz import Ctx
 from hifz import memorize as memorize_feature
-from hifz.refs import surah_ref
 from lib import scheduler
-from lib.plan_builder import advancing, build_plan
 from lib.store import get_store
 from lib.store.plans import DAY_COMPLETED, PLAN_ACTIVE, PLAN_PAUSED
 

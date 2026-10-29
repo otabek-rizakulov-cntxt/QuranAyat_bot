@@ -6,8 +6,8 @@ from bot.keyboards.sajda import sajda_keyboard
 from bot.media import send_page, send_page_audio
 from bot.router import callback, command
 from domain.parsing import as_int
+from domain.quran import Quran
 from locales import t
-from modules import Quran
 
 
 @command("page")

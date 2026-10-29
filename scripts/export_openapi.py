@@ -17,7 +17,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
-os.chdir(ROOT)  # modules.quran resolves its corpora relative to the repo
+os.chdir(ROOT)  # domain.quran resolves its corpora relative to the repo
 
 from fastapi.openapi.utils import get_openapi  # noqa: E402
 

@@ -294,7 +294,7 @@ class TestPlanWizard:
     async def test_an_empty_offset_falls_back_to_the_default(self):
         # Regression: both fallbacks named DEFAULT_OFFSET without importing it,
         # so an offset-less tap crashed the wizard with a NameError.
-        from lib.localtime import DEFAULT_OFFSET
+        from domain.localtime import DEFAULT_OFFSET
 
         store = await get_store()
         bot = _bot(

@@ -1,4 +1,4 @@
-"""Fixed-offset local time (`lib.localtime`).
+"""Fixed-offset local time (`domain.localtime`).
 
 The hifz platform has no IANA zones: a user's timezone is a fixed UTC offset
 stored as TEXT, so "what date is it for this user" is one addition and needs no
@@ -11,7 +11,7 @@ from datetime import date, datetime, time, timedelta, timezone
 
 import pytest
 
-from lib.localtime import (
+from domain.localtime import (
     DEFAULT_OFFSET,
     MAX_OFFSET_MINUTES,
     MIN_OFFSET_MINUTES,

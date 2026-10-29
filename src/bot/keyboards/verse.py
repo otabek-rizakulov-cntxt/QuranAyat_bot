@@ -10,9 +10,9 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.limits import REPEAT_COUNT
 from bot.text import nav_labels
+from domain.quran import Quran
 from lib.miniapp import app_row
 from locales import get_language, t
-from modules import Quran
 
 # Short codes keep callback_data tiny (Telegram caps it at 64 bytes).
 TYPE_BY_CODE = {"tr": "translation", "ar": "arabic", "tf": "tafsir", "au": "audio"}

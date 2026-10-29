@@ -26,8 +26,11 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from modules import Quran, TranslationRegistry  # noqa: E402
-from modules.quran import _QURAN_DATA  # noqa: E402
+from domain.quran import (  # noqa: E402
+    _QURAN_DATA,  # noqa: E402
+    Quran,
+    TranslationRegistry,
+)
 
 DEFAULT_OUT_DIR = os.path.join(ROOT, "build", "web-content")
 ARABIC = "ar"

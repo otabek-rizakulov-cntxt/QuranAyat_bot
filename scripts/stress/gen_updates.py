@@ -2,7 +2,7 @@
 
 Same JSON shape `tests/test_handle_update.py` builds by hand for `handle_update`
 unit tests — reused here as plain dicts POSTed over HTTP to the real webhook
-route (`main.py`'s `telegram_webhook` does the `Update.de_json` parsing itself).
+route (`app/routes/webhook.py`'s `telegram_webhook` does the `Update.de_json` parsing itself).
 
 The mix is Phase-1 DM personal-feature traffic only (registration-free), no
 group flows — matching the "dozens to low hundreds of users" scale this report

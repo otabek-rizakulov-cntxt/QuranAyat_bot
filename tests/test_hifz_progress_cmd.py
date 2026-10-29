@@ -1,6 +1,6 @@
 """`/progress` and `/forgot` (C3), driven through the seam.
 
-`tests/test_hifz_progress.py` pins the arithmetic in `lib/hifz_progress.py`; this
+`tests/test_hifz_progress.py` pins the arithmetic in `domain/hifz_progress.py`; this
 file pins the two commands built on it — above all the deliberate choice of
 **units**: the surah is quoted in ayahs, the juz and the whole Qur'an in mushaf
 pages, because that is how a hafiz measures each of them.
@@ -12,11 +12,11 @@ import pytest
 
 import bot.router as router
 import hifz
+from domain.quran import Quran
+from domain.refs import juz_ref
 from hifz import Ctx
 from hifz import progress as progress_feature
-from hifz.refs import juz_ref
 from lib.store import get_store
-from modules import Quran
 
 USER_ID = 900456
 CHAT_ID = 900456
@@ -104,7 +104,7 @@ class TestProgressCommand:
     async def test_the_juz_and_quran_lines_are_quoted_in_pages_not_ayahs(self):
         # The decision this module exists to carry: a juz is "twenty pages", never
         # "431 ayahs". By ayahs juz 29 would read 2%; by pages it reads 3%.
-        from lib.hifz_progress import summarize
+        from domain.hifz_progress import summarize
 
         await _mark(67, 1, 8)
         summary = summarize([(67, 1, 8)])
@@ -116,7 +116,7 @@ class TestProgressCommand:
     async def test_the_whole_quran_line_is_pages_too(self):
         # A whole juz 30 is 9% of the Qur'an by ayahs (its ayahs are short) and 4%
         # by pages. The page figure is the one a hafiz recognizes.
-        from lib.hifz_progress import summarize
+        from domain.hifz_progress import summarize
 
         ref = juz_ref(30)
         spans = progress_feature.surah_spans(ref)
@@ -275,12 +275,12 @@ class TestForgot:
 
 class TestSurahSpans:
     def test_a_within_surah_reference_is_one_span(self):
-        from hifz.refs import parse_reference
+        from domain.refs import parse_reference
 
         assert progress_feature.surah_spans(parse_reference("67:5-6")) == [(67, 5, 6)]
 
     def test_a_cross_surah_reference_is_split_at_the_boundary(self):
-        from hifz.refs import parse_reference
+        from domain.refs import parse_reference
 
         assert progress_feature.surah_spans(parse_reference("67:30-68:2")) == [
             (67, 30, 30),

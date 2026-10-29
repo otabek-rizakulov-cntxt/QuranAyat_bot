@@ -10,7 +10,7 @@
 #
 # Four properties are load-bearing here, and each has a test named after it:
 #
-#   D1  **the preview is the plan.** `lib.plan_builder.build_plan` is pure, so
+#   D1  **the preview is the plan.** `domain.plan_builder.build_plan` is pure, so
 #       the preview calendar and the rows written by `create_plan` are the same
 #       function call over the same arguments — the start date the preview used
 #       is stashed in the draft so confirming ten minutes later still reproduces
@@ -56,26 +56,25 @@ from bot.keyboards.rows import button_rows
 from bot.keyboards.time_pickers import offset_keyboard
 from bot.limits import MAX_RANGE_AYAHS, REPEAT_COUNT
 from bot.media import send_combined_audio, send_quran
-from hifz import Ctx, callback, command, wizard
-from hifz.profile import (
-    format_reminder_time,
-    parse_reminder_time,
-)
-from hifz.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
-from lib.localtime import (
+from domain.localtime import (
     DEFAULT_OFFSET,
     is_valid_offset,
     local_date,
     normalize_offset,
 )
+from domain.plan_builder import AUTO_PACE, Portion, build_plan
+from domain.quran import Quran, get_translation
+from domain.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
+from hifz import Ctx, callback, command, wizard
+from hifz.profile import (
+    format_reminder_time,
+    parse_reminder_time,
+)
 from lib.miniapp import app_row
-from lib.plan_builder import AUTO_PACE, Portion, build_plan
 from lib.scheduler import SendCtx, send_handler
 from lib.store.plans import PLAN_ACTIVE, PLAN_PAUSED
 from lib.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
 from locales import t
-from modules import Quran
-from modules.quran import get_translation
 from services.plans import SEND_KIND
 from services.profile import as_time
 

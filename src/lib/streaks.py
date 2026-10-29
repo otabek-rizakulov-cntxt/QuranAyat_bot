@@ -8,7 +8,7 @@
 #
 # The day unit is the user's local date, never UTC: 23:59 and 00:01 local are two
 # days one minute apart, and a UTC boundary would silently move a UTC+5 user's
-# rollover to 05:00. `lib.localtime` owns that arithmetic; nothing here adds or
+# rollover to 05:00. `domain.localtime` owns that arithmetic; nothing here adds or
 # subtracts hours by hand.
 #
 # The one genuinely contested piece of arithmetic is what "current" means before
@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Sequence, Tuple
 
-from lib.localtime import DEFAULT_OFFSET, local_date, parse_offset
+from domain.localtime import DEFAULT_OFFSET, local_date, parse_offset
 from lib.store import get_store
 
 logger = logging.getLogger(__name__)

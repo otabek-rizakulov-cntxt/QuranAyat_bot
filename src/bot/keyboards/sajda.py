@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.rows import button_rows
 from bot.keyboards.verse import CODE_BY_TYPE
-from modules import Quran
+from domain.quran import Quran
 
 
 def sajda_keyboard(ui_lang: str) -> InlineKeyboardMarkup:

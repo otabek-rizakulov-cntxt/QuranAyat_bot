@@ -10,9 +10,9 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.verse import CODE_BY_TYPE
 from bot.text import nav_labels
+from domain.quran import Quran
 from lib.miniapp import app_row
 from locales import t
-from modules import Quran
 
 
 def page_keyboard(page: int, ui_lang: str) -> InlineKeyboardMarkup:

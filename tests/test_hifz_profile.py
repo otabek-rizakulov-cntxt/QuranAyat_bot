@@ -320,7 +320,7 @@ class TestLeaderboardOptIn:
 
 class TestTimezone:
     async def test_the_picker_offers_every_offset(self):
-        from lib.localtime import OFFSET_CHOICES
+        from domain.localtime import OFFSET_CHOICES
 
         bot = AsyncMock()
         ctx = await _ctx(bot, tap=True)

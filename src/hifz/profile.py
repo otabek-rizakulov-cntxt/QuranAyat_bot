@@ -30,8 +30,8 @@ from typing import Optional, Tuple
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.time_pickers import offset_keyboard  # re-exported (see __all__)
+from domain.localtime import is_valid_offset, normalize_offset
 from hifz import Ctx, callback, command, wizard
-from lib.localtime import is_valid_offset, normalize_offset
 from services.profile import (  # noqa: F401 — re-exported (see __all__)
     NAME_MAX,
     NAME_MIN,
