@@ -12,6 +12,8 @@ from dataclasses import dataclass, field, replace
 from datetime import date, datetime, time, timezone
 from typing import Any, Dict, List, Optional, Sequence
 
+import ujson as json
+
 from ._state import MemoryState
 from .plans import PlanDaySpec
 
@@ -322,7 +324,6 @@ class PostgresGroupStore(GroupStore):
     def _config(self, r):
         if r is None:
             return None
-        import ujson as json
 
         flags = r["content_flags"]
         if isinstance(flags, str):
@@ -387,7 +388,6 @@ class PostgresGroupStore(GroupStore):
         return await self.get_config(chat_id)
 
     async def update_config(self, chat_id, **fields):
-        import ujson as json
 
         sets, args = [], []
         for k, v in fields.items():

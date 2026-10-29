@@ -22,6 +22,7 @@ from config.settings import get_settings
 from domain.quran import Quran, TranslationRegistry, make_index
 from infra.postgres import close_pool
 from infra.redis_client import RedisSingleton, cache_backend
+from infra.scheduler import run_scheduler
 from infra.store import apply_schema
 from infra.telegram import create_bot
 from locales import BOT_COMMANDS, DEFAULT_LANG, UI_LANGUAGES, t
@@ -170,8 +171,6 @@ async def initialize(state: AppState) -> None:
     # continues), so the only thing that can land here is a failure to *start* it.
     # It is stopped by cancellation when uvicorn tears the event loop down.
     try:
-        from infra.scheduler import run_scheduler
-
         spawn(run_scheduler(bot, data))
     except Exception as e:
         logger.error("INIT ERROR (scheduler): %s: %s", type(e).__name__, e)

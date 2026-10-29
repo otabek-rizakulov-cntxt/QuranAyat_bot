@@ -32,6 +32,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from bot.features import Ctx, callback, command, wizard
 from bot.keyboards.time_pickers import offset_keyboard  # re-exported (see __all__)
 from domain.localtime import is_valid_offset, normalize_offset
+from locales import t
 from services.profile import (  # noqa: F401 — re-exported (see __all__)
     NAME_MAX,
     NAME_MIN,
@@ -146,7 +147,6 @@ def reminder_keyboard(
     something a person can type in three seconds. `off_data` and `cancel_data`
     are parameters so another wizard can route the same keyboard to itself.
     """
-    from locales import t
 
     rows = [[InlineKeyboardButton(t("btn_reminder_off", ui_lang), callback_data=off_data)]]
     if cancel_data:

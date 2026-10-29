@@ -36,6 +36,8 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 import telegram
 
 from domain.localtime import local_date, next_due_utc
+from infra.file_facade import File
+from infra.store import get_store
 from infra.store.schedule import ScheduledSend
 
 logger = logging.getLogger(__name__)
@@ -423,8 +425,6 @@ async def tick(
 
 
 async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
-    from infra.file_facade import File
-    from infra.store import get_store
 
     now = _utcnow(now)
     store = store if store is not None else await get_store()

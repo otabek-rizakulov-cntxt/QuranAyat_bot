@@ -405,8 +405,9 @@ class TestSevenTheCommandsExist:
     def test_the_scheduler_starts_at_boot(self):
         """A loop nobody starts is a feature nobody gets."""
         source = open("src/app/lifespan.py", encoding="utf-8").read()  # boot sequence
-        assert "run_scheduler" in source
+        start = "spawn(run_scheduler("  # the call that starts the loop, not the import
+        assert start in source
         assert "features.load_features()" in source
-        assert source.index("features.load_features()") < source.index("run_scheduler"), (
+        assert source.index("features.load_features()") < source.index(start), (
             "handlers must be registered before the loop that dispatches to them"
         )
