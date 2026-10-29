@@ -2,7 +2,7 @@
 # per-kind warnings. Shared by the bot's /reciter picker (main.py) and the Mini
 # App's GET /catalog/reciters.
 
-from lib.utils import File
+from infra import catalog
 
 # A curated shortlist of well-known reciters (subfolder keys into performers.json).
 # These lead the catalog, so the first page of the picker is the ten names most
@@ -41,7 +41,7 @@ _KIND_WARNING_KEYS = {
 def reciter_catalog() -> list:
     """Every reciter in src/common/performers.json, shortlist first then the rest in
     catalog order — the order the picker pages through."""
-    performers = File._load_performers()
+    performers = catalog.performers()
     by_subfolder = {p["subfolder"]: p for p in performers}
     # a shortlist entry the catalog no longer has is skipped, not fatal
     ordered = [by_subfolder[s] for s in _RECITER_SHORTLIST if s in by_subfolder]
@@ -53,7 +53,7 @@ def reciter_catalog() -> list:
 def reciter_kind(subfolder: str) -> str:
     """Which group `subfolder` belongs to, defaulting to plain recitation for an
     entry with no `kind` (or a stale saved preference no longer in the catalog)."""
-    match = next((p for p in File._load_performers() if p["subfolder"] == subfolder), None)
+    match = next((p for p in catalog.performers() if p["subfolder"] == subfolder), None)
     if match is None:
         return DEFAULT_RECITER_KIND
     return match.get("kind", DEFAULT_RECITER_KIND)

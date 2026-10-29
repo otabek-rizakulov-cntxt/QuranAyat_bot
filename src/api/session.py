@@ -8,11 +8,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from config import Environment
+from infra import catalog
 from lib.localtime import is_valid_offset, normalize_offset, offset_options
 from lib.store import get_store
 from lib.streaks import streak_summary
 from lib.user_settings import UserSettings
-from lib.utils import File
 from locales import is_supported, is_ui_language, normalize_lang
 from modules import TranslationRegistry
 from services import plans as plans_service
@@ -220,7 +220,7 @@ async def patch_settings(body: SettingsPatch, user_id: int = Depends(require_use
             raise _unprocessable("unknown translation_lang")
         await settings.set_translation_lang(user_id, user_id, body.translation_lang)
     if body.reciter is not None:
-        if not any(p["subfolder"] == body.reciter for p in File._load_performers()):
+        if not any(p["subfolder"] == body.reciter for p in catalog.performers()):
             raise _unprocessable("unknown reciter")
         await settings.set_reciter(user_id, user_id, body.reciter)
     return _settings(await settings.get(user_id, user_id))

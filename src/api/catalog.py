@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from config import Environment
-from lib.utils import File
+from infra import nav_state
 from locales import LANGUAGES, UI_LANGUAGES
 from modules import Quran, TranslationRegistry
 from services.reciters import _KIND_WARNING_KEYS, RECITER_KINDS, reciter_catalog
@@ -98,7 +98,7 @@ class ReaderPosition(BaseModel):
 @router.get("/reader/position", response_model=Optional[ReaderPosition])
 async def get_position(user_id: int = Depends(require_user)) -> Optional[ReaderPosition]:
     """Where the user last read — in the bot or the app. Null if they never have."""
-    state = await File().get_user(user_id)
+    state = await nav_state.get(user_id)
     if not state:
         return None
     try:
@@ -121,5 +121,5 @@ async def put_position(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="invalid position"
         )
-    await File().save_user(user_id, (body.surah, body.ayah, body.type))
+    await nav_state.save(user_id, body.surah, body.ayah, body.type)
     return body

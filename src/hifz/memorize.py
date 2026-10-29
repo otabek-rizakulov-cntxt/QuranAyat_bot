@@ -826,7 +826,6 @@ async def _send_drill(
     await send_quran(
         bot,
         data,
-        file,
         day.surah,
         day.start_ayah,
         "arabic",
@@ -847,7 +846,6 @@ async def _send_drill(
         await send_quran(
             bot,
             data,
-            file,
             day.surah,
             day.start_ayah,
             "audio",
