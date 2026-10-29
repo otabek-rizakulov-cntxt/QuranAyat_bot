@@ -254,6 +254,28 @@ class TestPlanWizard:
                  if r.kind == G.SEND_KIND]
         assert len(posts) == 1 and posts[0].thread_id == 77
 
+    async def test_an_empty_offset_falls_back_to_the_default(self):
+        # Regression: both fallbacks named DEFAULT_OFFSET without importing it,
+        # so an offset-less tap crashed the wizard with a NameError.
+        from lib.localtime import DEFAULT_OFFSET
+        store = await get_store()
+        bot = _bot(get_chat_member=_member("administrator"),
+                   create_forum_topic=SimpleNamespace(message_thread_id=77))
+        await _run_setup_to_plan(store, bot)
+        await hifz.dispatch_wizard(await _ctx(bot), "67")
+
+        async def tap(cb):
+            c = await Ctx.build(bot, {}, (await _ctx(bot)).file, ADMIN, ADMIN, _Settings(),
+                                callback_query=SimpleNamespace(id="cq", message=None))
+            await hifz.dispatch_callback(c, cb)
+        await tap("gr:pace:0")
+        await tap("gr:d:all")
+        await tap("gr:tz:")                                         # no offset in the payload
+        await hifz.dispatch_wizard(await _ctx(bot), "07:00")
+
+        config = await store.groups.get_config(CHAT)
+        assert config.status == "active" and config.timezone == DEFAULT_OFFSET
+
     async def test_a_bad_target_is_rejected_without_advancing(self):
         store = await get_store()
         bot = _bot(get_chat_member=_member("administrator"),

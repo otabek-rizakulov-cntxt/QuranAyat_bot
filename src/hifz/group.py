@@ -28,6 +28,7 @@ import telegram
 
 from hifz import Ctx, callback, wizard
 from lib.scheduler import send_handler
+from lib.localtime import DEFAULT_OFFSET
 from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED, CONFIG_SETUP
 from locales import t
 
