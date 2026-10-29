@@ -3,7 +3,7 @@
 # Owns: /progress (surah / juz / whole-Qur'an percentages derived from the
 # interval store) and /forgot (unmark a range, splitting intervals as needed).
 # Percentages are always derived arithmetic — no counter is ever stored.
-# Callback prefix: "hg:" (see hifz.PREFIXES).
+# Callback prefix: "hg:" (see bot.features.PREFIXES).
 #
 # **The headline uses two units on purpose.** The surah is quoted in *ayahs*
 # ("Al-Mulk 8/30 — 27%") because that is how a surah is learned and how the spec's
@@ -20,10 +20,10 @@ from typing import Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.features import Ctx, callback, command
 from bot.keyboards.rows import button_rows
 from domain.quran import Quran
 from domain.refs import format_ref, parse_reference
-from hifz import Ctx, callback, command
 from services.progress import load_summary, surah_spans, unmark  # noqa: F401 — re-exported
 
 __all__ = [

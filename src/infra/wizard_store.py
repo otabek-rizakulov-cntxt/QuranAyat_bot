@@ -43,7 +43,7 @@ class Wizard:
     """Per-user draft state for a multi-step flow.
 
     A draft is `{"kind": str, "step": str, "data": dict}`. `kind` names the
-    wizard (and is what `hifz.dispatch_wizard` routes on), `step` is that
+    wizard (and is what `bot.features.dispatch_wizard` routes on), `step` is that
     wizard's own business, and `data` accumulates the answers.
     """
 

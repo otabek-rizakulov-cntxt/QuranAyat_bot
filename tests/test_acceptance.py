@@ -15,11 +15,11 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
+from bot.features import Ctx
+from bot.features import memorize as memorize_feature
 from domain.hifz_progress import summarize
-from hifz import Ctx
-from hifz import memorize as memorize_feature
 from infra import scheduler
 from infra.store import get_store
 from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
@@ -406,7 +406,7 @@ class TestSevenTheCommandsExist:
         """A loop nobody starts is a feature nobody gets."""
         source = open("src/app/lifespan.py", encoding="utf-8").read()  # boot sequence
         assert "run_scheduler" in source
-        assert "hifz.load_features()" in source
-        assert source.index("hifz.load_features()") < source.index("run_scheduler"), (
+        assert "features.load_features()" in source
+        assert source.index("features.load_features()") < source.index("run_scheduler"), (
             "handlers must be registered before the loop that dispatches to them"
         )

@@ -4,7 +4,7 @@
 # memorizing from a physical mushaf earn a session without ever running a drill.
 # Question text comes from `Quran.get_ayah_text` (no "(s:a)" suffix — that would
 # leak the answer into the options).
-# Callback prefix: "hc:" (see hifz.PREFIXES).
+# Callback prefix: "hc:" (see bot.features.PREFIXES).
 #
 # Two design points carry this module:
 #
@@ -32,10 +32,10 @@ from typing import Optional, Tuple
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 import services.check as check_service
+from bot.features import Ctx, callback, command
 from domain.quran import Quran
 from domain.recall_check import OPTION_COUNT, RecallQuestion
 from domain.refs import parse_reference
-from hifz import Ctx, callback, command
 from services.check import DEFAULT_JUZ  # noqa: F401 — re-exported
 from services.streaks import user_today
 

@@ -12,10 +12,10 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz import group as G
+from bot.features import Ctx
+from bot.features import group as G
 from infra.store import get_store
 
 ADMIN = 500
@@ -384,7 +384,7 @@ class TestDailyPost:
         ):
             posted["audio"] = (s, a, b, chat_id, message_thread_id)
 
-        monkeypatch.setattr("hifz.group.send_combined_audio", fake_audio)
+        monkeypatch.setattr("bot.features.group.send_combined_audio", fake_audio)
 
         bot = AsyncMock()
         row = SimpleNamespace(
@@ -414,7 +414,7 @@ class TestDailyPost:
         day = (await store.groups.list_plan_days(plan.id))[0]
         await store.groups.claim_plan_day(day.id)  # already sent
 
-        monkeypatch.setattr("hifz.group.send_combined_audio", AsyncMock())
+        monkeypatch.setattr("bot.features.group.send_combined_audio", AsyncMock())
         bot = AsyncMock()
         row = SimpleNamespace(
             id=1,

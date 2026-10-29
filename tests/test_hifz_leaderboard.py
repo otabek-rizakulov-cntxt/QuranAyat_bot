@@ -14,9 +14,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
+from bot.features import Ctx
 from infra.store import get_store
 from infra.store.sessions import KIND_DRILL
 

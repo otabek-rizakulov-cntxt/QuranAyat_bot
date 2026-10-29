@@ -9,9 +9,9 @@ reading session doesn't flood the chat with near-identical bubbles.
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.limits import REPEAT_COUNT
+from bot.miniapp import app_row
 from bot.text import nav_labels
 from domain.quran import Quran
-from lib.miniapp import app_row
 from locales import get_language, t
 
 # Short codes keep callback_data tiny (Telegram caps it at 64 bytes).

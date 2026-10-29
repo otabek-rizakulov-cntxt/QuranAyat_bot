@@ -1,4 +1,4 @@
-"""`/streak` (`src/hifz/streak.py`) — spec items G2 and G3.
+"""`/streak` (`src/bot/features/streak.py`) — spec items G2 and G3.
 
 Two properties are load-bearing:
 
@@ -19,11 +19,11 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.features as hifz
 import bot.router as router
-import hifz
+from bot.features import Ctx
+from bot.features.streak import CB_GRID
 from bot.streak_image import cache_key
-from hifz import Ctx
-from hifz.streak import CB_GRID
 from infra.store import get_store
 from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
 from locales import t
@@ -215,7 +215,7 @@ class TestMilestones:
 
 class TestGraphCache:
     async def test_the_graph_is_rendered_once_a_day_and_re_sent_from_the_file_id(self, monkeypatch):
-        import hifz.streak as streak_module
+        import bot.features.streak as streak_module
         from infra.file_facade import File
 
         renders = []
@@ -281,7 +281,7 @@ class TestCallback:
 
     @pytest.mark.parametrize("cb_data", ["hs:", "hs:grid:extra", "hs:garbage"])
     async def test_an_unknown_shape_is_acknowledged_and_ignored(self, cb_data):
-        from hifz.streak import on_streak
+        from bot.features.streak import on_streak
 
         bot = AsyncMock()
         cq = type("CQ", (), {"id": "cq-1", "message": None})()

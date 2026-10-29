@@ -12,18 +12,18 @@ from contextlib import asynccontextmanager
 
 from telegram import BotCommand
 
-import hifz
 from app.routes.webhook import WEBHOOK_PATH, webhook_secret
 from app.state import AppState
 from app.tasks import spawn
+from bot import features
 from bot.inline import get_default_query_results
+from bot.miniapp import set_menu_button
 from config.settings import get_settings
 from domain.quran import Quran, TranslationRegistry, make_index
 from infra.postgres import close_pool
 from infra.redis_client import RedisSingleton, cache_backend
 from infra.store import apply_schema
 from infra.telegram import create_bot
-from lib.miniapp import set_menu_button
 from locales import BOT_COMMANDS, DEFAULT_LANG, UI_LANGUAGES, t
 
 logger = logging.getLogger(__name__)
@@ -154,16 +154,16 @@ async def initialize(state: AppState) -> None:
         except Exception as e:
             logger.error("INIT ERROR (set_chat_menu_button): %s: %s", type(e).__name__, e)
 
-    # Register the hifz features (src/hifz/*.py). Discovery is lazy, so this is
+    # Register the hifz features (src/bot/features/*.py). Discovery is lazy, so this is
     # where they load at boot rather than on the first update.
     try:
-        hifz.load_features()
+        features.load_features()
     except Exception as e:
         logger.error("INIT ERROR (hifz features): %s: %s", type(e).__name__, e)
 
     # --- SCHEDULER SLOT (Wave 1D) ---------------------------------------------
     # The due-queue loop. It goes last because it needs `bot` and `data`
-    # populated and the schema applied — and after hifz.load_features(), because
+    # populated and the schema applied — and after features.load_features(), because
     # that import is what registers the per-kind send handlers it dispatches to.
     #
     # The loop owns its own error handling (a failing tick is logged and the loop

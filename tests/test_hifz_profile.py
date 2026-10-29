@@ -12,10 +12,10 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
-from hifz import Ctx
-from hifz import profile as profile_feature
+from bot.features import Ctx
+from bot.features import profile as profile_feature
 from infra.store import get_store
 
 USER_ID = 900123
@@ -291,7 +291,7 @@ class TestLeaderboardOptIn:
         # `hifz/leaderboard.py` hard-codes "hp:board:on" rather than importing it,
         # so that a broken profile module cannot take the board down with it. That
         # only holds if this module actually answers that exact shape.
-        from hifz import leaderboard as board_feature
+        from bot.features import leaderboard as board_feature
 
         assert board_feature.CB_JOIN == profile_feature.BOARD_ON_CB
         ctx = await _ctx(username="abubakr", tap=True)

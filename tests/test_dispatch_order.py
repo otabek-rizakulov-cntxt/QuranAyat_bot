@@ -16,7 +16,7 @@ import telegram
 
 import app.lifespan as lifespan
 import bot.dispatch as dispatch
-import hifz
+import bot.features as hifz
 import locales
 from infra.file_facade import File
 from infra.wizard_store import Wizard

@@ -90,10 +90,10 @@ CATCH_UP_WINDOW = timedelta(hours=6)
 # The scheduler knows how to claim a row, when to give up on it and how to keep
 # the queue moving. It deliberately knows nothing about what a 'plan_day' *is* —
 # that is the drill's business. Feature modules register a coroutine per `kind`,
-# exactly as `src/hifz/__init__.py` registers commands, so nobody has to edit
+# exactly as `src/bot/features/__init__.py` registers commands, so nobody has to edit
 # this file to add a scheduled send:
 #
-#     # src/hifz/memorize.py
+#     # src/bot/features/memorize.py
 #     from infra.scheduler import SendCtx, send_handler
 #
 #     @send_handler("plan_day")
@@ -147,7 +147,7 @@ def register_send_handler(kind: str, handler: SendHandler) -> SendHandler:
     """Bind `kind` to `handler`. Registering a kind twice raises.
 
     A silent overwrite would mean one feature module quietly stealing another's
-    sends, so this fails at import time instead — same rule as `hifz.command`.
+    sends, so this fails at import time instead — same rule as `bot.features.command`.
     """
     existing = SEND_HANDLERS.get(kind)
     if existing is not None and existing is not handler and not _same_origin(existing, handler):
@@ -162,7 +162,7 @@ def register_send_handler(kind: str, handler: SendHandler) -> SendHandler:
 def _same_origin(a, b) -> bool:
     """Whether two functions are the same declaration, across a module reload.
 
-    Identity is the obvious test and the wrong one: `hifz.load_features` reloads
+    Identity is the obvious test and the wrong one: `bot.features.load_features` reloads
     already-imported feature modules so their decorators run again, and a reload
     produces a *new* function object for the same `def`. Under identity that reads
     as a second module stealing the kind and raises. Module plus qualified name is
@@ -195,7 +195,7 @@ def registered_kinds() -> Dict[str, str]:
 class SendCtx:
     """Everything a scheduled-send handler needs, assembled once per row.
 
-    Deliberately shaped like `hifz.Ctx`: a handler reads its context and writes
+    Deliberately shaped like `bot.features.Ctx`: a handler reads its context and writes
     through `store`. There is no `ui_lang` here — a scheduled push happens
     outside any update, so the handler looks the recipient's settings up itself
     (`store.profiles.get_settings`), which is also what makes a group post in one

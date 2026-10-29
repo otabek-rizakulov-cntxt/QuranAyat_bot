@@ -15,12 +15,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
+from bot.features import Ctx
+from bot.features import memorize as memorize_feature
 from domain.plan_builder import advancing, build_plan
 from domain.refs import surah_ref
-from hifz import Ctx
-from hifz import memorize as memorize_feature
 from infra import scheduler
 from infra.store import get_store
 from infra.store.plans import DAY_COMPLETED, PLAN_ACTIVE, PLAN_PAUSED

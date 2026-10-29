@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     """Process a single Telegram update pushed to the webhook."""
     if update.my_chat_member:  # the bot was added to or removed from a chat
-        from hifz import group as hifz_group
+        from bot.features import group as hifz_group
         from infra.store import get_store
 
         try:

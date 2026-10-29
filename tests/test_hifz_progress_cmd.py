@@ -10,12 +10,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.features as hifz
 import bot.router as router
-import hifz
+from bot.features import Ctx
+from bot.features import progress as progress_feature
 from domain.quran import Quran
 from domain.refs import juz_ref
-from hifz import Ctx
-from hifz import progress as progress_feature
 from infra.store import get_store
 
 USER_ID = 900456

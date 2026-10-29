@@ -3,7 +3,7 @@
 # Owns: /leaderboard. Ranks sessions completed in the Mon->Sun week local to the
 # user (see domain/localtime.week_bounds), ties broken by streak length, opted-in
 # users only. The caller's own row is always shown, even outside the top N.
-# Callback prefix: "hl:" (see hifz.PREFIXES).
+# Callback prefix: "hl:" (see bot.features.PREFIXES).
 #
 # Three things this module deliberately does *not* do:
 #
@@ -15,7 +15,7 @@
 #   * It does not draw the caller twice. `WeeklyBoard.me_in_top` says whether
 #     their row is already among `entries`; the extra "you" row is drawn only
 #     when it is not.
-#   * It does not own the opt-in. Workstream B (src/hifz/profile.py) owns that
+#   * It does not own the opt-in. Workstream B (src/bot/features/profile.py) owns that
 #     flow; this offers a button into it and names /profile in the copy, so the
 #     user has a path even if the button's owner is not loaded.
 #
@@ -25,7 +25,7 @@
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from hifz import Ctx, callback, command
+from bot.features import Ctx, callback, command
 from services.leaderboard import weekly_board
 
 # --- callback_data shapes ------------------------------------------------------
@@ -33,7 +33,7 @@ from services.leaderboard import weekly_board
 CB_ME = "hl:me"
 
 # Workstream B's opt-in tap. Spelled out rather than imported so a broken profile
-# module cannot take the board down with it; see hifz.PREFIXES ("hp:board:on").
+# module cannot take the board down with it; see bot.features.PREFIXES ("hp:board:on").
 CB_JOIN = "hp:board:on"
 
 # A row for an opted-in user who somehow has no display name. B2 sets one at

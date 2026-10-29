@@ -26,11 +26,11 @@ from typing import Optional
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.features import Ctx, callback, wizard
 from bot.keyboards.time_pickers import offset_keyboard
 from bot.media import send_combined_audio
 from domain.localtime import DEFAULT_OFFSET
 from domain.quran import get_translation
-from hifz import Ctx, callback, wizard
 from infra import catalog
 from infra.page_image import fetch_and_stitch
 from infra.scheduler import send_handler
@@ -216,7 +216,7 @@ async def _step_target(ctx: Ctx, draft, text: str) -> None:
 
 
 async def _step_post_time(ctx: Ctx, draft, text: str) -> None:
-    from hifz.profile import parse_reminder_time
+    from bot.features.profile import parse_reminder_time
 
     post_time = parse_reminder_time(text)
     if post_time is None:

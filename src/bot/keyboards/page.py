@@ -9,9 +9,9 @@ audio is ~1 MB nobody asked for if they only wanted to read.
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.keyboards.verse import CODE_BY_TYPE
+from bot.miniapp import app_row
 from bot.text import nav_labels
 from domain.quran import Quran
-from lib.miniapp import app_row
 from locales import t
 
 

@@ -2,20 +2,21 @@
 
 Dependencies point one way:
 
-    app, main  →  bot, api, hifz  →  services  →  infra, lib  →  domain, config, locales
+    app, main  →  bot, api  →  services  →  infra  →  domain, config, locales
 
-Nothing imports `main`. Only the presentation layer (app, bot, api, hifz, main)
+Nothing imports `main`. Only the presentation layer (app, bot, api, main)
 and infra, which wraps the Telegram client, may import Telegram or FastAPI.
 
-Today's code breaks a few of these rules. They are listed in KNOWN with the
-refactor step that removes each one, and the list is a ratchet:
+The refactor (docs/REFACTOR_PLAN.md) brought the code in line with these
+rules, so KNOWN is empty. It stays as the escape hatch for a deliberate,
+temporary exception, and the tests keep it honest:
 
   * a violation that isn't listed fails `test_no_new_violations`;
   * a listed violation that no longer exists fails `test_known_violations_still_exist`,
-    so the entry has to be deleted in the same PR that fixes it.
+    so an entry has to be deleted in the same PR that fixes it.
 
-When the refactor renames packages (app/, bot/, domain/, infra/), update ALLOWED
-in the same PR.
+A new top-level package needs a rule in ALLOWED (test_the_scan_sees_every_package
+fails until it has one).
 """
 
 import ast
@@ -24,27 +25,23 @@ import os
 SRC = os.path.join(os.path.dirname(__file__), "..", "src")
 
 PACKAGES = {
-    "main", "app", "bot", "api", "hifz",
+    "main", "app", "bot", "api",
     "services",
-    "infra", "lib",
+    "infra",
     "domain", "config", "locales",
 }  # fmt: skip
 
 _BASE = {"domain", "config", "locales"}
-_LOWER = _BASE | {"infra", "lib"}
+_LOWER = _BASE | {"infra"}
 
 # Which project packages each package may import (itself included).
 ALLOWED = {
     "config": {"config"},
     "locales": {"locales"},
     "domain": {"domain", "config", "locales"},
-    "lib": _LOWER,
     "infra": _LOWER,
     "services": _LOWER | {"services"},
-    # The bot's feature modules (hifz, until it becomes bot/features) and the bot
-    # core sit side by side in the presentation layer.
-    "bot": _LOWER | {"services", "bot", "hifz"},
-    "hifz": _LOWER | {"services", "bot", "hifz"},
+    "bot": _LOWER | {"services", "bot"},
     "api": _LOWER | {"services", "api"},
     "app": PACKAGES - {"main"},
     "main": PACKAGES - {"main"},
@@ -52,12 +49,10 @@ ALLOWED = {
 
 FRAMEWORKS = {"telegram", "fastapi"}
 # Packages below the presentation layer: no Telegram, no FastAPI.
-FRAMEWORK_FREE = {"config", "locales", "domain", "lib", "services"}
+FRAMEWORK_FREE = {"config", "locales", "domain", "services"}
 
 # (file relative to src/, imported module) -> the refactor step that removes it.
-KNOWN = {
-    ("lib/miniapp.py", "telegram"): "5.3 app_row moves to bot/keyboards/",
-}
+KNOWN = {}
 
 
 def _sources():

@@ -4,7 +4,7 @@ with decorators and dispatched from one place.
 A feature module declares itself and is discovered by walking its package —
 there is no shared import list, so two features never edit the same line:
 
-    from hifz import Ctx, callback, command, wizard
+    from bot.features import Ctx, callback, command, wizard
 
     @command("profile")
     async def profile(ctx: Ctx) -> None:
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Packages whose modules register handlers. Discovery imports every module in
 # each one whose name does not start with "_".
-FEATURE_PACKAGES = ("bot.handlers", "hifz")
+FEATURE_PACKAGES = ("bot.handlers", "bot.features")
 
 
 CommandHandler = Callable[["Ctx"], Awaitable[None]]
@@ -103,7 +103,7 @@ def command(*names: str):
 def callback(*prefixes: str):
     """Register an inline-button handler for every callback_data with `prefix`.
 
-    Use the prefix allocated to your module in `hifz.PREFIXES` — `@callback("hm:")`.
+    Use the prefix allocated to your module in `bot.features.PREFIXES` — `@callback("hm:")`.
     The handler receives the full callback_data, prefix included, and must parse
     it defensively: callback_data comes off the wire and can be stale, truncated
     or forged.

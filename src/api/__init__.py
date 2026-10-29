@@ -2,7 +2,7 @@
 # (docs/MINI_APP_PLAN.md §5).
 #
 # Routes here are thin adapters: they authenticate, validate shapes and call
-# into `services/*` and `lib/*` — the same code the bot handlers run. No SQL
+# into `services/*` and `domain/*` — the same code the bot handlers run. No SQL
 # lives in this package (tests/test_service_layer.py); persistence goes through
 # `infra.store`.
 

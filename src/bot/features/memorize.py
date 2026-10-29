@@ -3,7 +3,7 @@
 # Owns: /memorize (the setup wizard: target -> pace -> days -> preview ->
 # confirm), drill delivery, the "I know this by heart" button, and the plan
 # lifecycle (pause / resume / abandon / complete).
-# Callback prefix: "hm:" (see hifz.PREFIXES). Wizard kinds: prefix them "plan_".
+# Callback prefix: "hm:" (see bot.features.PREFIXES). Wizard kinds: prefix them "plan_".
 #
 # Drill delivery reuses `main.send_quran` (module level since Wave 0b, so the
 # scheduler can call it too) and `main.send_combined_audio`.
@@ -52,10 +52,16 @@ from typing import Optional, Sequence
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 import services.plans as plans_service
+from bot.features import Ctx, callback, command, wizard
+from bot.features.profile import (
+    format_reminder_time,
+    parse_reminder_time,
+)
 from bot.keyboards.rows import button_rows
 from bot.keyboards.time_pickers import offset_keyboard
 from bot.limits import MAX_RANGE_AYAHS, REPEAT_COUNT
 from bot.media import send_combined_audio, send_quran
+from bot.miniapp import app_row
 from domain.localtime import (
     DEFAULT_OFFSET,
     is_valid_offset,
@@ -65,14 +71,8 @@ from domain.localtime import (
 from domain.plan_builder import AUTO_PACE, Portion, build_plan
 from domain.quran import Quran, get_translation
 from domain.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
-from hifz import Ctx, callback, command, wizard
-from hifz.profile import (
-    format_reminder_time,
-    parse_reminder_time,
-)
 from infra.scheduler import SendCtx, send_handler
 from infra.store.plans import PLAN_ACTIVE, PLAN_PAUSED
-from lib.miniapp import app_row
 from locales import t
 from services.plans import SEND_KIND
 from services.profile import as_time

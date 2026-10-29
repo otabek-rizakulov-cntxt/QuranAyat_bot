@@ -1,8 +1,8 @@
 # The operations behind every feature, shared by the two surfaces that expose
 # them (docs/MINI_APP_PLAN.md §3, Phase 1):
 #
-#   bot handlers (src/hifz/*, src/main.py)  ─┐
-#                                            ├─► services/* ─► lib/* ─► infra/store
+#   bot handlers (src/bot/features/*, src/main.py)  ─┐
+#                                            ├─► services/* ─► domain/* + infra/store
 #   Mini App API (src/api/*)                ─┘
 #
 # A service takes plain values and a store and returns plain values. It never
