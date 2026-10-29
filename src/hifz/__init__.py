@@ -58,9 +58,9 @@ __all__ = [
 # Telegram caps callback_data at 64 bytes (see bot.keyboards.verse.TYPE_BY_CODE
 # for the same constraint on the reader), so prefixes are two letters and payloads are numbers.
 # One prefix per feature module, allocated here so parallel work cannot collide.
-# The reader owns "vc:", "vr:", "rep:", "pg:", "pga:", "recgrp:", "setlang:",
-# "settranslang:", "setreciter:", "showlang" and "reciter_search"; nothing below
-# may shadow those.
+# The reader's own prefixes are whatever bot/handlers/ registers; the router
+# refuses any prefix that overlaps one another module owns, so nothing below can
+# shadow them.
 PREFIXES: Dict[str, str] = {
     "profile": "hp:",  # hp:name  hp:board:on  hp:tz  hp:tz:+05:00  hp:rem
     "progress": "hg:",  # hg:surah:67  hg:juz:30  hg:forget:...

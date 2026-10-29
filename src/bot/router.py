@@ -103,10 +103,14 @@ def command(*names: str):
 def callback(*prefixes: str):
     """Register an inline-button handler for every callback_data with `prefix`.
 
-    Use the prefix allocated to your module in `PREFIXES` — `@callback("hm:")`.
+    Use the prefix allocated to your module in `hifz.PREFIXES` — `@callback("hm:")`.
     The handler receives the full callback_data, prefix included, and must parse
     it defensively: callback_data comes off the wire and can be stale, truncated
     or forged.
+
+    A prefix may not overlap one another *module* owns ("p" would take every
+    "pg:" tap no longer prefix claims). Within one module it may: "hm:day:" can be
+    split out of "hm:", and the longer one wins (see `_match_callback`).
     """
 
     def decorate(handler: CallbackHandler) -> CallbackHandler:
@@ -121,6 +125,16 @@ def callback(*prefixes: str):
                     "callback prefix %r is already registered by %s"
                     % (prefix, getattr(existing, "__module__", "?"))
                 )
+            module = getattr(handler, "__module__", None)
+            for other, owner in CALLBACKS.items():
+                overlaps = other != prefix and (
+                    other.startswith(prefix) or prefix.startswith(other)
+                )
+                if overlaps and getattr(owner, "__module__", None) != module:
+                    raise ValueError(
+                        "callback prefix %r overlaps %r, registered by %s"
+                        % (prefix, other, getattr(owner, "__module__", "?"))
+                    )
             CALLBACKS[prefix] = handler
         return handler
 
