@@ -26,6 +26,7 @@ from typing import Optional
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.keyboards.time_pickers import offset_keyboard
 from bot.media import send_combined_audio
 from hifz import Ctx, callback, wizard
 from lib.localtime import DEFAULT_OFFSET
@@ -552,7 +553,9 @@ async def on_group_tap(ctx: Ctx, cb_data: str) -> None:
     elif action == "d":  # daily | weekdays
         days = list(range(1, 8)) if arg == "all" else [1, 2, 3, 4, 5]
         ctx.wiz.update(ctx.user_id, days=days, step="timezone")
-        await ctx.edit(ctx.tr("group_timezone_prompt"), reply_markup=_offset_keyboard())
+        await ctx.edit(
+            ctx.tr("group_timezone_prompt"), reply_markup=offset_keyboard("en", "gr:tz:")
+        )
     elif action == "tz":  # utc offset chosen
         ctx.wiz.update(ctx.user_id, offset=arg or DEFAULT_OFFSET, step="post_time")
         await ctx.edit(ctx.tr("group_post_time_prompt"))
@@ -576,21 +579,6 @@ def _days_keyboard() -> InlineKeyboardMarkup:
             ]
         ]
     )
-
-
-def _offset_keyboard() -> InlineKeyboardMarkup:
-    from lib.localtime import offset_options
-
-    opts = offset_options()
-    rows, row = [], []
-    for off in opts:
-        row.append(InlineKeyboardButton(off, callback_data="gr:tz:" + off))
-        if len(row) == 4:
-            rows.append(row)
-            row = []
-    if row:
-        rows.append(row)
-    return InlineKeyboardMarkup(rows)
 
 
 # --- J6 (entry only): a member joins the board via deep link -------------------

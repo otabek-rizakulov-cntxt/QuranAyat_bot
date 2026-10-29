@@ -53,6 +53,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 import services.plans as plans_service
 from bot.keyboards.rows import button_rows
+from bot.keyboards.time_pickers import offset_keyboard
 from bot.limits import MAX_RANGE_AYAHS, REPEAT_COUNT
 from bot.media import send_combined_audio, send_quran
 from hifz import Ctx, callback, command, wizard
@@ -63,7 +64,6 @@ from hifz.profile import (
 from hifz.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
 from lib.localtime import (
     DEFAULT_OFFSET,
-    OFFSET_CHOICES,
     is_valid_offset,
     local_date,
     normalize_offset,
@@ -228,30 +228,12 @@ def _custom_days_keyboard(selected: Sequence[int], ui_lang: str) -> InlineKeyboa
     )
 
 
-# --- INTEGRATION NOTE (Wave 2A) ------------------------------------------------
-# B3 says the timezone and reminder time are captured once, during first plan
-# setup, and `/profile` edits them later. Wave 2A owns `/profile` and is building
-# the offset picker and the reminder-time capture in parallel; at the time this
-# module was written `src/hifz/profile.py` was still a stub exporting nothing, so
-# the two keyboards below are the minimum needed to finish the wizard. They are
-# deliberately kept together, use only frozen manifest keys, and carry this
-# module's own callback prefix — when Wave 2A lands its public helpers, delete
-# `_offset_keyboard` / `_reminder_keyboard` and call theirs with an `hm:` prefix.
-
-
-def _offset_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    """The UTC-offset picker. Labels are the offsets, which need no translation."""
-    buttons = [
-        InlineKeyboardButton("UTC" + offset, callback_data="hm:tz:" + offset)
-        for offset in OFFSET_CHOICES
-    ]
-    rows = [buttons[i : i + 4] for i in range(0, len(buttons), 4)]
-    rows.append(_cancel_row(ui_lang))
-    return InlineKeyboardMarkup(rows)
-
-
 def _reminder_keyboard(ui_lang: str) -> InlineKeyboardMarkup:
-    """Preset reminder times, with free text as the escape for anything else."""
+    """Preset reminder times, with free text as the escape for anything else.
+
+    Not profile.reminder_keyboard: /profile deliberately has the time typed with
+    no presets (docs/REFACTOR_PLAN.md §10 lists the difference as a UX decision).
+    """
     buttons = [
         InlineKeyboardButton(choice, callback_data="hm:rt:" + choice) for choice in REMINDER_CHOICES
     ]
@@ -380,7 +362,12 @@ async def _after_days(ctx: Ctx) -> None:
         if ctx.wiz.set_step(ctx.user_id, STEP_TIMEZONE) is None:
             await _expired(ctx)
             return
-        await ctx.edit(ctx.tr("timezone_prompt"), reply_markup=_offset_keyboard(ctx.ui_lang))
+        await ctx.edit(
+            ctx.tr("timezone_prompt"),
+            reply_markup=offset_keyboard(
+                ctx.ui_lang, "hm:tz:", label_prefix="UTC", cancel_data="hm:x"
+            ),
+        )
         return
 
     reminder = draft.get("time") or (
