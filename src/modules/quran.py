@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import asyncio
 import os
 import re
 import xml.etree.ElementTree as ET
@@ -486,3 +487,10 @@ def make_index():
     for i, j in zip(left, right):
         index.append(f"/{i} <code>{chapters[i - 1]}</code>/{j} {chapters[j - 1]}")
     return "\n".join(index)
+
+
+async def get_translation(lang: str) -> Quran:
+    """Return the Qur'an translation for `lang`, parsing off the event loop on first use."""
+    if TranslationRegistry.is_cached(lang):
+        return TranslationRegistry.get(lang)
+    return await asyncio.to_thread(TranslationRegistry.get, lang)
