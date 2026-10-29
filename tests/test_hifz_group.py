@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.router as router
 import hifz
 from hifz import Ctx
 from hifz import group as G
@@ -29,7 +30,7 @@ class _Settings:
 
 @pytest.fixture(autouse=True)
 def _isolate_registries():
-    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), hifz._loaded)
+    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), router._loaded)
     G._bot_username = None
     yield
     hifz.COMMANDS.clear()
@@ -38,7 +39,7 @@ def _isolate_registries():
     hifz.CALLBACKS.update(saved[1])
     hifz.WIZARDS.clear()
     hifz.WIZARDS.update(saved[2])
-    hifz._loaded = saved[3]
+    router._loaded = saved[3]
     G._bot_username = None
 
 
