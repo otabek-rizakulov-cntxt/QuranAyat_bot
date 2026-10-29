@@ -5,7 +5,8 @@
 > repository root — **without changing a single user-visible behaviour.** Every
 > step is a pure move or a mechanical extraction, gated by the existing suite.
 
-**Status:** Proposal — nothing moved. §9 lists what needs an answer before Phase 1.
+**Status:** §11.1 shipped (PR #26). Phase 0 done on `refactor/phase-0-guardrails`. §9
+records the decisions taken; questions 2, 3 and 7 are still open.
 §11 holds two user-reported problems (settings resetting; a country-based
 timezone picker). They change behaviour, so they ship as separate `fix/` and
 `feat/` work, but they're tracked here because they touch the same modules.
@@ -233,7 +234,7 @@ Each numbered step is one PR on its own branch, merged only on green CI. Moves
 and edits are never mixed in one commit, so `git log --follow` and review diffs
 stay readable.
 
-### Phase 0 — Guardrails (no code moves)
+### Phase 0 — Guardrails (no code moves) — *done*
 
 - **0.1 Tooling.**
   - Add `pyproject.toml` with `ruff` (lint + format) and a minimal rule set
@@ -241,14 +242,24 @@ stay readable.
   - Run one mass format commit to normalise 2-space → 4-space. Put its hash in
     `.git-blame-ignore-revs`.
   - Add a `ruff check` + `ruff format --check` step to `.github/workflows`.
-- **0.2 Layering test.** Generalise `tests/test_service_layer.py` to the §4 table.
-  Mark the violations that exist today as `xfail` with a pointer to the phase that
-  removes them, so the test tightens as phases land.
+- **0.2 Layering test.** `tests/test_layering.py` checks import direction between
+  today's packages. The 13 violations that exist now are listed in `KNOWN`, each
+  with the step that removes it. It works as a ratchet rather than `xfail`: a new
+  violation fails, and so does a listed one that has been fixed, so the list
+  only shrinks. Each refactor step deletes its entries.
 - **0.3 Logging.** Add `config/logging.py` and replace all 56 `print()` calls
   with module loggers at the right levels (`INIT ERROR` → `logger.exception`).
   Output stays on stdout, so the platform logs are unchanged.
 
 *Done when:* CI runs lint + format; zero `print(` in `src/`.
+
+*As shipped:*
+- Ruff ignores style-only rules: `%`-formatting, typing-syntax upgrades and a
+  few others, each with its reason in `pyproject.toml`.
+- Ruff's undefined-name check found a real `NameError` in the group setup
+  wizard, fixed in its own commit.
+- Logging keeps httpx/httpcore at WARNING, because Bot API URLs contain the
+  bot token.
 
 ### Phase 1 — Take `main.py` apart (pure moves)
 
@@ -460,7 +471,16 @@ phase boundary and leave the tree in a consistent state.
 | Offset pickers | 3 | 1 |
 | Places to edit to add a command | 2 (chain + menu) | 1 handler (+ locale key) |
 
-## 9. Open questions
+## 9. Decisions and open questions
+
+Decided 2026-10-29:
+- **Order:** §11.1 first, then Phase 0. *(Q6: Phases 0–3 land before the
+  channel seam.)*
+- **Q1:** layout as in §4, with `hifz/` → `bot/features/`.
+- **Q4:** ruff for both lint and format.
+- **Q5:** one PR per phase, with one commit per numbered step.
+
+Still open:
 
 1. **Package names.** Is `app/ bot/ domain/ infra/ services/` acceptable, or do you want
    `hifz/` kept as a top-level name rather than `bot/features/`? (It's in commit
