@@ -4,6 +4,7 @@ Every sender tries the file_id Telegram gave us last time first and only
 uploads (and caches the new id) on a miss or a rejected id.
 """
 
+import logging
 from urllib.parse import urlencode
 
 import telegram
@@ -16,6 +17,8 @@ from infra import audio as cdn_audio
 from lib.page_image import fetch_and_stitch
 from lib.utils import File
 from modules import Quran
+
+logger = logging.getLogger(__name__)
 
 _UPLOAD_ACTION = {
     "photo": telegram.constants.ChatAction.UPLOAD_PHOTO,
@@ -49,8 +52,9 @@ async def send_cached(
     if cached_id is not None:
         try:
             return await _send(bot, kind, cached_id, chat_id=chat_id, **kwargs)
-        except telegram.error.TelegramError:
-            pass  # cached file_id rejected; rebuild below
+        except telegram.error.TelegramError as err:
+            # a file_id can go stale; treat the rejection as a miss, not a failure
+            logger.warning("cached file_id for %s rejected (%s); re-uploading", key, err)
 
     if upload_action:
         await bot.send_chat_action(chat_id=chat_id, action=_UPLOAD_ACTION[kind])

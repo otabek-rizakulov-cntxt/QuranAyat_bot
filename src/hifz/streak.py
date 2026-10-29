@@ -21,9 +21,9 @@
 # pair `main.send_file` uses, so hammering /streak costs one render a day.
 import logging
 
-import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.media import send_cached
 from hifz import Ctx, callback, command
 from lib.streak_image import cache_key, render_streak_graph
 from lib.streaks import StreakSummary, streak_summary
@@ -96,32 +96,22 @@ def _keyboard(ctx: Ctx, summary: StreakSummary):
 
 
 async def _send_graph(ctx: Ctx, summary: StreakSummary) -> None:
-    """Send the graph, preferring a cached file_id over a fresh render.
+    """Send the graph through the file_id cache, rendering it only on a miss.
 
-    Same shape as `main.send_file`: try the cached id, and treat Telegram
-    rejecting it as a cache miss rather than an error — a file_id can go stale,
-    and a user must never see a failed /streak because of it.
+    A stale cached id is a miss, never an error — a user must never see a failed
+    /streak because of it (bot.media.send_cached).
     """
-    caption = _caption(ctx, summary)
-    markup = _keyboard(ctx, summary)
-    key = cache_key(ctx.user_id, summary.today)
 
-    cached = ctx.file.get_file(key)
-    if cached is not None:
-        try:
-            await ctx.bot.send_photo(
-                chat_id=ctx.chat_id, photo=cached, caption=caption, reply_markup=markup
-            )
-            return
-        except telegram.error.TelegramError:
-            logger.warning("streak: cached graph file_id rejected for %s; re-rendering" % (key,))
+    async def render():
+        return await render_streak_graph(ctx.user_id, today=summary.today)
 
-    graph = await render_streak_graph(ctx.user_id, today=summary.today)
-    message = await ctx.bot.send_photo(
-        chat_id=ctx.chat_id, photo=graph, caption=caption, reply_markup=markup
+    await send_cached(
+        ctx.bot,
+        "photo",
+        cache_key(ctx.user_id, summary.today),
+        render,
+        chat_id=ctx.chat_id,
+        upload_action=False,
+        caption=_caption(ctx, summary),
+        reply_markup=_keyboard(ctx, summary),
     )
-
-    photo = getattr(message, "photo", None)
-    if photo:
-        # Largest size last, as main.send_file does.
-        ctx.file.save_file(key, photo[-1].file_id)
