@@ -13,6 +13,7 @@ from contextlib import asynccontextmanager
 from telegram import BotCommand
 
 import hifz
+from app.routes.webhook import WEBHOOK_PATH, webhook_secret
 from app.state import AppState
 from app.tasks import spawn
 from bot.inline import get_default_query_results
@@ -138,8 +139,7 @@ async def initialize(state: AppState) -> None:
     webhook_base = get_settings().webhook_base_url
     if bot and webhook_base:
         try:
-            token = get_settings().token
-            await bot.set_webhook(url=f"{webhook_base}/webhook/{token}")
+            await bot.set_webhook(url=webhook_base + WEBHOOK_PATH, secret_token=webhook_secret())
             logger.info("Webhook registered at %s", webhook_base)
         except Exception as e:
             logger.error("INIT ERROR (set_webhook): %s: %s", type(e).__name__, e)

@@ -190,7 +190,7 @@ cp .env.example .env
 | `AUDIO_BASE_URL` | Base URL of the recitation mp3s (e.g. an everyayah.com mirror/CDN)  |
 | `PHOTO_BASE_URL` | Base URL of the Arabic ayah images. Prefer everyayah's `quranpngs` (1500px, uniform width) over `images_png` (115–700px) |
 | `PAGE_IMAGE_BASE_URL` | Base URL of the per-ayah images `/page` tiles into a page. Needs a **uniform-width** set (everyayah's `quranpngs`, all 1500px); falls back to `PHOTO_BASE_URL`, so it can stay unset if that already points at `quranpngs` |
-| `WEBHOOK_URL`    | Public HTTPS base URL Telegram POSTs updates to; the webhook is registered as `WEBHOOK_URL` + `/webhook/` + `TOKEN`. Also where Telegram fetches stitched range recitations from (`/media/range.mp3`), so inline range audio is only offered when it is set |
+| `WEBHOOK_URL`    | Public HTTPS base URL Telegram POSTs updates to; the webhook is registered as `WEBHOOK_URL` + `/webhook`, and Telegram authenticates each delivery with a secret header derived from the bot token (the token never appears in a URL). Also where Telegram fetches stitched range recitations from (`/media/range.mp3`), so inline range audio is only offered when it is set |
 
 Media (audio + images) is fetched from the configured CDN base URLs at runtime,
 so no local media download is required. The Qur'an text corpora that ship in the
