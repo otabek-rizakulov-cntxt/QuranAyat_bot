@@ -1,4 +1,4 @@
-"""The due-queue scheduler (`src/infra/scheduler.py`) — workstream F.
+"""The due-queue scheduler (`src/infra/scheduler/`) — workstream F.
 
 The acceptance criterion this file exists for is §7's:
 
