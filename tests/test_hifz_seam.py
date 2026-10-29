@@ -17,6 +17,7 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.router as router
 import hifz
 from hifz import Ctx
 
@@ -34,7 +35,7 @@ def _isolate_registries():
     They are process-wide, so a test that registers a dummy command would
     otherwise leak it into every later test — and into the real boot path.
     """
-    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), hifz._loaded)
+    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), router._loaded)
     yield
     hifz.COMMANDS.clear()
     hifz.COMMANDS.update(saved[0])
@@ -42,7 +43,7 @@ def _isolate_registries():
     hifz.CALLBACKS.update(saved[1])
     hifz.WIZARDS.clear()
     hifz.WIZARDS.update(saved[2])
-    hifz._loaded = saved[3]
+    router._loaded = saved[3]
 
 
 async def _ctx(**kwargs) -> Ctx:
@@ -165,7 +166,7 @@ class TestConflictFreeByConstruction:
         hifz.COMMANDS.clear()
         hifz.CALLBACKS.clear()
         hifz.WIZARDS.clear()
-        hifz._loaded = False
+        router._loaded = False
 
         hifz.load_features()
         assert sorted(hifz.COMMANDS) == expected
@@ -409,21 +410,14 @@ class TestCtx:
 
 # --- The callback-data namespace -----------------------------------------------
 
-READER_PREFIXES = (
-    "vc:",
-    "vr:",
-    "rep:",
-    "pg:",
-    "pga:",
-    "recgrp:",
-    "setlang:",
-    "settranslang:",
-    "setreciter:",
-    "showlang",
-    "reciter_search",
-    "recpage_noop",
-    "pgnoop",
-)
+
+def _reader_prefixes():
+    """Every callback prefix the core reader registers (bot/handlers/), plus the
+    two no-op callbacks it sends but never routes."""
+    hifz.load_features()
+    owned = {p for p, h in hifz.CALLBACKS.items() if h.__module__.startswith("bot.handlers.")}
+    assert {"vc:", "pg:", "setreciter:"} <= owned  # the scan found the reader
+    return sorted(owned | {"recpage_noop", "pgnoop"})
 
 
 class TestPrefixNamespace:
@@ -436,12 +430,33 @@ class TestPrefixNamespace:
         assert len(set(values)) == len(values)
 
     def test_no_hifz_prefix_collides_with_the_reader(self):
-        # main.py's chain runs first for its own prefixes; a shadow would make a
-        # verse-card tap silently reach a hifz handler or vice versa.
+        # A shadow would make a verse-card tap silently reach a hifz handler or
+        # vice versa.
         for feature, prefix in hifz.PREFIXES.items():
-            for reader in READER_PREFIXES:
+            for reader in _reader_prefixes():
                 assert not prefix.startswith(reader), (feature, prefix, reader)
                 assert not reader.startswith(prefix), (feature, prefix, reader)
+
+    def test_the_router_refuses_a_prefix_that_overlaps_another_modules(self):
+        async def mine(ctx, cb_data):
+            pass
+
+        mine.__module__ = "zz_other_feature"
+        with pytest.raises(ValueError, match="overlaps"):
+            hifz.callback("v")(mine)  # would take every "vc:" / "vr:" tap
+        with pytest.raises(ValueError, match="overlaps"):
+            hifz.callback("vc:extra:")(mine)  # would carve a piece out of the reader's
+
+    def test_a_module_may_split_its_own_prefix(self):
+        async def wide(ctx, cb_data):
+            pass
+
+        async def narrow(ctx, cb_data):
+            pass
+
+        wide.__module__ = narrow.__module__ = "zz_same_feature"
+        hifz.callback("zz:")(wide)
+        hifz.callback("zz:day:")(narrow)  # no error: same module
 
     def test_prefixes_leave_room_inside_telegrams_64_byte_cap(self):
         for feature, prefix in hifz.PREFIXES.items():

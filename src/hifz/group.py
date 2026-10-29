@@ -26,6 +26,7 @@ from typing import Optional
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.keyboards.time_pickers import offset_keyboard
 from bot.media import send_combined_audio
 from hifz import Ctx, callback, wizard
 from lib.localtime import DEFAULT_OFFSET
@@ -347,7 +348,7 @@ async def push_group_day(ctx) -> None:
         return  # already delivered (restart between claim and mark)
 
     await _post_portion(ctx.bot, config, claimed)
-    await _enqueue_next_group(ctx.store, chat_id, plan)
+    await _enqueue_next_group(ctx.store, chat_id, plan, now=ctx.now)
 
 
 async def _post_portion(bot, config, day) -> None:
@@ -467,7 +468,7 @@ async def push_board(ctx) -> None:
     if config is None or config.status != CONFIG_ACTIVE:
         return
     await post_board(ctx.bot, ctx.store, chat_id)
-    await _enqueue_next_board(ctx.store, chat_id)
+    await _enqueue_next_board(ctx.store, chat_id, now=ctx.now)
 
 
 async def _enqueue_next_board(store, chat_id: int, now=None):
@@ -552,7 +553,9 @@ async def on_group_tap(ctx: Ctx, cb_data: str) -> None:
     elif action == "d":  # daily | weekdays
         days = list(range(1, 8)) if arg == "all" else [1, 2, 3, 4, 5]
         ctx.wiz.update(ctx.user_id, days=days, step="timezone")
-        await ctx.edit(ctx.tr("group_timezone_prompt"), reply_markup=_offset_keyboard())
+        await ctx.edit(
+            ctx.tr("group_timezone_prompt"), reply_markup=offset_keyboard("en", "gr:tz:")
+        )
     elif action == "tz":  # utc offset chosen
         ctx.wiz.update(ctx.user_id, offset=arg or DEFAULT_OFFSET, step="post_time")
         await ctx.edit(ctx.tr("group_post_time_prompt"))
@@ -576,21 +579,6 @@ def _days_keyboard() -> InlineKeyboardMarkup:
             ]
         ]
     )
-
-
-def _offset_keyboard() -> InlineKeyboardMarkup:
-    from lib.localtime import offset_options
-
-    opts = offset_options()
-    rows, row = [], []
-    for off in opts:
-        row.append(InlineKeyboardButton(off, callback_data="gr:tz:" + off))
-        if len(row) == 4:
-            rows.append(row)
-            row = []
-    if row:
-        rows.append(row)
-    return InlineKeyboardMarkup(rows)
 
 
 # --- J6 (entry only): a member joins the board via deep link -------------------

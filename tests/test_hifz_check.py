@@ -19,6 +19,7 @@ from unittest.mock import AsyncMock
 import pytest
 import telegram
 
+import bot.router as router
 import hifz
 from hifz import Ctx
 from hifz.check import CB_ANSWER, CB_START, _parse_answer
@@ -40,7 +41,7 @@ class _Settings:
 @pytest.fixture(autouse=True)
 def _isolate_registries():
     """Snapshot and restore the process-wide registries (see tests/test_hifz_seam)."""
-    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), hifz._loaded)
+    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), router._loaded)
     yield
     hifz.COMMANDS.clear()
     hifz.COMMANDS.update(saved[0])
@@ -48,7 +49,7 @@ def _isolate_registries():
     hifz.CALLBACKS.update(saved[1])
     hifz.WIZARDS.clear()
     hifz.WIZARDS.update(saved[2])
-    hifz._loaded = saved[3]
+    router._loaded = saved[3]
 
 
 def _callback_query(message_id: int = 11):

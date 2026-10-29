@@ -52,7 +52,7 @@ covered. The problems are concentrated, and the plan targets those spots and lea
    | "send cached file_id, else upload and cache it" | 5 | `send_file`, `send_combined_audio`, `send_page`, `send_page_audio`, `send_repeated_audio` |
    | chunk buttons into rows of N | 10 | `main.py` ×5 (both language keyboards, reciter, sajda, search results); `hifz/memorize.py:222,231`; `hifz/profile.py:109`; `hifz/group.py:527`; `hifz/progress.py:94` |
    | UTC-offset picker keyboard | 3 | `profile.offset_keyboard` (public, already takes `prefix` + `columns`), `memorize._offset_keyboard`, `group._offset_keyboard` |
-   | `except BadRequest: if "not modified" not in …: raise` | 6 | `main.py`, `hifz/` |
+   | `except BadRequest: if "not modified" not in …: raise` | 3 | `main.py`, `hifz/__init__.py` |
    | `create_task` + `_background_tasks.add` + `discard` | 3 | `main.py` |
    | `language_keyboard` vs `translation_language_keyboard` | 2 | identical except list + callback prefix |
    | per-update settings unpacking `ui_lang, translation_lang, reciter = …` | 3 | `handle_update` |
@@ -314,7 +314,7 @@ step 1.6. Tests patch ~40 `main.*` attributes (73 references to
   function through `main` had to move in the step that moved the function
   (1.3), because a patch on `main` no longer reaches the caller.
 
-### Phase 2 — DRY the duplicated patterns
+### Phase 2 — DRY the duplicated patterns — *done*
 
 - **2.1 `send_cached(bot, key, kind, build_source, **kwargs)`** in `bot/media.py`.
   It tries the cached file_id, falls back to building and uploading, then stores
@@ -351,7 +351,26 @@ step 1.6. Tests patch ~40 `main.*` attributes (73 references to
 *Done when:* each §1.3 row has one implementation; senders have a table-driven
 test over their cache keys.
 
-### Phase 3 — One router for everything
+*As shipped* (`refactor/phase-2-dry`):
+- `tests/test_media_cache_keys.py` pinned every sender's Redis key before the
+  merge.
+- There were six cache-or-upload copies, not five: `/streak`'s graph was one
+  too. All six now go through `send_cached`, which also logs a rejected cached
+  id for every sender.
+- Row-chunking (8 sites; the other 2 were the private offset pickers) goes
+  through `button_rows`. The two language keyboards are now one
+  `language_picker`.
+- The three offset pickers are one, and all three grids were checked
+  identical to before. `reminder_keyboard` stayed in `profile.py`: it has a
+  single caller, and memorize's preset picker is a different interaction
+  (§10), not a copy.
+- There were three "not modified" sites, not six (the count included
+  comments).
+- 2.6 (caching the group portion image) was skipped. It's optional and adds
+  a cache key.
+- The "settings unpacking ×3" row is left to Phase 3, where `Ctx` replaces it.
+
+### Phase 3 — One router for everything — *done*
 
 - **3.1 Promote the seam.** Move `Ctx`, the decorators and the dispatchers from
   `hifz/__init__.py` to `bot/router.py` and `bot/context.py`. `hifz/__init__.py`
@@ -379,6 +398,31 @@ test over their cache keys.
   prefix at load time instead of by convention.
 
 *Done when:* `handle_update` is under 40 lines; adding a command touches one file.
+
+*As shipped* (`refactor/phase-3-router`):
+- `tests/test_dispatch_order.py` pinned the text-message order before the
+  rewrite.
+- `handle_update` is ~20 lines, plus `_on_callback` and `_on_text` (~60
+  together), down from ~460. The reader's 12 commands and 11 prefixes live
+  in `bot/handlers/`.
+- **3.3 skipped on purpose.** Making reciter search a wizard would change
+  three behaviours the order tests pin:
+  - wizards are one per user, so tapping "Search reciter" mid-`/memorize`
+    would destroy that draft;
+  - any command clears a pending search, but commands deliberately don't end
+    wizards;
+  - the prompt would live 30 minutes instead of 2.
+
+  The pending-input flag stays.
+- 3.4: instead of a longer table, the router enforces the namespace. It
+  rejects a callback prefix that overlaps another module's.
+- The reader's callbacks now get the router's error handling (logged and
+  acknowledged on failure, no endless spinner).
+- The "settings unpacking ×3" row from §1.3 is gone: handlers read
+  `ctx.ui_lang` / `ctx.reciter`.
+- Found and fixed on the way: scheduled pushes queued their follow-up from
+  the wall clock, not the tick's time, which made one acceptance test fail
+  between 02:00 and 19:00 UTC (the test user's reminder time to local midnight).
 
 ### Phase 4 — Split infrastructure god-objects
 

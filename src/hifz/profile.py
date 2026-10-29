@@ -20,15 +20,18 @@
 #     are captured *once*, during first plan setup — which lives in `memorize.py`
 #     — and changed later from here. Both call sites must behave identically, so
 #     there is one implementation and the callback prefix is a parameter: the plan
-#     wizard passes its own ("hm:tz:") and keeps routing its own taps.
+#     wizard passes its own ("hm:tz:") and keeps routing its own taps. The offset
+#     picker itself lives in bot/keyboards/time_pickers.py, since group setup uses
+#     it too; it is re-exported here.
 
 import html
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.keyboards.time_pickers import offset_keyboard  # re-exported (see __all__)
 from hifz import Ctx, callback, command, wizard
-from lib.localtime import is_valid_offset, normalize_offset, offset_options
+from lib.localtime import is_valid_offset, normalize_offset
 from services.profile import (  # noqa: F401 — re-exported (see __all__)
     NAME_MAX,
     NAME_MIN,
@@ -113,31 +116,6 @@ def telegram_username(ctx: Ctx) -> Optional[str]:
 
 
 # --- The UTC-offset picker (B3) ------------------------------------------------
-
-
-def offset_keyboard(
-    ui_lang: str, prefix: str = OFFSET_PREFIX, columns: int = 4, cancel_data: Optional[str] = None
-) -> InlineKeyboardMarkup:
-    """The 34-offset picker, as an inline keyboard.
-
-    The labels *are* the offsets ("+05:00"), so this keyboard needs no
-    translation — half the reason the fixed-offset model was chosen over IANA
-    zone names. `prefix` is what each button's callback_data starts with, so
-    another wizard can own its own taps: `offset_keyboard(lang, prefix="hm:tz:")`.
-    `cancel_data` adds a trailing Cancel row when given.
-    """
-    from locales import t
-
-    buttons = [
-        InlineKeyboardButton(offset, callback_data=prefix + offset) for offset in offset_options()
-    ]
-    columns = max(1, int(columns))
-    rows: List[List[InlineKeyboardButton]] = [
-        buttons[i : i + columns] for i in range(0, len(buttons), columns)
-    ]
-    if cancel_data:
-        rows.append([InlineKeyboardButton(t("btn_cancel", ui_lang), callback_data=cancel_data)])
-    return InlineKeyboardMarkup(rows)
 
 
 def offset_from_callback(cb_data: str, prefix: str = OFFSET_PREFIX) -> Optional[str]:
@@ -299,7 +277,7 @@ async def on_profile_tap(ctx: Ctx, cb_data: str) -> None:
         await ctx.answer()
         await ctx.edit(
             ctx.tr("timezone_prompt"),
-            reply_markup=offset_keyboard(ctx.ui_lang, cancel_data=PROFILE_CB),
+            reply_markup=offset_keyboard(ctx.ui_lang, OFFSET_PREFIX, cancel_data=PROFILE_CB),
         )
         return
 

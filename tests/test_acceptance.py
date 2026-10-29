@@ -15,6 +15,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import bot.router as router
 import hifz
 from hifz import Ctx
 from hifz import memorize as memorize_feature
@@ -41,7 +42,7 @@ class _Settings:
 
 @pytest.fixture(autouse=True)
 def _isolate_registries():
-    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), hifz._loaded)
+    saved = (dict(hifz.COMMANDS), dict(hifz.CALLBACKS), dict(hifz.WIZARDS), router._loaded)
     handlers = dict(scheduler.SEND_HANDLERS)
     yield
     hifz.COMMANDS.clear()
@@ -50,7 +51,7 @@ def _isolate_registries():
     hifz.CALLBACKS.update(saved[1])
     hifz.WIZARDS.clear()
     hifz.WIZARDS.update(saved[2])
-    hifz._loaded = saved[3]
+    router._loaded = saved[3]
     scheduler.SEND_HANDLERS.clear()
     scheduler.SEND_HANDLERS.update(handlers)
 
