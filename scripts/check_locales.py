@@ -106,10 +106,14 @@ def main() -> int:
     # translation-only ones that have no string table to check.
     for lang in LANGUAGES:
         path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "translations", lang.code + ".txt"
+            os.path.dirname(os.path.abspath(__file__)),
+            "..",
+            "data",
+            "translations",
+            lang.code + ".txt",
         )
         if not os.path.exists(path):
-            problems.append("%s: translations/%s.txt is missing" % (lang.code, lang.code))
+            problems.append("%s: data/translations/%s.txt is missing" % (lang.code, lang.code))
 
     print(
         "checked %d interface languages (%d keys each) and %d bundled translations"

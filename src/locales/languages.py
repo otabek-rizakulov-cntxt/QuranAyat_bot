@@ -7,7 +7,7 @@
 #
 # The running bot only reads `code`, `native`, `english`, `rtl`, `flag`. The
 # `edition` field is consumed exclusively by scripts/bundle_translations.py when it
-# fetches and converts the translation files into translations/<code>.txt — the app
+# fetches and converts the translation files into data/translations/<code>.txt — the app
 # never touches the network.
 
 from dataclasses import dataclass

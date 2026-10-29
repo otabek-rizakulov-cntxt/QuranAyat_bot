@@ -3,7 +3,7 @@ Husary/
 quranic_images/
 *.mp3
 *.png
-Al_Jalalain_Eng.pdf
+data/Al_Jalalain_Eng.pdf
 
 # Local/dev artifacts
 venv/

@@ -29,7 +29,6 @@ from unittest.mock import AsyncMock
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "src"))
-os.chdir(REPO_ROOT)  # corpus files (quran-data.xml, translations/*) resolve relative to CWD
 
 import telegram  # noqa: E402
 

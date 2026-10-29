@@ -19,7 +19,7 @@
 #   * Button labels have no such cap but do get truncated by the client, so options
 #     are kept to a handful of words (see `MAX_OPTION_WORDS` / `MAX_OPTION_LENGTH`).
 #
-# The corpus is `translations/ar.txt` — the full vocalized Uthmani text, 6236
+# The corpus is `data/translations/ar.txt` — the full vocalized Uthmani text, 6236
 # ayahs, already bundled and reachable through the existing TranslationRegistry.
 # It is parsed on the first question, never at import: it is 1.3 MB and the
 # production instance has 512 MB.

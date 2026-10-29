@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 
 from domain.quran import (  # noqa: E402
     _QURAN_DATA,  # noqa: E402
+    TRANSLATIONS_DIR,
     Quran,
     TranslationRegistry,
 )
@@ -91,7 +92,7 @@ def export(out_dir: str = DEFAULT_OUT_DIR) -> dict:
     """Write the full content tree under `out_dir`; return meta.json's content."""
     codes = sorted(c for c in TranslationRegistry.available() if c != ARABIC)
 
-    arabic = Quran.from_file(os.path.join(ROOT, "translations", "ar.txt")).text
+    arabic = Quran.from_file(os.path.join(TRANSLATIONS_DIR, "ar.txt")).text
     for n, (ayahs, bismillah) in enumerate(split_basmalah(arabic), start=1):
         _write(
             os.path.join(out_dir, ARABIC, "%d.json" % n),
@@ -99,13 +100,13 @@ def export(out_dir: str = DEFAULT_OUT_DIR) -> dict:
         )
 
     for code in codes:
-        quran = Quran.from_file(os.path.join(ROOT, "translations", "%s.txt" % code))
+        quran = Quran.from_file(os.path.join(TRANSLATIONS_DIR, "%s.txt" % code))
         for n, ayahs in enumerate(quran.text, start=1):
             _write(
                 os.path.join(out_dir, "translations", code, "%d.json" % n), {"n": n, "ayahs": ayahs}
             )
 
-    tafsir = Quran.from_tafsir(os.path.join(ROOT, "Al_Jalalain_Eng.txt"))
+    tafsir = Quran.from_tafsir()
     for n, ayahs in enumerate(tafsir.text, start=1):
         _write(os.path.join(out_dir, "tafsir", "%d.json" % n), {"n": n, "ayahs": ayahs})
 

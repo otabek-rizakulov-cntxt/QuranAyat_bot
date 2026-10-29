@@ -3,10 +3,10 @@
 # The application is imported the same way it runs in production
 # (`uvicorn main:app --app-dir src`, CWD at the repo root):
 #   * `src/` is on the import path so `import main`, `from locales import ...`,
-#     `from modules import ...` resolve as top-level packages.
-#   * the process CWD is the repo root so the corpus files resolved relative to
-#     CWD load correctly. `modules.quran` parses `quran-data.xml` in a class body
-#     at import time, so this must be set BEFORE any app module is imported.
+#     `from domain.quran import ...` resolve as top-level packages.
+#   * the process CWD is the repo root, because a few tests open repo files by
+#     relative path (e.g. "src/app/lifespan.py"). The corpora in data/ no longer
+#     need it: domain.quran resolves them from its own location.
 #
 # Test environment is pinned here, before the first app import, so that:
 #   * `config.settings` reads deterministic values, and
