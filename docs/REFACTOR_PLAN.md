@@ -584,10 +584,11 @@ Measured after Phase 6:
 | Copies of row-chunking | 10 | 1 | **1** |
 | Offset pickers | 3 | 1 | **1** |
 | Places to edit to add a command | 2 | 1 | **1** handler (+ locale key) |
-| Largest source file | 1,512 | ~300 | **971**: `bot/features/memorize.py` — **not met** |
+| Largest source file | 1,512 | ~300 | **680**: `infra/scheduler.py` — **not met** (memorize.py, 971, is now split; see below) |
 
-Still over ~300 lines: `bot/features/memorize.py` (971), `infra/scheduler.py`
-(680), `domain/recall_check.py` (651) and `bot/features/group.py` (601).
+Still over ~300 lines: `infra/scheduler.py` (680), `domain/recall_check.py`
+(651) and `bot/features/group.py` (601). `bot/features/memorize.py` was split
+into an entry module (294 lines) and six `_plan_*` helpers, all under 300.
 Each is one cohesive feature, not a grab bag, so splitting them is ordinary
 feature-level refactoring. It's left for follow-up PRs, one file each.
 

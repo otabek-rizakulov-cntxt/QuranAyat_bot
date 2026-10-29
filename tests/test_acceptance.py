@@ -16,6 +16,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 import bot.features as hifz
+import bot.features._plan_drill as plan_drill
 import bot.router as router
 from bot.features import Ctx
 from bot.features import memorize as memorize_feature
@@ -220,8 +221,8 @@ class TestTwoTheDailyPush:
         async def no_network(*args, **kwargs):
             pass
 
-        monkeypatch.setattr(memorize_feature, "send_combined_audio", no_network)
-        monkeypatch.setattr(memorize_feature, "send_quran", no_network)
+        monkeypatch.setattr(plan_drill, "send_combined_audio", no_network)
+        monkeypatch.setattr(plan_drill, "send_quran", no_network)
 
         store = await get_store()
         await _save_plan()
