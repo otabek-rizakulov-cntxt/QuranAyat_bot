@@ -31,7 +31,7 @@ from typing import Awaitable, Callable, Dict, Optional
 import telegram
 
 from bot.context import Ctx
-from lib.wizard import Wizard
+from infra.wizard_store import Wizard
 
 logger = logging.getLogger(__name__)
 

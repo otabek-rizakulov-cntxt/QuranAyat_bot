@@ -15,7 +15,7 @@ import pytest
 
 import bot.media as bot_media
 import infra.audio as cdn_audio
-from lib.utils import File
+from infra.file_facade import File
 
 RECITER = "Husary_128kbps"  # has single-file page audio upstream
 STITCHED_RECITER = "Ibrahim_Akhdar_64kbps"  # page audio is stitched from ayahs

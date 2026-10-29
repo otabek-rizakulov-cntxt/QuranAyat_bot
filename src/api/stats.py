@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from domain.localtime import week_bounds
 from domain.streaks import GRID_WEEKS
-from lib.store import get_store
+from infra.store import get_store
 from services.leaderboard import weekly_board
 from services.streaks import streak_summary
 

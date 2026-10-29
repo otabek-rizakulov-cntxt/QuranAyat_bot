@@ -70,13 +70,13 @@ from hifz.profile import (
     format_reminder_time,
     parse_reminder_time,
 )
+from infra.scheduler import SendCtx, send_handler
+from infra.store.plans import PLAN_ACTIVE, PLAN_PAUSED
 from lib.miniapp import app_row
-from lib.scheduler import SendCtx, send_handler
-from lib.store.plans import PLAN_ACTIVE, PLAN_PAUSED
-from lib.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
 from locales import t
 from services.plans import SEND_KIND
 from services.profile import as_time
+from services.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ _day_position = plans_service.day_position
 # timezone, when the profile already has one) without renaming anything.
 WIZARD_KIND = "plan_setup"
 
-# The scheduled-send kind. `lib.scheduler` dispatches on it; nothing else uses it.
+# The scheduled-send kind. `infra.scheduler` dispatches on it; nothing else uses it.
 
 STEP_TARGET = "target"  # which kind of target (buttons)
 STEP_TARGET_TEXT = "target_text"  # the surah / juz / range itself (typed)

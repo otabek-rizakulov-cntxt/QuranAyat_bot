@@ -17,13 +17,13 @@ from app.routes.webhook import WEBHOOK_PATH, webhook_secret
 from app.state import AppState
 from app.tasks import spawn
 from bot.inline import get_default_query_results
-from config.postgres import close_pool
-from config.redis import RedisSingleton, cache_backend
 from config.settings import get_settings
 from domain.quran import Quran, TranslationRegistry, make_index
+from infra.postgres import close_pool
+from infra.redis_client import RedisSingleton, cache_backend
+from infra.store import apply_schema
 from infra.telegram import create_bot
 from lib.miniapp import set_menu_button
-from lib.store import apply_schema
 from locales import BOT_COMMANDS, DEFAULT_LANG, UI_LANGUAGES, t
 
 logger = logging.getLogger(__name__)
@@ -170,7 +170,7 @@ async def initialize(state: AppState) -> None:
     # continues), so the only thing that can land here is a failure to *start* it.
     # It is stopped by cancellation when uvicorn tears the event loop down.
     try:
-        from lib.scheduler import run_scheduler
+        from infra.scheduler import run_scheduler
 
         spawn(run_scheduler(bot, data))
     except Exception as e:

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from domain.hifz_progress import surah_progress
 from domain.quran import Quran
-from lib.store import get_store
+from infra.store import get_store
 from services import progress as progress_service
 from services.progress import load_summary
 

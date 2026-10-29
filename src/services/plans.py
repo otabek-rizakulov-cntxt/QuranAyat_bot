@@ -30,8 +30,8 @@ from domain.localtime import (
 from domain.plan_builder import AUTO_PACE, Portion, advancing, build_plan
 from domain.quran import Quran
 from domain.refs import KIND_JUZ, KIND_RANGE, KIND_SURAH, Ref, format_ref, juz_ref
-from lib.scheduler import enqueue
-from lib.store.plans import (
+from infra.scheduler import enqueue
+from infra.store.plans import (
     DAY_COMPLETED,
     DAY_PENDING,
     PLAN_ACTIVE,
@@ -39,7 +39,7 @@ from lib.store.plans import (
     PLAN_PAUSED,
     PlanDaySpec,
 )
-from lib.store.sessions import KIND_DRILL
+from infra.store.sessions import KIND_DRILL
 from services.profile import as_time
 from services.progress import load_summary
 from services.streaks import record_session

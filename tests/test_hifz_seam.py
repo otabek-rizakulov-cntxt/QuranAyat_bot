@@ -48,7 +48,7 @@ def _isolate_registries():
 
 async def _ctx(**kwargs) -> Ctx:
     bot = kwargs.pop("bot", None) or AsyncMock()
-    from lib.utils import File
+    from infra.file_facade import File
 
     return await Ctx.build(bot, {}, File(), 900001, 900001, _Settings(), **kwargs)
 
@@ -474,7 +474,7 @@ class TestSchemaApplication:
     _initialize()."""
 
     async def test_apply_schema_survives_an_unset_database_url(self):
-        from lib.store import apply_schema
+        from infra.store import apply_schema
 
         assert os.environ.get("DATABASE_URL") == ""
         await apply_schema()  # must not raise
@@ -493,7 +493,7 @@ class TestSchemaApplication:
         assert "apply_schema" in source
 
     async def test_schema_application_is_idempotent(self):
-        from lib.store import apply_schema
+        from infra.store import apply_schema
 
         await apply_schema()
         await apply_schema()  # a restart re-applies it; must stay clean

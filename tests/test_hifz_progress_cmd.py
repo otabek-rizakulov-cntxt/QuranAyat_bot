@@ -16,7 +16,7 @@ from domain.quran import Quran
 from domain.refs import juz_ref
 from hifz import Ctx
 from hifz import progress as progress_feature
-from lib.store import get_store
+from infra.store import get_store
 
 USER_ID = 900456
 CHAT_ID = 900456
@@ -54,7 +54,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}

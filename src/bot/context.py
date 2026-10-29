@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from bot.errors import ignore_not_modified
-from lib.wizard import Wizard
+from infra.wizard_store import Wizard
 from locales import t
 
 
@@ -18,8 +18,8 @@ class Ctx:
 
     bot: Any  # telegram.Bot (an AsyncMock under test)
     data: dict  # the shared corpora dict built by main.build_data
-    file: Any  # lib.utils.File — media cache + nav state
-    store: Any  # lib.store.Store — profiles/hifz/plans/sessions/schedule
+    file: Any  # infra.file_facade.File — media cache + nav state
+    store: Any  # infra.store.Store — profiles/hifz/plans/sessions/schedule
     chat_id: int
     user_id: int
     ui_lang: str
@@ -39,7 +39,7 @@ class Ctx:
         returns. The store is fetched here so no call site has to know that
         storage is a coroutine-guarded singleton.
         """
-        from lib.store import get_store
+        from infra.store import get_store
 
         return cls(
             bot=bot,
@@ -58,7 +58,7 @@ class Ctx:
 
     @property
     def wiz(self) -> Wizard:
-        """The user's wizard-draft store (see lib/wizard.py)."""
+        """The user's wizard-draft store (see infra/wizard_store.py)."""
         return Wizard()
 
     def tr(self, key: str, **fmt: Any) -> str:

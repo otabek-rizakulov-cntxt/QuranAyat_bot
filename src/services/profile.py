@@ -9,7 +9,7 @@ from typing import Optional
 from domain.localtime import is_valid_offset, next_due_utc, normalize_offset
 from domain.quran import Quran
 from domain.refs import KIND_RANGE, Ref, format_ref
-from lib.store.plans import DAY_COMPLETED
+from infra.store.plans import DAY_COMPLETED
 
 NAME_MIN = 2
 NAME_MAX = 32

@@ -15,7 +15,7 @@ import bot.dispatch as dispatch
 import bot.inline as inline
 import bot.text as bot_text
 import locales
-from lib.user_settings import UserSettings
+from services.user_settings import UserSettings
 
 
 @pytest.fixture(scope="module")

@@ -22,9 +22,9 @@ from bot.keyboards.reciter import reciter_label
 from bot.keyboards.rows import button_rows
 from bot.settings import resolve_settings
 from infra import catalog, pending_input
-from lib.user_settings import UserSettings
-from lib.utils import File
+from infra.file_facade import File
 from locales import t
+from services.user_settings import UserSettings
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     """Process a single Telegram update pushed to the webhook."""
     if update.my_chat_member:  # the bot was added to or removed from a chat
         from hifz import group as hifz_group
-        from lib.store import get_store
+        from infra.store import get_store
 
         try:
             await hifz_group.on_my_chat_member(bot, await get_store(), update)

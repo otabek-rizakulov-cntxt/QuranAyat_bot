@@ -20,10 +20,10 @@ import hifz
 from domain.hifz_progress import summarize
 from hifz import Ctx
 from hifz import memorize as memorize_feature
-from lib import scheduler
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
-from lib.wizard import Wizard
+from infra import scheduler
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
+from infra.wizard_store import Wizard
 from services.leaderboard import weekly_board
 from services.streaks import record_session, streak_summary
 
@@ -70,7 +70,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, user=USER, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}

@@ -13,8 +13,8 @@ still reach these through it; each method just forwards.
 
 from typing import Optional
 
-from config import RedisSingleton
 from infra import catalog, media_cache, nav_state, pending_input
+from infra.redis_client import RedisSingleton
 
 
 class File:
@@ -39,7 +39,7 @@ class File:
     async def get_user(self, chat_id: int):
         return await nav_state.get(chat_id)
 
-    # --- legacy language key (read only by lib.user_settings' migration) ------
+    # --- legacy language key (read only by services.user_settings' migration) ------
     def get_lang(self, chat_id: int):
         return self.redis.get(self._lang_key(chat_id))
 

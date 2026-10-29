@@ -24,8 +24,8 @@ from config.settings import get_settings
 from domain.parsing import parse_ayah_range
 from domain.quran import Quran, get_translation
 from infra import catalog, media_cache
-from lib.user_settings import UserSettings
 from locales import t
+from services.user_settings import UserSettings
 
 
 def get_default_query_results(quran: Quran):

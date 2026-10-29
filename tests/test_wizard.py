@@ -1,4 +1,4 @@
-"""Multi-step draft state (`lib.wizard`).
+"""Multi-step draft state (`infra.wizard_store`).
 
 `/memorize` collects four answers across several turns and `/profile` collects a
 name and a timezone, none of which the pre-existing `set_awaiting_input` flag can
@@ -13,8 +13,8 @@ REDIS_HOST_URL, so nothing here touches a network.
 
 import pytest
 
-from lib.utils import File
-from lib.wizard import CANCEL_COMMANDS, DRAFT_TTL, Wizard
+from infra.file_facade import File
+from infra.wizard_store import CANCEL_COMMANDS, DRAFT_TTL, Wizard
 
 USER = 810001
 

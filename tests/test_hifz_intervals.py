@@ -1,4 +1,4 @@
-"""The merge-on-insert / split-on-remove arithmetic (`lib.store.hifz`), C1.
+"""The merge-on-insert / split-on-remove arithmetic (`infra.store.hifz`), C1.
 
 `tests/test_store_contract.py` pins the *behaviour* both store legs must agree
 on. This file goes after the *arithmetic*: it enumerates every relative position
@@ -18,8 +18,8 @@ import random
 
 import pytest
 
-from lib.store import get_store
-from lib.store.hifz import HifzInterval, _covers, _merge_span, _overlaps, _split_span, _touches
+from infra.store import get_store
+from infra.store.hifz import HifzInterval, _covers, _merge_span, _overlaps, _split_span, _touches
 
 USER = 1
 AL_MULK = 67  # 30 ayahs
@@ -257,7 +257,7 @@ class TestAddInterval:
         two keys, which cannot happen here. Checked against a realistically large
         Telegram id because the pair is packed rather than hashed.
         """
-        from lib.store.hifz import PostgresHifzStore
+        from infra.store.hifz import PostgresHifzStore
 
         key = PostgresHifzStore._lock_key
         pairs = [

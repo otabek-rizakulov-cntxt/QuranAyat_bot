@@ -12,8 +12,8 @@ their settings resetting every week or two.
 import pytest
 
 import app.routes.health as health_route
-from config import postgres
-from lib import store as store_module
+from infra import postgres
+from infra import store as store_module
 
 
 class _FakePool:
@@ -116,7 +116,7 @@ def strict(monkeypatch):
 @pytest.fixture
 def fresh_redis(monkeypatch):
     """A RedisSingleton that has never connected; restored after the test."""
-    from config.redis import RedisSingleton
+    from infra.redis_client import RedisSingleton
 
     monkeypatch.setattr(RedisSingleton, "_instance", None)
     monkeypatch.setattr(RedisSingleton, "last_error", None)
@@ -141,7 +141,7 @@ class TestStrictByDefault:
         assert store_module.store_backend() == "memory"
 
     def test_an_unset_redis_url_raises_without_the_flag(self, strict, fresh_redis, monkeypatch):
-        from config.redis import CacheUnavailable, cache_backend
+        from infra.redis_client import CacheUnavailable, cache_backend
 
         monkeypatch.setenv("REDIS_HOST_URL", "")
         with pytest.raises(CacheUnavailable):
@@ -154,7 +154,7 @@ class TestStrictByDefault:
         # Production incident: the Upstash database behind the configured URL was
         # deleted, its hostname stopped resolving, and every update and Mini App
         # login failed — though nothing durable lives in Redis.
-        from config import redis as redis_module
+        from infra import redis_client as redis_module
 
         monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
         monkeypatch.setattr(
@@ -171,7 +171,7 @@ class TestStrictByDefault:
     ):
         from fastapi import Response
 
-        from config import redis as redis_module
+        from infra import redis_client as redis_module
 
         monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
         monkeypatch.setattr(
@@ -184,7 +184,7 @@ class TestStrictByDefault:
         assert response.status_code == 200
 
     def test_a_degraded_cache_recovers_when_redis_returns(self, strict, fresh_redis, monkeypatch):
-        from config import redis as redis_module
+        from infra import redis_client as redis_module
 
         monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
         attempts = []
@@ -214,7 +214,7 @@ class TestStrictByDefault:
     def test_an_unreachable_redis_falls_back_to_memory_with_the_flag(
         self, fresh_redis, monkeypatch
     ):
-        from config import redis as redis_module
+        from infra import redis_client as redis_module
 
         monkeypatch.setenv("REDIS_HOST_URL", "redis://cache.invalid:6379")
         monkeypatch.setattr(
@@ -228,7 +228,7 @@ class TestStrictByDefault:
     ):
         # The client is synchronous: retrying on every update while Redis is down
         # would block the event loop for the connect timeout each time.
-        from config import redis as redis_module
+        from infra import redis_client as redis_module
 
         attempts = []
         real = redis_module.RedisSingleton._make_connection.__func__
@@ -298,7 +298,7 @@ class TestHealthReportsTheStores:
     async def test_a_missing_redis_fails_the_health_check(self, strict, fresh_redis, monkeypatch):
         from fastapi import Response
 
-        from config.redis import CacheUnavailable
+        from infra.redis_client import CacheUnavailable
 
         monkeypatch.setenv("REDIS_HOST_URL", "")
         with pytest.raises(CacheUnavailable):

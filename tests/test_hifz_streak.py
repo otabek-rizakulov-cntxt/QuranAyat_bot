@@ -24,8 +24,8 @@ import hifz
 from bot.streak_image import cache_key
 from hifz import Ctx
 from hifz.streak import CB_GRID
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL, KIND_RECALL_CHECK
 from locales import t
 from services.streaks import refresh_streaks, user_today
 
@@ -64,7 +64,7 @@ def _photo_message(file_id: str = "FILEID"):
 
 
 async def _ctx(bot=None, **kwargs) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     bot.send_photo.return_value = _photo_message()
@@ -216,7 +216,7 @@ class TestMilestones:
 class TestGraphCache:
     async def test_the_graph_is_rendered_once_a_day_and_re_sent_from_the_file_id(self, monkeypatch):
         import hifz.streak as streak_module
-        from lib.utils import File
+        from infra.file_facade import File
 
         renders = []
         original = streak_module.render_streak_graph
@@ -237,7 +237,7 @@ class TestGraphCache:
         assert second.send_photo.await_args.kwargs["photo"] == "FILEID"
 
     async def test_the_cache_is_keyed_per_user_and_per_local_day(self):
-        from lib.utils import File
+        from infra.file_facade import File
 
         today = await _earn((0,))
         await _streak()
@@ -247,7 +247,7 @@ class TestGraphCache:
         assert File().get_file(cache_key(USER + 1, today)) is None
 
     async def test_a_rejected_file_id_falls_back_to_a_fresh_upload(self):
-        from lib.utils import File
+        from infra.file_facade import File
 
         today = await _earn((0,))
         File().save_file(cache_key(USER, today), "STALE")

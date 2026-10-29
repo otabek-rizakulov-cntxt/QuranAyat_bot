@@ -16,12 +16,12 @@ import pytest
 import main
 from api.auth import sign_init_data
 from config import get_settings
-from lib.store import get_store
-from lib.store.plans import DAY_COMPLETED
-from lib.store.sessions import KIND_DRILL
-from lib.user_settings import UserSettings
-from lib.utils import File
+from infra.file_facade import File
+from infra.store import get_store
+from infra.store.plans import DAY_COMPLETED
+from infra.store.sessions import KIND_DRILL
 from services import plans as plans_service
+from services.user_settings import UserSettings
 
 SECRET = "test-jwt-secret-not-real"
 ALICE, BOB = 7001, 7002

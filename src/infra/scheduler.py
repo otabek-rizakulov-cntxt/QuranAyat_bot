@@ -36,7 +36,7 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 import telegram
 
 from domain.localtime import local_date, next_due_utc
-from lib.store.schedule import ScheduledSend
+from infra.store.schedule import ScheduledSend
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ CATCH_UP_WINDOW = timedelta(hours=6)
 # this file to add a scheduled send:
 #
 #     # src/hifz/memorize.py
-#     from lib.scheduler import SendCtx, send_handler
+#     from infra.scheduler import SendCtx, send_handler
 #
 #     @send_handler("plan_day")
 #     async def push_plan_day(ctx: SendCtx) -> None:
@@ -204,8 +204,8 @@ class SendCtx:
 
     bot: Any  # telegram.Bot (an AsyncMock under test)
     data: dict  # the shared corpora dict built by main.build_data
-    file: Any  # lib.utils.File — media cache + nav state
-    store: Any  # lib.store.Store
+    file: Any  # infra.file_facade.File — media cache + nav state
+    store: Any  # infra.store.Store
     send: ScheduledSend  # the row being delivered
     # The tick's notion of "now". A handler that queues a follow-up (the next
     # portion, next week's board) computes it from this, not from the wall
@@ -331,7 +331,7 @@ class TickResult:
 # An asyncio primitive binds to the loop it is first awaited in, and pytest gives
 # every test its own loop, so a module-level Lock would hang the second test that
 # touched it. Rebuild it whenever the running loop changes — the same pattern as
-# `lib/page_image.py`'s stitch semaphore and `lib/store/__init__.py`'s creation
+# `infra/page_image.py`'s stitch semaphore and `infra/store/__init__.py`'s creation
 # lock. The lock itself exists so a manual `tick()` (boot catch-up, a test) can
 # never interleave with the polling loop's tick and claim the same batch twice.
 _tick_lock_obj = None
@@ -423,8 +423,8 @@ async def tick(
 
 
 async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
-    from lib.store import get_store
-    from lib.utils import File
+    from infra.file_facade import File
+    from infra.store import get_store
 
     now = _utcnow(now)
     store = store if store is not None else await get_store()

@@ -38,8 +38,8 @@ from domain.hifz_progress import (
     surah_progress,
 )
 from domain.quran import Quran
-from lib.store import get_store
-from lib.store.hifz import HifzInterval
+from infra.store import get_store
+from infra.store.hifz import HifzInterval
 from services.progress import load_summary
 
 USER = 1

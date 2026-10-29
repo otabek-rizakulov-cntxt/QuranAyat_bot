@@ -9,7 +9,7 @@
 # grid is ~201x144 px, roughly 29k pixels, where a stitched mushaf page is tens
 # of millions. It is an order of magnitude cheaper than work this same instance
 # already does per /page. It is still bounded — the same loop-aware semaphore as
-# `lib/page_image.py`, because on a 512 MB box the rule is that nothing
+# `infra/page_image.py`, because on a 512 MB box the rule is that nothing
 # unbounded ever runs, not that this particular thing is small.
 #
 # Two production constraints shape the drawing:
@@ -32,7 +32,7 @@ from typing import Iterable, Mapping, Optional, Union
 
 from domain.localtime import week_bounds
 from domain.streaks import GRID_WEEKS  # re-exported
-from lib.store import get_store
+from infra.store import get_store
 from services.streaks import user_today
 
 __all__ = [

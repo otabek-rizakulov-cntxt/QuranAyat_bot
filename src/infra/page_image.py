@@ -37,7 +37,7 @@ _STITCH_CONCURRENCY = 2
 # asyncio primitives bind to the first event loop they are awaited in, so a plain
 # module-level semaphore would break the moment a second loop appeared (production
 # has one loop for the process lifetime, but each test gets its own). Rebuild it
-# whenever the running loop changes — see the same concern in config/postgres.py.
+# whenever the running loop changes — see the same concern in infra/postgres.py.
 _stitch_semaphore = None
 _stitch_semaphore_loop = None
 

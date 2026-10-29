@@ -1,7 +1,7 @@
 """The mushaf page reader's pager.
 
 The page, not the ayah, is the unit people actually read and memorize in. A page
-card is one stitched image of the whole page (see lib/page_image.py) under a
+card is one stitched image of the whole page (see infra/page_image.py) under a
 1-604 pager, with its recitation one tap away rather than attached — a page of
 audio is ~1 MB nobody asked for if they only wanted to read.
 """

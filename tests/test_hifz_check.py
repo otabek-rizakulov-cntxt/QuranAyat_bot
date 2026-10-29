@@ -24,8 +24,8 @@ import hifz
 from domain.recall_check import OPTION_COUNT, build_question
 from hifz import Ctx
 from hifz.check import CB_ANSWER, CB_START, _parse_answer
-from lib.store import get_store
-from lib.store.sessions import KIND_RECALL_CHECK
+from infra.store import get_store
+from infra.store.sessions import KIND_RECALL_CHECK
 from locales import t
 from services.streaks import streak_summary, user_today
 
@@ -58,7 +58,7 @@ def _callback_query(message_id: int = 11):
 
 
 async def _ctx(bot=None, **kwargs) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     return await Ctx.build(bot or AsyncMock(), {}, File(), USER, USER, _Settings(), **kwargs)
 
@@ -142,7 +142,7 @@ class TestCheckEntryPoint:
         assert t("check_usage", "en") in text
 
     async def test_bare_check_prefers_the_plan_portion_already_reached(self):
-        from lib.store.plans import PlanDaySpec
+        from infra.store.plans import PlanDaySpec
 
         store = await get_store()
         today = await user_today(USER)

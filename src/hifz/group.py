@@ -32,9 +32,9 @@ from domain.localtime import DEFAULT_OFFSET
 from domain.quran import get_translation
 from hifz import Ctx, callback, wizard
 from infra import catalog
-from lib.page_image import fetch_and_stitch
-from lib.scheduler import send_handler
-from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
+from infra.page_image import fetch_and_stitch
+from infra.scheduler import send_handler
+from infra.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
 from locales import t
 
 logger = logging.getLogger(__name__)
@@ -290,8 +290,8 @@ async def _enqueue_next_group(store, chat_id: int, plan, now=None):
     from datetime import datetime, timezone
 
     from domain.localtime import local_date, next_due_utc, normalize_offset, to_utc
-    from lib.scheduler import enqueue
-    from lib.store.groups import GDAY_PENDING, GPLAN_ACTIVE
+    from infra.scheduler import enqueue
+    from infra.store.groups import GDAY_PENDING, GPLAN_ACTIVE
 
     if plan is None or plan.status != GPLAN_ACTIVE:
         return None
@@ -480,8 +480,8 @@ async def _enqueue_next_board(store, chat_id: int, now=None):
     from datetime import time as _time
 
     from domain.localtime import DEFAULT_OFFSET, normalize_offset, to_utc
-    from lib.scheduler import enqueue
-    from lib.store.groups import CONFIG_ACTIVE as _ACTIVE
+    from infra.scheduler import enqueue
+    from infra.store.groups import CONFIG_ACTIVE as _ACTIVE
     from services.leaderboard import week_window
 
     config = await store.groups.get_config(chat_id)

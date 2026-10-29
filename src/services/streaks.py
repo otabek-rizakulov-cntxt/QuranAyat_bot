@@ -31,7 +31,7 @@ from domain.streaks import (  # re-exported: callers read streaks from one place
     offset_of,
     percentile_band,
 )
-from lib.store import get_store
+from infra.store import get_store
 
 logger = logging.getLogger(__name__)
 

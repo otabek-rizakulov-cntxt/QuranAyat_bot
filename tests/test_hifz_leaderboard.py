@@ -17,8 +17,8 @@ import pytest
 import bot.router as router
 import hifz
 from hifz import Ctx
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL
 
 USER_ID = 930001
 CHAT_ID = 930001
@@ -61,7 +61,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, user_id=USER_ID, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery()} if tap else {"message": _Message()}

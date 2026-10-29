@@ -5,8 +5,8 @@ from bot.errors import ignore_not_modified
 from bot.keyboards.reciter import reciter_keyboard, reciter_page_of, reciter_set_confirmation
 from bot.router import callback, command
 from infra import pending_input
-from lib.user_settings import UserSettings
 from locales import t
+from services.user_settings import UserSettings
 
 
 @command("reciter")

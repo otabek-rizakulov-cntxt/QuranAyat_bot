@@ -26,8 +26,8 @@ from bot.streak_image import (
     level_for,
     render_streak_graph,
 )
-from lib.store import get_store
-from lib.store.sessions import KIND_DRILL
+from infra.store import get_store
+from infra.store.sessions import KIND_DRILL
 
 WEDNESDAY = date(2026, 3, 18)
 MONDAY = date(2026, 3, 16)

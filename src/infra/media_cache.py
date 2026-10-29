@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from config import RedisSingleton
+from infra.redis_client import RedisSingleton
 
 # Telegram file_ids are stable far longer; two days bounds how long a stale one
 # can linger before it is simply re-uploaded.

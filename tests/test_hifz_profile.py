@@ -16,7 +16,7 @@ import bot.router as router
 import hifz
 from hifz import Ctx
 from hifz import profile as profile_feature
-from lib.store import get_store
+from infra.store import get_store
 
 USER_ID = 900123
 CHAT_ID = 900123
@@ -65,7 +65,7 @@ class _CallbackQuery:
 
 
 async def _ctx(bot=None, username=None, argument="", tap=False) -> Ctx:
-    from lib.utils import File
+    from infra.file_facade import File
 
     bot = bot or AsyncMock()
     extra = {"callback_query": _CallbackQuery(username)} if tap else {"message": _Message(username)}
@@ -153,7 +153,7 @@ class TestProfileCard:
         )
 
     async def test_an_active_plan_is_named_with_its_progress(self):
-        from lib.store.plans import PlanDaySpec
+        from infra.store.plans import PlanDaySpec
 
         store = await get_store()
         days = [PlanDaySpec(date(2026, 8, 1), 67, 1, 5), PlanDaySpec(date(2026, 8, 2), 67, 6, 10)]
@@ -342,9 +342,9 @@ class TestTimezone:
 
     async def test_changing_the_timezone_shifts_the_next_push(self):
         # B3's done-when. The scheduler queues each day's push from the profile as
-        # it stands (lib.scheduler.schedule_daily), so the stored offset is the
+        # it stands (infra.scheduler.schedule_daily), so the stored offset is the
         # only thing that has to move.
-        from lib.scheduler import schedule_daily
+        from infra.scheduler import schedule_daily
 
         store = await get_store()
         now = datetime(2026, 8, 5, 0, 0, tzinfo=timezone.utc)

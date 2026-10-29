@@ -2,7 +2,7 @@
 # them (docs/MINI_APP_PLAN.md §3, Phase 1):
 #
 #   bot handlers (src/hifz/*, src/main.py)  ─┐
-#                                            ├─► services/* ─► lib/* ─► lib/store
+#                                            ├─► services/* ─► lib/* ─► infra/store
 #   Mini App API (src/api/*)                ─┘
 #
 # A service takes plain values and a store and returns plain values. It never

@@ -3,7 +3,7 @@ Redis-backed media cache (exercised here against the in-memory fallbacks)."""
 
 import pytest
 
-from lib.utils import File
+from infra.file_facade import File
 
 
 class TestAudioFilename:

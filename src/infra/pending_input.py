@@ -7,7 +7,7 @@ not a setting.
 
 from typing import Optional
 
-from config import RedisSingleton
+from infra.redis_client import RedisSingleton
 
 TTL_SECONDS = 120
 

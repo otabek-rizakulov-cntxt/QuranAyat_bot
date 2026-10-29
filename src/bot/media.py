@@ -16,7 +16,7 @@ from config.settings import get_settings
 from domain.quran import Quran
 from infra import audio as cdn_audio
 from infra import catalog, media_cache, nav_state
-from lib.page_image import fetch_and_stitch
+from infra.page_image import fetch_and_stitch
 
 logger = logging.getLogger(__name__)
 
