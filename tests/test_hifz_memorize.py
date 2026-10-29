@@ -10,7 +10,7 @@ row — and **the enqueue chain**, without which the scheduler drains a queue
 nothing ever fills and the headline feature silently never fires.
 """
 
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date
 from unittest.mock import AsyncMock
 
 import pytest
@@ -18,11 +18,11 @@ import pytest
 import hifz
 from hifz import Ctx
 from hifz import memorize as memorize_feature
+from hifz.refs import surah_ref
 from lib import scheduler
 from lib.plan_builder import advancing, build_plan
 from lib.store import get_store
-from lib.store.plans import DAY_COMPLETED, PLAN_ACTIVE, PLAN_COMPLETE, PLAN_PAUSED
-from hifz.refs import surah_ref
+from lib.store.plans import DAY_COMPLETED, PLAN_ACTIVE, PLAN_PAUSED
 
 USER_ID = 940001
 CHAT_ID = 940001

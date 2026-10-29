@@ -15,8 +15,8 @@ import pytest
 import telegram
 
 import main
-from lib.utils import File
 from lib.user_settings import UserSettings
+from lib.utils import File
 from modules import TranslationRegistry
 
 

@@ -21,8 +21,9 @@
 # re-runs `/memorize` — no durable state is involved, since nothing is written to
 # Postgres until the wizard is confirmed.
 
-import ujson as json
 from typing import Any, Dict, Optional
+
+import ujson as json
 
 from config import RedisSingleton
 

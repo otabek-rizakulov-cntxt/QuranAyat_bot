@@ -23,8 +23,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from hifz import Ctx, callback, command
 from hifz.refs import format_ref, parse_reference
 from lib.hifz_progress import load_summary
-from services.progress import surah_spans, unmark  # noqa: F401 — re-exported
 from modules import Quran
+from services.progress import surah_spans, unmark  # noqa: F401 — re-exported
 
 __all__ = [
     "REFRESH_CB",

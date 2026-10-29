@@ -4,7 +4,6 @@
 
 from lib.utils import File
 
-
 # A curated shortlist of well-known reciters (subfolder keys into performers.json).
 # These lead the catalog, so the first page of the picker is the ten names most
 # people are looking for and the pager walks through everything else.

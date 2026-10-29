@@ -51,18 +51,13 @@ from typing import Optional, Sequence
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+import services.plans as plans_service
 from hifz import Ctx, callback, command, wizard
 from hifz.profile import (
     format_reminder_time,
-    offset_from_callback,
-    offset_keyboard,
     parse_reminder_time,
-    reminder_keyboard,
-    save_reminder_time,
-    save_timezone,
 )
 from hifz.refs import KIND_RANGE, Ref, format_ref, juz_ref, parse_reference, surah_ref
-from lib.miniapp import app_row
 from lib.localtime import (
     DEFAULT_OFFSET,
     OFFSET_CHOICES,
@@ -70,16 +65,16 @@ from lib.localtime import (
     local_date,
     normalize_offset,
 )
+from lib.miniapp import app_row
 from lib.plan_builder import AUTO_PACE, Portion, build_plan
 from lib.scheduler import SendCtx, send_handler
 from lib.store.plans import PLAN_ACTIVE, PLAN_PAUSED
-import services.plans as plans_service
-from services.plans import SEND_KIND
-from services.profile import as_time
 from lib.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
 from locales import t
 from main import MAX_RANGE_AYAHS, REPEAT_COUNT, get_translation, send_combined_audio, send_quran
 from modules import Quran
+from services.plans import SEND_KIND
+from services.profile import as_time
 
 __all__ = ["memorize", "on_tap", "plan_step", "push_plan_day", "SEND_KIND", "WIZARD_KIND"]
 

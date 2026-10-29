@@ -12,8 +12,8 @@ import pytest
 import telegram
 
 import main
-from lib.utils import File
 from lib.user_settings import UserSettings
+from lib.utils import File
 
 
 @pytest.fixture(scope="module")
@@ -103,7 +103,7 @@ class TestCatalogOrder:
 
     def test_page_size_matches_the_shortlist(self):
         # Page 1 being exactly the shortlist is the point of the ordering above.
-        assert main.RECITER_PAGE_SIZE == len(main._RECITER_SHORTLIST)
+        assert len(main._RECITER_SHORTLIST) == main.RECITER_PAGE_SIZE
 
 
 class TestLabels:

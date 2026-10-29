@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
+
 from .store import get_store
 from .store.profiles import UserSettingsRow
 from .utils import File

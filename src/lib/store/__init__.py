@@ -15,12 +15,12 @@ import os
 from config.postgres import get_pool
 
 from ._state import MemoryState
+from .groups import GroupStore, InMemoryGroupStore, PostgresGroupStore
 from .hifz import HifzStore, InMemoryHifzStore, PostgresHifzStore
 from .plans import InMemoryPlanStore, PlanStore, PostgresPlanStore
 from .profiles import InMemoryProfileStore, PostgresProfileStore, ProfileStore
 from .schedule import InMemoryScheduleStore, PostgresScheduleStore, ScheduleStore
 from .sessions import InMemorySessionStore, PostgresSessionStore, SessionStore
-from .groups import GroupStore, InMemoryGroupStore, PostgresGroupStore
 
 __all__ = [
     "Store",
@@ -106,7 +106,7 @@ class PostgresStore(Store):
         every statement is `IF NOT EXISTS`, and there is no migration framework by
         design at this scale.
         """
-        with open(SCHEMA_PATH, "r", encoding="utf-8") as fp:
+        with open(SCHEMA_PATH, encoding="utf-8") as fp:
             await self.pool.execute(fp.read())
 
     async def close(self) -> None:

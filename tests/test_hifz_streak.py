@@ -200,9 +200,7 @@ class TestMilestones:
                     identifiers.add(node.id)
                 elif isinstance(node, ast.Attribute):
                     identifiers.add(node.attr)
-                elif isinstance(node, ast.arg):
-                    identifiers.add(node.arg)
-                elif isinstance(node, ast.keyword) and node.arg:
+                elif isinstance(node, ast.arg) or isinstance(node, ast.keyword) and node.arg:
                     identifiers.add(node.arg)
                 elif isinstance(node, ast.alias):
                     identifiers.add(node.asname or node.name)
@@ -216,8 +214,8 @@ class TestMilestones:
 
 class TestGraphCache:
     async def test_the_graph_is_rendered_once_a_day_and_re_sent_from_the_file_id(self, monkeypatch):
-        from lib.utils import File
         import hifz.streak as streak_module
+        from lib.utils import File
 
         renders = []
         original = streak_module.render_streak_graph
@@ -229,7 +227,7 @@ class TestGraphCache:
         monkeypatch.setattr(streak_module, "render_streak_graph", counting)
 
         today = await _earn((0,))
-        first = await _streak()
+        await _streak()
         assert len(renders) == 1
         assert File().get_file(cache_key(USER, today)) == "FILEID"
 

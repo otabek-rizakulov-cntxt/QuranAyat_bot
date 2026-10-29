@@ -23,13 +23,13 @@
 import html
 from typing import Optional
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from hifz import Ctx, callback, wizard
-from lib.scheduler import send_handler
 from lib.localtime import DEFAULT_OFFSET
-from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED, CONFIG_SETUP
+from lib.scheduler import send_handler
+from lib.store.groups import CONFIG_ACTIVE, CONFIG_PAUSED
 from locales import t
 
 WIZARD_KIND = "group_setup"
@@ -194,7 +194,7 @@ async def _step_topic(ctx: Ctx, draft, text: str) -> None:
 
 
 async def _step_target(ctx: Ctx, draft, text: str) -> None:
-    from hifz.refs import parse_reference, KIND_RANGE, KIND_SURAH, KIND_JUZ
+    from hifz.refs import parse_reference
 
     ref = parse_reference(text)
     if ref is None:
@@ -220,10 +220,9 @@ async def _step_post_time(ctx: Ctx, draft, text: str) -> None:
 
 async def _save_group_plan(ctx: Ctx, data: dict, post_time) -> None:
     """Build the plan (same pure generator as the personal plan) and queue day one."""
-    from datetime import date
     from hifz.refs import Ref
-    from lib.plan_builder import build_plan, to_day_specs, advancing
     from lib.localtime import local_date, normalize_offset
+    from lib.plan_builder import advancing, build_plan, to_day_specs
 
     chat_id = data.get("chat_id")
     kind, s_s, s_a, e_s, e_a = data["target"]
@@ -281,9 +280,10 @@ async def _enqueue_next_group(store, chat_id: int, plan, now=None):
     rather than raising, so re-arming the chain more often than needed is a no-op.
     """
     from datetime import datetime, timezone
-    from lib.localtime import to_utc, next_due_utc, local_date, normalize_offset, parse_offset
+
+    from lib.localtime import local_date, next_due_utc, normalize_offset, to_utc
     from lib.scheduler import enqueue
-    from lib.store.groups import GPLAN_ACTIVE, GDAY_PENDING
+    from lib.store.groups import GDAY_PENDING, GPLAN_ACTIVE
 
     if plan is None or plan.status != GPLAN_ACTIVE:
         return None
@@ -346,9 +346,9 @@ async def push_group_day(ctx) -> None:
 
 async def _post_portion(bot, config, day) -> None:
     """Post one portion to the group's topic: image, audio, translation, per flags."""
-    from main import send_combined_audio, get_translation
-    from lib.utils import File
     from lib.page_image import fetch_and_stitch
+    from lib.utils import File
+    from main import get_translation, send_combined_audio
 
     flags = config.content_flags or {}
     thread = config.thread_id
@@ -400,8 +400,9 @@ async def group_board_entries(store, bot, chat_id: int, utc_now=None):
     board (H1).
     """
     from datetime import datetime, timezone
+
     from lib.leaderboard import week_window
-    from lib.localtime import normalize_offset, DEFAULT_OFFSET
+    from lib.localtime import DEFAULT_OFFSET, normalize_offset
 
     config = await store.groups.get_config(chat_id)
     if config is None:
@@ -471,12 +472,14 @@ async def _enqueue_next_board(store, chat_id: int, now=None):
     Keyed by the week's Sunday so a restart cannot double-post it; `enqueue`
     answers None on a clash rather than raising.
     """
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta, timezone
+    from datetime import datetime as _dt
+    from datetime import time as _time
+
     from lib.leaderboard import week_window
-    from lib.localtime import to_utc, normalize_offset, DEFAULT_OFFSET
+    from lib.localtime import DEFAULT_OFFSET, normalize_offset, to_utc
     from lib.scheduler import enqueue
     from lib.store.groups import CONFIG_ACTIVE as _ACTIVE
-    from datetime import datetime as _dt, time as _time
 
     config = await store.groups.get_config(chat_id)
     if config is None or config.status != _ACTIVE:

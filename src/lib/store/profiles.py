@@ -57,10 +57,10 @@ _SETTINGS_COLUMNS = "telegram_user_id, ui_lang, translation_lang, reciter"
 # reaches the statement text.
 _PROFILE_UPSERT = {
     column: (
-        "INSERT INTO user_profile (telegram_user_id, {c}) VALUES ($1, $2) "
-        "ON CONFLICT (telegram_user_id) DO UPDATE SET {c} = EXCLUDED.{c}, "
-        "updated_at = now() RETURNING {cols}"
-    ).format(c=column, cols=_PROFILE_COLUMNS)
+        f"INSERT INTO user_profile (telegram_user_id, {column}) VALUES ($1, $2) "
+        f"ON CONFLICT (telegram_user_id) DO UPDATE SET {column} = EXCLUDED.{column}, "
+        f"updated_at = now() RETURNING {_PROFILE_COLUMNS}"
+    )
     for column in ("display_name", "leaderboard_opt_in", "timezone", "reminder_time")
 }
 

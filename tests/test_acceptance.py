@@ -10,7 +10,7 @@ deploy. If a refactor keeps every unit test green and breaks this, the refactor
 broke the product.
 """
 
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
 import pytest

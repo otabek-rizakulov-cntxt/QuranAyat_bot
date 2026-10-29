@@ -23,8 +23,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # Make `from locales.languages import ...` work when run from the repo root.
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from locales.languages import (  # noqa: E402
-    LANGUAGES,
     ARABIC_ORIGINAL,
+    LANGUAGES,
     TRANSLIT_UZ,
 )
 

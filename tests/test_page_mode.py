@@ -18,7 +18,6 @@ from PIL import Image
 import main
 from lib import page_image
 from lib.utils import File
-from modules import Quran
 
 
 def _png(width: int, height: int, colour=(0, 0, 0)) -> bytes:

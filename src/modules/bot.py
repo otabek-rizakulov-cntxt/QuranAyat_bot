@@ -1,5 +1,6 @@
-from config import Environment
 from telegram import Bot as TelegramBot
+
+from config import Environment
 
 
 class Bot:

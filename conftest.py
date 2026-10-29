@@ -52,8 +52,8 @@ def _clean_state_store():
     production has a single loop for the process lifetime, so this only bites
     under test.
     """
-    from lib.utils import File
     from lib.store import reset_for_tests
+    from lib.utils import File
 
     redis = File().redis
     if hasattr(redis, "_data"):  # MemoryStore, not a real Redis connection

@@ -1,7 +1,9 @@
 import os
-import ujson as json
 from typing import Optional
-from config import RedisSingleton, Environment
+
+import ujson as json
+
+from config import Environment, RedisSingleton
 
 
 class File(Environment):
@@ -91,7 +93,7 @@ class File(Environment):
         if cls._performers_cache is None:
             base_dir = os.path.dirname(os.path.dirname(__file__))  # up from lib/ to src/
             file_path = os.path.join(base_dir, "common", "performers.json")
-            with open(file_path, "r", encoding="utf-8") as fp:
+            with open(file_path, encoding="utf-8") as fp:
                 cls._performers_cache = json.load(fp)["performers"]
         return cls._performers_cache
 

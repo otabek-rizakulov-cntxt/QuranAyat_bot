@@ -55,7 +55,7 @@ def parse_quran(filename: str):
         """Add verse and replace for Arabic ligatures (salawat)"""
         return verse.strip().replace("– peace and blessings be upon him", "ﷺ‎")
 
-    with open(filename, "r") as f:
+    with open(filename) as f:
         for line in f.readlines():
             if line == "\n":
                 continue
@@ -91,7 +91,7 @@ def parse_quran_tafsir(filename: str = "Al_Jalalain_Eng.txt"):
         """Add line and replace for Arabic ligatures (salawat)"""
         verse.append(line.strip().replace("(s)", "ﷺ‎"))
 
-    with open(filename, "r") as f:
+    with open(filename) as f:
         for line in f.readlines():
             if line == "\n":
                 continue
@@ -484,5 +484,5 @@ def make_index():
     left = range(1, 58)
     right = range(58, 115)
     for i, j in zip(left, right):
-        index.append("/{} <code>{}</code>/{} {}".format(i, chapters[i - 1], j, chapters[j - 1]))
+        index.append(f"/{i} <code>{chapters[i - 1]}</code>/{j} {chapters[j - 1]}")
     return "\n".join(index)

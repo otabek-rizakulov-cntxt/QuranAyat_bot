@@ -31,13 +31,13 @@ from typing import Optional, Tuple
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+import services.check as check_service
 from hifz import Ctx, callback, command
 from hifz.refs import parse_reference
 from lib.recall_check import OPTION_COUNT, RecallQuestion
 from lib.streaks import user_today
-import services.check as check_service
-from services.check import DEFAULT_JUZ  # noqa: F401 — re-exported
 from modules import Quran
+from services.check import DEFAULT_JUZ  # noqa: F401 — re-exported
 
 # --- callback_data shapes ------------------------------------------------------
 # hc:start                              start a check from another screen (23 B max: 8)

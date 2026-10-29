@@ -177,7 +177,6 @@ class TestConflictFreeByConstruction:
         from locales import BOT_COMMANDS
 
         hifz.load_features()
-        import main
 
         advertised = {name for name, _ in BOT_COMMANDS}
         hifz_owned = {"memorize", "progress", "streak", "leaderboard", "profile", "check", "forgot"}

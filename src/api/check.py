@@ -15,8 +15,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from lib.streaks import user_today
 from lib.store import get_store
+from lib.streaks import user_today
 from services import check as check_service
 
 from .auth import jwt_secret, require_user

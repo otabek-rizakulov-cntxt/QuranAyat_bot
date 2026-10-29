@@ -12,7 +12,6 @@
 
 from dataclasses import dataclass
 
-
 # Sentinel editions handled specially by the bundler:
 #   __arabic__      -> fetch the original Arabic mushaf (quran-simple)
 #   __translit_uz__ -> derive Uzbek Latin from the bundled Uzbek Cyrillic file

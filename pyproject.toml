@@ -8,7 +8,8 @@ target-version = "py310"
 # packages — main, api, config, hifz, lib, locales, modules, services — sort as
 # first-party.
 src = ["src", "."]
-extend-exclude = ["graphify-out", "build"]
+# Markdown: ruff also formats code blocks in docs; those are prose examples.
+extend-exclude = ["graphify-out", "build", "*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
@@ -25,6 +26,7 @@ ignore = [
     "E741",   # `l` as a short-lived loop name; readability, not correctness
     "SIM105", # contextlib.suppress vs try/except/pass is a style preference
     "SIM108", # ternaries are not always clearer than if/else
+    "SIM117", # merging nested `async with` in the Postgres stores — only CI's SQL leg runs them
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -35,4 +37,4 @@ ignore = [
 # The package's public API is a re-export of its submodules.
 "src/locales/__init__.py" = ["F401"]
 # Tests: opening fixture files inline and loop-unpacking for readability are fine.
-"tests/**" = ["B007", "B017", "SIM115", "SIM117"]
+"tests/**" = ["B007", "B017", "SIM115"]

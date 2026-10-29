@@ -22,7 +22,6 @@ safely make in a load test — to Telegram — is removed.
 """
 
 import asyncio
-import json
 import os
 import sys
 import time
@@ -34,6 +33,7 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 os.chdir(REPO_ROOT)  # corpus files (quran-data.xml, translations/*) resolve relative to CWD
 
 import telegram  # noqa: E402
+
 import modules.bot as bot_module  # noqa: E402
 
 # A plain AsyncMock() breaks `telegram.Update.de_json` (main.py's webhook route

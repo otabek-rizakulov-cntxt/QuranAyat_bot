@@ -7,7 +7,8 @@ services/*, so "the app and the bot agree" is asserted on shared rows."""
 
 import json
 import time
-from datetime import date, time as dtime
+from datetime import date
+from datetime import time as dtime
 
 import httpx
 import pytest

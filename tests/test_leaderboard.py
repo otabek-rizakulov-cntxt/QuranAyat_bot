@@ -7,7 +7,7 @@ way to the screen.
 
 from datetime import date, datetime, timedelta, timezone
 
-from lib.leaderboard import DEFAULT_LIMIT, weekly_board, week_window
+from lib.leaderboard import DEFAULT_LIMIT, week_window, weekly_board
 from lib.store import get_store
 from lib.store.sessions import KIND_DRILL
 

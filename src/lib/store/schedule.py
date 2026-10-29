@@ -13,7 +13,7 @@
 
 import abc
 from dataclasses import dataclass, field, replace
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Sequence
 
 import ujson as json

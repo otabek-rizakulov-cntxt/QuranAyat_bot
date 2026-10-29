@@ -207,8 +207,9 @@ class _Unreachable:
 
 class TestHealthReportsTheStores:
     async def test_memory_stores_are_visible_on_the_health_endpoint(self):
-        import main
         from fastapi import Response
+
+        import main
 
         await store_module.get_store()
         response = Response()
@@ -216,8 +217,9 @@ class TestHealthReportsTheStores:
         assert response.status_code == 200
 
     async def test_a_store_that_is_not_built_yet_is_pending_not_down(self, fresh_redis):
-        import main
         from fastapi import Response
+
+        import main
 
         response = Response()
         body = await main.health(response)
@@ -225,8 +227,9 @@ class TestHealthReportsTheStores:
         assert response.status_code == 200
 
     async def test_a_missing_database_fails_the_health_check(self, strict):
-        import main
         from fastapi import Response
+
+        import main
 
         with pytest.raises(postgres.DatabaseUnavailable):
             await store_module.get_store()
@@ -236,8 +239,9 @@ class TestHealthReportsTheStores:
         assert response.status_code == 503
 
     async def test_a_missing_redis_fails_the_health_check(self, strict, fresh_redis, monkeypatch):
-        import main
         from fastapi import Response
+
+        import main
         from config.redis import CacheUnavailable
 
         monkeypatch.setenv("REDIS_HOST_URL", "")

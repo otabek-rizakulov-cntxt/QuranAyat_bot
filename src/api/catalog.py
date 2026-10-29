@@ -10,7 +10,7 @@ from config import Environment
 from lib.utils import File
 from locales import LANGUAGES, UI_LANGUAGES
 from modules import Quran, TranslationRegistry
-from services.reciters import RECITER_KINDS, _KIND_WARNING_KEYS, reciter_catalog
+from services.reciters import _KIND_WARNING_KEYS, RECITER_KINDS, reciter_catalog
 
 from .auth import require_user
 

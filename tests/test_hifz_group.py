@@ -262,8 +262,6 @@ class TestPlanWizard:
         await hifz.dispatch_wizard(await _ctx(bot), "67")  # target: Al-Mulk
 
         def tap(cb):
-            ctx = None
-
             async def _do():
                 c = await Ctx.build(
                     bot,
@@ -333,7 +331,7 @@ class TestPlanWizard:
         )
         await _run_setup_to_plan(store, bot)
         await hifz.dispatch_wizard(await _ctx(bot), "not a surah")
-        assert G.WIZARD_KIND == (await _ctx(bot)).wiz.kind(ADMIN)
+        assert (await _ctx(bot)).wiz.kind(ADMIN) == G.WIZARD_KIND
         assert (await _ctx(bot)).wiz.get(ADMIN)["step"] == "target"
 
 
@@ -342,8 +340,9 @@ class TestPlanWizard:
 
 class TestDailyPost:
     async def _saved_plan(self, store):
-        from lib.store.plans import PlanDaySpec
         from datetime import date
+
+        from lib.store.plans import PlanDaySpec
 
         await store.groups.ensure_config(CHAT, admin_user_id=ADMIN)
         from datetime import time as _time
@@ -470,7 +469,8 @@ class TestBoard:
         )
 
     async def test_board_ranks_linked_members_by_sessions(self, monkeypatch):
-        from datetime import datetime, timezone, date
+        from datetime import date, datetime, timezone
+
         from lib.store.sessions import KIND_DRILL
 
         store = await get_store()
@@ -491,7 +491,8 @@ class TestBoard:
         assert [(e[1], e[2]) for e in entries] == [("Bilal", 5), ("Aisha", 3), ("Zayd", 1)]
 
     async def test_a_member_who_left_is_dropped(self, monkeypatch):
-        from datetime import datetime, timezone, date
+        from datetime import date, datetime, timezone
+
         from lib.store.sessions import KIND_DRILL
 
         store = await get_store()

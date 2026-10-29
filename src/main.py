@@ -29,6 +29,7 @@ Required env vars (see .env.example):
 
 import os
 import re
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,8 +39,11 @@ import html
 from io import BytesIO
 from time import time
 from urllib.parse import urlencode
+
 import httpx
 import telegram
+from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from telegram import (
     BotCommand,
     InlineKeyboardButton,
@@ -52,41 +56,38 @@ from telegram import (
     InputTextMessageContent,
     ReplyKeyboardRemove,
 )
-from fastapi import FastAPI, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
-from modules import Quran, make_index, Bot, TranslationRegistry
+
 import hifz
-from lib.utils import File
-from lib.page_image import fetch_and_stitch
+from api import router as api_router
+from config import Environment
+from config.postgres import close_pool
+from config.redis import RedisSingleton, cache_backend
 from lib.miniapp import app_row, set_menu_button
+from lib.page_image import fetch_and_stitch
 from lib.store import apply_schema, store_backend
 from lib.user_settings import UserSettings
-from config import Environment
-from api import router as api_router
+from lib.utils import File
+from locales import (
+    BOT_COMMANDS,
+    DEFAULT_LANG,
+    LANGUAGES,
+    UI_LANGUAGES,
+    button_action,
+    get_language,
+    normalize_lang,
+    t,
+    welcome_text,
+)
+from modules import Bot, Quran, TranslationRegistry, make_index
 from services.reciters import (  # noqa: F401 — re-exported; tests and the picker use them here
-    DEFAULT_RECITER_KIND,
-    RECITER_KINDS,
     _KIND_WARNING_KEYS,
     _RECITER_SHORTLIST,
+    DEFAULT_RECITER_KIND,
+    RECITER_KINDS,
     reciter_catalog,
     reciter_group,
     reciter_kind,
 )
-from config.postgres import close_pool
-from config.redis import RedisSingleton, cache_backend
-from locales import (
-    LANGUAGES,
-    UI_LANGUAGES,
-    DEFAULT_LANG,
-    BOT_COMMANDS,
-    t,
-    button_action,
-    normalize_lang,
-    get_language,
-    is_ui_language,
-    welcome_text,
-)
-
 
 # ---------------------------------------------------------------------------
 # Bot logic
@@ -994,8 +995,8 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
     user_settings = UserSettings()
 
     if update.my_chat_member:  # the bot was added to or removed from a chat
-        from lib.store import get_store
         from hifz import group as hifz_group
+        from lib.store import get_store
 
         try:
             await hifz_group.on_my_chat_member(bot, await get_store(), update)

@@ -5,14 +5,14 @@
 # be partial — any key a locale omits is served from English, so a half-translated
 # language still works everywhere.
 
-from functools import lru_cache
+from functools import cache, lru_cache
 from importlib import import_module
 
 from .languages import (  # re-exported for callers
+    DEFAULT_LANG,
     LANGUAGES,
     LANGUAGES_BY_CODE,
     UI_LANGUAGES,
-    DEFAULT_LANG,
     Language,
     get_language,
     is_supported,
@@ -182,7 +182,7 @@ def keyboard_rows(lang: str) -> list[list[str]]:
     ]
 
 
-@lru_cache(maxsize=None)
+@cache
 def _reverse_button_map(lang: str) -> dict[str, str]:
     """{lowercased label -> canonical action} for `lang`, English, and canonical words."""
     m: dict[str, str] = {}
