@@ -348,7 +348,7 @@ async def push_group_day(ctx) -> None:
         return  # already delivered (restart between claim and mark)
 
     await _post_portion(ctx.bot, config, claimed)
-    await _enqueue_next_group(ctx.store, chat_id, plan)
+    await _enqueue_next_group(ctx.store, chat_id, plan, now=ctx.now)
 
 
 async def _post_portion(bot, config, day) -> None:
@@ -468,7 +468,7 @@ async def push_board(ctx) -> None:
     if config is None or config.status != CONFIG_ACTIVE:
         return
     await post_board(ctx.bot, ctx.store, chat_id)
-    await _enqueue_next_board(ctx.store, chat_id)
+    await _enqueue_next_board(ctx.store, chat_id, now=ctx.now)
 
 
 async def _enqueue_next_board(store, chat_id: int, now=None):

@@ -774,7 +774,7 @@ async def push_plan_day(ctx: SendCtx) -> None:
         translation_lang,
         reciter,
     )
-    await _enqueue_next(ctx.store, user_id, ctx.chat_id, plan)
+    await _enqueue_next(ctx.store, user_id, ctx.chat_id, plan, now=ctx.now)
 
 
 # --- Drill delivery (D3) --------------------------------------------------------

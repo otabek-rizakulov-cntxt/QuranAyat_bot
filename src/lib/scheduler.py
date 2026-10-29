@@ -207,6 +207,10 @@ class SendCtx:
     file: Any  # lib.utils.File — media cache + nav state
     store: Any  # lib.store.Store
     send: ScheduledSend  # the row being delivered
+    # The tick's notion of "now". A handler that queues a follow-up (the next
+    # portion, next week's board) computes it from this, not from the wall
+    # clock, so a tick run with an injected time stays consistent with itself.
+    now: Optional[datetime] = None
 
     @property
     def kind(self) -> str:
@@ -458,7 +462,12 @@ async def _tick(bot, data, now, store, limit, release_before) -> TickResult:
                 continue
             await _deliver(
                 SendCtx(
-                    bot=bot, data=data if data is not None else {}, file=file, store=store, send=row
+                    bot=bot,
+                    data=data if data is not None else {},
+                    file=file,
+                    store=store,
+                    send=row,
+                    now=now,
                 )
             )
         except asyncio.CancelledError:
