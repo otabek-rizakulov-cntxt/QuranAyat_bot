@@ -34,7 +34,11 @@ class MemoryState:
     group_plan: Dict[int, object] = field(default_factory=dict)  # id -> GroupPlanRow
     group_plan_day: Dict[int, object] = field(default_factory=dict)  # id -> GroupPlanDayRow
     group_member_link: List[object] = field(default_factory=list)  # GroupMemberLink
+    # Multi-platform — (platform, external_id) -> IdentityRow.
+    identity: Dict[tuple, object] = field(default_factory=dict)
     sequence: int = 0
+    # Stands in for the `non_telegram_user_id` sequence; see store/identity.py.
+    user_id_sequence: int = 2**52 - 1
 
     def next_id(self) -> int:
         """Hand out the next surrogate key, standing in for BIGSERIAL.
@@ -45,6 +49,11 @@ class MemoryState:
         """
         self.sequence += 1
         return self.sequence
+
+    def next_user_id(self) -> int:
+        """Hand out the next non-Telegram `user_id`, from 2^52 up."""
+        self.user_id_sequence += 1
+        return self.user_id_sequence
 
     def clear(self) -> None:
         """Drop every row and reset the sequence (used by `reset_for_tests`)."""
@@ -60,4 +69,6 @@ class MemoryState:
         self.group_plan.clear()
         self.group_plan_day.clear()
         self.group_member_link.clear()
+        self.identity.clear()
         self.sequence = 0
+        self.user_id_sequence = 2**52 - 1

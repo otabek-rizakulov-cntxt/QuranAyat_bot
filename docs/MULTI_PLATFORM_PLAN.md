@@ -215,11 +215,13 @@ CREATE SEQUENCE IF NOT EXISTS non_telegram_user_id START 4503599627370496;
 
   *Done when:* `tests/test_channels_telegram.py` covers every method against an
   `AsyncMock` bot.
-- [ ] **P1.2 — Identity store + `scheduled_send.platform`.**
+- [x] **P1.2 — Identity store + `scheduled_send.platform`.** ✅ 2026-11-01 (memory
+  leg; ⚠️ Postgres leg not yet run — no test database).
   - Schema per §5, as idempotent `IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`.
   - `infra/store/identity.py` with memory and Postgres backends. Methods:
-    `resolve`, `external_id`, `touch_inbound`, `last_inbound`, `opt_in`,
-    `opt_out`, `consent`.
+    `resolve`, `external_id`, `get`, `get_by_user`, `touch_inbound`, `opt_in`,
+    `opt_out`; the window and consent are read off the row
+    (`last_inbound_at`, `IdentityRow.consented`).
   - `ScheduledSend.platform`; `enqueue()` and `schedule_daily()` take
     `platform=`.
 
@@ -455,6 +457,10 @@ cost of daily pushes, and whether groups matter.
   queued send, so `channels` may not import `bot`. The Telegram transport the
   bot layer owned — `send_cached` (file_id cache) and `ignore_not_modified` —
   moved to `channels/telegram.py`; `bot/media.py` and `bot/errors.py` re-export it.
+- 2026-11-01 — P1.2 done on the in-memory store. The Postgres leg of
+  `tests/test_store_contract.py` (incl. the new `TestIdentity`) still has to run
+  against a throwaway database (`TEST_DATABASE_URL`) before Phase 2 ships; the
+  schema change is `IF NOT EXISTS`-only, so deploys stay idempotent.
 
 ## References
 

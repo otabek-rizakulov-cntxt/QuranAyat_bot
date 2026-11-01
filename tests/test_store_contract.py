@@ -18,6 +18,7 @@ from datetime import date, datetime, time, timedelta, timezone
 import pytest
 
 from infra.store import InMemoryStore, PostgresStore
+from infra.store.identity import NON_TELEGRAM_ID_START
 from infra.store.plans import (
     DAY_COMPLETED,
     DAY_PENDING,
@@ -43,6 +44,7 @@ _TABLES = (
     "group_plan",
     "group_member_link",
     "group_config",
+    "identity",
 )
 
 UTC = timezone.utc
@@ -68,6 +70,8 @@ async def store(request):
         sql_store = PostgresStore(pool)
         await sql_store.apply_schema()
         await pool.execute("TRUNCATE %s RESTART IDENTITY CASCADE" % ", ".join(_TABLES))
+        # Not owned by a table, so RESTART IDENTITY leaves it alone.
+        await pool.execute("ALTER SEQUENCE non_telegram_user_id RESTART")
         yield sql_store
     finally:
         await pool.close()
@@ -559,6 +563,19 @@ class TestSchedule:
         assert row.state == STATE_PENDING
         assert row.claimed_at is None
 
+    async def test_platform_defaults_to_telegram(self, store):
+        row = await store.schedule.enqueue("plan_day", 1, self.NOW, "k")
+        assert row.platform == "telegram"
+        assert (await store.schedule.get(row.id)).platform == "telegram"
+
+    async def test_platform_round_trips(self, store):
+        uid = NON_TELEGRAM_ID_START
+        row = await store.schedule.enqueue("daily_ayah", uid, self.NOW, "k", platform="whatsapp")
+        assert row.platform == "whatsapp"
+        assert (await store.schedule.get_by_key("k")).platform == "whatsapp"
+        (claimed,) = await store.schedule.claim_due(self.NOW)
+        assert (claimed.target_chat_id, claimed.platform) == (uid, "whatsapp")
+
     async def test_enqueue_defaults_to_an_empty_payload(self, store):
         row = await store.schedule.enqueue("weekly_board", 1, self.NOW, "wb:1")
         assert row.payload == {}
@@ -814,3 +831,67 @@ class TestGroups:
         await store.groups.link_member(5, -200)
         await store.groups.unlink_member(5, -100)
         assert await store.groups.list_linked(-200) == [5]
+
+
+class TestIdentity:
+    AT = datetime(2026, 11, 1, 9, 0, tzinfo=UTC)
+
+    async def test_telegram_is_computed_not_stored(self, store):
+        assert await store.identity.resolve("telegram", "123456") == 123456
+        assert await store.identity.get("telegram", "123456") is None
+        assert await store.identity.external_id(123456, "telegram") == "123456"
+
+    async def test_telegram_has_no_stored_state_to_update(self, store):
+        with pytest.raises(ValueError):
+            await store.identity.touch_inbound(123456, "telegram", self.AT)
+
+    async def test_first_contact_allocates_from_2_to_the_52(self, store):
+        first = await store.identity.resolve("whatsapp", "998901234567")
+        second = await store.identity.resolve("whatsapp", "998907654321")
+        assert first == NON_TELEGRAM_ID_START == 2**52
+        assert second == first + 1
+        assert first < 2**53  # still a safe integer in the Mini App's JSON
+
+    async def test_resolve_is_idempotent(self, store):
+        uid = await store.identity.resolve("whatsapp", "998901234567")
+        assert await store.identity.resolve("whatsapp", "998901234567") == uid
+        row = await store.identity.get("whatsapp", "998901234567")
+        assert (row.platform, row.external_id, row.user_id) == ("whatsapp", "998901234567", uid)
+        assert row.created_at is not None
+
+    async def test_concurrent_first_contact_gets_one_id(self, store):
+        import asyncio
+
+        ids = await asyncio.gather(
+            *[store.identity.resolve("whatsapp", "998901234567") for _ in range(5)]
+        )
+        assert len(set(ids)) == 1
+
+    async def test_external_id_round_trip(self, store):
+        uid = await store.identity.resolve("whatsapp", "998901234567")
+        assert await store.identity.external_id(uid, "whatsapp") == "998901234567"
+        assert await store.identity.external_id(uid + 1, "whatsapp") is None
+        assert await store.identity.external_id(uid, "telegram") is None
+
+    async def test_touch_inbound(self, store):
+        uid = await store.identity.resolve("whatsapp", "998901234567")
+        assert (await store.identity.get_by_user(uid, "whatsapp")).last_inbound_at is None
+        await store.identity.touch_inbound(uid, "whatsapp", self.AT)
+        assert (await store.identity.get_by_user(uid, "whatsapp")).last_inbound_at == self.AT
+
+    async def test_consent_round_trip(self, store):
+        uid = await store.identity.resolve("whatsapp", "998901234567")
+        assert not (await store.identity.get_by_user(uid, "whatsapp")).consented
+        await store.identity.opt_in(uid, "whatsapp", self.AT)
+        assert (await store.identity.get_by_user(uid, "whatsapp")).consented
+        await store.identity.opt_out(uid, "whatsapp", self.AT + timedelta(days=1))
+        row = await store.identity.get_by_user(uid, "whatsapp")
+        assert not row.consented and row.opted_out_at == self.AT + timedelta(days=1)
+        await store.identity.opt_in(uid, "whatsapp", self.AT + timedelta(days=2))
+        assert (await store.identity.get_by_user(uid, "whatsapp")).consented
+
+    async def test_returned_rows_are_copies(self, store):
+        uid = await store.identity.resolve("whatsapp", "998901234567")
+        row = await store.identity.get_by_user(uid, "whatsapp")
+        row.opted_in_at = self.AT
+        assert not (await store.identity.get_by_user(uid, "whatsapp")).consented
