@@ -266,7 +266,7 @@ CREATE SEQUENCE IF NOT EXISTS non_telegram_user_id START 4503599627370496;
 
 Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
-- [ ] **P2.0 — Config.** `whatsapp_enabled` plus the phone-number id, access
+- [x] **P2.0 — Config.** ✅ 2026-11-02. `whatsapp_enabled` plus the phone-number id, access
   token, app secret and verify token, in `config/settings.py`. `.env.example`
   gets placeholders. Everything is off unless enabled. *Done when:* the app
   boots unchanged with nothing configured.
