@@ -2,10 +2,14 @@
 
 Dependencies point one way:
 
-    app, main  →  bot, api  →  services  →  infra  →  domain, config, locales
+    app, main  →  bot, api  →  services  →  infra, channels  →  domain, config, locales
+
+`channels` (platform transports) sits in the infra tier: infra's scheduler builds
+a channel per queued send, and channels use infra's caches, so the two may
+import each other — but neither may import `bot`.
 
 Nothing imports `main`. Only the presentation layer (app, bot, api, main)
-and infra, which wraps the Telegram client, may import Telegram or FastAPI.
+and the infra tier, which wraps the Telegram client, may import Telegram or FastAPI.
 
 The refactor (docs/REFACTOR_PLAN.md) brought the code in line with these
 rules, so KNOWN is empty. It stays as the escape hatch for a deliberate,
@@ -27,7 +31,7 @@ SRC = os.path.join(os.path.dirname(__file__), "..", "src")
 PACKAGES = {
     "main", "app", "bot", "api",
     "services",
-    "infra",
+    "infra", "channels",
     "domain", "config", "locales",
 }  # fmt: skip
 
@@ -39,9 +43,10 @@ ALLOWED = {
     "config": {"config"},
     "locales": {"locales"},
     "domain": {"domain", "config", "locales"},
-    "infra": _LOWER,
+    "infra": _LOWER | {"channels"},
+    "channels": _LOWER | {"channels"},
     "services": _LOWER | {"services"},
-    "bot": _LOWER | {"services", "bot"},
+    "bot": _LOWER | {"services", "bot", "channels"},
     "api": _LOWER | {"services", "api"},
     "app": PACKAGES - {"main"},
     "main": PACKAGES - {"main"},

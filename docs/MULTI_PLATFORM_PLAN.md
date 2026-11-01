@@ -198,7 +198,7 @@ CREATE SEQUENCE IF NOT EXISTS non_telegram_user_id START 4503599627370496;
 - [x] **P1.0 — Plan detail and doc corrections.** ✅ 2026-11-01. Parity row for the verse of
   the day, Telegram identity computed rather than stored (§5), and this
   breakdown. *Done when:* committed.
-- [ ] **P1.1 — `src/channels/` package.**
+- [x] **P1.1 — `src/channels/` package.** ✅ 2026-11-01.
   - `base.py`:
     - `Choice(label, data, url, web_app, switch_inline)`, with `Choices` as
       rows of `Choice`;
@@ -450,6 +450,11 @@ cost of daily pushes, and whether groups matter.
   (P2.5). Telegram identity is computed, not stored, until Phase 6. Stitched
   pages and repeated audio get public routes so WhatsApp can send them by link
   (P2.3).
+- 2026-11-01 — P1.1 done. `channels` sits in the **infra tier**
+  (`tests/test_layering.py`): the scheduler in `infra` builds a channel per
+  queued send, so `channels` may not import `bot`. The Telegram transport the
+  bot layer owned — `send_cached` (file_id cache) and `ignore_not_modified` —
+  moved to `channels/telegram.py`; `bot/media.py` and `bot/errors.py` re-export it.
 
 ## References
 

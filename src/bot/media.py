@@ -1,10 +1,10 @@
 """Sending Quran media to a chat, through the Telegram file_id cache.
 
 Every sender tries the file_id Telegram gave us last time first and only
-uploads (and caches the new id) on a miss or a rejected id.
+uploads (and caches the new id) on a miss or a rejected id — `send_cached`,
+which lives with the rest of the Telegram transport in channels/telegram.py.
 """
 
-import logging
 from urllib.parse import urlencode
 
 import telegram
@@ -12,54 +12,12 @@ import telegram
 from bot.keyboards.page import page_keyboard
 from bot.limits import REPEAT_COUNT
 from bot.text import build_verse_text, page_caption, reference
+from channels.telegram import send_cached
 from config.settings import get_settings
 from domain.quran import Quran
 from infra import audio as cdn_audio
-from infra import catalog, media_cache, nav_state
+from infra import catalog, nav_state
 from infra.page_image import fetch_and_stitch
-
-logger = logging.getLogger(__name__)
-
-_UPLOAD_ACTION = {
-    "photo": telegram.constants.ChatAction.UPLOAD_PHOTO,
-    "audio": telegram.constants.ChatAction.UPLOAD_VOICE,
-}
-
-
-async def _send(bot, kind: str, source, **kwargs) -> str:
-    """Send a photo or an audio file and return the file_id Telegram assigned."""
-    if kind == "photo":
-        result = await bot.send_photo(photo=source, **kwargs)
-        return result.photo[-1].file_id
-    result = await bot.send_audio(audio=source, **kwargs)
-    return result.audio.file_id
-
-
-async def send_cached(
-    bot, kind: str, key: str, build, *, chat_id: int, upload_action: bool = True, **kwargs
-) -> str:
-    """Send media through the file_id cache: replay the id cached under `key`,
-    or — on a miss, or when Telegram rejects the cached id (e.g. expired) —
-    upload what `build()` returns and cache the new id under `key`.
-
-    `kind` is "photo" or "audio". `build` is a coroutine function, called only
-    when an upload is needed, returning a URL or a file-like object. On an upload
-    the chat sees "uploading…" first, unless `upload_action=False` (when the
-    caller has shown it already).
-    """
-    cached_id = media_cache.get(key)
-    if cached_id is not None:
-        try:
-            return await _send(bot, kind, cached_id, chat_id=chat_id, **kwargs)
-        except telegram.error.TelegramError as err:
-            # a file_id can go stale; treat the rejection as a miss, not a failure
-            logger.warning("cached file_id for %s rejected (%s); re-uploading", key, err)
-
-    if upload_action:
-        await bot.send_chat_action(chat_id=chat_id, action=_UPLOAD_ACTION[kind])
-    file_id = await _send(bot, kind, await build(), chat_id=chat_id, **kwargs)
-    media_cache.save(key, file_id)
-    return file_id
 
 
 async def send_file(bot, filename, quran_type, **kwargs):
