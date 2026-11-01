@@ -282,7 +282,8 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
   *Done when:* recorded-payload tests (`tests/fixtures/whatsapp/`) prove that a
   forged signature gets 401, a duplicate is processed once, and status
   callbacks are ignored.
-- [ ] **P2.2 — `channels/whatsapp.py`** over the Graph API `/messages` (httpx).
+- [x] **P2.2 — `channels/whatsapp.py`** ✅ 2026-11-02 (mocked Graph API; ⚠️ real-phone
+  check pending P0.2) over the Graph API `/messages` (httpx).
   - Text goes through P1.4.
   - `Choices` degrade by size:
     - ≤3 short callback choices become reply buttons;
@@ -297,7 +298,7 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
   *Done when:* each send type has a mocked-httpx test and is verified on a real
   phone.
-- [ ] **P2.3 — Media by link.** `GET /media/page/{n}.png` and
+- [x] ~~**P2.3 — Media by link.**~~ **Replaced 2026-11-02 by upload-and-cache** (see §12). `GET /media/page/{n}.png` and
   `GET /media/repeat.mp3` sit next to `/media/range.mp3` and reuse the existing
   stitchers. Telegram is unchanged. *Done when:* route tests pass and WhatsApp
   shows the page image and plays the audio.
@@ -477,6 +478,14 @@ cost of daily pushes, and whether groups matter.
   containing them could pick up formatting. **Phase 1 code complete**;
   outstanding before Phase 2 ships: the manual Telegram smoke test (P1.3) and
   the Postgres leg of the store contract tests (P1.2).
+- 2026-11-02 — P2.2 done; **P2.3 replaced.** Instead of public routes that
+  stitch pages and repeated audio on request, the WhatsApp channel uploads
+  generated media once (`POST /{phone}/media`) and caches the media id under the
+  Telegram cache key prefixed `wa:` — the same idea as `send_cached`. Reasons: no
+  public, unauthenticated endpoint doing CPU-heavy stitching on a 0.1 vCPU box,
+  and no dependency on a public base URL. URL sources (everyayah images and
+  per-ayah audio) still go by link. Tap answers with text become messages,
+  since WhatsApp has no toast.
 
 ## References
 
