@@ -11,20 +11,18 @@ from services.user_settings import UserSettings
 
 @command("language")
 async def language(ctx: Ctx) -> None:
-    await ctx.reply(t("choose_language", ctx.ui_lang), reply_markup=language_keyboard())
+    await ctx.reply(t("choose_language", ctx.ui_lang), language_keyboard())
 
 
 @command("translation")
 async def translation(ctx: Ctx) -> None:
-    await ctx.reply(
-        t("choose_translation_language", ctx.ui_lang), reply_markup=translation_language_keyboard()
-    )
+    await ctx.reply(t("choose_translation_language", ctx.ui_lang), translation_language_keyboard())
 
 
 @callback("showlang")  # the 🌐 button on a verse card
 async def show_languages(ctx: Ctx, cb_data: str) -> None:
     await ctx.answer()
-    await ctx.reply(t("choose_language", ctx.ui_lang), reply_markup=language_keyboard())
+    await ctx.reply(t("choose_language", ctx.ui_lang), language_keyboard())
 
 
 @callback("setlang:")  # UI language picked from the /language keyboard

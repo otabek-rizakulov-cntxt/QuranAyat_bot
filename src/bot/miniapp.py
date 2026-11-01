@@ -11,6 +11,7 @@ from typing import Optional
 
 from telegram import InlineKeyboardButton, MenuButtonWebApp, WebAppInfo
 
+from channels import Choice, Choices
 from config.settings import get_settings
 
 
@@ -31,6 +32,12 @@ def app_row(label: str, path: str = "/") -> list:
     """`[[button]]` to append to a keyboard's rows, or `[]` when the app is off."""
     button = app_button(label, path)
     return [[button]] if button is not None else []
+
+
+def app_choice_row(label: str, path: str = "/") -> Choices:
+    """`app_row` as neutral `Choices`: `[[choice]]`, or `[]` when the app is off."""
+    url = app_url(path)
+    return [[Choice(label, web_app=url)]] if url else []
 
 
 async def set_menu_button(bot) -> bool:

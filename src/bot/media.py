@@ -1,18 +1,20 @@
-"""Sending Quran media to a chat, through the Telegram file_id cache.
+"""Sending Quran media to a conversation.
 
-Every sender tries the file_id Telegram gave us last time first and only
-uploads (and caches the new id) on a miss or a rejected id — `send_cached`,
-which lives with the rest of the Telegram transport in channels/telegram.py.
+The `deliver_*` functions take a `Channel` (channels/), so the same send works
+on every platform. On Telegram each media send replays the file_id cached under
+its key and only uploads (and caches the new id) on a miss or a rejected id —
+`send_cached` in channels/telegram.py. The `send_*` functions are the original
+`(bot, …, chat_id, …)` entry points, kept as thin Telegram wrappers for the
+callers that have not moved to a channel yet (the hifz drill and the group post,
+docs/MULTI_PLATFORM_PLAN.md P3.1).
 """
 
 from urllib.parse import urlencode
 
-import telegram
-
 from bot.keyboards.page import page_keyboard
 from bot.limits import REPEAT_COUNT
 from bot.text import build_verse_text, page_caption, reference
-from channels.telegram import send_cached
+from channels.telegram import TelegramChannel
 from config.settings import get_settings
 from domain.quran import Quran
 from infra import audio as cdn_audio
@@ -20,51 +22,10 @@ from infra import catalog, nav_state
 from infra.page_image import fetch_and_stitch
 
 
-async def send_file(bot, filename, quran_type, **kwargs):
-    """Send one ayah's image or recitation, keyed and uploaded by its URL."""
-
-    async def source():
-        return filename
-
-    kind = {"arabic": "photo", "audio": "audio"}[quran_type]
-    return await send_cached(bot, kind, filename, source, upload_action=False, **kwargs)
-
-
 def combined_audio_key(surah: int, start: int, end: int, performer: str) -> str:
     """Telegram file_id cache key for a stitched range, shared by the in-chat send
     that produces it and the inline result that replays it."""
     return "combined:%d:%d-%d:%s" % (surah, start, end, performer)
-
-
-async def send_combined_audio(
-    bot,
-    surah: int,
-    start: int,
-    end: int,
-    chat_id: int,
-    performer: str,
-    reply_markup=None,
-    message_thread_id=None,
-) -> None:
-    """Send a range of ayahs as a single combined audio file, cached by Telegram file_id.
-
-    `message_thread_id` targets a forum topic (the group cluster's daily post);
-    left None it posts to the chat as before.
-    """
-    kwargs = dict(
-        title="Quran %d:%d-%d" % (surah, start, end),
-        performer=catalog.performer_name(performer),
-        reply_markup=reply_markup,
-    )
-    if message_thread_id is not None:
-        kwargs["message_thread_id"] = message_thread_id
-
-    async def stitch():
-        return await cdn_audio.download_combined_audio(surah, start, end, performer)
-
-    key = combined_audio_key(surah, start, end, performer)
-    await send_cached(bot, "audio", key, stitch, chat_id=chat_id, **kwargs)
-    await nav_state.save(chat_id, surah, end, "audio")
 
 
 # Route (on this very app) that stitches a range of recitations on demand. An
@@ -84,13 +45,78 @@ def range_audio_url(surah: int, start: int, end: int, performer: str) -> str | N
     return base + RANGE_AUDIO_PATH + "?" + query
 
 
-async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
+async def deliver_quran(
+    channel,
+    data: dict,
+    surah: int,
+    ayah: int,
+    quran_type: str,
+    performer: str,
+    ui_lang: str,
+    translation_lang: str,
+    choices=None,
+    **opts,
+) -> None:
+    """Send one ayah in one representation, and remember it as the reader's position.
+
+    Module level rather than a closure inside `handle_update`: the scheduler
+    pushes a plan's daily portion outside any update, and the hifz drill reuses
+    this same send — neither has an update to close over.
+    """
+    if quran_type in ("translation", "tafsir"):
+        text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
+        await channel.send_text(text, choices, html=True, **opts)
+    elif quran_type == "arabic":
+        await channel.typing("photo")
+        image = catalog.image_url(surah, ayah)
+        await channel.send_image(
+            image,
+            caption=reference(surah, ayah, ui_lang),
+            choices=choices,
+            cache_key=image,
+            upload_action=False,
+            **opts,
+        )
+    elif quran_type == "audio":
+        await channel.typing("audio")
+        audio = catalog.audio_url(surah, ayah, performer)
+        await channel.send_audio(
+            audio,
+            title=reference(surah, ayah, ui_lang),
+            performer=catalog.performer_name(performer),
+            choices=choices,
+            cache_key=audio,
+            upload_action=False,
+            **opts,
+        )
+    await nav_state.save(channel.chat_id, surah, ayah, quran_type)
+
+
+async def deliver_combined_audio(
+    channel, surah: int, start: int, end: int, performer: str, choices=None, **opts
+) -> None:
+    """Send a range of ayahs as a single combined audio file, cached by its range."""
+
+    async def stitch():
+        return await cdn_audio.download_combined_audio(surah, start, end, performer)
+
+    await channel.send_audio(
+        stitch,
+        title="Quran %d:%d-%d" % (surah, start, end),
+        performer=catalog.performer_name(performer),
+        choices=choices,
+        cache_key=combined_audio_key(surah, start, end, performer),
+        **opts,
+    )
+    await nav_state.save(channel.chat_id, surah, end, "audio")
+
+
+async def deliver_page(channel, page: int, ui_lang: str) -> None:
     """Send mushaf page `page` as one stitched image.
 
     Stitching is expensive (a few hundred KB of PNGs decoded and re-encoded), so
-    the upload is cached by Telegram file_id exactly like every other media file
-    the bot sends — the CDN and Pillow are touched once per page, not once per
-    reader.
+    the upload is cached exactly like every other media file the bot sends — the
+    CDN and Pillow are touched once per page, not once per reader.
     """
 
     async def stitch():
@@ -101,18 +127,15 @@ async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
         ]
         return await fetch_and_stitch(urls, "page_%03d.jpg" % page)
 
-    await send_cached(
-        bot,
-        "photo",
-        "page:%d" % page,
+    await channel.send_image(
         stitch,
-        chat_id=chat_id,
         caption=page_caption(page, ui_lang),
-        reply_markup=page_keyboard(page, ui_lang),
+        choices=page_keyboard(page, ui_lang),
+        cache_key="page:%d" % page,
     )
 
 
-async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang: str) -> None:
+async def deliver_page_audio(channel, page: int, performer: str, ui_lang: str) -> None:
     """Send the recitation of one mushaf page.
 
     Most reciters have a single Page<NNN>.mp3 upstream; 19 of the 79 catalog
@@ -131,19 +154,16 @@ async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang:
             "quran_page_%03d.mp3" % page,
         )
 
-    await send_cached(
-        bot,
-        "audio",
-        "pageaudio:%d:%s" % (page, performer),
+    await channel.send_audio(
         source,
-        chat_id=chat_id,
         title=page_caption(page, ui_lang).replace("\n", " · "),
         performer=catalog.performer_name(performer),
+        cache_key="pageaudio:%d:%s" % (page, performer),
     )
 
 
-async def send_repeated_audio(
-    bot, surah: int, ayah: int, chat_id: int, performer: str, ui_lang: str, reply_markup=None
+async def deliver_repeated_audio(
+    channel, surah: int, ayah: int, performer: str, ui_lang: str, choices=None, **opts
 ) -> None:
     """Send one ayah recited REPEAT_COUNT times back to back, for memorization.
 
@@ -160,16 +180,19 @@ async def send_repeated_audio(
             "quran_%d_%d_x%d.mp3" % (surah, ayah, REPEAT_COUNT),
         )
 
-    await send_cached(
-        bot,
-        "audio",
-        "repeat:%d:%d:%d:%s" % (REPEAT_COUNT, surah, ayah, performer),
+    await channel.send_audio(
         stitch,
-        chat_id=chat_id,
         title="%s ×%d" % (reference(surah, ayah, ui_lang), REPEAT_COUNT),
         performer=catalog.performer_name(performer),
-        reply_markup=reply_markup,
+        choices=choices,
+        cache_key="repeat:%d:%d:%d:%s" % (REPEAT_COUNT, surah, ayah, performer),
+        **opts,
     )
+
+
+# --- Telegram entry points ---------------------------------------------------------
+# `reply_markup` is passed through as-is (an InlineKeyboardMarkup, or None), so
+# these send exactly what they sent before the channel seam existed.
 
 
 async def send_quran(
@@ -184,43 +207,51 @@ async def send_quran(
     translation_lang: str,
     reply_markup=None,
 ) -> None:
-    """Send one ayah in one representation, and remember it as the reader's position.
+    await deliver_quran(
+        TelegramChannel(bot, chat_id),
+        data,
+        surah,
+        ayah,
+        quran_type,
+        performer,
+        ui_lang,
+        translation_lang,
+        reply_markup=reply_markup,
+    )
 
-    Module level rather than a closure inside `handle_update`: the scheduler
-    pushes a plan's daily portion outside any update, and the hifz drill reuses
-    this same send — neither has a `handle_update` frame to close over. `bot`
-    and `data` are therefore explicit leading parameters.
-    """
-    if quran_type in ("translation", "tafsir"):
-        text = await build_verse_text(surah, ayah, quran_type, ui_lang, translation_lang, data)
-        await bot.send_message(
-            chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=reply_markup
-        )
-    elif quran_type == "arabic":
-        await bot.send_chat_action(
-            chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_PHOTO
-        )
-        image = catalog.image_url(surah, ayah)
-        await send_file(
-            bot,
-            image,
-            quran_type,
-            chat_id=chat_id,
-            caption=reference(surah, ayah, ui_lang),
-            reply_markup=reply_markup,
-        )
-    elif quran_type == "audio":
-        await bot.send_chat_action(
-            chat_id=chat_id, action=telegram.constants.ChatAction.UPLOAD_VOICE
-        )
-        audio = catalog.audio_url(surah, ayah, performer)
-        await send_file(
-            bot,
-            audio,
-            quran_type,
-            chat_id=chat_id,
-            performer=catalog.performer_name(performer),
-            title=reference(surah, ayah, ui_lang),
-            reply_markup=reply_markup,
-        )
-    await nav_state.save(chat_id, surah, ayah, quran_type)
+
+async def send_combined_audio(
+    bot,
+    surah: int,
+    start: int,
+    end: int,
+    chat_id: int,
+    performer: str,
+    reply_markup=None,
+    message_thread_id=None,
+) -> None:
+    """`message_thread_id` targets a forum topic (the group cluster's daily post)."""
+    await deliver_combined_audio(
+        TelegramChannel(bot, chat_id, message_thread_id),
+        surah,
+        start,
+        end,
+        performer,
+        reply_markup=reply_markup,
+    )
+
+
+async def send_page(bot, page: int, chat_id: int, ui_lang: str) -> None:
+    await deliver_page(TelegramChannel(bot, chat_id), page, ui_lang)
+
+
+async def send_page_audio(bot, page: int, chat_id: int, performer: str, ui_lang: str) -> None:
+    await deliver_page_audio(TelegramChannel(bot, chat_id), page, performer, ui_lang)
+
+
+async def send_repeated_audio(
+    bot, surah: int, ayah: int, chat_id: int, performer: str, ui_lang: str, reply_markup=None
+) -> None:
+    await deliver_repeated_audio(
+        TelegramChannel(bot, chat_id), surah, ayah, performer, ui_lang, reply_markup=reply_markup
+    )

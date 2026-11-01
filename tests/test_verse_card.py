@@ -19,6 +19,7 @@ import bot.keyboards.verse as verse_kb
 import bot.limits as limits
 import bot.text as bot_text
 import locales
+from channels.telegram import to_markup
 from locales import LANGUAGES, get_language
 
 
@@ -76,47 +77,50 @@ def _callback(tg_bot, data_str, chat_id=556000, message_kind="text"):
 
 class TestVerseKeyboard:
     def test_active_view_is_marked_with_a_dot(self):
-        rows = verse_kb.verse_keyboard(2, 255, "tafsir", "en").inline_keyboard
+        rows = to_markup(verse_kb.verse_keyboard(2, 255, "tafsir", "en")).inline_keyboard
         labels = [b.text for b in rows[0]]
         assert any(label.startswith("• ") and "Tafsir" in label for label in labels)
 
     def test_only_audio_carries_an_icon(self):
         labels = [
-            b.text for b in verse_kb.verse_keyboard(1, 1, "translation", "en").inline_keyboard[0]
+            b.text
+            for b in to_markup(verse_kb.verse_keyboard(1, 1, "translation", "en")).inline_keyboard[
+                0
+            ]
         ]
         assert "🔊 Audio" in labels
         # The scripture views stay clean — no icon decorates translation/arabic/tafsir.
         assert "Translation" in [label.lstrip("• ") for label in labels]
 
     def test_nav_callbacks_point_at_neighbouring_ayat(self):
-        nav = verse_kb.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
+        nav = to_markup(verse_kb.verse_keyboard(2, 255, "translation", "en")).inline_keyboard[1]
         assert nav[0].callback_data == "vc:tr:2:254"  # previous
         assert nav[1].callback_data == "vr:tr"  # random keeps the view
         assert nav[2].callback_data == "vc:tr:2:256"  # next
 
     def test_arrows_flip_for_rtl(self):
-        ltr = verse_kb.verse_keyboard(2, 255, "translation", "en").inline_keyboard[1]
-        rtl = verse_kb.verse_keyboard(2, 255, "translation", "ar").inline_keyboard[1]
+        ltr = to_markup(verse_kb.verse_keyboard(2, 255, "translation", "en")).inline_keyboard[1]
+        rtl = to_markup(verse_kb.verse_keyboard(2, 255, "translation", "ar")).inline_keyboard[1]
         assert ltr[0].text.startswith("‹")  # LTR: previous points left
         assert rtl[0].text.endswith("›")  # RTL: mirrored so "next" reads forward
 
     def test_share_uses_inline_mode(self):
         share = _button(
-            verse_kb.verse_keyboard(2, 255, "translation", "en"),
+            to_markup(verse_kb.verse_keyboard(2, 255, "translation", "en")),
             lambda b: b.switch_inline_query is not None,
         )
         assert share.switch_inline_query == "2:255"
 
     def test_language_button_shows_current_language(self):
         util = _button(
-            verse_kb.verse_keyboard(2, 255, "translation", "uz"),
+            to_markup(verse_kb.verse_keyboard(2, 255, "translation", "uz")),
             lambda b: b.callback_data == "showlang",
         )
         assert get_language("uz").native in util.text
 
     def test_repeat_button_replays_this_ayah(self):
         repeat = _button(
-            verse_kb.verse_keyboard(2, 255, "audio", "en"),
+            to_markup(verse_kb.verse_keyboard(2, 255, "audio", "en")),
             lambda b: (b.callback_data or "").startswith("rep:"),
         )
         assert repeat.callback_data == "rep:2:255"
@@ -124,7 +128,7 @@ class TestVerseKeyboard:
 
     def test_repeat_label_is_localized(self):
         repeat = _button(
-            verse_kb.verse_keyboard(2, 255, "audio", "ru"),
+            to_markup(verse_kb.verse_keyboard(2, 255, "audio", "ru")),
             lambda b: (b.callback_data or "").startswith("rep:"),
         )
         assert "Повтор" in repeat.text
@@ -200,6 +204,6 @@ class TestLanguageFlags:
         assert missing == []
 
     def test_picker_prefixes_the_flag(self):
-        first = language_kb.language_keyboard().inline_keyboard[0][0].text
+        first = to_markup(language_kb.language_keyboard()).inline_keyboard[0][0].text
         english = get_language("en")
         assert english.flag in first and english.native in first

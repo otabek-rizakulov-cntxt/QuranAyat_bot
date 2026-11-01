@@ -15,6 +15,7 @@ import app.lifespan as lifespan
 import bot.dispatch as dispatch
 import bot.keyboards.reciter as reciter_kb
 import services.reciters as reciters
+from channels.telegram import to_markup
 from infra.file_facade import File
 from services.user_settings import UserSettings
 
@@ -126,19 +127,19 @@ class TestLabels:
     def test_same_reciter_at_two_bitrates_is_distinguishable(self):
         # The motivating case: two catalog entries share the name "Abdul Basit
         # Murattal" and used to render as two identical buttons.
-        labels = [b.text for b in _reciter_buttons(reciter_kb.reciter_keyboard("en"))]
+        labels = [b.text for b in _reciter_buttons(to_markup(reciter_kb.reciter_keyboard("en")))]
         murattal = [label for label in labels if label.startswith("Abdul Basit Murattal")]
         assert len(murattal) == len(set(murattal))
 
     def test_every_button_stays_within_telegrams_callback_data_limit(self):
         for page in range(reciter_kb.reciter_page_count()):
-            for button in _reciter_buttons(reciter_kb.reciter_keyboard("en", page)):
+            for button in _reciter_buttons(to_markup(reciter_kb.reciter_keyboard("en", page))):
                 assert len(button.callback_data.encode()) <= 64
 
 
 class TestPagination:
     def test_first_page_is_the_shortlist(self):
-        buttons = _reciter_buttons(reciter_kb.reciter_keyboard("en", 0))
+        buttons = _reciter_buttons(to_markup(reciter_kb.reciter_keyboard("en", 0)))
         assert [b.callback_data.split(":", 1)[1] for b in buttons] == list(
             reciters._RECITER_SHORTLIST
         )
@@ -149,21 +150,25 @@ class TestPagination:
             for page in range(reciter_kb.reciter_page_count(kind)):
                 seen += [
                     b.callback_data.split(":", 1)[1]
-                    for b in _reciter_buttons(reciter_kb.reciter_keyboard("en", kind, page))
+                    for b in _reciter_buttons(
+                        to_markup(reciter_kb.reciter_keyboard("en", kind, page))
+                    )
                 ]
         assert sorted(seen) == sorted(p["subfolder"] for p in reciters.reciter_catalog())
 
     def test_pager_shows_the_position_in_the_group(self):
         pages = reciter_kb.reciter_page_count("recitation")
         assert pages > 1  # else there is nothing to page
-        indicator = _pager_row(reciter_kb.reciter_keyboard("en", "recitation", 2))[1]
+        indicator = _pager_row(to_markup(reciter_kb.reciter_keyboard("en", "recitation", 2)))[1]
         assert indicator.text == "3/%d" % pages
 
     def test_pages_wrap_so_neither_arrow_is_ever_dead(self):
         pages = reciter_kb.reciter_page_count("recitation")
-        first_prev, _, first_next = _pager_row(reciter_kb.reciter_keyboard("en", "recitation", 0))
+        first_prev, _, first_next = _pager_row(
+            to_markup(reciter_kb.reciter_keyboard("en", "recitation", 0))
+        )
         last_prev, _, last_next = _pager_row(
-            reciter_kb.reciter_keyboard("en", "recitation", pages - 1)
+            to_markup(reciter_kb.reciter_keyboard("en", "recitation", pages - 1))
         )
         assert first_prev.callback_data == "recgrp:recitation:%d" % (pages - 1)
         assert first_next.callback_data == "recgrp:recitation:1"
@@ -173,19 +178,23 @@ class TestPagination:
     def test_out_of_range_page_wraps_instead_of_erroring(self):
         pages = reciter_kb.reciter_page_count("recitation")
         assert _reciter_buttons(
-            reciter_kb.reciter_keyboard("en", "recitation", pages)
-        ) == _reciter_buttons(reciter_kb.reciter_keyboard("en", "recitation", 0))
+            to_markup(reciter_kb.reciter_keyboard("en", "recitation", pages))
+        ) == _reciter_buttons(to_markup(reciter_kb.reciter_keyboard("en", "recitation", 0)))
 
     def test_pager_arrows_follow_reading_direction(self):
-        ltr_prev, _, ltr_next = _pager_row(reciter_kb.reciter_keyboard("en", "recitation", 1))
-        rtl_prev, _, rtl_next = _pager_row(reciter_kb.reciter_keyboard("ar", "recitation", 1))
+        ltr_prev, _, ltr_next = _pager_row(
+            to_markup(reciter_kb.reciter_keyboard("en", "recitation", 1))
+        )
+        rtl_prev, _, rtl_next = _pager_row(
+            to_markup(reciter_kb.reciter_keyboard("ar", "recitation", 1))
+        )
         assert ltr_prev.text.startswith("‹") and ltr_next.text.endswith("›")
         assert rtl_prev.text.endswith("›") and rtl_next.text.startswith("‹")
 
     def test_search_button_survives_on_every_page(self):
         for kind in reciters.RECITER_KINDS:
             for page in range(reciter_kb.reciter_page_count(kind)):
-                markup = reciter_kb.reciter_keyboard("en", kind, page)
+                markup = to_markup(reciter_kb.reciter_keyboard("en", kind, page))
                 assert any(
                     b.callback_data == "reciter_search"
                     for row in markup.inline_keyboard
@@ -195,7 +204,9 @@ class TestPagination:
 
 class TestCurrentReciter:
     def test_active_reciter_is_marked(self):
-        buttons = _reciter_buttons(reciter_kb.reciter_keyboard("en", 0, current="Husary_128kbps"))
+        buttons = _reciter_buttons(
+            to_markup(reciter_kb.reciter_keyboard("en", 0, current="Husary_128kbps"))
+        )
         marked = [b.text for b in buttons if b.text.startswith("• ")]
         assert marked == ["• " + reciter_kb.reciter_label(reciters.reciter_catalog()[0])]
 

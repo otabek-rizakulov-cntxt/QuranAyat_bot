@@ -24,8 +24,8 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.features import Ctx, callback, command
-from bot.media import send_cached
 from bot.streak_image import cache_key, render_streak_graph
+from channels.telegram import send_cached
 from services.streaks import StreakSummary, streak_summary
 
 logger = logging.getLogger(__name__)
@@ -99,7 +99,7 @@ async def _send_graph(ctx: Ctx, summary: StreakSummary) -> None:
     """Send the graph through the file_id cache, rendering it only on a miss.
 
     A stale cached id is a miss, never an error — a user must never see a failed
-    /streak because of it (bot.media.send_cached).
+    /streak because of it (channels.telegram.send_cached).
     """
 
     async def render():

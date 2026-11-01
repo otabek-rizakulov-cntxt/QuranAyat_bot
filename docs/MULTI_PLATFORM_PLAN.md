@@ -228,7 +228,8 @@ CREATE SEQUENCE IF NOT EXISTS non_telegram_user_id START 4503599627370496;
   *Done when:* the store contract tests cover allocation from 2^52, idempotent
   and concurrent resolve, Telegram pass-through, opt-in/out, and the `platform`
   round trip, on both backends.
-- [ ] **P1.3 — Route Telegram through the seam.**
+- [x] **P1.3 — Route Telegram through the seam.** ✅ 2026-11-01 (suite + snapshots;
+  ⚠️ manual Telegram smoke test still to run on a dev bot).
   - `Ctx` and `SendCtx` carry `channel` alongside `bot`; `bot` is removed in
     P3.5.
   - `ctx.reply`/`ctx.edit` take `choices=`. The existing `reply_markup` kwargs
@@ -461,6 +462,14 @@ cost of daily pushes, and whether groups matter.
   `tests/test_store_contract.py` (incl. the new `TestIdentity`) still has to run
   against a throwaway database (`TEST_DATABASE_URL`) before Phase 2 ships; the
   schema change is `IF NOT EXISTS`-only, so deploys stay idempotent.
+- 2026-11-01 — P1.3 done. Every `Ctx`/`SendCtx` send goes through
+  `ctx.channel` (`reply`, `edit`, `answer`, new `edit_choices`, and
+  `ctx.from_inline`). The reader, page, reciter, settings and info handlers use
+  `Choices` and the channel-first `bot/media.deliver_*`; the old `send_*`
+  signatures stay as Telegram wrappers for hifz. `bot/dispatch.handle_update`
+  normalizes to `Incoming` and routes through the shared `handle_incoming`.
+  `resolve_settings` now takes `(user_id, lang_hint)` instead of a Telegram user.
+  226 keyboard snapshots, recorded before the change, match exactly.
 
 ## References
 

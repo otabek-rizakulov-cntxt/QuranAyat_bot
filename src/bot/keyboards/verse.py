@@ -6,11 +6,10 @@ same message in place (for the text views) rather than posting a new one, so a
 reading session doesn't flood the chat with near-identical bubbles.
 """
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 from bot.limits import REPEAT_COUNT
-from bot.miniapp import app_row
+from bot.miniapp import app_choice_row
 from bot.text import nav_labels
+from channels import Choice, Choices
 from domain.quran import Quran
 from locales import get_language, t
 
@@ -33,8 +32,8 @@ _MODES = (
 
 def verse_keyboard(
     surah: int, ayah: int, quran_type: str, ui_lang: str, app: bool = True
-) -> InlineKeyboardMarkup:
-    """The inline keyboard attached to a verse card — localized and RTL-aware.
+) -> Choices:
+    """The keyboard attached to a verse card — localized and RTL-aware.
 
     Three rows: choose a view (Translation / Arabic / Tafsir / Audio, the active
     one marked with a dot), navigate (Previous / Random / Next), and act
@@ -48,13 +47,11 @@ def verse_keyboard(
     an inline-mode message (`app=False`), where Telegram rejects web_app buttons.
     """
 
-    def mode_button(mode: str, key: str, icon: str) -> InlineKeyboardButton:
+    def mode_button(mode: str, key: str, icon: str) -> Choice:
         label = icon + t(key, ui_lang)
         if mode == quran_type:
             label = "• " + label  # the dot marks the view you're in now
-        return InlineKeyboardButton(
-            label, callback_data="vc:%s:%d:%d" % (CODE_BY_TYPE[mode], surah, ayah)
-        )
+        return Choice(label, data="vc:%s:%d:%d" % (CODE_BY_TYPE[mode], surah, ayah))
 
     code = CODE_BY_TYPE[quran_type]
     prev_s, prev_a = Quran.get_previous_ayah(surah, ayah)
@@ -62,32 +59,23 @@ def verse_keyboard(
     rnd = t("btn_random", ui_lang)
     prev_label, next_label = nav_labels(ui_lang)
 
-    return InlineKeyboardMarkup(
+    return [
+        [mode_button(*mode) for mode in _MODES],
         [
-            [mode_button(*mode) for mode in _MODES],
-            [
-                InlineKeyboardButton(
-                    prev_label, callback_data="vc:%s:%d:%d" % (code, prev_s, prev_a)
-                ),
-                InlineKeyboardButton("🎲 " + rnd, callback_data="vr:%s" % code),
-                InlineKeyboardButton(
-                    next_label, callback_data="vc:%s:%d:%d" % (code, next_s, next_a)
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
-                    callback_data="rep:%d:%d" % (surah, ayah),
-                ),
-                InlineKeyboardButton(
-                    "🌐 " + get_language(ui_lang).native, callback_data="showlang"
-                ),
-                InlineKeyboardButton("📤", switch_inline_query="%d:%d" % (surah, ayah)),
-            ],
-        ]
-        + (
-            app_row("📱 " + t("web_btn_open_app", ui_lang), "/read/%d?a=%d" % (surah, ayah))
-            if app
-            else []
-        )
+            Choice(prev_label, data="vc:%s:%d:%d" % (code, prev_s, prev_a)),
+            Choice("🎲 " + rnd, data="vr:%s" % code),
+            Choice(next_label, data="vc:%s:%d:%d" % (code, next_s, next_a)),
+        ],
+        [
+            Choice(
+                "🔁 %s ×%d" % (t("btn_repeat", ui_lang), REPEAT_COUNT),
+                data="rep:%d:%d" % (surah, ayah),
+            ),
+            Choice("🌐 " + get_language(ui_lang).native, data="showlang"),
+            Choice("📤", switch_inline="%d:%d" % (surah, ayah)),
+        ],
+    ] + (
+        app_choice_row("📱 " + t("web_btn_open_app", ui_lang), "/read/%d?a=%d" % (surah, ayah))
+        if app
+        else []
     )

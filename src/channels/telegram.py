@@ -155,6 +155,14 @@ class TelegramChannel:
             )
         return True
 
+    async def edit_choices(self, message_id: Any, choices: Optional[Choices]) -> bool:
+        """Swap the keyboard under a sent message. A re-tap is not an error."""
+        with ignore_not_modified():
+            await self.bot.edit_message_reply_markup(
+                chat_id=self.chat_id, message_id=message_id, reply_markup=to_markup(choices)
+            )
+        return True
+
     async def _send_media(self, kind: str, source, choices, cache_key, upload_action, opts) -> Any:
         opts = self._opts(choices, False, opts)
         if cache_key is not None:

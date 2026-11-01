@@ -35,6 +35,8 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 
 import telegram
 
+from channels import TELEGRAM
+from channels.telegram import TelegramChannel
 from infra.store.schedule import ScheduledSend
 
 SendHandler = Callable[["SendCtx"], Awaitable[None]]
@@ -108,10 +110,23 @@ class SendCtx:
     # portion, next week's board) computes it from this, not from the wall
     # clock, so a tick run with an injected time stays consistent with itself.
     now: Optional[datetime] = None
+    # channels.Channel bound to the target (and topic). Built here for Telegram
+    # rows; other platforms resolve their address first (MULTI_PLATFORM_PLAN P2.6).
+    channel: Any = None
+
+    def __post_init__(self):
+        if self.channel is None and self.platform == TELEGRAM:
+            channel = TelegramChannel(self.bot, self.send.target_chat_id, self.send.thread_id)
+            object.__setattr__(self, "channel", channel)
 
     @property
     def kind(self) -> str:
         return self.send.kind
+
+    @property
+    def platform(self) -> str:
+        # a row shaped before the platform column existed is a Telegram one
+        return getattr(self.send, "platform", TELEGRAM)
 
     @property
     def chat_id(self) -> int:
@@ -126,11 +141,9 @@ class SendCtx:
     def payload(self) -> Dict[str, Any]:
         return self.send.payload
 
-    async def reply(self, text: str, **kwargs) -> Any:
+    async def reply(self, text: str, choices=None, **kwargs) -> Any:
         """Send a message to the target chat, into the bound topic if there is one."""
-        if self.thread_id is not None:
-            kwargs.setdefault("message_thread_id", self.thread_id)
-        return await self.bot.send_message(chat_id=self.chat_id, text=text, **kwargs)
+        return await self.channel.send_text(text, choices, **kwargs)
 
 
 # Which Telegram failures are worth trying again in a minute, and which are not.

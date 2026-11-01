@@ -118,6 +118,19 @@ class TestEditText:
         assert "message_thread_id" not in bot.edit_message_text.await_args.kwargs
 
 
+class TestEditChoices:
+    async def test_swaps_the_keyboard(self, bot):
+        rows = [[Choice("A", data="a")]]
+        assert await TelegramChannel(bot, 42).edit_choices(9, rows) is True
+        kwargs = bot.edit_message_reply_markup.await_args.kwargs
+        assert (kwargs["chat_id"], kwargs["message_id"]) == (42, 9)
+        assert kwargs["reply_markup"].to_dict() == to_markup(rows).to_dict()
+
+    async def test_not_modified_is_not_an_error(self, bot):
+        bot.edit_message_reply_markup.side_effect = telegram.error.BadRequest("not modified")
+        assert await TelegramChannel(bot, 42).edit_choices(9, []) is True
+
+
 class TestMedia:
     async def test_image_by_url_without_cache(self, bot):
         await TelegramChannel(bot, 42).send_image(

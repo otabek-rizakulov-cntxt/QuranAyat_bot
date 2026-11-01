@@ -70,6 +70,8 @@ class Incoming:
     callback_id: Optional[str] = None  # to acknowledge the tap, where that exists
     message_id: Optional[Any] = None  # the platform's id for the message
     voice_media_id: Optional[str] = None
+    lang_hint: Optional[str] = None  # the client's language, for a first-contact default
+    inline: bool = False  # a tap on a card shared through inline mode (Telegram)
     raw: Any = None  # the platform's own update object, for adapter-only needs
 
 
@@ -78,6 +80,7 @@ class Channel(Protocol):
 
     platform: str
     caps: Caps
+    chat_id: int  # our id for the conversation (nav state, sessions key on it)
 
     async def send_text(
         self, text: str, choices: Optional[Choices] = None, *, html: bool = False, **opts
@@ -92,6 +95,9 @@ class Channel(Protocol):
         html: bool = False,
         **opts,
     ) -> bool: ...
+
+    async def edit_choices(self, message_id: Any, choices: Optional[Choices]) -> bool:
+        """Swap a sent message's buttons, keeping its text."""
 
     async def send_image(
         self,

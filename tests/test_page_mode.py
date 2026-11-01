@@ -22,6 +22,7 @@ import bot.media
 import bot.media as bot_media
 import infra.audio
 import infra.audio as cdn_audio
+from channels.telegram import to_markup
 from infra import page_image
 from infra.file_facade import File
 
@@ -159,25 +160,25 @@ class TestPageCard:
 
 class TestPageKeyboard:
     def test_pages_wrap_at_both_ends(self):
-        first = page_kb.page_keyboard(1, "en").inline_keyboard[0]
-        last = page_kb.page_keyboard(604, "en").inline_keyboard[0]
+        first = to_markup(page_kb.page_keyboard(1, "en")).inline_keyboard[0]
+        last = to_markup(page_kb.page_keyboard(604, "en")).inline_keyboard[0]
         assert first[0].callback_data == "pg:604"
         assert first[2].callback_data == "pg:2"
         assert last[2].callback_data == "pg:1"
 
     def test_ayah_view_button_opens_the_pages_first_ayah(self):
-        rows = page_kb.page_keyboard(255, "en").inline_keyboard
+        rows = to_markup(page_kb.page_keyboard(255, "en")).inline_keyboard
         ayah_view = rows[1][1]
         assert ayah_view.callback_data == "vc:tr:13:43"
 
     def test_audio_is_a_button_not_an_attachment(self):
         # a page of recitation is ~1 MB nobody asked for if they only wanted to read
-        rows = page_kb.page_keyboard(255, "en").inline_keyboard
+        rows = to_markup(page_kb.page_keyboard(255, "en")).inline_keyboard
         assert rows[1][0].callback_data == "pga:255"
 
     def test_every_button_stays_within_telegrams_callback_data_limit(self):
         for page in (1, 255, 604):
-            for row in page_kb.page_keyboard(page, "en").inline_keyboard:
+            for row in to_markup(page_kb.page_keyboard(page, "en")).inline_keyboard:
                 for button in row:
                     if button.callback_data:
                         assert len(button.callback_data.encode()) <= 64

@@ -163,7 +163,7 @@ async def answer_inline_query(bot, data: dict, inline_query) -> None:
     query = inline_query.query
     user = inline_query.from_user
     # inline users have no chat with us; key the preference by their user id
-    settings = await resolve_settings(user_settings, None, user)
+    settings = await resolve_settings(user_settings, None, user.id, user.language_code)
     ui_lang, translation_lang = settings.ui_lang, settings.translation_lang
     results = []
     cache_time = 66 * (60**2 * 24)

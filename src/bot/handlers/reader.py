@@ -5,10 +5,9 @@ prompt and any wizard have had their turn (see bot.dispatch).
 """
 
 from bot.context import Ctx
-from bot.errors import ignore_not_modified
 from bot.keyboards.verse import TYPE_BY_CODE, verse_keyboard
 from bot.limits import MAX_RANGE_AYAHS
-from bot.media import send_combined_audio, send_quran, send_repeated_audio
+from bot.media import deliver_combined_audio, deliver_quran, deliver_repeated_audio
 from bot.router import callback, command
 from bot.text import build_verse_text
 from domain.parsing import parse_ayah_range
@@ -28,20 +27,18 @@ async def reader_position(ctx: Ctx) -> tuple:
     return surah, ayah, quran_type
 
 
-async def _send_verse(ctx: Ctx, surah: int, ayah: int, quran_type: str, **kwargs) -> None:
-    """send_quran with the caller's settings, under a fresh verse card."""
-    await send_quran(
-        ctx.bot,
+async def _send_verse(ctx: Ctx, surah: int, ayah: int, quran_type: str, choices=None) -> None:
+    """deliver_quran with the caller's settings, under a fresh verse card."""
+    await deliver_quran(
+        ctx.channel,
         ctx.data,
         surah,
         ayah,
         quran_type,
-        ctx.chat_id,
         ctx.reciter,
         ctx.ui_lang,
         ctx.translation_lang,
-        reply_markup=kwargs.pop("reply_markup", None)
-        or verse_keyboard(surah, ayah, quran_type, ctx.ui_lang),
+        choices=choices or verse_keyboard(surah, ayah, quran_type, ctx.ui_lang),
     )
 
 
@@ -58,14 +55,13 @@ async def repeat(ctx: Ctx, cb_data: str) -> None:
     surah, ayah = int(surah_s), int(ayah_s)
     await ctx.answer()
     if Quran.exists(surah, ayah):
-        await send_repeated_audio(
-            ctx.bot,
+        await deliver_repeated_audio(
+            ctx.channel,
             surah,
             ayah,
-            ctx.chat_id,
             ctx.reciter,
             ctx.ui_lang,
-            reply_markup=verse_keyboard(surah, ayah, "audio", ctx.ui_lang),
+            choices=verse_keyboard(surah, ayah, "audio", ctx.ui_lang),
         )
 
 
@@ -80,30 +76,18 @@ async def verse_card(ctx: Ctx, cb_data: str) -> None:
     if not Quran.exists(surah, ayah):
         await ctx.answer()
         return
-    message = ctx.callback_query.message
-    from_inline = message is None
-    markup = verse_keyboard(surah, ayah, quran_type, ctx.ui_lang, app=not from_inline)
+    choices = verse_keyboard(surah, ayah, quran_type, ctx.ui_lang, app=not ctx.from_inline)
     if quran_type in ("translation", "tafsir"):
         text = await build_verse_text(
             surah, ayah, quran_type, ctx.ui_lang, ctx.translation_lang, ctx.data
         )
-        if from_inline or message.photo or message.audio:
-            # can't turn a photo/audio message into text — post a fresh card
-            await ctx.reply(text, parse_mode="HTML", reply_markup=markup)
-        else:
-            # the common path: turn the page in place; re-tapping the current
-            # view yields an identical message, which is fine
-            with ignore_not_modified():
-                await ctx.bot.edit_message_text(
-                    text=text,
-                    chat_id=ctx.chat_id,
-                    message_id=message.message_id,
-                    parse_mode="HTML",
-                    reply_markup=markup,
-                )
+        # the common path turns the page in place (re-tapping the current view
+        # yields an identical message, which is fine); a photo/audio message or
+        # an inline-mode card can't be turned into text, so a fresh card goes out
+        await ctx.edit(text, choices, html=True)
         await nav_state.save(ctx.chat_id, surah, ayah, quran_type)
     else:  # arabic/audio arrive as fresh media messages
-        await _send_verse(ctx, surah, ayah, quran_type, reply_markup=markup)
+        await _send_verse(ctx, surah, ayah, quran_type, choices)
     await ctx.answer()
 
 
@@ -137,14 +121,13 @@ async def read_text(ctx: Ctx, text: str) -> None:
         elif end - start + 1 > MAX_RANGE_AYAHS:
             await ctx.reply(t("range_too_large", ctx.ui_lang).format(n=MAX_RANGE_AYAHS))
         else:
-            await send_combined_audio(
-                ctx.bot,
+            await deliver_combined_audio(
+                ctx.channel,
                 surah,
                 start,
                 end,
-                ctx.chat_id,
                 ctx.reciter,
-                reply_markup=verse_keyboard(surah, end, "audio", ctx.ui_lang),
+                choices=verse_keyboard(surah, end, "audio", ctx.ui_lang),
             )
     elif Quran.exists(surah, start):
         await _send_verse(ctx, surah, start, quran_type)
