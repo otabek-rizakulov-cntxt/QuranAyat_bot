@@ -12,7 +12,7 @@ import ujson as json
 
 from infra.redis_client import RedisSingleton
 
-TTL_SECONDS = 60 * 60
+TTL_SECONDS = 15 * 60  # a typed "5" is a surah again once the menu is stale
 
 
 def _key(chat_id: int) -> str:

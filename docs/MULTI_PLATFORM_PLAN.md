@@ -270,7 +270,7 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
   token, app secret and verify token, in `config/settings.py`. `.env.example`
   gets placeholders. Everything is off unless enabled. *Done when:* the app
   boots unchanged with nothing configured.
-- [ ] **P2.1 — Webhook** (`app/routes/whatsapp.py`, mounted only when enabled).
+- [x] **P2.1 — Webhook** ✅ 2026-11-02 (recorded payloads; ⚠️ live Meta delivery pending P0.2) (`app/routes/whatsapp.py`, mounted only when enabled).
   - `GET` answers the verify-token handshake.
   - `POST` checks `X-Hub-Signature-256` (HMAC-SHA256 of the raw body,
     `hmac.compare_digest`), returns 200 at once, then processes via
@@ -302,7 +302,7 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
   `GET /media/repeat.mp3` sit next to `/media/range.mp3` and reuse the existing
   stitchers. Telegram is unchanged. *Done when:* route tests pass and WhatsApp
   shows the page image and plays the audio.
-- [ ] **P2.4 — Router for a chat without commands.**
+- [x] **P2.4 — Router for a chat without commands.** ✅ 2026-11-02
   - Keywords map to existing router commands: `menu`, `help`, `language`,
     `reciter`, `daily`, `stop`, plus their localized labels.
   - Button, list and numbered replies route as `callback_data` through
@@ -486,6 +486,14 @@ cost of daily pushes, and whether groups matter.
   and no dependency on a public base URL. URL sources (everyayah images and
   per-ayah audio) still go by link. Tap answers with text become messages,
   since WhatsApp has no toast.
+- 2026-11-02 — P2.1 + P2.4 done (one commit: the webhook hands messages to the
+  router). `bot/whatsapp.py` maps words in English, Uzbek (both scripts) and
+  Russian to commands, taps and numbered replies to `callback_data`, and gates
+  WhatsApp to converted features (`COMMANDS`, `CALLBACK_PREFIXES`); anything else
+  answers `wa_not_here`. First contact sends the welcome, a WhatsApp hint and the
+  language picker; the first UI language comes from the calling code (998 → uz).
+  New `wa_*` strings ship in en/ru/uz/uz-Cyrl (`WA_LOCALES`), others fall back.
+  `STOP` (and localized forms) opts out immediately.
 
 ## References
 

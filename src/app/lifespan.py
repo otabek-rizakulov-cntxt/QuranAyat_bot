@@ -18,6 +18,7 @@ from app.tasks import spawn
 from bot import features
 from bot.inline import get_default_query_results
 from bot.miniapp import set_menu_button
+from channels.whatsapp import GraphClient
 from config.settings import get_settings
 from domain.quran import Quran, TranslationRegistry, make_index
 from infra.postgres import close_pool
@@ -106,6 +107,10 @@ async def initialize(state: AppState) -> None:
             "(e.g. everyayah.com/data/quranpngs) or pages will render ragged."
         )
 
+    if get_settings().whatsapp_ready:
+        state.whatsapp = GraphClient.from_settings(get_settings())
+        logger.info("WhatsApp channel ready")
+
     try:
         state.bot = bot = create_bot(get_settings())
     except Exception as e:
@@ -190,6 +195,8 @@ async def lifespan(app):
             await state.bot.delete_webhook()
         except Exception as e:
             logger.error("Shutdown: delete_webhook failed: %s: %s", type(e).__name__, e)
+    if state.whatsapp is not None:
+        await state.whatsapp.close()
     try:
         await close_pool()
     except Exception as e:

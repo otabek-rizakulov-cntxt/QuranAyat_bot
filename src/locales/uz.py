@@ -268,4 +268,9 @@ strings = {
     "web_btn_open_app": "Ilovada ochish",
     "web_app_intro": "Qurʼonni ilovada oʻqing, tinglang va yodlang:",
     "web_app_unavailable": "Ilova hozircha mavjud emas.",
+    # WhatsApp (docs/MULTI_PLATFORM_PLAN.md P2.4)
+    "wa_welcome_hint": "WhatsApp'da oyatni <b>2:255</b> kabi yoki sura nomini yozing. Buyruqlar oʻrniga soʻz yozing: <b>menyu</b>, <b>til</b>, <b>tarjima</b>, <b>qori</b>, <b>sahifa 1</b>, <b>pora 30</b>, <b>sajda</b>, <b>tasodifiy</b>, <b>kunlik</b>. Kunlik xabarlarni toʻxtatish uchun istalgan vaqtda <b>STOP</b> deb yozing.",
+    "wa_unsupported": "Men faqat matnli xabarlarni tushunaman. Oyatni 2:255 kabi yuboring yoki menyu deb yozing.",
+    "wa_not_here": "Bu imkoniyat hozircha WhatsApp'da mavjud emas.",
+    "wa_stopped": "Endi kunlik xabarlar kelmaydi. Qayta yoqish uchun kunlik deb yozing.",
 }

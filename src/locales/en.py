@@ -293,4 +293,9 @@ strings = {
     "web_btn_open_app": "Open in app",
     "web_app_intro": "Read, listen and memorize the Qur'an in the app:",
     "web_app_unavailable": "The app isn't available yet.",
+    # WhatsApp (docs/MULTI_PLATFORM_PLAN.md P2.4)
+    "wa_welcome_hint": "On WhatsApp, type an ayah like <b>2:255</b> or a surah name. Instead of commands, type a word: <b>menu</b>, <b>language</b>, <b>translation</b>, <b>reciter</b>, <b>page 1</b>, <b>juz 30</b>, <b>sajda</b>, <b>random</b>, <b>daily</b>. Reply <b>STOP</b> any time to stop daily messages.",
+    "wa_unsupported": "I can only read text messages. Send an ayah like 2:255, or type menu.",
+    "wa_not_here": "This feature is not available on WhatsApp yet.",
+    "wa_stopped": "You won't receive daily messages any more. Type daily to turn them back on.",
 }

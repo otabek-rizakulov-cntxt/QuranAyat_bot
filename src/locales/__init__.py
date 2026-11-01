@@ -79,7 +79,10 @@ WEB_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
 
 # Key prefix -> the locales expected to translate it. Anywhere else, a key with
 # that prefix is an intended English fallback, not a gap.
-PARTIAL_KEY_PREFIXES = {"group_": GROUP_LOCALES, "web_": WEB_LOCALES}
+# WhatsApp-only strings (`wa_*`, docs/MULTI_PLATFORM_PLAN.md P2.4): same policy.
+WA_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
+
+PARTIAL_KEY_PREFIXES = {"group_": GROUP_LOCALES, "web_": WEB_LOCALES, "wa_": WA_LOCALES}
 
 
 def missing_keys(lang: str) -> list[str]:
