@@ -291,4 +291,14 @@ strings = {
     "wa_reminder_consent": "BismillahBot sizga har kuni soat {time} da shu yerda, WhatsApp'da, yodlashni eslatib tursinmi? Toʻxtatish uchun istalgan vaqtda STOP deb yozing.",
     "wa_reminders_on": "Eslatmalar yoqildi. Toʻxtatish uchun STOP deb yozing.",
     "wa_reminders_off": "Eslatmasiz. Tayyor boʻlganingizda yodlash deb yozing va boshlash tugmasini bosing.",
+    # Account linking (docs/MULTI_PLATFORM_PLAN.md Phase 6)
+    "link_cmd": "Telegram va WhatsApp'ni bogʻlash",
+    "link_code": "Bu hisobni boshqa ilovangiz bilan bogʻlash uchun (Telegram ↔ WhatsApp) 10 daqiqa ichida oʻsha yerga yuboring:\n\n<b>link {code}</b>\n\nTelegram'dagi rejangiz, natijalaringiz va sozlamalaringiz saqlanadi va ikkala ilovada umumiy boʻladi.",
+    "link_done": "Bogʻlandi. Endi Telegram va WhatsApp rejangiz, natijalaringiz, ketma-ketligingiz va sozlamalaringizni birga ishlatadi. Eslatmalar Telegram'ga keladi.",
+    "link_bad_code": "Kod notoʻgʻri yoki eskirgan. Yangisini olish uchun boshqa ilovada link deb yuboring.",
+    "link_same": "Kodni boshqa ilovadan yuboring: bir tomoni Telegram, ikkinchisi WhatsApp boʻlishi kerak.",
+    "link_taken": "Bu Telegram hisobi allaqachon WhatsApp raqamiga bogʻlangan. Avval oʻsha yerda unlink deb yuboring.",
+    "link_too_many": "Notoʻgʻri kodlar juda koʻp. 10 daqiqa kutib, qayta urinib koʻring.",
+    "link_unlinked": "Bogʻlanish uzildi. Telegram'dagi maʼlumotlaringiz oʻzgarmadi; bu WhatsApp raqami yangidan boshlaydi.",
+    "link_not_linked": "Uzadigan narsa yoʻq: bu hisob boshqa ilovaga bogʻlanmagan.",
 }

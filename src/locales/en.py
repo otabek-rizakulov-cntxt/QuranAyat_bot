@@ -316,4 +316,14 @@ strings = {
     "wa_reminder_consent": "Should BismillahBot remind you here on WhatsApp every day at {time} to memorize? Reply STOP at any time to stop.",
     "wa_reminders_on": "Reminders are on. Reply STOP at any time to stop them.",
     "wa_reminders_off": "No reminders. Type memorize and tap the start button whenever you are ready.",
+    # Account linking (docs/MULTI_PLATFORM_PLAN.md Phase 6)
+    "link_cmd": "Connect Telegram and WhatsApp",
+    "link_code": "To connect this account with your other app (Telegram ↔ WhatsApp), send this there within 10 minutes:\n\n<b>link {code}</b>\n\nYour Telegram plan, progress and settings are kept and shared by both apps.",
+    "link_done": "Connected. Telegram and WhatsApp now share your plan, progress, streak and settings. Reminders arrive on Telegram.",
+    "link_bad_code": "That code is wrong or has expired. Send link on your other app to get a new one.",
+    "link_same": "Send the code from your other app: one side must be Telegram, the other WhatsApp.",
+    "link_taken": "This Telegram account is already connected to a WhatsApp number. Send unlink there first.",
+    "link_too_many": "Too many wrong codes. Wait 10 minutes, then try again.",
+    "link_unlinked": "Disconnected. Your Telegram data is unchanged; this WhatsApp number starts fresh.",
+    "link_not_linked": "Nothing to disconnect: this account is not connected to another app.",
 }

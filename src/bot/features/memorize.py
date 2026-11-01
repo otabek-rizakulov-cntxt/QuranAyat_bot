@@ -275,6 +275,11 @@ async def push_plan_day(ctx: SendCtx) -> None:
         return
 
     user_id = int(payload.get("user_id") or ctx.chat_id)
+    if ctx.platform == WHATSAPP and await ctx.store.identity.get_by_user(user_id, WHATSAPP) is None:
+        # The number was linked to a Telegram account (or unlinked): this id has
+        # nowhere to be reached any more, so the chain ends here.
+        logger.info("HIFZ: plan day #%d not pushed — no WhatsApp identity" % day.id)
+        return
     if ctx.platform == WHATSAPP and not await _consented(ctx.store, user_id):
         # No pushes without opt-in (WhatsApp policy). The day stays unclaimed, so
         # "Start today's portion" still finds it, and the chain keeps re-arming so

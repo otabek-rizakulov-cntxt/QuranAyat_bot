@@ -90,6 +90,7 @@ PARTIAL_KEY_PREFIXES = {
     "web_": WEB_LOCALES,
     "wa_": WA_LOCALES,
     "daily_": DAILY_LOCALES,
+    "link_": DAILY_LOCALES,  # account linking (Phase 6): the same four locales
 }
 
 
@@ -148,6 +149,7 @@ BOT_COMMANDS = (
     ("language", "cmd_language"),
     ("translation", "cmd_translation"),
     ("reciter", "cmd_reciter"),
+    ("link", "link_cmd"),
     ("about", "cmd_about"),
 )
 

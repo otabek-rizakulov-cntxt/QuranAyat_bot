@@ -5,10 +5,12 @@
 > FastAPI service, the same Python business logic and the same database, so a
 > feature is written once and every platform is a thin adapter.
 
-**Status:** Phase 1 in progress on `feat/multi-platform`. §2 architecture
-decisions confirmed 2026-11-01; §11 lists the business decisions still open
-(they gate Phase 0/2, not Phase 1).
-**Last updated:** 2026-11-01
+**Status:** Code for Phases 1, 2, 3, 5 and account linking is done on
+`feat/multi-platform` (2026-11-02). Open: Phase 0 (Meta onboarding, templates,
+budget — §11), P2.7 testers, P4.1 (blocked on the recitation checker), the Mini
+App frontend half of P5.1, the second platform and WhatsApp groups (Phase 6),
+the Telegram smoke test and the Postgres leg of the store tests.
+**Last updated:** 2026-11-02
 
 Same conventions as `docs/HIFZ_PLATFORM.md` and `docs/MINI_APP_PLAN.md`: each
 task has a checkbox, the files it touches, and a falsifiable **done-when**.
@@ -376,11 +378,11 @@ WhatsApp channels, asserts the same state transitions for a week of drills.
 
 ### Phase 6 — Later
 
-- [ ] **Account linking.** A one-time code from one platform, entered on the
+- [x] **Account linking.** ✅ 2026-11-02 (re-point, not stored Telegram rows — see §12). A one-time code from one platform, entered on the
   other, re-points the `identity` row to the existing `user_id`. The target
   account's hifz data wins. Telegram identity rows start being stored here.
-- [ ] **Second platform**, chosen from §10 by real demand.
-- [ ] **Hifz groups on WhatsApp**, if the Groups API matures.
+- [ ] **Second platform**, chosen from §10 by real demand. ⏸ Waits for P2.7 usage data.
+- [ ] **Hifz groups on WhatsApp**, if the Groups API matures. ⏸ Not buildable on today's API.
 
 ---
 
@@ -537,6 +539,16 @@ cost of daily pushes, and whether groups matter.
   work remains** in the Mini App repo: when there is no `initData`, read `t`,
   exchange it at `/auth/link`, and run without the Telegram WebApp SDK.
   P4.1 recorded as blocked on the recitation checker.
+- 2026-11-02 — Account linking done. `link` shows a six-digit code (10 min,
+  single-use, 5 wrong tries per window); `link <code>` on the other app re-points
+  the WhatsApp identity at the Telegram user id. **Changed from the draft:** no
+  Telegram identity rows are stored — Telegram stays the canonical account, so
+  linking is one `UPDATE`, and the WhatsApp number's own earlier history stays
+  under its old id (kept, not merged). Pushes go to the home platform
+  (Telegram); the number's WhatsApp-only verse of the day is turned off and its
+  plan chain ends. `unlink` from either side deletes the identity row; the
+  number's next message starts a fresh account. Second platform and WhatsApp
+  groups stay open (data- and API-gated).
 
 ## References
 
