@@ -236,3 +236,15 @@ CREATE TABLE IF NOT EXISTS identity (
     PRIMARY KEY (platform, external_id)
 );
 CREATE UNIQUE INDEX IF NOT EXISTS identity_user_platform_idx ON identity (user_id, platform);
+
+-- Verse of the day (docs/MULTI_PLATFORM_PLAN.md P2.5): one row per subscriber,
+-- kept when turned off so turning it back on remembers the time. The time zone
+-- is user_profile.timezone, shared with hifz reminders.
+CREATE TABLE IF NOT EXISTS daily_ayah_sub (
+    user_id           BIGINT PRIMARY KEY,
+    platform          TEXT NOT NULL DEFAULT 'telegram',
+    send_time         TIME NOT NULL,              -- local to the user
+    enabled           BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);

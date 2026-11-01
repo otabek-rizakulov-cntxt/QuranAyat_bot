@@ -231,5 +231,7 @@ class TelegramChannel:
     async def typing(self, kind: str = "text") -> None:
         await self.bot.send_chat_action(chat_id=self.chat_id, action=_ACTIONS[kind])
 
-    async def send_template(self, name: str, lang: str, params: List[str]) -> Any:
+    async def send_template(
+        self, name: str, lang: str, params: List[str], payloads: Optional[List[str]] = None
+    ) -> Any:
         raise NotImplementedError("Telegram has no message templates; send a session message")

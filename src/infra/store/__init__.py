@@ -15,6 +15,7 @@ import os
 from infra.postgres import get_pool
 
 from ._state import MemoryState
+from .daily import DailyStore, InMemoryDailyStore, PostgresDailyStore
 from .groups import GroupStore, InMemoryGroupStore, PostgresGroupStore
 from .hifz import HifzStore, InMemoryHifzStore, PostgresHifzStore
 from .identity import IdentityStore, InMemoryIdentityStore, PostgresIdentityStore
@@ -38,6 +39,7 @@ __all__ = [
     "SessionStore",
     "GroupStore",
     "IdentityStore",
+    "DailyStore",
 ]
 
 # src/infra/store/__init__.py -> src/infra/store -> src/lib -> src
@@ -60,6 +62,7 @@ class Store:
     schedule: ScheduleStore
     groups: GroupStore
     identity: IdentityStore
+    daily: DailyStore
 
     async def apply_schema(self) -> None:
         """Create any missing tables and indexes. Idempotent."""
@@ -82,6 +85,7 @@ class InMemoryStore(Store):
         self.schedule = InMemoryScheduleStore(self.state)
         self.groups = InMemoryGroupStore(self.state)
         self.identity = InMemoryIdentityStore(self.state)
+        self.daily = InMemoryDailyStore(self.state)
 
     async def apply_schema(self) -> None:
         """No-op: there is no schema to apply to a dict."""
@@ -103,6 +107,7 @@ class PostgresStore(Store):
         self.schedule = PostgresScheduleStore(pool)
         self.groups = PostgresGroupStore(pool)
         self.identity = PostgresIdentityStore(pool)
+        self.daily = PostgresDailyStore(pool)
 
     async def apply_schema(self) -> None:
         """Apply `src/common/schema.sql` in one multi-statement execute.

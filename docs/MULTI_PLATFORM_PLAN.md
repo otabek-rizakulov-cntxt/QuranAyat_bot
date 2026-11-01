@@ -312,7 +312,7 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
   *Done when:* every Phase 2 feature in §1 is reachable without typing a
   command name.
-- [ ] **P2.5 — Verse of the day, both platforms** (`bot/features/daily.py`).
+- [x] **P2.5 — Verse of the day, both platforms** ✅ 2026-11-02 (`bot/features/daily.py`).
   - Subscriptions are stored in `daily_ayah_sub` (§5).
   - Everyone gets the same ayah each day: a hash of the date indexes a curated
     list.
@@ -323,7 +323,7 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
   - The `@send_handler("daily_ayah")` handler delivers and re-enqueues.
 
   *Done when:* contract and handler tests pass on both platforms.
-- [ ] **P2.6 — Window-aware delivery** (`infra/scheduler/push.py:
+- [x] **P2.6 — Window-aware delivery** ✅ 2026-11-02 (`infra/scheduler/push.py:
   deliver_push`).
   - WhatsApp inside the 24-hour window: a free session message.
   - WhatsApp outside it: the approved template.
@@ -494,6 +494,17 @@ cost of daily pushes, and whether groups matter.
   language picker; the first UI language comes from the calling code (998 → uz).
   New `wa_*` strings ship in en/ru/uz/uz-Cyrl (`WA_LOCALES`), others fall back.
   `STOP` (and localized forms) opts out immediately.
+- 2026-11-02 — P2.5 + P2.6 done. `/daily` (Telegram) and `daily`/`kunlik`
+  (WhatsApp) set it up; callbacks under `hd:`; strings under `daily_*` in the
+  four launch locales; `/daily` added to the command menu. 68 hand-picked
+  standalone ayat (`domain/daily_ayah.py`) rotate in order by local date. Queue
+  keys include the send time, so a time changed mid-day queues the new row and
+  the handler skips the old one. `infra/scheduler/push.deliver_push` decides
+  session vs template vs drop and logs one `push … outcome= category=` line per
+  send for the cost estimate. The template's quick-reply button carries
+  `vc:tr:S:A`, so tapping it opens the card *and* reopens the free window.
+  **P0.3 must submit** `daily_ayah` with body params {{1}} reference,
+  {{2}} translation (≤600 chars) and one quick-reply button, in en/ru/uz.
 
 ## References
 

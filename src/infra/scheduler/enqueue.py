@@ -57,6 +57,7 @@ async def schedule_daily(
     payload: Optional[Dict[str, Any]] = None,
     thread_id: Optional[int] = None,
     platform: str = "telegram",
+    key_extra: Optional[str] = None,
 ) -> Optional[ScheduledSend]:
     """Queue the next occurrence of a daily push at the user's local `reminder_time`.
 
@@ -69,19 +70,26 @@ async def schedule_daily(
 
     The recipient's offset is copied into the payload (unless the caller already
     put one there) because staleness is a local-day question: see `_is_stale`.
+
+    `key_extra` widens the key beyond one-per-day — the verse of the day adds its
+    send time, so a time changed mid-day queues the new row instead of colliding
+    with the old one (which its handler then skips).
     """
     now = _utcnow(now)
     due_at = next_due_utc(reminder_time, offset, now)
     day = local_date(due_at, offset)
     body = dict(payload or {})
     body.setdefault("offset", offset)
+    key = idempotency_key(kind, target_chat_id, day)
+    if key_extra:
+        key += ":" + key_extra
     return await enqueue(
         store,
         kind,
         target_chat_id,
         due_at,
-        local_day=day,
         payload=body,
         thread_id=thread_id,
+        key=key,
         platform=platform,
     )

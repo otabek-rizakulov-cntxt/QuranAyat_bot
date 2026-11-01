@@ -45,6 +45,7 @@ _TABLES = (
     "group_member_link",
     "group_config",
     "identity",
+    "daily_ayah_sub",
 )
 
 UTC = timezone.utc
@@ -895,3 +896,28 @@ class TestIdentity:
         row = await store.identity.get_by_user(uid, "whatsapp")
         row.opted_in_at = self.AT
         assert not (await store.identity.get_by_user(uid, "whatsapp")).consented
+
+
+class TestDaily:
+    async def test_none_until_subscribed(self, store):
+        assert await store.daily.get(1) is None
+        assert await store.daily.set_enabled(1, False) is None
+
+    async def test_upsert_and_toggle(self, store):
+        row = await store.daily.upsert(1, "telegram", time(7, 0))
+        assert (row.user_id, row.platform, row.send_time, row.enabled) == (
+            1,
+            "telegram",
+            time(7, 0),
+            True,
+        )
+        assert row.created_at is not None
+        assert (await store.daily.set_enabled(1, False)).enabled is False
+        kept = await store.daily.get(1)
+        assert kept.send_time == time(7, 0) and kept.enabled is False
+
+    async def test_upsert_replaces_time_and_platform(self, store):
+        first = await store.daily.upsert(1, "telegram", time(7, 0))
+        again = await store.daily.upsert(1, "whatsapp", time(20, 30), True)
+        assert (again.platform, again.send_time) == ("whatsapp", time(20, 30))
+        assert again.created_at == first.created_at

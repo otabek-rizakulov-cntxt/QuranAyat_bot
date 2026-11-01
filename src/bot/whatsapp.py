@@ -42,6 +42,7 @@ COMMANDS = {
     "juz",
     "sajda",
     "random",
+    "daily",
 }
 CALLBACK_PREFIXES = (
     "vc:",
@@ -57,6 +58,7 @@ CALLBACK_PREFIXES = (
     "recpage_noop",
     "reciter_search",
     "setreciter:",
+    "hd:",  # verse of the day
 )
 
 # A typed word -> the command it stands for, in English, Uzbek (both scripts)
@@ -72,6 +74,7 @@ KEYWORDS = {
     "random": ("random", "tasodifiy", "тасодифий", "случайный"),
     "about": ("about",),
     "index": ("index", "suralar", "суралар", "суры"),
+    "daily": ("daily", "kunlik", "кунлик", "ежедневно"),
 }
 _COMMAND_BY_WORD = {word: name for name, words in KEYWORDS.items() for word in words}
 
@@ -224,4 +227,5 @@ async def handle_message(client, data: dict, message: dict, bot=None, now=None) 
 async def opt_out(store, user_id: int, ui_lang: str, channel, at: datetime) -> None:
     """STOP: withdraw consent to scheduled pushes, at once (WhatsApp policy)."""
     await store.identity.opt_out(user_id, WHATSAPP, at)
+    await store.daily.set_enabled(user_id, False)
     await channel.send_text(t("wa_stopped", ui_lang))

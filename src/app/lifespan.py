@@ -24,6 +24,7 @@ from domain.quran import Quran, TranslationRegistry, make_index
 from infra.postgres import close_pool
 from infra.redis_client import RedisSingleton, cache_backend
 from infra.scheduler import run_scheduler
+from infra.scheduler.push import set_whatsapp_client
 from infra.store import apply_schema
 from infra.telegram import create_bot
 from locales import BOT_COMMANDS, DEFAULT_LANG, UI_LANGUAGES, t
@@ -109,6 +110,7 @@ async def initialize(state: AppState) -> None:
 
     if get_settings().whatsapp_ready:
         state.whatsapp = GraphClient.from_settings(get_settings())
+        set_whatsapp_client(state.whatsapp)  # scheduled pushes reach WhatsApp through it
         logger.info("WhatsApp channel ready")
 
     try:

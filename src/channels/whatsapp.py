@@ -323,12 +323,30 @@ class WhatsAppChannel:
     async def typing(self, kind: str = "text") -> None:
         return None  # no chat action without a message id to attach it to
 
-    async def send_template(self, name: str, lang: str, params: List[str]) -> Any:
+    async def send_template(
+        self, name: str, lang: str, params: List[str], payloads: Optional[List[str]] = None
+    ) -> Any:
+        """An approved template. `params` fill the body's {{1}}, {{2}}…; `payloads`
+        are what the template's quick-reply buttons send back when tapped — a
+        `callback_data`, so a tap is routed like any button (and reopens the
+        free 24-hour window)."""
         template = {"name": name, "language": {"code": lang}}
+        components = []
         if params:
-            template["components"] = [
+            components.append(
                 {"type": "body", "parameters": [{"type": "text", "text": p} for p in params]}
-            ]
+            )
+        for index, payload in enumerate(payloads or []):
+            components.append(
+                {
+                    "type": "button",
+                    "sub_type": "quick_reply",
+                    "index": str(index),
+                    "parameters": [{"type": "payload", "payload": payload}],
+                }
+            )
+        if components:
+            template["components"] = components
         return await self._send({"type": "template", "template": template})
 
     async def _send(self, message: dict) -> Optional[str]:
