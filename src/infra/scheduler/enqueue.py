@@ -28,20 +28,22 @@ async def enqueue(
     payload: Optional[Dict[str, Any]] = None,
     thread_id: Optional[int] = None,
     key: Optional[str] = None,
+    platform: str = "telegram",
 ) -> Optional[ScheduledSend]:
     """Queue one send. Returns the row, or None if that key is already queued.
 
     Enqueueing the same key twice inserts one row and raises nothing — that is
     F2, and it is what makes a double boot or a re-run of the day's scheduling
     pass harmless. Pass either `local_day` (the key is derived) or an explicit
-    `key`.
+    `key`. `platform` says where `target_chat_id` lives; ids are unique across
+    platforms (store/identity.py), so the key needs no platform of its own.
     """
     if key is None:
         if local_day is None:
             raise ValueError("enqueue needs either local_day or an explicit key")
         key = idempotency_key(kind, target_chat_id, local_day)
     return await store.schedule.enqueue(
-        kind, target_chat_id, due_at, key, payload=payload, thread_id=thread_id
+        kind, target_chat_id, due_at, key, payload=payload, thread_id=thread_id, platform=platform
     )
 
 
@@ -54,6 +56,7 @@ async def schedule_daily(
     now: Optional[datetime] = None,
     payload: Optional[Dict[str, Any]] = None,
     thread_id: Optional[int] = None,
+    platform: str = "telegram",
 ) -> Optional[ScheduledSend]:
     """Queue the next occurrence of a daily push at the user's local `reminder_time`.
 
@@ -73,5 +76,12 @@ async def schedule_daily(
     body = dict(payload or {})
     body.setdefault("offset", offset)
     return await enqueue(
-        store, kind, target_chat_id, due_at, local_day=day, payload=body, thread_id=thread_id
+        store,
+        kind,
+        target_chat_id,
+        due_at,
+        local_day=day,
+        payload=body,
+        thread_id=thread_id,
+        platform=platform,
     )

@@ -7,6 +7,7 @@ in, so it must appear under /translation and nowhere else.
 
 import app.lifespan as lifespan
 import bot.keyboards.language as language_kb
+from channels.telegram import to_markup
 from domain.quran import TranslationRegistry
 from locales import (
     DEFAULT_LANG,
@@ -74,7 +75,7 @@ class TestTransliteration:
     def test_it_is_offered_as_a_translation(self):
         codes = [
             b.callback_data.split(":", 1)[1]
-            for row in language_kb.translation_language_keyboard().inline_keyboard
+            for row in to_markup(language_kb.translation_language_keyboard()).inline_keyboard
             for b in row
         ]
         assert "translit" in codes
@@ -82,7 +83,7 @@ class TestTransliteration:
     def test_it_is_not_offered_as_an_interface_language(self):
         codes = [
             b.callback_data.split(":", 1)[1]
-            for row in language_kb.language_keyboard().inline_keyboard
+            for row in to_markup(language_kb.language_keyboard()).inline_keyboard
             for b in row
         ]
         assert "translit" not in codes

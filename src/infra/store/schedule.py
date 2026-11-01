@@ -41,11 +41,12 @@ class ScheduledSend:
     state: str = STATE_PENDING
     claimed_at: Optional[datetime] = None
     attempts: int = 0
+    platform: str = "telegram"  # where target_chat_id lives; see store/identity.py
 
 
 _COLUMNS = (
     "id, kind, target_chat_id, thread_id, due_at, payload, state, "
-    "idempotency_key, claimed_at, attempts"
+    "idempotency_key, claimed_at, attempts, platform"
 )
 
 
@@ -61,6 +62,7 @@ class ScheduleStore(abc.ABC):
         idempotency_key: str,
         payload: Optional[Dict[str, Any]] = None,
         thread_id: Optional[int] = None,
+        platform: str = "telegram",
     ) -> Optional[ScheduledSend]:
         """Queue one send. Returns the row, or None if `idempotency_key` already exists.
 
@@ -134,7 +136,14 @@ class InMemoryScheduleStore(ScheduleStore):
         return replace(row, payload=dict(row.payload))
 
     async def enqueue(
-        self, kind, target_chat_id, due_at, idempotency_key, payload=None, thread_id=None
+        self,
+        kind,
+        target_chat_id,
+        due_at,
+        idempotency_key,
+        payload=None,
+        thread_id=None,
+        platform="telegram",
     ):
         if any(r.idempotency_key == idempotency_key for r in self._state.scheduled_send.values()):
             return None
@@ -147,6 +156,7 @@ class InMemoryScheduleStore(ScheduleStore):
             payload=dict(payload or {}),
             thread_id=thread_id,
             state=STATE_PENDING,
+            platform=platform,
         )
         self._state.scheduled_send[row.id] = row
         return self._copy(row)
@@ -247,15 +257,23 @@ class PostgresScheduleStore(ScheduleStore):
             state=record["state"],
             claimed_at=record["claimed_at"],
             attempts=record["attempts"],
+            platform=record["platform"],
         )
 
     async def enqueue(
-        self, kind, target_chat_id, due_at, idempotency_key, payload=None, thread_id=None
+        self,
+        kind,
+        target_chat_id,
+        due_at,
+        idempotency_key,
+        payload=None,
+        thread_id=None,
+        platform="telegram",
     ):
         return self._row(
             await self._pool.fetchrow(
                 "INSERT INTO scheduled_send (kind, target_chat_id, thread_id, due_at, payload, "
-                "idempotency_key) VALUES ($1, $2, $3, $4, $5::jsonb, $6) "
+                "idempotency_key, platform) VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7) "
                 "ON CONFLICT (idempotency_key) DO NOTHING RETURNING " + _COLUMNS,
                 kind,
                 target_chat_id,
@@ -263,6 +281,7 @@ class PostgresScheduleStore(ScheduleStore):
                 due_at,
                 json.dumps(dict(payload or {})),
                 idempotency_key,
+                platform,
             )
         )
 
@@ -293,7 +312,7 @@ class PostgresScheduleStore(ScheduleStore):
                     ") UPDATE scheduled_send s SET state = $4, claimed_at = $1, "
                     "updated_at = now() FROM due WHERE s.id = due.id "
                     "RETURNING s.id, s.kind, s.target_chat_id, s.thread_id, s.due_at, s.payload, "
-                    "s.state, s.idempotency_key, s.claimed_at, s.attempts",
+                    "s.state, s.idempotency_key, s.claimed_at, s.attempts, s.platform",
                     now,
                     STATE_PENDING,
                     limit,

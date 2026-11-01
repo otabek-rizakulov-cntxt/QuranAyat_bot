@@ -3,7 +3,8 @@
 from dataclasses import dataclass
 from typing import Any
 
-from bot.errors import ignore_not_modified
+from channels import TELEGRAM
+from channels.telegram import TelegramChannel
 from infra.store import get_store
 from infra.wizard_store import Wizard
 from locales import t
@@ -29,6 +30,14 @@ class Ctx:
     argument: str = ""  # text after the command: "/check 67" -> "67"
     callback_query: Any = None  # telegram.CallbackQuery, on a callback dispatch
     message: Any = None  # telegram.Message, on a message dispatch
+    # channels.Channel bound to this chat. Every send goes through it; `bot`
+    # stays only for the hifz features not yet converted (MULTI_PLATFORM_PLAN P3.5).
+    channel: Any = None
+    platform: str = TELEGRAM
+
+    def __post_init__(self):
+        if self.channel is None:
+            object.__setattr__(self, "channel", TelegramChannel(self.bot, self.chat_id))
 
     # --- construction ---------------------------------------------------------
 
@@ -70,34 +79,58 @@ class Ctx:
         text = t(key, self.ui_lang)
         return text.format(**fmt) if fmt else text
 
-    async def reply(self, text: str, **kwargs) -> Any:
-        """Send a message to the caller's chat."""
-        return await self.bot.send_message(chat_id=self.chat_id, text=text, **kwargs)
+    @property
+    def from_inline(self) -> bool:
+        """A tap on a card shared through inline mode: there is no message of ours
+        to edit, and the tapper may never have opened a DM with the bot."""
+        return self.callback_query is not None and self.callback_query.message is None
+
+    def _editable(self):
+        """The tapped message, if this channel can rewrite it; else None."""
+        if not self.channel.caps.can_edit:
+            return None
+        return getattr(self.callback_query, "message", None)
+
+    async def reply(self, text: str, choices=None, **kwargs) -> Any:
+        """Send a message to the caller's chat.
+
+        `choices` are neutral buttons (channels.Choice rows); `html=True` marks
+        the text as Telegram HTML. Telegram-only kwargs (`reply_markup`,
+        `parse_mode`) still pass straight through for unconverted callers.
+        """
+        return await self.channel.send_text(text, choices, **kwargs)
 
     async def answer(self, text: str = None, show_alert: bool = False) -> None:
         """Acknowledge the tap, so the client stops spinning. No-op off a callback."""
         if self.callback_query is None:
             return
-        if text is None:
-            await self.bot.answer_callback_query(self.callback_query.id)
-        else:
-            await self.bot.answer_callback_query(
-                self.callback_query.id, text=text, show_alert=show_alert
-            )
+        await self.channel.answer(self.callback_query.id, text, show_alert)
 
-    async def edit(self, text: str, **kwargs) -> bool:
+    async def edit(self, text: str, choices=None, **kwargs) -> bool:
         """Edit the tapped message in place; send a fresh one if that isn't possible.
 
-        Returns True if the message was edited. Re-tapping the view you are
-        already in produces an identical message, and Telegram answers "message
-        is not modified" — that is a no-op, not an error (bot.errors).
+        Returns True if the message was edited. A fresh message goes out when there
+        is nothing of ours to edit (an inline-mode card), the tapped message is a
+        photo or audio, or the platform cannot edit at all. Re-tapping the view you
+        are already in produces an identical message, which is a no-op, not an error.
         """
-        msg = getattr(self.callback_query, "message", None)
+        msg = self._editable()
         if msg is None or msg.photo or msg.audio:
-            await self.reply(text, **kwargs)
+            await self.reply(text, choices, **kwargs)
             return False
-        with ignore_not_modified():
-            await self.bot.edit_message_text(
-                text=text, chat_id=self.chat_id, message_id=msg.message_id, **kwargs
-            )
-        return True
+        return await self.channel.edit_text(msg.message_id, text, choices, **kwargs)
+
+    async def edit_choices(self, choices, text_if_new: str = None) -> bool:
+        """Swap the tapped message's buttons, keeping its text.
+
+        Where the platform cannot edit, `text_if_new` is sent with the new buttons
+        instead (nothing is sent without it). Off a message of ours, does nothing.
+        """
+        if self.callback_query is None or self.callback_query.message is None:
+            return False
+        msg = self._editable()
+        if msg is None:
+            if text_if_new is not None:
+                await self.reply(text_if_new, choices)
+            return False
+        return await self.channel.edit_choices(msg.message_id, choices)

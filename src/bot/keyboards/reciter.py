@@ -1,9 +1,8 @@
 """The /reciter picker: tabs per recording kind, paged, with search."""
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 from bot.keyboards.rows import button_rows
 from bot.text import nav_labels
+from channels import Choice, Choices
 from infra import catalog
 from locales import t
 from services.reciters import (
@@ -64,7 +63,7 @@ def reciter_page_of(subfolder: str) -> tuple[str, int]:
 
 def reciter_keyboard(
     ui_lang: str, kind: str = DEFAULT_RECITER_KIND, page: int = 0, current: str | None = None
-) -> InlineKeyboardMarkup:
+) -> Choices:
     """One page of one group of the reciter catalog, two per row, under a group-tab
     row, a Previous / n-of-m / Next pager and a search button.
 
@@ -84,9 +83,9 @@ def reciter_keyboard(
     # Tab row first: what kind of recording this list is, before any of the names.
     rows = [
         [
-            InlineKeyboardButton(
+            Choice(
                 ("• " if k == kind else "") + _KIND_ICONS[k] + t(_KIND_LABEL_KEYS[k], ui_lang),
-                callback_data="recgrp:%s:0" % k,
+                data="recgrp:%s:0" % k,
             )
             for k in RECITER_KINDS
         ]
@@ -94,9 +93,9 @@ def reciter_keyboard(
 
     rows += button_rows(
         [
-            InlineKeyboardButton(
+            Choice(
                 ("• " if p["subfolder"] == current else "") + reciter_label(p),
-                callback_data="setreciter:" + p["subfolder"],
+                data="setreciter:" + p["subfolder"],
             )
             for p in entries[page * RECITER_PAGE_SIZE : (page + 1) * RECITER_PAGE_SIZE]
         ],
@@ -106,23 +105,20 @@ def reciter_keyboard(
     prev_label, next_label = nav_labels(ui_lang)
     rows.append(
         [
-            InlineKeyboardButton(
-                prev_label, callback_data="recgrp:%s:%d" % (kind, (page - 1) % pages)
-            ),
-            InlineKeyboardButton("%d/%d" % (page + 1, pages), callback_data="recpage_noop"),
-            InlineKeyboardButton(
-                next_label, callback_data="recgrp:%s:%d" % (kind, (page + 1) % pages)
-            ),
+            Choice(prev_label, data="recgrp:%s:%d" % (kind, (page - 1) % pages)),
+            Choice("%d/%d" % (page + 1, pages), data="recpage_noop"),
+            Choice(next_label, data="recgrp:%s:%d" % (kind, (page + 1) % pages)),
         ]
     )
-    rows.append(
-        [
-            InlineKeyboardButton(
-                "🔍 " + t("btn_search_reciter", ui_lang), callback_data="reciter_search"
-            )
-        ]
+    rows.append([Choice("🔍 " + t("btn_search_reciter", ui_lang), data="reciter_search")])
+    return rows
+
+
+def reciter_search_keyboard(matches) -> Choices:
+    """Search results: each matching reciter, two per row, choosing it on tap."""
+    return button_rows(
+        [Choice(reciter_label(p), data="setreciter:" + p["subfolder"]) for p in matches], 2
     )
-    return InlineKeyboardMarkup(rows)
 
 
 def reciter_set_confirmation(subfolder: str, ui_lang: str) -> str:

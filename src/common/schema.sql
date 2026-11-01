@@ -148,6 +148,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS scheduled_send_idempotency_key_idx
     ON scheduled_send (idempotency_key);
 -- The claim query: pending rows already due, oldest first.
 CREATE INDEX IF NOT EXISTS scheduled_send_state_due_idx ON scheduled_send (state, due_at);
+-- Which platform target_chat_id lives on (docs/MULTI_PLATFORM_PLAN.md §5).
+ALTER TABLE scheduled_send ADD COLUMN IF NOT EXISTS platform TEXT NOT NULL DEFAULT 'telegram';
 
 -- ---------------------------------------------------------------------------
 -- Phase 2 — the group cluster (items 5-7). A supergroup runs one study circle:
@@ -212,3 +214,25 @@ CREATE TABLE IF NOT EXISTS group_member_link (
     linked_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, chat_id)
 );
+
+-- ---------------------------------------------------------------------------
+-- Multi-platform (docs/MULTI_PLATFORM_PLAN.md §5). A platform's sender id maps
+-- to our user_id. Telegram users are not stored: their user_id is their Telegram
+-- id. Every other platform draws from non_telegram_user_id, which starts at
+-- 2^52 — above every Telegram user id (≤52 bits), positive so `chat_id < 0`
+-- still means a group, and below JavaScript's 2^53 safe-integer limit.
+-- ---------------------------------------------------------------------------
+
+CREATE SEQUENCE IF NOT EXISTS non_telegram_user_id START 4503599627370496;
+
+CREATE TABLE IF NOT EXISTS identity (
+    platform          TEXT NOT NULL,              -- 'whatsapp' | …
+    external_id       TEXT NOT NULL,              -- E.164 wa_id, …
+    user_id           BIGINT NOT NULL,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_inbound_at   TIMESTAMPTZ,                -- drives the 24-hour window
+    opted_in_at       TIMESTAMPTZ,                -- consent to scheduled pushes
+    opted_out_at      TIMESTAMPTZ,
+    PRIMARY KEY (platform, external_id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS identity_user_platform_idx ON identity (user_id, platform);

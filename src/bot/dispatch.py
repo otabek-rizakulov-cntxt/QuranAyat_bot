@@ -1,4 +1,8 @@
-"""Routing one Telegram update to what handles it.
+"""Routing one incoming event to what handles it.
+
+A Telegram update is normalized to a `channels.Incoming` and routed by
+`handle_incoming`, the path every platform shares (docs/MULTI_PLATFORM_PLAN.md
+P1.3); group membership changes and inline queries stay Telegram-only.
 
 Commands, callback prefixes and wizard steps are registered with the router
 (bot/router.py) by the core reader (bot/handlers/) and the hifz features alike;
@@ -12,16 +16,16 @@ import logging
 from time import time
 
 import telegram
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot import router
 from bot.context import Ctx
 from bot.features import group as hifz_group
 from bot.handlers.reader import read_text
 from bot.inline import answer_inline_query
-from bot.keyboards.reciter import reciter_label
-from bot.keyboards.rows import button_rows
+from bot.keyboards.reciter import reciter_search_keyboard
 from bot.settings import resolve_settings
+from channels import TELEGRAM, Incoming
+from channels.telegram import TelegramChannel
 from infra import catalog, pending_input
 from infra.file_facade import File
 from infra.store import get_store
@@ -44,35 +48,89 @@ async def handle_update(bot, data: dict, update: telegram.Update) -> None:
         await answer_inline_query(bot, data, update.inline_query)
         return
 
-    if update.callback_query:
-        await _on_callback(bot, data, update.callback_query)
-        return
-
-    if update.message and update.message.text:
-        await _on_text(bot, data, update.message)
+    incoming = await _incoming(update)
+    if incoming is not None:
+        await handle_incoming(TelegramChannel(bot, incoming.chat_id), data, incoming, bot=bot)
 
 
-async def _on_callback(bot, data: dict, cq) -> None:
-    """A tap on an inline button, routed by its callback_data prefix."""
-    # A card sent through inline mode carries an inline_message_id instead of a
-    # message: there is no chat to read legacy state from, and the tapper may
-    # never have opened a DM with us at all.
-    from_inline = cq.message is None
-    chat_id = cq.from_user.id if from_inline else cq.message.chat.id
+async def _incoming(update: telegram.Update):
+    """A tap or a text message as a platform-neutral `Incoming`; None for anything else."""
+    store = await get_store()
+    cq = update.callback_query
+    if cq:
+        # A card sent through inline mode carries an inline_message_id instead of a
+        # message: there is no chat to read legacy state from, and the tapper may
+        # never have opened a DM with us at all.
+        inline = cq.message is None
+        sender = cq.from_user
+        return Incoming(
+            platform=TELEGRAM,
+            external_id=str(sender.id),
+            user_id=await store.identity.resolve(TELEGRAM, str(sender.id)),
+            chat_id=sender.id if inline else cq.message.chat.id,
+            callback_data=cq.data or "",
+            callback_id=cq.id,
+            message_id=None if inline else cq.message.message_id,
+            lang_hint=sender.language_code,
+            inline=inline,
+            raw=cq,
+        )
+    message = update.message
+    if message and message.text:
+        sender = message.from_user
+        # a sender-less message (a channel post) is keyed by its chat, as before
+        sender_id = sender.id if sender is not None else message.chat.id
+        return Incoming(
+            platform=TELEGRAM,
+            external_id=str(sender_id),
+            user_id=await store.identity.resolve(TELEGRAM, str(sender_id)),
+            chat_id=message.chat.id,
+            text=message.text,
+            message_id=message.message_id,
+            lang_hint=getattr(sender, "language_code", None),
+            raw=message,
+        )
+    return None
+
+
+async def handle_incoming(channel, data: dict, incoming: Incoming, bot=None) -> None:
+    """Route one normalized event: a tap to its callback handler, text to commands,
+    prompts, wizards and the reader. Shared by every platform; `bot` is the
+    Telegram client the not-yet-converted hifz handlers still read off `Ctx`."""
     settings = await resolve_settings(
-        UserSettings(), None if from_inline else chat_id, cq.from_user
+        UserSettings(),
+        None if incoming.inline else incoming.chat_id,
+        incoming.user_id,
+        incoming.lang_hint,
     )
-    ctx = await Ctx.build(bot, data, File(), chat_id, cq.from_user.id, settings, callback_query=cq)
-    if not await router.dispatch_callback(ctx, cq.data or ""):
-        await bot.answer_callback_query(cq.id)  # unknown callback: acknowledge and ignore
+    if incoming.callback_data is not None:
+        await _on_callback(channel, bot, data, incoming, settings)
+    elif incoming.text:
+        await _on_text(channel, bot, data, incoming, settings)
 
 
-async def _on_text(bot, data: dict, message) -> None:
-    chat_id = message.chat.id
-    raw = message.text
+async def _on_callback(channel, bot, data: dict, incoming: Incoming, settings) -> None:
+    """A tap on an inline button, routed by its callback_data prefix."""
+    ctx = await Ctx.build(
+        bot,
+        data,
+        File(),
+        incoming.chat_id,
+        incoming.user_id,
+        settings,
+        callback_query=incoming.raw,
+        channel=channel,
+        platform=incoming.platform,
+    )
+    if not await router.dispatch_callback(ctx, incoming.callback_data):
+        await channel.answer(incoming.callback_id)  # unknown callback: acknowledge and ignore
+
+
+async def _on_text(channel, bot, data: dict, incoming: Incoming, settings) -> None:
+    chat_id = incoming.chat_id
+    raw = incoming.text
     text = raw.lower()
     file = File()
-    settings = await resolve_settings(UserSettings(), chat_id, message.from_user)
     logger.debug("%d:%.3f:%s" % (chat_id, time(), text.replace("\n", " ")))
 
     if chat_id < 0:
@@ -83,7 +141,16 @@ async def _on_text(bot, data: dict, message) -> None:
 
     async def ctx(**kwargs) -> Ctx:
         return await Ctx.build(
-            bot, data, file, chat_id, message.from_user.id, settings, message=message, **kwargs
+            bot,
+            data,
+            file,
+            chat_id,
+            incoming.user_id,
+            settings,
+            message=incoming.raw,
+            channel=channel,
+            platform=incoming.platform,
+            **kwargs,
         )
 
     if text.startswith("/"):
@@ -99,33 +166,22 @@ async def _on_text(bot, data: dict, message) -> None:
             return
 
     if pending_input.take(chat_id) == "reciter_search":
-        await _search_reciters(bot, file, chat_id, raw, settings.ui_lang)
+        await _search_reciters(channel, raw, settings.ui_lang)
         return
 
     # A wizard in progress consumes free text — but only after commands, so
     # /cancel and every other command remain an escape hatch.
-    if router.has_wizard(message.from_user.id) and await router.dispatch_wizard(await ctx(), raw):
+    if router.has_wizard(incoming.user_id) and await router.dispatch_wizard(await ctx(), raw):
         return
 
     await read_text(await ctx(), text)
 
 
-async def _search_reciters(bot, file, chat_id: int, query: str, ui_lang: str) -> None:
+async def _search_reciters(channel, query: str, ui_lang: str) -> None:
     """A name typed after tapping "🔍 Search reciter" — not an ayah reference."""
     matches = catalog.search(query)
     if not matches:
-        await bot.send_message(chat_id=chat_id, text=t("reciter_search_no_matches", ui_lang))
-        pending_input.expect(chat_id, "reciter_search")  # allow one retry
+        await channel.send_text(t("reciter_search_no_matches", ui_lang))
+        pending_input.expect(channel.chat_id, "reciter_search")  # allow one retry
         return
-    rows = button_rows(
-        [
-            InlineKeyboardButton(reciter_label(p), callback_data="setreciter:" + p["subfolder"])
-            for p in matches
-        ],
-        2,
-    )
-    await bot.send_message(
-        chat_id=chat_id,
-        text=t("reciter_search_results", ui_lang),
-        reply_markup=InlineKeyboardMarkup(rows),
-    )
+    await channel.send_text(t("reciter_search_results", ui_lang), reciter_search_keyboard(matches))
