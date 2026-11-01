@@ -29,10 +29,9 @@ import html
 from datetime import datetime
 from typing import Optional, Tuple
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 import services.check as check_service
 from bot.features import Ctx, callback, command
+from channels import Choice, Choices
 from domain.quran import Quran
 from domain.recall_check import OPTION_COUNT, RecallQuestion
 from domain.refs import parse_reference
@@ -100,7 +99,7 @@ async def _ask(ctx: Ctx, argument: str) -> None:
     text = _question_text(ctx, question)
     if hint:
         text += "\n\n" + ctx.tr("check_usage")
-    await ctx.reply(text, parse_mode="HTML", reply_markup=_options_keyboard(question, today))
+    await ctx.reply(text, _options_keyboard(question, today), html=True)
 
 
 def _question_text(ctx: Ctx, question: RecallQuestion) -> str:
@@ -112,14 +111,12 @@ def _question_text(ctx: Ctx, question: RecallQuestion) -> str:
     return "%s\n\n<b>%s</b> …" % (ctx.tr("check_question"), html.escape(question.prompt))
 
 
-def _options_keyboard(question: RecallQuestion, today) -> InlineKeyboardMarkup:
+def _options_keyboard(question: RecallQuestion, today) -> Choices:
     """One option per row — an Arabic fragment does not share a row legibly."""
-    return InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton(option, callback_data=_answer_data(question, today, index))]
-            for index, option in enumerate(question.options)
-        ]
-    )
+    return [
+        [Choice(option, data=_answer_data(question, today, index))]
+        for index, option in enumerate(question.options)
+    ]
 
 
 def _answer_data(question: RecallQuestion, today, index: int) -> str:
@@ -162,7 +159,7 @@ async def _score(ctx: Ctx, cb_data: str) -> None:
     await ctx.answer()
     # Editing without a reply_markup drops the keyboard, so the same question
     # cannot be answered twice from the same message.
-    await ctx.edit(_question_text(ctx, question) + "\n\n" + result, parse_mode="HTML")
+    await ctx.edit(_question_text(ctx, question) + "\n\n" + result, html=True)
 
 
 def _parse_answer(cb_data: str) -> Optional[Tuple[int, int, object, int]]:

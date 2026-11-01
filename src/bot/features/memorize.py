@@ -82,11 +82,14 @@ from bot.features._plan_setup import (
     _tap_days_confirm,
     _tap_pace,
     _tap_reminder,
+    _tap_reminder_consent,
     _tap_target,
     _tap_timezone,
 )
-from domain.refs import parse_reference
+from channels import WHATSAPP
+from domain.refs import KIND_RANGE, Ref, format_ref, parse_reference
 from infra.scheduler import SendCtx, send_handler
+from infra.scheduler.push import Template, deliver_push, template_lang
 from infra.store.plans import PLAN_ACTIVE, PLAN_PAUSED
 from services.plans import SEND_KIND
 from services.user_settings import DEFAULT_RECITER, DEFAULT_TRANSLATION_LANG, DEFAULT_UI_LANG
@@ -140,12 +143,12 @@ async def memorize(ctx: Ctx) -> None:
     """
     active = await ctx.store.plans.get_active_plan(ctx.user_id)
     if active is not None:
-        await ctx.reply(ctx.tr("plan_exists"), reply_markup=_plan_keyboard(active, ctx.ui_lang))
+        await ctx.reply(ctx.tr("plan_exists"), choices=_plan_keyboard(active, ctx.ui_lang))
         return
 
     paused = await ctx.store.plans.list_plans(ctx.user_id, PLAN_PAUSED)
     if paused:
-        await ctx.reply(ctx.tr("plan_paused"), reply_markup=_plan_keyboard(paused[0], ctx.ui_lang))
+        await ctx.reply(ctx.tr("plan_paused"), choices=_plan_keyboard(paused[0], ctx.ui_lang))
         return
 
     ctx.wiz.start(ctx.user_id, WIZARD_KIND, step=STEP_TARGET)
@@ -158,7 +161,7 @@ async def memorize(ctx: Ctx) -> None:
         await _ask_pace(ctx)
         return
 
-    await ctx.reply(ctx.tr("memorize_choose_target"), reply_markup=_target_keyboard(ctx.ui_lang))
+    await ctx.reply(ctx.tr("memorize_choose_target"), choices=_target_keyboard(ctx.ui_lang))
 
 
 @wizard(WIZARD_KIND)
@@ -201,6 +204,7 @@ async def on_tap(ctx: Ctx, cb_data: str) -> None:
         hm:dok          confirm custom days  hm:go          start today's portion
         hm:kn:<id>      "I know this by heart"
         hm:ps hm:rs hm:ab                    pause / resume / abandon
+        hm:cy hm:cn     WhatsApp: allow / decline daily reminders
     """
     action, _, arg = cb_data[len("hm:") :].partition(":")
 
@@ -226,6 +230,8 @@ async def on_tap(ctx: Ctx, cb_data: str) -> None:
         await _save_plan(ctx)
     elif action == "go":
         await _start_drill(ctx)
+    elif action in ("cy", "cn"):  # WhatsApp: allow daily reminders, or not
+        await _tap_reminder_consent(ctx, action == "cy")
     elif action == "kn":
         await _know_by_heart(ctx, arg)
     elif action in ("ps", "rs", "ab"):
@@ -268,6 +274,20 @@ async def push_plan_day(ctx: SendCtx) -> None:
         )
         return
 
+    user_id = int(payload.get("user_id") or ctx.chat_id)
+    if ctx.platform == WHATSAPP and await ctx.store.identity.get_by_user(user_id, WHATSAPP) is None:
+        # The number was linked to a Telegram account (or unlinked): this id has
+        # nowhere to be reached any more, so the chain ends here.
+        logger.info("HIFZ: plan day #%d not pushed — no WhatsApp identity" % day.id)
+        return
+    if ctx.platform == WHATSAPP and not await _consented(ctx.store, user_id):
+        # No pushes without opt-in (WhatsApp policy). The day stays unclaimed, so
+        # "Start today's portion" still finds it, and the chain keeps re-arming so
+        # reminders resume the moment the user opts in.
+        logger.info("HIFZ: plan day #%d not pushed — no WhatsApp consent" % day.id)
+        await _enqueue_next(ctx.store, user_id, ctx.chat_id, plan, now=ctx.now)
+        return
+
     claimed = await ctx.store.plans.claim_plan_day(day.id)
     if claimed is None:
         # A restart between claim and mark_sent can re-deliver the queued row;
@@ -275,25 +295,35 @@ async def push_plan_day(ctx: SendCtx) -> None:
         logger.info("HIFZ: plan day #%d was already delivered" % day.id)
         return
 
-    user_id = int(payload.get("user_id") or ctx.chat_id)
     settings = await ctx.store.profiles.get_settings(user_id)
     ui_lang = getattr(settings, "ui_lang", None) or DEFAULT_UI_LANG
     translation_lang = getattr(settings, "translation_lang", None) or DEFAULT_TRANSLATION_LANG
     reciter = getattr(settings, "reciter", None) or DEFAULT_RECITER
 
-    await _send_drill(
-        ctx.bot,
-        ctx.data,
-        ctx.file,
-        ctx.store,
-        ctx.chat_id,
-        plan,
-        claimed,
-        ui_lang,
-        translation_lang,
-        reciter,
-    )
+    async def session(channel) -> None:
+        await _send_drill(
+            channel,
+            ctx.data,
+            ctx.file,
+            ctx.store,
+            plan,
+            claimed,
+            ui_lang,
+            translation_lang,
+            reciter,
+        )
+
+    ref = Ref(KIND_RANGE, claimed.surah, claimed.start_ayah, claimed.surah, claimed.end_ayah)
+    # Outside WhatsApp's 24-hour window: the approved reminder, whose button
+    # starts the drill (and reopens the window) — the day is due until completed.
+    template = Template("drill_reminder", template_lang(ui_lang), [format_ref(ref)], ["hm:go"])
+    await deliver_push(ctx, session=session, template=template, category="utility")
     await _enqueue_next(ctx.store, user_id, ctx.chat_id, plan, now=ctx.now)
+
+
+async def _consented(store, user_id: int) -> bool:
+    row = await store.identity.get_by_user(user_id, WHATSAPP)
+    return row is not None and row.consented
 
 
 # --- Drill delivery (D3) --------------------------------------------------------

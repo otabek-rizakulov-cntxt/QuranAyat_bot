@@ -16,6 +16,8 @@ from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import Optional
 
+import asyncpg
+
 from channels.base import TELEGRAM
 
 from ._state import MemoryState
@@ -69,6 +71,20 @@ class IdentityStore(abc.ABC):
         row = await self.get_by_user(user_id, platform)
         return row.external_id if row is not None else None
 
+    async def home_platform(self, user_id: int) -> str:
+        """The platform `user_id` came from — where their scheduled pushes go.
+
+        Telegram ids are below 2^52 and need no lookup; every other id was
+        allocated for exactly one sender, so its one identity row names it.
+        """
+        if user_id < NON_TELEGRAM_ID_START:
+            return TELEGRAM
+        row = await self._any_row(user_id)
+        return row.platform if row is not None else TELEGRAM
+
+    @abc.abstractmethod
+    async def _any_row(self, user_id: int) -> Optional[IdentityRow]: ...
+
     @abc.abstractmethod
     async def _resolve(self, platform: str, external_id: str) -> int: ...
 
@@ -79,6 +95,18 @@ class IdentityStore(abc.ABC):
     @abc.abstractmethod
     async def get_by_user(self, user_id: int, platform: str) -> Optional[IdentityRow]:
         """One identity by our id, or None."""
+
+    @abc.abstractmethod
+    async def relink(self, platform: str, external_id: str, user_id: int) -> bool:
+        """Point an existing sender at another `user_id` (account linking, Phase 6).
+
+        False when that user already has an identity on this platform — one
+        WhatsApp number per account — or the sender is unknown.
+        """
+
+    @abc.abstractmethod
+    async def unlink(self, platform: str, external_id: str) -> bool:
+        """Forget a sender; their next message starts a fresh account. False if unknown."""
 
     @abc.abstractmethod
     async def touch_inbound(self, user_id: int, platform: str, at: datetime) -> None:
@@ -105,6 +133,12 @@ class InMemoryIdentityStore(IdentityStore):
                 return row
         return None
 
+    async def _any_row(self, user_id):
+        for row in self._state.identity.values():
+            if row.user_id == user_id:
+                return replace(row)
+        return None
+
     async def _resolve(self, platform, external_id):
         row = self._state.identity.get((platform, external_id))
         if row is None:
@@ -124,6 +158,21 @@ class InMemoryIdentityStore(IdentityStore):
     async def get_by_user(self, user_id, platform):
         row = self._find(user_id, platform)
         return replace(row) if row is not None else None
+
+    async def relink(self, platform, external_id, user_id):
+        _stored(platform)
+        row = self._state.identity.get((platform, str(external_id)))
+        if row is None:
+            return False
+        clash = self._find(user_id, platform)
+        if clash is not None and clash is not row:
+            return False
+        row.user_id = user_id
+        return True
+
+    async def unlink(self, platform, external_id):
+        _stored(platform)
+        return self._state.identity.pop((platform, str(external_id)), None) is not None
 
     def _update(self, user_id, platform, **fields):
         _stored(platform)
@@ -151,6 +200,13 @@ class PostgresIdentityStore(IdentityStore):
     @staticmethod
     def _row(record) -> Optional[IdentityRow]:
         return IdentityRow(**dict(record)) if record is not None else None
+
+    async def _any_row(self, user_id):
+        return self._row(
+            await self._pool.fetchrow(
+                "SELECT " + _COLUMNS + " FROM identity WHERE user_id = $1 LIMIT 1", user_id
+            )
+        )
 
     async def _resolve(self, platform, external_id):
         # ON CONFLICT DO NOTHING returns no row when another request won the race
@@ -188,6 +244,28 @@ class PostgresIdentityStore(IdentityStore):
                 platform,
             )
         )
+
+    async def relink(self, platform, external_id, user_id):
+        _stored(platform)
+        try:
+            result = await self._pool.execute(
+                "UPDATE identity SET user_id = $3 WHERE platform = $1 AND external_id = $2",
+                platform,
+                str(external_id),
+                user_id,
+            )
+        except asyncpg.UniqueViolationError:  # identity_user_platform_idx
+            return False
+        return result.endswith(" 1")
+
+    async def unlink(self, platform, external_id):
+        _stored(platform)
+        result = await self._pool.execute(
+            "DELETE FROM identity WHERE platform = $1 AND external_id = $2",
+            platform,
+            str(external_id),
+        )
+        return result.endswith(" 1")
 
     async def touch_inbound(self, user_id, platform, at):
         _stored(platform)

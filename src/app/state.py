@@ -12,3 +12,4 @@ class AppState:
 
     bot: Any = None  # telegram.Bot — created in startup so a bad TOKEN can't crash import
     data: Optional[dict] = None  # corpora and inline defaults, parsed in startup
+    whatsapp: Any = None  # channels.whatsapp.GraphClient, when WhatsApp is configured

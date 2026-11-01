@@ -27,10 +27,12 @@
 import html
 from typing import Optional, Tuple
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 from bot.features import Ctx, callback, command, wizard
-from bot.keyboards.time_pickers import offset_keyboard  # re-exported (see __all__)
+from bot.keyboards.time_pickers import (
+    offset_choices,
+    offset_keyboard,  # re-exported (see __all__)
+)
+from channels import Choice, Choices
 from domain.localtime import is_valid_offset, normalize_offset
 from locales import t
 from services.profile import (  # noqa: F401 — re-exported (see __all__)
@@ -139,7 +141,7 @@ def offset_from_callback(cb_data: str, prefix: str = OFFSET_PREFIX) -> Optional[
 
 def reminder_keyboard(
     ui_lang: str, off_data: str = REMINDER_OFF_CB, cancel_data: Optional[str] = None
-) -> InlineKeyboardMarkup:
+) -> Choices:
     """The keyboard under `reminder_prompt`: turn reminders off, or back out.
 
     The time itself is typed, not picked — a picker for 1,440 minutes is either
@@ -148,10 +150,10 @@ def reminder_keyboard(
     are parameters so another wizard can route the same keyboard to itself.
     """
 
-    rows = [[InlineKeyboardButton(t("btn_reminder_off", ui_lang), callback_data=off_data)]]
+    rows = [[Choice(t("btn_reminder_off", ui_lang), data=off_data)]]
     if cancel_data:
-        rows.append([InlineKeyboardButton(t("btn_cancel", ui_lang), callback_data=cancel_data)])
-    return InlineKeyboardMarkup(rows)
+        rows.append([Choice(t("btn_cancel", ui_lang), data=cancel_data)])
+    return rows
 
 
 # --- The card (B1) -------------------------------------------------------------
@@ -167,7 +169,7 @@ async def _plan_line(ctx: Ctx) -> str:
     )
 
 
-async def profile_view(ctx: Ctx) -> Tuple[str, InlineKeyboardMarkup]:
+async def profile_view(ctx: Ctx) -> Tuple[str, Choices]:
     """The `/profile` card: its HTML text and its keyboard.
 
     Every field has an unset state, so this renders for a user who has never used
@@ -200,19 +202,17 @@ async def profile_view(ctx: Ctx) -> Tuple[str, InlineKeyboardMarkup]:
     lines.append(await _plan_line(ctx))
 
     board_button = (
-        InlineKeyboardButton(ctx.tr("btn_leave_board"), callback_data=BOARD_OFF_CB)
+        Choice(ctx.tr("btn_leave_board"), data=BOARD_OFF_CB)
         if profile.leaderboard_opt_in
-        else InlineKeyboardButton(ctx.tr("btn_join_board"), callback_data=BOARD_ON_CB)
+        else Choice(ctx.tr("btn_join_board"), data=BOARD_ON_CB)
     )
-    markup = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton(ctx.tr("btn_edit_name"), callback_data=NAME_CB)],
-            [board_button],
-            [InlineKeyboardButton(ctx.tr("btn_edit_timezone"), callback_data=TIMEZONE_CB)],
-            [InlineKeyboardButton(ctx.tr("btn_edit_reminder"), callback_data=REMINDER_CB)],
-        ]
-    )
-    return "\n".join(lines), markup
+    choices = [
+        [Choice(ctx.tr("btn_edit_name"), data=NAME_CB)],
+        [board_button],
+        [Choice(ctx.tr("btn_edit_timezone"), data=TIMEZONE_CB)],
+        [Choice(ctx.tr("btn_edit_reminder"), data=REMINDER_CB)],
+    ]
+    return "\n".join(lines), choices
 
 
 async def _show_card(ctx: Ctx, prefix: str = "", toast: Optional[str] = None) -> None:
@@ -222,14 +222,14 @@ async def _show_card(ctx: Ctx, prefix: str = "", toast: Optional[str] = None) ->
     from typed input (where a toast has nowhere to appear); `toast` is the same
     confirmation for a tap.
     """
-    text, markup = await profile_view(ctx)
+    text, choices = await profile_view(ctx)
     if prefix:
         text = html.escape(prefix) + "\n\n" + text
     if ctx.callback_query is not None:
         await ctx.answer(toast)
-        await ctx.edit(text, parse_mode="HTML", reply_markup=markup)
+        await ctx.edit(text, choices, html=True)
     else:
-        await ctx.reply(text, parse_mode="HTML", reply_markup=markup)
+        await ctx.reply(text, choices, html=True)
 
 
 # --- /profile ------------------------------------------------------------------
@@ -260,7 +260,7 @@ async def on_profile_tap(ctx: Ctx, cb_data: str) -> None:
     if action in ("name", "n"):
         ctx.wiz.start(ctx.user_id, WIZARD_NAME, join=False)
         await ctx.answer()
-        await ctx.edit(ctx.tr("name_prompt"), reply_markup=_cancel_keyboard(ctx))
+        await ctx.edit(ctx.tr("name_prompt"), choices=_cancel_keyboard(ctx))
         return
 
     if action in ("board:on", "b:1"):
@@ -277,7 +277,7 @@ async def on_profile_tap(ctx: Ctx, cb_data: str) -> None:
         await ctx.answer()
         await ctx.edit(
             ctx.tr("timezone_prompt"),
-            reply_markup=offset_keyboard(ctx.ui_lang, OFFSET_PREFIX, cancel_data=PROFILE_CB),
+            choices=offset_choices(ctx.ui_lang, OFFSET_PREFIX, cancel_data=PROFILE_CB),
         )
         return
 
@@ -286,7 +286,7 @@ async def on_profile_tap(ctx: Ctx, cb_data: str) -> None:
         await ctx.answer()
         await ctx.edit(
             ctx.tr("reminder_prompt"),
-            reply_markup=reminder_keyboard(ctx.ui_lang, cancel_data=PROFILE_CB),
+            choices=reminder_keyboard(ctx.ui_lang, cancel_data=PROFILE_CB),
         )
         return
 
@@ -301,10 +301,8 @@ async def on_profile_tap(ctx: Ctx, cb_data: str) -> None:
     await _show_card(ctx)
 
 
-def _cancel_keyboard(ctx: Ctx) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(ctx.tr("btn_cancel"), callback_data=PROFILE_CB)]]
-    )
+def _cancel_keyboard(ctx: Ctx) -> Choices:
+    return [[Choice(ctx.tr("btn_cancel"), data=PROFILE_CB)]]
 
 
 # --- Leaderboard opt-in (B2) ---------------------------------------------------
@@ -320,7 +318,7 @@ async def _join_board(ctx: Ctx) -> None:
     if not await join_leaderboard(ctx.store, ctx.user_id, telegram_username(ctx)):
         ctx.wiz.start(ctx.user_id, WIZARD_NAME, join=True)
         await ctx.answer()
-        await ctx.edit(ctx.tr("name_prompt"), reply_markup=_cancel_keyboard(ctx))
+        await ctx.edit(ctx.tr("name_prompt"), choices=_cancel_keyboard(ctx))
         return
     await _show_card(ctx, toast=ctx.tr("board_joined"))
 

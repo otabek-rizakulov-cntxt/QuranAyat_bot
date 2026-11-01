@@ -125,7 +125,7 @@ class TestStreakCard:
     async def test_a_day_already_earned_carries_no_call_to_action(self):
         await _earn((0,))
         bot = await _streak()
-        assert bot.send_photo.await_args.kwargs["reply_markup"] is None
+        assert bot.send_photo.await_args.kwargs.get("reply_markup") is None
 
     async def test_a_streak_at_risk_still_offers_the_check(self):
         await _earn((1,))  # yesterday, not today

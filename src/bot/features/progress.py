@@ -18,10 +18,9 @@
 import html
 from typing import Optional, Tuple
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 from bot.features import Ctx, callback, command
 from bot.keyboards.rows import button_rows
+from channels import Choice, Choices
 from domain.quran import Quran
 from domain.refs import format_ref, parse_reference
 from services.progress import load_summary, surah_spans, unmark  # noqa: F401 — re-exported
@@ -57,7 +56,7 @@ def _surah_line(ctx: Ctx, progress) -> str:
 
 async def progress_view(
     ctx: Ctx, focus_surah: Optional[int] = None
-) -> Tuple[str, Optional[InlineKeyboardMarkup]]:
+) -> Tuple[str, Optional[Choices]]:
     """The `/progress` screen: its HTML text and its keyboard (None when empty).
 
     `focus_surah` names the surah the headline leads with; left out, the summary
@@ -107,25 +106,22 @@ async def progress_view(
         )
 
     buttons = [
-        InlineKeyboardButton(
-            Quran.get_surah_name(s.surah), callback_data=SURAH_PREFIX + str(s.surah)
-        )
+        Choice(Quran.get_surah_name(s.surah), data=SURAH_PREFIX + str(s.surah))
         for s in others[:MAX_BREAKDOWN_ROWS]
     ]
     rows = button_rows(buttons, 2)
-    markup = InlineKeyboardMarkup(rows) if rows else None
-    return "\n".join(lines), markup
+    return "\n".join(lines), rows or None
 
 
 async def _show(ctx: Ctx, focus_surah: Optional[int] = None, prefix: str = "") -> None:
-    text, markup = await progress_view(ctx, focus_surah)
+    text, choices = await progress_view(ctx, focus_surah)
     if prefix:
         text = html.escape(prefix) + "\n\n" + text
     if ctx.callback_query is not None:
         await ctx.answer()
-        await ctx.edit(text, parse_mode="HTML", reply_markup=markup)
+        await ctx.edit(text, choices, html=True)
     else:
-        await ctx.reply(text, parse_mode="HTML", reply_markup=markup)
+        await ctx.reply(text, choices, html=True)
 
 
 @command("progress")

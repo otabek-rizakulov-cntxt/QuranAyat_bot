@@ -233,6 +233,7 @@ async def enqueue_next(store, user_id: int, chat_id: int, plan, now: Optional[da
         due_at,
         local_day=local_date(due_at, offset),
         payload={"plan_day_id": day.id, "plan_id": plan.id, "user_id": user_id, "offset": offset},
+        platform=await store.identity.home_platform(user_id),
     )
 
 

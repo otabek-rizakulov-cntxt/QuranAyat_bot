@@ -45,6 +45,7 @@ _TABLES = (
     "group_member_link",
     "group_config",
     "identity",
+    "daily_ayah_sub",
 )
 
 UTC = timezone.utc
@@ -890,8 +891,60 @@ class TestIdentity:
         await store.identity.opt_in(uid, "whatsapp", self.AT + timedelta(days=2))
         assert (await store.identity.get_by_user(uid, "whatsapp")).consented
 
+    async def test_relink_points_a_number_at_another_account(self, store):
+        uid = await store.identity.resolve("whatsapp", "998901234567")
+        assert await store.identity.relink("whatsapp", "998901234567", 4242) is True
+        assert await store.identity.resolve("whatsapp", "998901234567") == 4242
+        assert await store.identity.get_by_user(uid, "whatsapp") is None
+        assert await store.identity.home_platform(4242) == "telegram"
+
+    async def test_one_number_per_account(self, store):
+        await store.identity.resolve("whatsapp", "998900000001")
+        await store.identity.resolve("whatsapp", "998900000002")
+        assert await store.identity.relink("whatsapp", "998900000001", 4242) is True
+        assert await store.identity.relink("whatsapp", "998900000002", 4242) is False
+
+    async def test_relink_or_unlink_an_unknown_number(self, store):
+        assert await store.identity.relink("whatsapp", "000", 4242) is False
+        assert await store.identity.unlink("whatsapp", "000") is False
+
+    async def test_unlink_then_a_fresh_account(self, store):
+        first = await store.identity.resolve("whatsapp", "998901234567")
+        assert await store.identity.unlink("whatsapp", "998901234567") is True
+        assert await store.identity.resolve("whatsapp", "998901234567") != first
+
+    async def test_home_platform(self, store):
+        uid = await store.identity.resolve("whatsapp", "998901234567")
+        assert await store.identity.home_platform(uid) == "whatsapp"
+        assert await store.identity.home_platform(123) == "telegram"
+
     async def test_returned_rows_are_copies(self, store):
         uid = await store.identity.resolve("whatsapp", "998901234567")
         row = await store.identity.get_by_user(uid, "whatsapp")
         row.opted_in_at = self.AT
         assert not (await store.identity.get_by_user(uid, "whatsapp")).consented
+
+
+class TestDaily:
+    async def test_none_until_subscribed(self, store):
+        assert await store.daily.get(1) is None
+        assert await store.daily.set_enabled(1, False) is None
+
+    async def test_upsert_and_toggle(self, store):
+        row = await store.daily.upsert(1, "telegram", time(7, 0))
+        assert (row.user_id, row.platform, row.send_time, row.enabled) == (
+            1,
+            "telegram",
+            time(7, 0),
+            True,
+        )
+        assert row.created_at is not None
+        assert (await store.daily.set_enabled(1, False)).enabled is False
+        kept = await store.daily.get(1)
+        assert kept.send_time == time(7, 0) and kept.enabled is False
+
+    async def test_upsert_replaces_time_and_platform(self, store):
+        first = await store.daily.upsert(1, "telegram", time(7, 0))
+        again = await store.daily.upsert(1, "whatsapp", time(20, 30), True)
+        assert (again.platform, again.send_time) == ("whatsapp", time(20, 30))
+        assert again.created_at == first.created_at

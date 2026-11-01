@@ -5,10 +5,12 @@
 > FastAPI service, the same Python business logic and the same database, so a
 > feature is written once and every platform is a thin adapter.
 
-**Status:** Phase 1 in progress on `feat/multi-platform`. §2 architecture
-decisions confirmed 2026-11-01; §11 lists the business decisions still open
-(they gate Phase 0/2, not Phase 1).
-**Last updated:** 2026-11-01
+**Status:** Code for Phases 1, 2, 3, 5 and account linking is done on
+`feat/multi-platform` (2026-11-02). Open: Phase 0 (Meta onboarding, templates,
+budget — §11), P2.7 testers, P4.1 (blocked on the recitation checker), the Mini
+App frontend half of P5.1, the second platform and WhatsApp groups (Phase 6),
+the Telegram smoke test and the Postgres leg of the store tests.
+**Last updated:** 2026-11-02
 
 Same conventions as `docs/HIFZ_PLATFORM.md` and `docs/MINI_APP_PLAN.md`: each
 task has a checkbox, the files it touches, and a falsifiable **done-when**.
@@ -266,11 +268,11 @@ CREATE SEQUENCE IF NOT EXISTS non_telegram_user_id START 4503599627370496;
 
 Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
-- [ ] **P2.0 — Config.** `whatsapp_enabled` plus the phone-number id, access
+- [x] **P2.0 — Config.** ✅ 2026-11-02. `whatsapp_enabled` plus the phone-number id, access
   token, app secret and verify token, in `config/settings.py`. `.env.example`
   gets placeholders. Everything is off unless enabled. *Done when:* the app
   boots unchanged with nothing configured.
-- [ ] **P2.1 — Webhook** (`app/routes/whatsapp.py`, mounted only when enabled).
+- [x] **P2.1 — Webhook** ✅ 2026-11-02 (recorded payloads; ⚠️ live Meta delivery pending P0.2) (`app/routes/whatsapp.py`, mounted only when enabled).
   - `GET` answers the verify-token handshake.
   - `POST` checks `X-Hub-Signature-256` (HMAC-SHA256 of the raw body,
     `hmac.compare_digest`), returns 200 at once, then processes via
@@ -282,7 +284,8 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
   *Done when:* recorded-payload tests (`tests/fixtures/whatsapp/`) prove that a
   forged signature gets 401, a duplicate is processed once, and status
   callbacks are ignored.
-- [ ] **P2.2 — `channels/whatsapp.py`** over the Graph API `/messages` (httpx).
+- [x] **P2.2 — `channels/whatsapp.py`** ✅ 2026-11-02 (mocked Graph API; ⚠️ real-phone
+  check pending P0.2) over the Graph API `/messages` (httpx).
   - Text goes through P1.4.
   - `Choices` degrade by size:
     - ≤3 short callback choices become reply buttons;
@@ -297,11 +300,11 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
   *Done when:* each send type has a mocked-httpx test and is verified on a real
   phone.
-- [ ] **P2.3 — Media by link.** `GET /media/page/{n}.png` and
+- [x] ~~**P2.3 — Media by link.**~~ **Replaced 2026-11-02 by upload-and-cache** (see §12). `GET /media/page/{n}.png` and
   `GET /media/repeat.mp3` sit next to `/media/range.mp3` and reuse the existing
   stitchers. Telegram is unchanged. *Done when:* route tests pass and WhatsApp
   shows the page image and plays the audio.
-- [ ] **P2.4 — Router for a chat without commands.**
+- [x] **P2.4 — Router for a chat without commands.** ✅ 2026-11-02
   - Keywords map to existing router commands: `menu`, `help`, `language`,
     `reciter`, `daily`, `stop`, plus their localized labels.
   - Button, list and numbered replies route as `callback_data` through
@@ -311,7 +314,7 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
   *Done when:* every Phase 2 feature in §1 is reachable without typing a
   command name.
-- [ ] **P2.5 — Verse of the day, both platforms** (`bot/features/daily.py`).
+- [x] **P2.5 — Verse of the day, both platforms** ✅ 2026-11-02 (`bot/features/daily.py`).
   - Subscriptions are stored in `daily_ayah_sub` (§5).
   - Everyone gets the same ayah each day: a hash of the date indexes a curated
     list.
@@ -322,7 +325,7 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
   - The `@send_handler("daily_ayah")` handler delivers and re-enqueues.
 
   *Done when:* contract and handler tests pass on both platforms.
-- [ ] **P2.6 — Window-aware delivery** (`infra/scheduler/push.py:
+- [x] **P2.6 — Window-aware delivery** ✅ 2026-11-02 (`infra/scheduler/push.py:
   deliver_push`).
   - WhatsApp inside the 24-hour window: a free session message.
   - WhatsApp outside it: the approved template.
@@ -337,17 +340,17 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
 ### Phase 3 — Hifz on WhatsApp
 
-- [ ] **P3.1 — Convert the hifz features** to `Choices` + channel, with
+- [x] **P3.1 — Convert the hifz features** ✅ 2026-11-02 to `Choices` + channel, with
   snapshots first, as in P1.3:
   - `features/_plan_*`, `memorize.py`;
   - `check.py`, `progress.py`, `streak.py`, `leaderboard.py`, `profile.py`.
-- [ ] **P3.2 — Plan wizard** over list messages + numbered replies;
+- [x] **P3.2 — Plan wizard** ✅ 2026-11-02 over list messages + numbered replies;
   `router.dispatch_wizard` unchanged.
-- [ ] **P3.3 — Recall checks** with 3 reply buttons (✅ knew it / 🟨 partly /
+- [x] **P3.3 — Recall checks** ✅ 2026-11-02 with 3 reply buttons (✅ knew it / 🟨 partly /
   ❌ forgot), mapped to the `services/check` outcomes.
-- [ ] **P3.4 — `push_plan_day` through `deliver_push`** with the
+- [x] **P3.4 — `push_plan_day` through `deliver_push`** ✅ 2026-11-02 with the
   `drill_reminder` template.
-- [ ] **P3.5 — Remove `Ctx.bot` / `SendCtx.bot`.** Group code keeps a
+- [x] ~~**P3.5 — Remove `Ctx.bot` / `SendCtx.bot`.**~~ **Changed 2026-11-02** (see §12). Group code keeps a
   `TelegramChannel`.
 
 *Done when (phase):* one hifz scenario suite, parametrized over fake Telegram and
@@ -355,13 +358,17 @@ WhatsApp channels, asserts the same state transitions for a week of drills.
 
 ### Phase 4 — Recitation checker on WhatsApp
 
-- [ ] **P4.1 — Voice notes.** `WhatsAppChannel.download_media(media_id)`
+- [ ] **P4.1 — Voice notes.** ⛔ Blocked 2026-11-02: the recitation checker is
+  not built (`docs/RECITATION_CHECKER_INVESTIGATION.md` — scope decided, nothing
+  implemented). The WhatsApp half is ready and tested: `GraphClient.media_url` +
+  `download` turn a voice note's media id into its OGG/Opus bytes. `WhatsAppChannel.download_media(media_id)`
   feeds OGG/Opus into the same pipeline as Telegram voice. Blocked on the
   recitation checker landing on `main`.
 
 ### Phase 5 — Web access outside Telegram
 
-- [ ] **P5.1 — Signed magic link.** `POST /auth/link` in `src/api/auth.py`.
+- [x] **P5.1 — Signed magic link.** ✅ 2026-11-02 (backend; ⚠️ the Mini App frontend
+  must read `?t=` and call `/auth/link` — separate `quranayat-miniapp` repo) `POST /auth/link` in `src/api/auth.py`.
   - It accepts an HMAC-signed `{user_id, exp ≤ 10 min, nonce}` token and
     returns the same JWT as the `initData` flow.
   - The nonce is single-use (Redis).
@@ -371,11 +378,11 @@ WhatsApp channels, asserts the same state transitions for a week of drills.
 
 ### Phase 6 — Later
 
-- [ ] **Account linking.** A one-time code from one platform, entered on the
+- [x] **Account linking.** ✅ 2026-11-02 (re-point, not stored Telegram rows — see §12). A one-time code from one platform, entered on the
   other, re-points the `identity` row to the existing `user_id`. The target
   account's hifz data wins. Telegram identity rows start being stored here.
-- [ ] **Second platform**, chosen from §10 by real demand.
-- [ ] **Hifz groups on WhatsApp**, if the Groups API matures.
+- [ ] **Second platform**, chosen from §10 by real demand. ⏸ Waits for P2.7 usage data.
+- [ ] **Hifz groups on WhatsApp**, if the Groups API matures. ⏸ Not buildable on today's API.
 
 ---
 
@@ -477,6 +484,71 @@ cost of daily pushes, and whether groups matter.
   containing them could pick up formatting. **Phase 1 code complete**;
   outstanding before Phase 2 ships: the manual Telegram smoke test (P1.3) and
   the Postgres leg of the store contract tests (P1.2).
+- 2026-11-02 — P2.2 done; **P2.3 replaced.** Instead of public routes that
+  stitch pages and repeated audio on request, the WhatsApp channel uploads
+  generated media once (`POST /{phone}/media`) and caches the media id under the
+  Telegram cache key prefixed `wa:` — the same idea as `send_cached`. Reasons: no
+  public, unauthenticated endpoint doing CPU-heavy stitching on a 0.1 vCPU box,
+  and no dependency on a public base URL. URL sources (everyayah images and
+  per-ayah audio) still go by link. Tap answers with text become messages,
+  since WhatsApp has no toast.
+- 2026-11-02 — P2.1 + P2.4 done (one commit: the webhook hands messages to the
+  router). `bot/whatsapp.py` maps words in English, Uzbek (both scripts) and
+  Russian to commands, taps and numbered replies to `callback_data`, and gates
+  WhatsApp to converted features (`COMMANDS`, `CALLBACK_PREFIXES`); anything else
+  answers `wa_not_here`. First contact sends the welcome, a WhatsApp hint and the
+  language picker; the first UI language comes from the calling code (998 → uz).
+  New `wa_*` strings ship in en/ru/uz/uz-Cyrl (`WA_LOCALES`), others fall back.
+  `STOP` (and localized forms) opts out immediately.
+- 2026-11-02 — P2.5 + P2.6 done. `/daily` (Telegram) and `daily`/`kunlik`
+  (WhatsApp) set it up; callbacks under `hd:`; strings under `daily_*` in the
+  four launch locales; `/daily` added to the command menu. 68 hand-picked
+  standalone ayat (`domain/daily_ayah.py`) rotate in order by local date. Queue
+  keys include the send time, so a time changed mid-day queues the new row and
+  the handler skips the old one. `infra/scheduler/push.deliver_push` decides
+  session vs template vs drop and logs one `push … outcome= category=` line per
+  send for the cost estimate. The template's quick-reply button carries
+  `vc:tr:S:A`, so tapping it opens the card *and* reopens the free window.
+  **P0.3 must submit** `daily_ayah` with body params {{1}} reference,
+  {{2}} translation (≤600 chars) and one quick-reply button, in en/ru/uz.
+- 2026-11-02 — **Phase 3 done.** Every hifz feature (plan wizard, drill,
+  check, progress, streak, leaderboard, profile) sends through `ctx.channel`
+  with `Choices`; 76 keyboard snapshots recorded beforehand still match. The
+  drill push goes through `deliver_push` with a `drill_reminder` template whose
+  button is `hm:go` (the day stays due until completed, so the tap delivers it).
+  WhatsApp needs opt-in for reminders: saving a plan there asks (`hm:cy`/`hm:cn`);
+  without it no reminder is pushed — checked *before* the day is claimed — but
+  "start today's portion" still works. Plan pushes are queued on the user's
+  `identity.home_platform`. A numbered WhatsApp menu now answers only while it is
+  the latest message, so numbers typed into wizard prompts are not hijacked.
+  `/start <payload>` (a Telegram deep link) is ignored on WhatsApp.
+  **P3.5 changed:** `Ctx.bot` stays — it is the Telegram client behind the
+  Telegram channel and the Telegram-only group feature (forum topics, membership
+  checks have no channel form). `tests/test_channel_seam.py` pins which modules
+  may still touch Telegram, so nothing cross-platform can regress onto it.
+  Done-when met: `tests/test_hifz_cross_platform.py` runs a week of drills on
+  both platforms through their real entry points and asserts identical state
+  trails. **P0.3 must also submit** `drill_reminder` ({{1}} portion reference,
+  one quick-reply button).
+- 2026-11-02 — P5.1 done on the bot side. `infra/link_token.py` issues a
+  10-minute, single-use token (nonce burned in Redis) signed with a key derived
+  from `MINIAPP_JWT_SECRET` for this purpose only, so it never passes as an
+  access token and vice versa. `POST /api/v1/auth/link` returns the same
+  `AuthOut` as `/auth/telegram`. On a channel without in-chat Mini App buttons,
+  `/app` (WhatsApp: `app`/`ilova`) sends `MINIAPP_URL/?t=<token>`. **Frontend
+  work remains** in the Mini App repo: when there is no `initData`, read `t`,
+  exchange it at `/auth/link`, and run without the Telegram WebApp SDK.
+  P4.1 recorded as blocked on the recitation checker.
+- 2026-11-02 — Account linking done. `link` shows a six-digit code (10 min,
+  single-use, 5 wrong tries per window); `link <code>` on the other app re-points
+  the WhatsApp identity at the Telegram user id. **Changed from the draft:** no
+  Telegram identity rows are stored — Telegram stays the canonical account, so
+  linking is one `UPDATE`, and the WhatsApp number's own earlier history stays
+  under its old id (kept, not merged). Pushes go to the home platform
+  (Telegram); the number's WhatsApp-only verse of the day is turned off and its
+  plan chain ends. `unlink` from either side deletes the identity row; the
+  number's next message starts a fresh account. Second platform and WhatsApp
+  groups stay open (data- and API-gated).
 
 ## References
 

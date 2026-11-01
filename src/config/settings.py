@@ -40,6 +40,13 @@ class Settings:
     allow_memory_store: bool
     webhook_url: Optional[str]
     railway_public_domain: Optional[str]
+    # WhatsApp Cloud API (docs/MULTI_PLATFORM_PLAN.md P2.0). Everything stays off
+    # unless the flag is on *and* all four values are set — see `whatsapp_ready`.
+    whatsapp_enabled: bool = False
+    whatsapp_phone_number_id: Optional[str] = None  # the sending number's Graph API id
+    whatsapp_access_token: Optional[str] = None  # system-user token for /messages
+    whatsapp_app_secret: Optional[str] = None  # signs each webhook (X-Hub-Signature-256)
+    whatsapp_verify_token: Optional[str] = None  # our half of the GET handshake
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -59,6 +66,27 @@ class Settings:
             allow_memory_store=_flag(env("ALLOW_MEMORY_STORE")),
             webhook_url=env("WEBHOOK_URL"),
             railway_public_domain=env("RAILWAY_PUBLIC_DOMAIN"),
+            whatsapp_enabled=_flag(env("WHATSAPP_ENABLED")),
+            whatsapp_phone_number_id=env("WHATSAPP_PHONE_NUMBER_ID") or None,
+            whatsapp_access_token=env("WHATSAPP_ACCESS_TOKEN") or None,
+            whatsapp_app_secret=env("WHATSAPP_APP_SECRET") or None,
+            whatsapp_verify_token=env("WHATSAPP_VERIFY_TOKEN") or None,
+        )
+
+    @property
+    def whatsapp_ready(self) -> bool:
+        """WhatsApp is on: the flag is set and every credential is present.
+
+        Half a configuration is treated as off, so a deployment can never accept
+        webhooks it cannot verify or answer.
+        """
+        return self.whatsapp_enabled and all(
+            (
+                self.whatsapp_phone_number_id,
+                self.whatsapp_access_token,
+                self.whatsapp_app_secret,
+                self.whatsapp_verify_token,
+            )
         )
 
     @property

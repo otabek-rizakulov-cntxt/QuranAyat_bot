@@ -32,9 +32,15 @@ class MemoryStore:
                 return None
             return value
 
-    def set(self, key, value, ex=None):
+    def set(self, key, value, ex=None, nx=False):
+        """Like Redis SET: with `nx`, only when the key is absent (True if set, else None)."""
         with self._lock:
+            if nx:
+                entry = self._data.get(key)
+                if entry is not None and (entry[1] is None or entry[1] >= time.time()):
+                    return None
             self._data[key] = (value, time.time() + ex if ex else None)
+            return True
 
     def delete(self, key):
         with self._lock:

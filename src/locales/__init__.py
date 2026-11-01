@@ -79,7 +79,19 @@ WEB_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
 
 # Key prefix -> the locales expected to translate it. Anywhere else, a key with
 # that prefix is an intended English fallback, not a gap.
-PARTIAL_KEY_PREFIXES = {"group_": GROUP_LOCALES, "web_": WEB_LOCALES}
+# WhatsApp-only strings (`wa_*`, docs/MULTI_PLATFORM_PLAN.md P2.4): same policy.
+WA_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
+
+# Verse of the day (`daily_*`, MULTI_PLATFORM_PLAN P2.5): same policy.
+DAILY_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
+
+PARTIAL_KEY_PREFIXES = {
+    "group_": GROUP_LOCALES,
+    "web_": WEB_LOCALES,
+    "wa_": WA_LOCALES,
+    "daily_": DAILY_LOCALES,
+    "link_": DAILY_LOCALES,  # account linking (Phase 6): the same four locales
+}
 
 
 def missing_keys(lang: str) -> list[str]:
@@ -122,6 +134,7 @@ BOT_COMMANDS = (
     ("juz", "cmd_juz"),
     ("sajda", "cmd_sajda"),
     ("random", "cmd_random"),
+    ("daily", "daily_cmd"),
     # Memorizing it — the hifz platform, in the order a user meets them:
     # commit to a plan, see how far you are, test yourself, correct a mistake,
     # then the two motivation surfaces.
@@ -136,6 +149,7 @@ BOT_COMMANDS = (
     ("language", "cmd_language"),
     ("translation", "cmd_translation"),
     ("reciter", "cmd_reciter"),
+    ("link", "link_cmd"),
     ("about", "cmd_about"),
 )
 

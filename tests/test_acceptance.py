@@ -221,8 +221,8 @@ class TestTwoTheDailyPush:
         async def no_network(*args, **kwargs):
             pass
 
-        monkeypatch.setattr(plan_drill, "send_combined_audio", no_network)
-        monkeypatch.setattr(plan_drill, "send_quran", no_network)
+        monkeypatch.setattr(plan_drill, "deliver_combined_audio", no_network)
+        monkeypatch.setattr(plan_drill, "deliver_quran", no_network)
 
         store = await get_store()
         await _save_plan()

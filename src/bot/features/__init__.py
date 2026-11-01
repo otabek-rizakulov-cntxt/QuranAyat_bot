@@ -69,6 +69,7 @@ PREFIXES: Dict[str, str] = {
     "streak": "hs:",  # hs:grid
     "leaderboard": "hl:",  # hl:me  hl:join
     "group": "gr:",  # gr:tl:ru  gr:rc:...  gr:ok — Phase 2 group setup
+    "daily": "hd:",  # hd:on  hd:tz:+05:00  hd:t:07:00  hd:ok:07:00  hd:off — verse of the day
     "shared": "hx:",  # hx:cancel  hx:back — the seam's own controls
 }
 

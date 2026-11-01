@@ -28,8 +28,8 @@ async def _lifecycle(ctx: Ctx, action: str) -> None:
         return
 
     if action == plans_service.PAUSE:
-        await ctx.reply(ctx.tr("plan_paused"), reply_markup=_plan_keyboard(plan, ctx.ui_lang))
+        await ctx.reply(ctx.tr("plan_paused"), choices=_plan_keyboard(plan, ctx.ui_lang))
     elif action == plans_service.RESUME:
-        await ctx.reply(ctx.tr("plan_resumed"), reply_markup=_plan_keyboard(plan, ctx.ui_lang))
+        await ctx.reply(ctx.tr("plan_resumed"), choices=_plan_keyboard(plan, ctx.ui_lang))
     else:
         await ctx.reply(ctx.tr("plan_abandoned"))

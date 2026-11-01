@@ -36,6 +36,7 @@ class MemoryState:
     group_member_link: List[object] = field(default_factory=list)  # GroupMemberLink
     # Multi-platform — (platform, external_id) -> IdentityRow.
     identity: Dict[tuple, object] = field(default_factory=dict)
+    daily_ayah_sub: Dict[int, object] = field(default_factory=dict)  # user_id -> DailySubRow
     sequence: int = 0
     # Stands in for the `non_telegram_user_id` sequence; see store/identity.py.
     user_id_sequence: int = 2**52 - 1
@@ -70,5 +71,6 @@ class MemoryState:
         self.group_plan_day.clear()
         self.group_member_link.clear()
         self.identity.clear()
+        self.daily_ayah_sub.clear()
         self.sequence = 0
         self.user_id_sequence = 2**52 - 1

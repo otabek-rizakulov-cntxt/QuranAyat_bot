@@ -4,8 +4,9 @@ from telegram import ReplyKeyboardRemove
 
 from bot.context import Ctx
 from bot.features import group as hifz_group
-from bot.miniapp import app_choice_row
+from bot.miniapp import app_choice_row, app_link
 from bot.router import command
+from channels import Choice
 from locales import t, welcome_text
 
 
@@ -31,7 +32,13 @@ async def help_(ctx: Ctx) -> None:
 
 @command("app")
 async def app(ctx: Ctx) -> None:
-    row = app_choice_row("📱 " + t("web_btn_open_app", ctx.ui_lang), "/")
+    label = "📱 " + t("web_btn_open_app", ctx.ui_lang)
+    if ctx.channel.caps.web_app:
+        row = app_choice_row(label, "/")
+    else:
+        # No in-chat Mini App outside Telegram: a one-time sign-in link instead.
+        link = app_link(ctx.user_id, "/")
+        row = [[Choice(label, url=link)]] if link else []
     await ctx.reply(t("web_app_intro" if row else "web_app_unavailable", ctx.ui_lang), row)
 
 
