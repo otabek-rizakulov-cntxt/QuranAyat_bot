@@ -1,6 +1,5 @@
 {
   "9": "Leaderboard",
-  "11": "Profile",
   "12": "Store",
   "16": "Context",
   "17": "Health",
@@ -22,7 +21,6 @@
   "50": "Services",
   "52": "Dispatch",
   "55": "Inline Reciter Search Tests",
-  "59": "Hifz",
   "61": "Dispatch Order Tests",
   "63": "Mini App Plan",
   "72": "Hifz Seam Tests",
@@ -39,7 +37,6 @@
   "96": "Hifz Seam Tests: TestRegistration",
   "98": "Scheduler Tests: TestTransientFailuresAreRetried",
   "99": "Store Contract Tests: TestPlans",
-  "112": "Store Contract Tests: TestSchedule",
   "115": "Koyeb Capacity Report",
   "116": "Blue Green Ci",
   "117": "Blue Green Ci: name",
