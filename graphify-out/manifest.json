@@ -55,10 +55,10 @@
     "ast_empty": true
   },
   "src/common/schema.sql": {
-    "mtime": 1793234223.1802104,
-    "seen": 1793252282.5299861,
-    "ast_hash": "4f78899d4b09d0bfce3f90e940df4ae0",
-    "semantic_hash": "4f78899d4b09d0bfce3f90e940df4ae0"
+    "mtime": 1793551372.1032355,
+    "seen": 1793551469.120296,
+    "ast_hash": "cf1440c2604b72b60948feac259e5299",
+    "semantic_hash": ""
   },
   "src/config/__init__.py": {
     "mtime": 1793249770.1464052,
@@ -529,10 +529,10 @@
     "semantic_hash": "b119592180a4cda183da55430b156063"
   },
   "tests/test_store_contract.py": {
-    "mtime": 1793249770.1731677,
-    "seen": 1793252282.5301518,
-    "ast_hash": "4d2a71129284756ac6c961b4db15d7d0",
-    "semantic_hash": "4d2a71129284756ac6c961b4db15d7d0"
+    "mtime": 1793551431.7356339,
+    "seen": 1793551469.1204731,
+    "ast_hash": "bfaf4597ef282354e9df42bf79e6dd6a",
+    "semantic_hash": ""
   },
   "tests/test_streak_image.py": {
     "mtime": 1793249770.1738698,
@@ -781,9 +781,9 @@
     "semantic_hash": "226df0089a3d766451a9c658963fe89d"
   },
   "docs/MULTI_PLATFORM_PLAN.md": {
-    "mtime": 1793551246.1110966,
-    "seen": 1793551252.704128,
-    "ast_hash": "ff250827fd4b422e923ad5b18a130f29",
+    "mtime": 1793551462.3937373,
+    "seen": 1793551469.120499,
+    "ast_hash": "3ae9e795ffad913a04da8ec6cc683a69",
     "semantic_hash": ""
   },
   "docs/RECITATION_CHECKER_INVESTIGATION.md": {
@@ -1225,10 +1225,10 @@
     "semantic_hash": "079a0dac70eed3d5135004e55ec91284"
   },
   "src/infra/scheduler/enqueue.py": {
-    "mtime": 1793251482.4568527,
-    "seen": 1793252282.530015,
-    "ast_hash": "9dfb538770e3e4973b93d1481a015a37",
-    "semantic_hash": "9dfb538770e3e4973b93d1481a015a37"
+    "mtime": 1793551372.10435,
+    "seen": 1793551469.1203258,
+    "ast_hash": "4ed468e5b49e0fa53c113c67e16756e4",
+    "semantic_hash": ""
   },
   "src/infra/scheduler/registry.py": {
     "mtime": 1793251495.4616692,
@@ -1249,16 +1249,16 @@
     "semantic_hash": "c5933f7d2d1a4733b11b5ebbcd5bacbb"
   },
   "src/infra/store/__init__.py": {
-    "mtime": 1793249770.1536362,
-    "seen": 1793252282.53002,
-    "ast_hash": "28462bf785cf6a2bbc66fdb57206cb9e",
-    "semantic_hash": "28462bf785cf6a2bbc66fdb57206cb9e"
+    "mtime": 1793551372.1025476,
+    "seen": 1793551469.1203341,
+    "ast_hash": "064a519384429f6484bda684c4f81d9b",
+    "semantic_hash": ""
   },
   "src/infra/store/_state.py": {
-    "mtime": 1793249770.153973,
-    "seen": 1793252282.530022,
-    "ast_hash": "64a888bbe2cd379a6413948d10571097",
-    "semantic_hash": "64a888bbe2cd379a6413948d10571097"
+    "mtime": 1793551372.1019912,
+    "seen": 1793551469.1203358,
+    "ast_hash": "dfa569927acb1993396b1331640dab9f",
+    "semantic_hash": ""
   },
   "src/infra/store/groups.py": {
     "mtime": 1793250156.7428353,
@@ -1285,10 +1285,10 @@
     "semantic_hash": "195fbb722b5774fe63a252ebf70a03b1"
   },
   "src/infra/store/schedule.py": {
-    "mtime": 1793249770.155248,
-    "seen": 1793252282.530027,
-    "ast_hash": "2a049aa993a0c29a39b3c968314e220a",
-    "semantic_hash": "2a049aa993a0c29a39b3c968314e220a"
+    "mtime": 1793551372.1038187,
+    "seen": 1793551469.1203442,
+    "ast_hash": "64f982126ed5913da2c6bb99c0358d9c",
+    "semantic_hash": ""
   },
   "src/infra/store/sessions.py": {
     "mtime": 1793249770.1554499,
@@ -1438,6 +1438,12 @@
     "mtime": 1793551137.4392986,
     "seen": 1793551252.7040598,
     "ast_hash": "27b9cc63542824b94809849f7accf340",
+    "semantic_hash": ""
+  },
+  "src/infra/store/identity.py": {
+    "mtime": 1793551399.7956302,
+    "seen": 1793551469.1203399,
+    "ast_hash": "37e5d8ba578f0f9a56192e10ee26268f",
     "semantic_hash": ""
   }
 }
