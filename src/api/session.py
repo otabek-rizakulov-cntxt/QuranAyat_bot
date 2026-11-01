@@ -1,5 +1,6 @@
-# Session, settings and profile: POST /auth/telegram, GET /me, PATCH /me/settings,
-# PATCH /me/profile (docs/MINI_APP_PLAN.md §4-5).
+# Session, settings and profile: POST /auth/telegram, POST /auth/link, GET /me,
+# PATCH /me/settings, PATCH /me/profile (docs/MINI_APP_PLAN.md §4-5,
+# docs/MULTI_PLATFORM_PLAN.md P5.1).
 
 import re
 from typing import List, Optional
@@ -10,7 +11,7 @@ from pydantic import BaseModel
 from config.settings import get_settings
 from domain.localtime import is_valid_offset, normalize_offset, offset_options
 from domain.quran import TranslationRegistry
-from infra import catalog
+from infra import catalog, link_token
 from infra.store import get_store
 from locales import is_supported, is_ui_language, normalize_lang
 from services import plans as plans_service
@@ -37,6 +38,10 @@ _START_PARAM = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 class TelegramAuthIn(BaseModel):
     init_data: str
+
+
+class LinkAuthIn(BaseModel):
+    token: str
 
 
 class TelegramUser(BaseModel):
@@ -148,6 +153,29 @@ async def auth_telegram(body: TelegramAuthIn) -> AuthOut:
         user=TelegramUser(**{k: tg_user.get(k) for k in TelegramUser.model_fields}),
         settings=_settings(row),
         start_param=start_param,
+    )
+
+
+@router.post("/auth/link", response_model=AuthOut)
+async def auth_link(body: LinkAuthIn) -> AuthOut:
+    """Exchange a one-time link token from the bot (WhatsApp, a browser) for an
+    access token — the same response as `/auth/telegram`, minus Telegram's names."""
+    secret = jwt_secret()
+    if not secret:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="mini app auth is not configured",
+        )
+    try:
+        user_id = link_token.redeem(body.token)
+    except link_token.InvalidLinkToken:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid link")
+    row = await UserSettings().get(user_id, user_id)
+    return AuthOut(
+        access_token=issue_token(user_id, secret),
+        expires_in=DEFAULT_TOKEN_TTL,
+        user=TelegramUser(id=user_id),
+        settings=_settings(row),
     )
 
 

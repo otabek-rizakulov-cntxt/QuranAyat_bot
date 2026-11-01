@@ -356,13 +356,17 @@ WhatsApp channels, asserts the same state transitions for a week of drills.
 
 ### Phase 4 — Recitation checker on WhatsApp
 
-- [ ] **P4.1 — Voice notes.** `WhatsAppChannel.download_media(media_id)`
+- [ ] **P4.1 — Voice notes.** ⛔ Blocked 2026-11-02: the recitation checker is
+  not built (`docs/RECITATION_CHECKER_INVESTIGATION.md` — scope decided, nothing
+  implemented). The WhatsApp half is ready and tested: `GraphClient.media_url` +
+  `download` turn a voice note's media id into its OGG/Opus bytes. `WhatsAppChannel.download_media(media_id)`
   feeds OGG/Opus into the same pipeline as Telegram voice. Blocked on the
   recitation checker landing on `main`.
 
 ### Phase 5 — Web access outside Telegram
 
-- [ ] **P5.1 — Signed magic link.** `POST /auth/link` in `src/api/auth.py`.
+- [x] **P5.1 — Signed magic link.** ✅ 2026-11-02 (backend; ⚠️ the Mini App frontend
+  must read `?t=` and call `/auth/link` — separate `quranayat-miniapp` repo) `POST /auth/link` in `src/api/auth.py`.
   - It accepts an HMAC-signed `{user_id, exp ≤ 10 min, nonce}` token and
     returns the same JWT as the `initData` flow.
   - The nonce is single-use (Redis).
@@ -524,6 +528,15 @@ cost of daily pushes, and whether groups matter.
   both platforms through their real entry points and asserts identical state
   trails. **P0.3 must also submit** `drill_reminder` ({{1}} portion reference,
   one quick-reply button).
+- 2026-11-02 — P5.1 done on the bot side. `infra/link_token.py` issues a
+  10-minute, single-use token (nonce burned in Redis) signed with a key derived
+  from `MINIAPP_JWT_SECRET` for this purpose only, so it never passes as an
+  access token and vice versa. `POST /api/v1/auth/link` returns the same
+  `AuthOut` as `/auth/telegram`. On a channel without in-chat Mini App buttons,
+  `/app` (WhatsApp: `app`/`ilova`) sends `MINIAPP_URL/?t=<token>`. **Frontend
+  work remains** in the Mini App repo: when there is no `initData`, read `t`,
+  exchange it at `/auth/link`, and run without the Telegram WebApp SDK.
+  P4.1 recorded as blocked on the recitation checker.
 
 ## References
 

@@ -8,11 +8,13 @@
 # callers that may be editing one (the verse card) can switch them off.
 
 from typing import Optional
+from urllib.parse import urlencode
 
 from telegram import InlineKeyboardButton, MenuButtonWebApp, WebAppInfo
 
 from channels import Choice, Choices
 from config.settings import get_settings
+from infra import link_token
 
 
 def app_url(path: str = "/") -> Optional[str]:
@@ -32,6 +34,17 @@ def app_row(label: str, path: str = "/") -> list:
     """`[[button]]` to append to a keyboard's rows, or `[]` when the app is off."""
     button = app_button(label, path)
     return [[button]] if button is not None else []
+
+
+def app_link(user_id: int, path: str = "/") -> Optional[str]:
+    """The Mini App URL with a one-time sign-in token (infra/link_token.py), for a
+    platform that cannot open it with Telegram's initData. None when either the
+    app URL or the API secret is not configured."""
+    url = app_url(path)
+    token = link_token.issue(user_id) if url else None
+    if not token:
+        return None
+    return url + ("&" if "?" in url else "?") + urlencode({"t": token})
 
 
 def app_choice_row(label: str, path: str = "/") -> Choices:

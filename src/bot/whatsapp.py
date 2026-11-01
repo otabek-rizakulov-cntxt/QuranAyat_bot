@@ -53,6 +53,7 @@ COMMANDS = {
     "leaderboard",
     "profile",
     "cancel",
+    "app",  # a one-time sign-in link to the Mini App (Phase 5)
 }
 CALLBACK_PREFIXES = (
     "vc:",
@@ -100,6 +101,7 @@ KEYWORDS = {
     "leaderboard": ("leaderboard", "reyting", "рейтинг"),
     "profile": ("profile", "profil", "профил", "профиль"),
     "cancel": ("cancel", "bekor", "бекор", "отмена"),
+    "app": ("app", "ilova", "илова", "приложение"),
 }
 _COMMAND_BY_WORD = {word: name for name, words in KEYWORDS.items() for word in words}
 

@@ -267,3 +267,22 @@ class TestNumberedMenuLifetime:
         assert choice_memory.pick(UID, "2") == "d:1"
         await channel.send_text("How many ayat a day?")
         assert choice_memory.pick(UID, "2") is None  # now a typed answer, not option 2
+
+
+class TestVoiceNotes:
+    """What the recitation checker (Phase 4) needs from WhatsApp: a received
+    voice note's bytes, by media id."""
+
+    async def test_media_id_to_bytes(self, channel, graph):
+        def media(request):
+            graph.requests.append(request)
+            if request.url.path.endswith("/MEDIA1"):
+                return httpx.Response(200, json={"url": "https://lookaside.example/voice"})
+            return httpx.Response(200, content=b"OggS-voice")
+
+        channel.client._transport = httpx.MockTransport(media)
+        channel.client._client = None
+        url = await channel.client.media_url("MEDIA1")
+        assert url == "https://lookaside.example/voice"
+        assert await channel.client.download(url) == b"OggS-voice"
+        assert graph.requests[-1].headers["Authorization"] == "Bearer TOKEN"
