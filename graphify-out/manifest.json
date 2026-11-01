@@ -51,7 +51,8 @@
     "mtime": 1793231122.5535624,
     "seen": 1793231128.224064,
     "ast_hash": "c1e223bac8b22a493d3ce5d49ba20736",
-    "semantic_hash": "c1e223bac8b22a493d3ce5d49ba20736"
+    "semantic_hash": "c1e223bac8b22a493d3ce5d49ba20736",
+    "ast_empty": true
   },
   "src/common/schema.sql": {
     "mtime": 1793234223.1802104,
@@ -1406,7 +1407,7 @@
   "pyproject.toml": {
     "mtime": 1793234411.0678596,
     "seen": 1793252282.529901,
-    "ast_hash": "823604932249990ec67d6b0b193de262",
-    "semantic_hash": "823604932249990ec67d6b0b193de262"
+    "ast_hash": "",
+    "semantic_hash": ""
   }
 }
