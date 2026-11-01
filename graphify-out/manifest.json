@@ -679,10 +679,10 @@
     "semantic_hash": "2a082f1146a5a596e59ccc19b2b608de"
   },
   "src/api/session.py": {
-    "mtime": 1793249770.1344821,
-    "seen": 1793252282.529923,
-    "ast_hash": "6eb675f954c92392f88d35dfd2041db0",
-    "semantic_hash": "6eb675f954c92392f88d35dfd2041db0"
+    "mtime": 1793568571.8048244,
+    "seen": 1793568635.194274,
+    "ast_hash": "ae8952a7e40845e21dc884af5bcad5d9",
+    "semantic_hash": ""
   },
   "src/api/stats.py": {
     "mtime": 1793249770.1347654,
@@ -781,9 +781,9 @@
     "semantic_hash": "226df0089a3d766451a9c658963fe89d"
   },
   "docs/MULTI_PLATFORM_PLAN.md": {
-    "mtime": 1793568504.5449815,
-    "seen": 1793568510.3649018,
-    "ast_hash": "7cb8d9db3efd70386ae57c4cbb961ab7",
+    "mtime": 1793568630.2774358,
+    "seen": 1793568635.194471,
+    "ast_hash": "61ff00925f94c4162a9d9cab48c51926",
     "semantic_hash": ""
   },
   "docs/RECITATION_CHECKER_INVESTIGATION.md": {
@@ -967,9 +967,9 @@
     "semantic_hash": "968757d347082dc37eafd6074454c736"
   },
   "src/bot/handlers/info.py": {
-    "mtime": 1793551730.2722623,
-    "seen": 1793551894.6468842,
-    "ast_hash": "aa5c2723b338d2251d19c8d5fa7efc2e",
+    "mtime": 1793568571.900295,
+    "seen": 1793568635.194301,
+    "ast_hash": "01a4f9f15ced8368ed41edcf89c993be",
     "semantic_hash": ""
   },
   "src/bot/handlers/pages.py": {
@@ -1063,9 +1063,9 @@
     "semantic_hash": ""
   },
   "src/bot/miniapp.py": {
-    "mtime": 1793551607.483364,
-    "seen": 1793551894.6469052,
-    "ast_hash": "97e9ac22ce781ad4dffb9af1d2861059",
+    "mtime": 1793568571.8052516,
+    "seen": 1793568635.194313,
+    "ast_hash": "48acc5ced34bb952c600f13f9c815aae",
     "semantic_hash": ""
   },
   "src/bot/router.py": {
@@ -1489,9 +1489,9 @@
     "semantic_hash": ""
   },
   "tests/test_channels_whatsapp.py": {
-    "mtime": 1793568281.9587896,
-    "seen": 1793568510.3648498,
-    "ast_hash": "5160447f504940de98c08b781b112694",
+    "mtime": 1793568605.3135915,
+    "seen": 1793568635.194417,
+    "ast_hash": "0464cf73f2eabe4a43586b1d9564ca7f",
     "semantic_hash": ""
   },
   "src/app/routes/whatsapp.py": {
@@ -1501,9 +1501,9 @@
     "semantic_hash": ""
   },
   "src/bot/whatsapp.py": {
-    "mtime": 1793568367.290765,
-    "seen": 1793568510.364751,
-    "ast_hash": "ef6ca0c4d64779c7dc57c4b7b0d054b6",
+    "mtime": 1793568571.8058145,
+    "seen": 1793568635.194318,
+    "ast_hash": "eb667757c688b7cacd380908733bf48e",
     "semantic_hash": ""
   },
   "tests/fixtures/whatsapp/button_reply.json": {
@@ -1618,6 +1618,18 @@
     "mtime": 1793568063.1263247,
     "seen": 1793568510.3648589,
     "ast_hash": "82a9a7df5207cf5cffa1d62a0944cd17",
+    "semantic_hash": ""
+  },
+  "src/infra/link_token.py": {
+    "mtime": 1793568571.5873137,
+    "seen": 1793568635.194339,
+    "ast_hash": "4314b798e5a664e625d854160534e186",
+    "semantic_hash": ""
+  },
+  "tests/test_link_auth.py": {
+    "mtime": 1793568605.4476833,
+    "seen": 1793568635.194438,
+    "ast_hash": "640f1f41e57e148cf7a8e19d7b5a4a05",
     "semantic_hash": ""
   }
 }
