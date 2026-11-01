@@ -69,6 +69,20 @@ class IdentityStore(abc.ABC):
         row = await self.get_by_user(user_id, platform)
         return row.external_id if row is not None else None
 
+    async def home_platform(self, user_id: int) -> str:
+        """The platform `user_id` came from — where their scheduled pushes go.
+
+        Telegram ids are below 2^52 and need no lookup; every other id was
+        allocated for exactly one sender, so its one identity row names it.
+        """
+        if user_id < NON_TELEGRAM_ID_START:
+            return TELEGRAM
+        row = await self._any_row(user_id)
+        return row.platform if row is not None else TELEGRAM
+
+    @abc.abstractmethod
+    async def _any_row(self, user_id: int) -> Optional[IdentityRow]: ...
+
     @abc.abstractmethod
     async def _resolve(self, platform: str, external_id: str) -> int: ...
 
@@ -103,6 +117,12 @@ class InMemoryIdentityStore(IdentityStore):
         for row in self._state.identity.values():
             if row.user_id == user_id and row.platform == platform:
                 return row
+        return None
+
+    async def _any_row(self, user_id):
+        for row in self._state.identity.values():
+            if row.user_id == user_id:
+                return replace(row)
         return None
 
     async def _resolve(self, platform, external_id):
@@ -151,6 +171,13 @@ class PostgresIdentityStore(IdentityStore):
     @staticmethod
     def _row(record) -> Optional[IdentityRow]:
         return IdentityRow(**dict(record)) if record is not None else None
+
+    async def _any_row(self, user_id):
+        return self._row(
+            await self._pool.fetchrow(
+                "SELECT " + _COLUMNS + " FROM identity WHERE user_id = $1 LIMIT 1", user_id
+            )
+        )
 
     async def _resolve(self, platform, external_id):
         # ON CONFLICT DO NOTHING returns no row when another request won the race

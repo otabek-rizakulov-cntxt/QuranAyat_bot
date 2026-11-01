@@ -9,7 +9,7 @@ from bot.features._plan_common import _day_position, _portion_for, _target_label
 from bot.features._plan_keyboards import _drill_keyboard, _plan_keyboard
 from bot.features._plan_preview import _portion_label
 from bot.limits import MAX_RANGE_AYAHS
-from bot.media import send_combined_audio, send_quran
+from bot.media import deliver_combined_audio, deliver_quran
 from domain.quran import Quran, get_translation
 from domain.refs import KIND_RANGE, Ref, format_ref
 from infra.store.plans import PLAN_PAUSED
@@ -31,11 +31,10 @@ async def _translation_text(surah: int, start: int, end: int, translation_lang: 
 
 
 async def _send_drill(
-    bot,
+    channel,
     data,
     file,
     store,
-    chat_id: int,
     plan,
     day,
     ui_lang: str,
@@ -44,9 +43,9 @@ async def _send_drill(
 ) -> None:
     """One portion: header, Arabic, translation, and **one** audio with controls.
 
-    The audio is the acceptance criterion: `send_combined_audio` stitches a range
-    into a single file (Telegram caches it by file_id afterwards), and only a
-    one-ayah portion goes through `send_quran`'s per-ayah path. A consolidation
+    The audio is the acceptance criterion: `deliver_combined_audio` stitches a
+    range into a single file (cached by file_id / media id afterwards), and only a
+    one-ayah portion goes through `deliver_quran`'s per-ayah path. A consolidation
     day wider than `MAX_RANGE_AYAHS` — a whole long surah — would be a download
     nobody wants, so it says so with the reader's existing "range too large"
     string instead of sending 200 files.
@@ -56,54 +55,38 @@ async def _send_drill(
     ref = Ref(KIND_RANGE, day.surah, day.start_ayah, day.surah, day.end_ayah)
     label = _portion_label(portion) if portion is not None else format_ref(ref)
 
-    await bot.send_message(
-        chat_id=chat_id, text=t("drill_title", ui_lang).format(ref=label, day=index, total=total)
-    )
-    # The Arabic image is the portion's opening ayah: `send_quran` renders one
+    await channel.send_text(t("drill_title", ui_lang).format(ref=label, day=index, total=total))
+    # The Arabic image is the portion's opening ayah: `deliver_quran` renders one
     # ayah per photo, and a fifty-photo album is not a drill.
-    await send_quran(
-        bot,
-        data,
-        day.surah,
-        day.start_ayah,
-        "arabic",
-        chat_id,
-        reciter,
-        ui_lang,
-        translation_lang,
+    await deliver_quran(
+        channel, data, day.surah, day.start_ayah, "arabic", reciter, ui_lang, translation_lang
     )
-    await bot.send_message(
-        chat_id=chat_id,
-        text=await _translation_text(day.surah, day.start_ayah, day.end_ayah, translation_lang),
-        parse_mode="HTML",
+    await channel.send_text(
+        await _translation_text(day.surah, day.start_ayah, day.end_ayah, translation_lang),
+        html=True,
     )
 
-    markup = _drill_keyboard(day.id, day.surah, day.start_ayah, ui_lang)
+    choices = _drill_keyboard(day.id, day.surah, day.start_ayah, ui_lang)
     ayahs = day.end_ayah - day.start_ayah + 1
     if ayahs == 1:
-        await send_quran(
-            bot,
+        await deliver_quran(
+            channel,
             data,
             day.surah,
             day.start_ayah,
             "audio",
-            chat_id,
             reciter,
             ui_lang,
             translation_lang,
-            reply_markup=markup,
+            choices=choices,
         )
     elif ayahs <= MAX_RANGE_AYAHS:
-        await send_combined_audio(
-            bot, day.surah, day.start_ayah, day.end_ayah, chat_id, reciter, reply_markup=markup
+        await deliver_combined_audio(
+            channel, day.surah, day.start_ayah, day.end_ayah, reciter, choices=choices
         )
     else:
         logger.warning("HIFZ: portion %s is %d ayahs; audio skipped" % (format_ref(ref), ayahs))
-        await bot.send_message(
-            chat_id=chat_id,
-            text=t("range_too_large", ui_lang).format(n=MAX_RANGE_AYAHS),
-            reply_markup=markup,
-        )
+        await channel.send_text(t("range_too_large", ui_lang).format(n=MAX_RANGE_AYAHS), choices)
 
 
 async def _start_drill(ctx: Ctx) -> None:
@@ -118,9 +101,7 @@ async def _start_drill(ctx: Ctx) -> None:
     if plan is None:
         paused = await ctx.store.plans.list_plans(ctx.user_id, PLAN_PAUSED)
         if paused:
-            await ctx.reply(
-                ctx.tr("plan_paused"), reply_markup=_plan_keyboard(paused[0], ctx.ui_lang)
-            )
+            await ctx.reply(ctx.tr("plan_paused"), choices=_plan_keyboard(paused[0], ctx.ui_lang))
         else:
             await ctx.reply(ctx.tr("drill_none_today"))
         return
@@ -133,11 +114,10 @@ async def _start_drill(ctx: Ctx) -> None:
     day = due[0]
     await ctx.store.plans.claim_plan_day(day.id)  # pending -> sent, once
     await _send_drill(
-        ctx.bot,
+        ctx.channel,
         ctx.data,
         ctx.file,
         ctx.store,
-        ctx.chat_id,
         plan,
         day,
         ctx.ui_lang,

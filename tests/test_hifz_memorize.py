@@ -323,14 +323,14 @@ class TestDrill:
         """D3's done-when: one combined file, not N."""
         calls = []
 
-        async def fake_combined(bot, surah, start, end, chat_id, performer, reply_markup=None):
+        async def fake_combined(channel, surah, start, end, performer, choices=None, **kw):
             calls.append((surah, start, end))
 
         async def fake_send_quran(*args, **kwargs):
             pass
 
-        monkeypatch.setattr(plan_drill, "send_combined_audio", fake_combined)
-        monkeypatch.setattr(plan_drill, "send_quran", fake_send_quran)
+        monkeypatch.setattr(plan_drill, "deliver_combined_audio", fake_combined)
+        monkeypatch.setattr(plan_drill, "deliver_quran", fake_send_quran)
 
         await _run_wizard()
         await _tap("hm:ok")
@@ -339,10 +339,19 @@ class TestDrill:
         day = (await store.plans.list_plan_days(plan.id))[0]
         assert day.end_ayah > day.start_ayah, "need a multi-ayah portion to test this"
 
+        from channels.telegram import TelegramChannel
         from infra.file_facade import File
 
         await memorize_feature._send_drill(
-            AsyncMock(), {}, File(), store, CHAT_ID, plan, day, "en", "en", "Husary_128kbps"
+            TelegramChannel(AsyncMock(), CHAT_ID),
+            {},
+            File(),
+            store,
+            plan,
+            day,
+            "en",
+            "en",
+            "Husary_128kbps",
         )
         assert len(calls) == 1
         assert calls[0] == (day.surah, day.start_ayah, day.end_ayah)

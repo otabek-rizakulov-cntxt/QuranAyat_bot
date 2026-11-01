@@ -21,11 +21,9 @@
 # pair `main.send_file` uses, so hammering /streak costs one render a day.
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 from bot.features import Ctx, callback, command
 from bot.streak_image import cache_key, render_streak_graph
-from channels.telegram import send_cached
+from channels import Choice
 from services.streaks import StreakSummary, streak_summary
 
 logger = logging.getLogger(__name__)
@@ -50,7 +48,7 @@ async def streak(ctx: Ctx) -> None:
         # a discouraging one, and it costs a render; the invitation is better.
         await ctx.reply(
             "%s\n\n%s" % (ctx.tr("streak_title"), ctx.tr("streak_none")),
-            reply_markup=_keyboard(ctx, summary),
+            choices=_keyboard(ctx, summary),
         )
         return
 
@@ -90,28 +88,23 @@ def _keyboard(ctx: Ctx, summary: StreakSummary):
     """
     if summary.active_today:
         return None
-    return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(ctx.tr("btn_check_start"), callback_data=CB_CHECK_START)]]
-    )
+    return [[Choice(ctx.tr("btn_check_start"), data=CB_CHECK_START)]]
 
 
 async def _send_graph(ctx: Ctx, summary: StreakSummary) -> None:
     """Send the graph through the file_id cache, rendering it only on a miss.
 
     A stale cached id is a miss, never an error — a user must never see a failed
-    /streak because of it (channels.telegram.send_cached).
+    /streak because of it (channels.telegram.send_cached, channels.whatsapp).
     """
 
     async def render():
         return await render_streak_graph(ctx.user_id, today=summary.today)
 
-    await send_cached(
-        ctx.bot,
-        "photo",
-        cache_key(ctx.user_id, summary.today),
+    await ctx.channel.send_image(
         render,
-        chat_id=ctx.chat_id,
-        upload_action=False,
         caption=_caption(ctx, summary),
-        reply_markup=_keyboard(ctx, summary),
+        choices=_keyboard(ctx, summary),
+        cache_key=cache_key(ctx.user_id, summary.today),
+        upload_action=False,
     )

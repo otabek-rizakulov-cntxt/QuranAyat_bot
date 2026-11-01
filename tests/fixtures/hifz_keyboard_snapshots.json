@@ -1,0 +1,2139 @@
+{
+ "check/options": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hc:a:67:12:20260731:0",
+     "text": "أ"
+    }
+   ],
+   [
+    {
+     "callback_data": "hc:a:67:12:20260731:1",
+     "text": "ب"
+    }
+   ],
+   [
+    {
+     "callback_data": "hc:a:67:12:20260731:2",
+     "text": "ت"
+    }
+   ]
+  ]
+ },
+ "custom_days/ar/()": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "اثن"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "ثلا"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "أرب"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "خمي"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "جمع"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "سبت"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "أحد"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "تأكيد"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "custom_days/ar/(1, 2, 3, 4, 5, 6, 7)": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "✅ اثن"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "✅ ثلا"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "✅ أرب"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "✅ خمي"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "✅ جمع"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "✅ سبت"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "✅ أحد"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "تأكيد"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "custom_days/ar/(1, 3, 5)": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "✅ اثن"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "ثلا"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "✅ أرب"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "خمي"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "✅ جمع"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "سبت"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "أحد"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "تأكيد"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "custom_days/en/()": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "Mon"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "Tue"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "Wed"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "Thu"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "Fri"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "Sat"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "Sun"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "Confirm"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "custom_days/en/(1, 2, 3, 4, 5, 6, 7)": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "✅ Mon"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "✅ Tue"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "✅ Wed"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "✅ Thu"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "✅ Fri"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "✅ Sat"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "✅ Sun"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "Confirm"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "custom_days/en/(1, 3, 5)": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "✅ Mon"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "Tue"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "✅ Wed"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "Thu"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "✅ Fri"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "Sat"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "Sun"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "Confirm"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "custom_days/uz/()": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "Dush"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "Sesh"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "Chor"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "Pay"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "Jum"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "Shan"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "Yak"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "Tasdiqlash"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "custom_days/uz/(1, 2, 3, 4, 5, 6, 7)": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "✅ Dush"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "✅ Sesh"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "✅ Chor"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "✅ Pay"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "✅ Jum"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "✅ Shan"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "✅ Yak"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "Tasdiqlash"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "custom_days/uz/(1, 3, 5)": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:dt:1",
+     "text": "✅ Dush"
+    },
+    {
+     "callback_data": "hm:dt:2",
+     "text": "Sesh"
+    },
+    {
+     "callback_data": "hm:dt:3",
+     "text": "✅ Chor"
+    },
+    {
+     "callback_data": "hm:dt:4",
+     "text": "Pay"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dt:5",
+     "text": "✅ Jum"
+    },
+    {
+     "callback_data": "hm:dt:6",
+     "text": "Shan"
+    },
+    {
+     "callback_data": "hm:dt:7",
+     "text": "Yak"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:dok",
+     "text": "Tasdiqlash"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "days/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:d:all",
+     "text": "كل يوم"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:d:wk",
+     "text": "أيام العمل"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:d:pick",
+     "text": "اختر الأيام"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "days/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:d:all",
+     "text": "Every day"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:d:wk",
+     "text": "Weekdays"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:d:pick",
+     "text": "Pick days"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "days/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:d:all",
+     "text": "Har kuni"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:d:wk",
+     "text": "Ish kunlari"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:d:pick",
+     "text": "Kun tanlash"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "drill/app/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:kn:7",
+     "text": "✅ حفظته عن ظهر قلب"
+    }
+   ],
+   [
+    {
+     "callback_data": "rep:67:1",
+     "text": "🔁 تكرار ×3"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "إيقاف مؤقت"
+    }
+   ],
+   [
+    {
+     "text": "📱 Open in app",
+     "web_app": {
+      "url": "https://app.example.org/drill"
+     }
+    }
+   ]
+  ]
+ },
+ "drill/app/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:kn:7",
+     "text": "✅ I know this by heart"
+    }
+   ],
+   [
+    {
+     "callback_data": "rep:67:1",
+     "text": "🔁 Repeat ×3"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "Pause plan"
+    }
+   ],
+   [
+    {
+     "text": "📱 Open in app",
+     "web_app": {
+      "url": "https://app.example.org/drill"
+     }
+    }
+   ]
+  ]
+ },
+ "drill/app/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:kn:7",
+     "text": "✅ Yod oldim"
+    }
+   ],
+   [
+    {
+     "callback_data": "rep:67:1",
+     "text": "🔁 Takror ×3"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "Rejani toʻxtatish"
+    }
+   ],
+   [
+    {
+     "text": "📱 Ilovada ochish",
+     "web_app": {
+      "url": "https://app.example.org/drill"
+     }
+    }
+   ]
+  ]
+ },
+ "drill/noapp/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:kn:7",
+     "text": "✅ حفظته عن ظهر قلب"
+    }
+   ],
+   [
+    {
+     "callback_data": "rep:67:1",
+     "text": "🔁 تكرار ×3"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "إيقاف مؤقت"
+    }
+   ]
+  ]
+ },
+ "drill/noapp/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:kn:7",
+     "text": "✅ I know this by heart"
+    }
+   ],
+   [
+    {
+     "callback_data": "rep:67:1",
+     "text": "🔁 Repeat ×3"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "Pause plan"
+    }
+   ]
+  ]
+ },
+ "drill/noapp/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:kn:7",
+     "text": "✅ Yod oldim"
+    }
+   ],
+   [
+    {
+     "callback_data": "rep:67:1",
+     "text": "🔁 Takror ×3"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "Rejani toʻxtatish"
+    }
+   ]
+  ]
+ },
+ "leaderboard/in/ar": null,
+ "leaderboard/in/en": null,
+ "leaderboard/in/uz": null,
+ "leaderboard/out/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:board:on",
+     "text": "الانضمام إلى الصدارة"
+    }
+   ]
+  ]
+ },
+ "leaderboard/out/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:board:on",
+     "text": "Join the leaderboard"
+    }
+   ]
+  ]
+ },
+ "leaderboard/out/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:board:on",
+     "text": "Reytingga qoʻshilish"
+    }
+   ]
+  ]
+ },
+ "offset/group": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "gr:tz:-12:00",
+     "text": "-12:00"
+    },
+    {
+     "callback_data": "gr:tz:-11:00",
+     "text": "-11:00"
+    },
+    {
+     "callback_data": "gr:tz:-10:00",
+     "text": "-10:00"
+    },
+    {
+     "callback_data": "gr:tz:-09:00",
+     "text": "-09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:-08:00",
+     "text": "-08:00"
+    },
+    {
+     "callback_data": "gr:tz:-07:00",
+     "text": "-07:00"
+    },
+    {
+     "callback_data": "gr:tz:-06:00",
+     "text": "-06:00"
+    },
+    {
+     "callback_data": "gr:tz:-05:00",
+     "text": "-05:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:-04:00",
+     "text": "-04:00"
+    },
+    {
+     "callback_data": "gr:tz:-03:30",
+     "text": "-03:30"
+    },
+    {
+     "callback_data": "gr:tz:-03:00",
+     "text": "-03:00"
+    },
+    {
+     "callback_data": "gr:tz:-02:00",
+     "text": "-02:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:-01:00",
+     "text": "-01:00"
+    },
+    {
+     "callback_data": "gr:tz:+00:00",
+     "text": "+00:00"
+    },
+    {
+     "callback_data": "gr:tz:+01:00",
+     "text": "+01:00"
+    },
+    {
+     "callback_data": "gr:tz:+02:00",
+     "text": "+02:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:+03:00",
+     "text": "+03:00"
+    },
+    {
+     "callback_data": "gr:tz:+03:30",
+     "text": "+03:30"
+    },
+    {
+     "callback_data": "gr:tz:+04:00",
+     "text": "+04:00"
+    },
+    {
+     "callback_data": "gr:tz:+04:30",
+     "text": "+04:30"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:+05:00",
+     "text": "+05:00"
+    },
+    {
+     "callback_data": "gr:tz:+05:30",
+     "text": "+05:30"
+    },
+    {
+     "callback_data": "gr:tz:+05:45",
+     "text": "+05:45"
+    },
+    {
+     "callback_data": "gr:tz:+06:00",
+     "text": "+06:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:+06:30",
+     "text": "+06:30"
+    },
+    {
+     "callback_data": "gr:tz:+07:00",
+     "text": "+07:00"
+    },
+    {
+     "callback_data": "gr:tz:+08:00",
+     "text": "+08:00"
+    },
+    {
+     "callback_data": "gr:tz:+09:00",
+     "text": "+09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:+09:30",
+     "text": "+09:30"
+    },
+    {
+     "callback_data": "gr:tz:+10:00",
+     "text": "+10:00"
+    },
+    {
+     "callback_data": "gr:tz:+11:00",
+     "text": "+11:00"
+    },
+    {
+     "callback_data": "gr:tz:+12:00",
+     "text": "+12:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "gr:tz:+13:00",
+     "text": "+13:00"
+    },
+    {
+     "callback_data": "gr:tz:+14:00",
+     "text": "+14:00"
+    }
+   ]
+  ]
+ },
+ "offset/memorize": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:tz:-12:00",
+     "text": "UTC-12:00"
+    },
+    {
+     "callback_data": "hm:tz:-11:00",
+     "text": "UTC-11:00"
+    },
+    {
+     "callback_data": "hm:tz:-10:00",
+     "text": "UTC-10:00"
+    },
+    {
+     "callback_data": "hm:tz:-09:00",
+     "text": "UTC-09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:-08:00",
+     "text": "UTC-08:00"
+    },
+    {
+     "callback_data": "hm:tz:-07:00",
+     "text": "UTC-07:00"
+    },
+    {
+     "callback_data": "hm:tz:-06:00",
+     "text": "UTC-06:00"
+    },
+    {
+     "callback_data": "hm:tz:-05:00",
+     "text": "UTC-05:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:-04:00",
+     "text": "UTC-04:00"
+    },
+    {
+     "callback_data": "hm:tz:-03:30",
+     "text": "UTC-03:30"
+    },
+    {
+     "callback_data": "hm:tz:-03:00",
+     "text": "UTC-03:00"
+    },
+    {
+     "callback_data": "hm:tz:-02:00",
+     "text": "UTC-02:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:-01:00",
+     "text": "UTC-01:00"
+    },
+    {
+     "callback_data": "hm:tz:+00:00",
+     "text": "UTC+00:00"
+    },
+    {
+     "callback_data": "hm:tz:+01:00",
+     "text": "UTC+01:00"
+    },
+    {
+     "callback_data": "hm:tz:+02:00",
+     "text": "UTC+02:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:+03:00",
+     "text": "UTC+03:00"
+    },
+    {
+     "callback_data": "hm:tz:+03:30",
+     "text": "UTC+03:30"
+    },
+    {
+     "callback_data": "hm:tz:+04:00",
+     "text": "UTC+04:00"
+    },
+    {
+     "callback_data": "hm:tz:+04:30",
+     "text": "UTC+04:30"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:+05:00",
+     "text": "UTC+05:00"
+    },
+    {
+     "callback_data": "hm:tz:+05:30",
+     "text": "UTC+05:30"
+    },
+    {
+     "callback_data": "hm:tz:+05:45",
+     "text": "UTC+05:45"
+    },
+    {
+     "callback_data": "hm:tz:+06:00",
+     "text": "UTC+06:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:+06:30",
+     "text": "UTC+06:30"
+    },
+    {
+     "callback_data": "hm:tz:+07:00",
+     "text": "UTC+07:00"
+    },
+    {
+     "callback_data": "hm:tz:+08:00",
+     "text": "UTC+08:00"
+    },
+    {
+     "callback_data": "hm:tz:+09:00",
+     "text": "UTC+09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:+09:30",
+     "text": "UTC+09:30"
+    },
+    {
+     "callback_data": "hm:tz:+10:00",
+     "text": "UTC+10:00"
+    },
+    {
+     "callback_data": "hm:tz:+11:00",
+     "text": "UTC+11:00"
+    },
+    {
+     "callback_data": "hm:tz:+12:00",
+     "text": "UTC+12:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:tz:+13:00",
+     "text": "UTC+13:00"
+    },
+    {
+     "callback_data": "hm:tz:+14:00",
+     "text": "UTC+14:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "offset/profile": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:tz:-12:00",
+     "text": "-12:00"
+    },
+    {
+     "callback_data": "hp:tz:-11:00",
+     "text": "-11:00"
+    },
+    {
+     "callback_data": "hp:tz:-10:00",
+     "text": "-10:00"
+    },
+    {
+     "callback_data": "hp:tz:-09:00",
+     "text": "-09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:-08:00",
+     "text": "-08:00"
+    },
+    {
+     "callback_data": "hp:tz:-07:00",
+     "text": "-07:00"
+    },
+    {
+     "callback_data": "hp:tz:-06:00",
+     "text": "-06:00"
+    },
+    {
+     "callback_data": "hp:tz:-05:00",
+     "text": "-05:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:-04:00",
+     "text": "-04:00"
+    },
+    {
+     "callback_data": "hp:tz:-03:30",
+     "text": "-03:30"
+    },
+    {
+     "callback_data": "hp:tz:-03:00",
+     "text": "-03:00"
+    },
+    {
+     "callback_data": "hp:tz:-02:00",
+     "text": "-02:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:-01:00",
+     "text": "-01:00"
+    },
+    {
+     "callback_data": "hp:tz:+00:00",
+     "text": "+00:00"
+    },
+    {
+     "callback_data": "hp:tz:+01:00",
+     "text": "+01:00"
+    },
+    {
+     "callback_data": "hp:tz:+02:00",
+     "text": "+02:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:+03:00",
+     "text": "+03:00"
+    },
+    {
+     "callback_data": "hp:tz:+03:30",
+     "text": "+03:30"
+    },
+    {
+     "callback_data": "hp:tz:+04:00",
+     "text": "+04:00"
+    },
+    {
+     "callback_data": "hp:tz:+04:30",
+     "text": "+04:30"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:+05:00",
+     "text": "+05:00"
+    },
+    {
+     "callback_data": "hp:tz:+05:30",
+     "text": "+05:30"
+    },
+    {
+     "callback_data": "hp:tz:+05:45",
+     "text": "+05:45"
+    },
+    {
+     "callback_data": "hp:tz:+06:00",
+     "text": "+06:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:+06:30",
+     "text": "+06:30"
+    },
+    {
+     "callback_data": "hp:tz:+07:00",
+     "text": "+07:00"
+    },
+    {
+     "callback_data": "hp:tz:+08:00",
+     "text": "+08:00"
+    },
+    {
+     "callback_data": "hp:tz:+09:00",
+     "text": "+09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:+09:30",
+     "text": "+09:30"
+    },
+    {
+     "callback_data": "hp:tz:+10:00",
+     "text": "+10:00"
+    },
+    {
+     "callback_data": "hp:tz:+11:00",
+     "text": "+11:00"
+    },
+    {
+     "callback_data": "hp:tz:+12:00",
+     "text": "+12:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz:+13:00",
+     "text": "+13:00"
+    },
+    {
+     "callback_data": "hp:tz:+14:00",
+     "text": "+14:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:main",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "pace/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:p:0",
+     "text": "اختر لي"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:p:1",
+     "text": "1"
+    },
+    {
+     "callback_data": "hm:p:2",
+     "text": "2"
+    },
+    {
+     "callback_data": "hm:p:3",
+     "text": "3"
+    },
+    {
+     "callback_data": "hm:p:5",
+     "text": "5"
+    },
+    {
+     "callback_data": "hm:p:10",
+     "text": "10"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:p:c",
+     "text": "✏️"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "pace/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:p:0",
+     "text": "Choose for me"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:p:1",
+     "text": "1"
+    },
+    {
+     "callback_data": "hm:p:2",
+     "text": "2"
+    },
+    {
+     "callback_data": "hm:p:3",
+     "text": "3"
+    },
+    {
+     "callback_data": "hm:p:5",
+     "text": "5"
+    },
+    {
+     "callback_data": "hm:p:10",
+     "text": "10"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:p:c",
+     "text": "✏️"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "pace/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:p:0",
+     "text": "Men uchun tanlang"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:p:1",
+     "text": "1"
+    },
+    {
+     "callback_data": "hm:p:2",
+     "text": "2"
+    },
+    {
+     "callback_data": "hm:p:3",
+     "text": "3"
+    },
+    {
+     "callback_data": "hm:p:5",
+     "text": "5"
+    },
+    {
+     "callback_data": "hm:p:10",
+     "text": "10"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:p:c",
+     "text": "✏️"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "plan/ar/abandoned": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "ترك الخطة"
+    }
+   ]
+  ]
+ },
+ "plan/ar/active": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:go",
+     "text": "ابدأ ورد اليوم"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "إيقاف مؤقت"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "ترك الخطة"
+    }
+   ]
+  ]
+ },
+ "plan/ar/paused": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:rs",
+     "text": "استئناف الخطة"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "ترك الخطة"
+    }
+   ]
+  ]
+ },
+ "plan/en/abandoned": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "Abandon plan"
+    }
+   ]
+  ]
+ },
+ "plan/en/active": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:go",
+     "text": "Start today's portion"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "Pause plan"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "Abandon plan"
+    }
+   ]
+  ]
+ },
+ "plan/en/paused": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:rs",
+     "text": "Resume plan"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "Abandon plan"
+    }
+   ]
+  ]
+ },
+ "plan/uz/abandoned": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "Rejani bekor qilish"
+    }
+   ]
+  ]
+ },
+ "plan/uz/active": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:go",
+     "text": "Bugungi ulush"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ps",
+     "text": "Rejani toʻxtatish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "Rejani bekor qilish"
+    }
+   ]
+  ]
+ },
+ "plan/uz/paused": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:rs",
+     "text": "Rejani davom ettirish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:ab",
+     "text": "Rejani bekor qilish"
+    }
+   ]
+  ]
+ },
+ "preview/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:ok",
+     "text": "ابدأ هذه الخطة"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "preview/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:ok",
+     "text": "Start this plan"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "preview/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:ok",
+     "text": "Rejani boshlash"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "profile/fresh/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:name",
+     "text": "تغيير الاسم"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:board:on",
+     "text": "الانضمام إلى الصدارة"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz",
+     "text": "تغيير المنطقة الزمنية"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:rem",
+     "text": "تغيير وقت التذكير"
+    }
+   ]
+  ]
+ },
+ "profile/fresh/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:name",
+     "text": "Change name"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:board:on",
+     "text": "Join the leaderboard"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz",
+     "text": "Change time zone"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:rem",
+     "text": "Change reminder time"
+    }
+   ]
+  ]
+ },
+ "profile/fresh/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:name",
+     "text": "Ismni oʻzgartirish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:board:on",
+     "text": "Reytingga qoʻshilish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz",
+     "text": "Mintaqani oʻzgartirish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:rem",
+     "text": "Eslatmani oʻzgartirish"
+    }
+   ]
+  ]
+ },
+ "profile/joined/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:name",
+     "text": "تغيير الاسم"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:board:off",
+     "text": "الخروج من الصدارة"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz",
+     "text": "تغيير المنطقة الزمنية"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:rem",
+     "text": "تغيير وقت التذكير"
+    }
+   ]
+  ]
+ },
+ "profile/joined/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:name",
+     "text": "Change name"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:board:off",
+     "text": "Leave the leaderboard"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz",
+     "text": "Change time zone"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:rem",
+     "text": "Change reminder time"
+    }
+   ]
+  ]
+ },
+ "profile/joined/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:name",
+     "text": "Ismni oʻzgartirish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:board:off",
+     "text": "Reytingdan chiqish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:tz",
+     "text": "Mintaqani oʻzgartirish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:rem",
+     "text": "Eslatmani oʻzgartirish"
+    }
+   ]
+  ]
+ },
+ "profile_reminder/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:rem:off",
+     "text": "إيقاف التذكير"
+    }
+   ]
+  ]
+ },
+ "profile_reminder/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:rem:off",
+     "text": "Turn reminders off"
+    }
+   ]
+  ]
+ },
+ "profile_reminder/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:rem:off",
+     "text": "Eslatmani oʻchirish"
+    }
+   ]
+  ]
+ },
+ "profile_reminder_cancel/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:rem:off",
+     "text": "إيقاف التذكير"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:main",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "profile_reminder_cancel/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:rem:off",
+     "text": "Turn reminders off"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:main",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "profile_reminder_cancel/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hp:rem:off",
+     "text": "Eslatmani oʻchirish"
+    }
+   ],
+   [
+    {
+     "callback_data": "hp:main",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "progress/empty/ar": null,
+ "progress/empty/en": null,
+ "progress/empty/uz": null,
+ "progress/focus36/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hg:s:1",
+     "text": "Al-Faatiha"
+    },
+    {
+     "callback_data": "hg:s:67",
+     "text": "Al-Mulk"
+    }
+   ],
+   [
+    {
+     "callback_data": "hg:s:112",
+     "text": "Al-Ikhlaas"
+    }
+   ]
+  ]
+ },
+ "progress/focus36/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hg:s:1",
+     "text": "Al-Faatiha"
+    },
+    {
+     "callback_data": "hg:s:67",
+     "text": "Al-Mulk"
+    }
+   ],
+   [
+    {
+     "callback_data": "hg:s:112",
+     "text": "Al-Ikhlaas"
+    }
+   ]
+  ]
+ },
+ "progress/focus36/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hg:s:1",
+     "text": "Al-Faatiha"
+    },
+    {
+     "callback_data": "hg:s:67",
+     "text": "Al-Mulk"
+    }
+   ],
+   [
+    {
+     "callback_data": "hg:s:112",
+     "text": "Al-Ikhlaas"
+    }
+   ]
+  ]
+ },
+ "progress/some/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hg:s:36",
+     "text": "Yaseen"
+    },
+    {
+     "callback_data": "hg:s:67",
+     "text": "Al-Mulk"
+    }
+   ],
+   [
+    {
+     "callback_data": "hg:s:112",
+     "text": "Al-Ikhlaas"
+    }
+   ]
+  ]
+ },
+ "progress/some/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hg:s:36",
+     "text": "Yaseen"
+    },
+    {
+     "callback_data": "hg:s:67",
+     "text": "Al-Mulk"
+    }
+   ],
+   [
+    {
+     "callback_data": "hg:s:112",
+     "text": "Al-Ikhlaas"
+    }
+   ]
+  ]
+ },
+ "progress/some/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hg:s:36",
+     "text": "Yaseen"
+    },
+    {
+     "callback_data": "hg:s:67",
+     "text": "Al-Mulk"
+    }
+   ],
+   [
+    {
+     "callback_data": "hg:s:112",
+     "text": "Al-Ikhlaas"
+    }
+   ]
+  ]
+ },
+ "reminder/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:rt:05:00",
+     "text": "05:00"
+    },
+    {
+     "callback_data": "hm:rt:07:00",
+     "text": "07:00"
+    },
+    {
+     "callback_data": "hm:rt:09:00",
+     "text": "09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:rt:12:00",
+     "text": "12:00"
+    },
+    {
+     "callback_data": "hm:rt:18:00",
+     "text": "18:00"
+    },
+    {
+     "callback_data": "hm:rt:21:00",
+     "text": "21:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "reminder/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:rt:05:00",
+     "text": "05:00"
+    },
+    {
+     "callback_data": "hm:rt:07:00",
+     "text": "07:00"
+    },
+    {
+     "callback_data": "hm:rt:09:00",
+     "text": "09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:rt:12:00",
+     "text": "12:00"
+    },
+    {
+     "callback_data": "hm:rt:18:00",
+     "text": "18:00"
+    },
+    {
+     "callback_data": "hm:rt:21:00",
+     "text": "21:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "reminder/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:rt:05:00",
+     "text": "05:00"
+    },
+    {
+     "callback_data": "hm:rt:07:00",
+     "text": "07:00"
+    },
+    {
+     "callback_data": "hm:rt:09:00",
+     "text": "09:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:rt:12:00",
+     "text": "12:00"
+    },
+    {
+     "callback_data": "hm:rt:18:00",
+     "text": "18:00"
+    },
+    {
+     "callback_data": "hm:rt:21:00",
+     "text": "21:00"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ },
+ "streak/False/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hc:start",
+     "text": "اختبرني"
+    }
+   ]
+  ]
+ },
+ "streak/False/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hc:start",
+     "text": "Test me"
+    }
+   ]
+  ]
+ },
+ "streak/False/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hc:start",
+     "text": "Meni sinang"
+    }
+   ]
+  ]
+ },
+ "streak/True/ar": null,
+ "streak/True/en": null,
+ "streak/True/uz": null,
+ "target/ar": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:t:s",
+     "text": "سورة"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:t:j",
+     "text": "جزء"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:t:r",
+     "text": "نطاق"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "إلغاء"
+    }
+   ]
+  ]
+ },
+ "target/en": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:t:s",
+     "text": "A surah"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:t:j",
+     "text": "A juz"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:t:r",
+     "text": "A range"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Cancel"
+    }
+   ]
+  ]
+ },
+ "target/uz": {
+  "inline_keyboard": [
+   [
+    {
+     "callback_data": "hm:t:s",
+     "text": "Sura"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:t:j",
+     "text": "Juz"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:t:r",
+     "text": "Oraliq"
+    }
+   ],
+   [
+    {
+     "callback_data": "hm:x",
+     "text": "Bekor qilish"
+    }
+   ]
+  ]
+ }
+}

@@ -313,4 +313,7 @@ strings = {
     "daily_btn_no": "Not now",
     "daily_enabled": "Done. Your verse of the day arrives every day at {time}.",
     "daily_disabled": "Verse of the day is turned off.",
+    "wa_reminder_consent": "Should BismillahBot remind you here on WhatsApp every day at {time} to memorize? Reply STOP at any time to stop.",
+    "wa_reminders_on": "Reminders are on. Reply STOP at any time to stop them.",
+    "wa_reminders_off": "No reminders. Type memorize and tap the start button whenever you are ready.",
 }

@@ -2,10 +2,8 @@
 preview -> confirm. The typed steps and the taps both land here; memorize.py
 routes them."""
 
-from datetime import date, time
+from datetime import date, datetime, time, timezone
 from typing import Optional
-
-from telegram import InlineKeyboardMarkup
 
 import services.plans as plans_service
 from bot.features import Ctx
@@ -37,18 +35,19 @@ from bot.features._plan_keyboards import (
 )
 from bot.features._plan_preview import _show_preview
 from bot.features.profile import format_reminder_time, parse_reminder_time
-from bot.keyboards.time_pickers import offset_keyboard
+from bot.keyboards.time_pickers import offset_choices
+from channels import WHATSAPP, Choice
 from domain.localtime import DEFAULT_OFFSET, is_valid_offset, normalize_offset
 from domain.plan_builder import AUTO_PACE
 from domain.refs import juz_ref, parse_reference, surah_ref
 
 
 async def _ask_pace(ctx: Ctx) -> None:
-    await ctx.edit(ctx.tr("memorize_choose_pace"), reply_markup=_pace_keyboard(ctx.ui_lang))
+    await ctx.edit(ctx.tr("memorize_choose_pace"), choices=_pace_keyboard(ctx.ui_lang))
 
 
 async def _ask_days(ctx: Ctx) -> None:
-    await ctx.edit(ctx.tr("memorize_choose_days"), reply_markup=_days_keyboard(ctx.ui_lang))
+    await ctx.edit(ctx.tr("memorize_choose_days"), choices=_days_keyboard(ctx.ui_lang))
 
 
 async def _after_days(ctx: Ctx) -> None:
@@ -67,9 +66,7 @@ async def _after_days(ctx: Ctx) -> None:
             return
         await ctx.edit(
             ctx.tr("timezone_prompt"),
-            reply_markup=offset_keyboard(
-                ctx.ui_lang, "hm:tz:", label_prefix="UTC", cancel_data="hm:x"
-            ),
+            choices=offset_choices(ctx.ui_lang, "hm:tz:", label_prefix="UTC", cancel_data="hm:x"),
         )
         return
 
@@ -80,7 +77,7 @@ async def _after_days(ctx: Ctx) -> None:
         if ctx.wiz.update(ctx.user_id, step=STEP_REMINDER, offset=normalize_offset(offset)) is None:
             await _expired(ctx)
             return
-        await ctx.edit(ctx.tr("reminder_prompt"), reply_markup=_reminder_keyboard(ctx.ui_lang))
+        await ctx.edit(ctx.tr("reminder_prompt"), choices=_reminder_keyboard(ctx.ui_lang))
         return
 
     if (
@@ -155,9 +152,7 @@ async def _tap_target(ctx: Ctx, arg: str) -> None:
     if ctx.wiz.update(ctx.user_id, step=STEP_TARGET_TEXT, tk=arg) is None:
         await _expired(ctx)
         return
-    await ctx.edit(
-        ctx.tr(prompts[arg]), reply_markup=InlineKeyboardMarkup([_cancel_row(ctx.ui_lang)])
-    )
+    await ctx.edit(ctx.tr(prompts[arg]), choices=[_cancel_row(ctx.ui_lang)])
 
 
 async def _tap_pace(ctx: Ctx, arg: str) -> None:
@@ -168,7 +163,7 @@ async def _tap_pace(ctx: Ctx, arg: str) -> None:
             return
         await ctx.edit(
             ctx.tr("memorize_pace_prompt"),
-            reply_markup=InlineKeyboardMarkup([_cancel_row(ctx.ui_lang)]),
+            choices=[_cancel_row(ctx.ui_lang)],
         )
         return
     pace = int(arg) if arg.isdigit() else AUTO_PACE
@@ -188,7 +183,7 @@ async def _tap_days(ctx: Ctx, arg: str) -> None:
             return
         await ctx.edit(
             ctx.tr("memorize_days_prompt"),
-            reply_markup=_custom_days_keyboard(WEEKDAYS, ctx.ui_lang),
+            choices=_custom_days_keyboard(WEEKDAYS, ctx.ui_lang),
         )
         return
     days = list(DAILY) if arg == "all" else list(WEEKDAYS)
@@ -210,7 +205,7 @@ async def _tap_day_toggle(ctx: Ctx, arg: str) -> None:
         return
     await ctx.edit(
         ctx.tr("memorize_days_prompt"),
-        reply_markup=_custom_days_keyboard(sorted(chosen), ctx.ui_lang),
+        choices=_custom_days_keyboard(sorted(chosen), ctx.ui_lang),
     )
 
 
@@ -221,7 +216,7 @@ async def _tap_days_confirm(ctx: Ctx) -> None:
         # An empty week cannot be materialized at all (build_plan raises), so the
         # picker simply stays open.
         await ctx.edit(
-            ctx.tr("memorize_days_prompt"), reply_markup=_custom_days_keyboard((), ctx.ui_lang)
+            ctx.tr("memorize_days_prompt"), choices=_custom_days_keyboard((), ctx.ui_lang)
         )
         return
     await _after_days(ctx)
@@ -282,5 +277,37 @@ async def _save_plan(ctx: Ctx) -> None:
     ctx.wiz.clear(ctx.user_id)
     await ctx.reply(
         ctx.tr("plan_saved").format(first_date=first.isoformat()),
-        reply_markup=_plan_keyboard(plan, ctx.ui_lang),
+        choices=_plan_keyboard(plan, ctx.ui_lang),
     )
+    await _ask_reminder_consent(ctx, data.get("time") or "07:00")
+
+
+async def _ask_reminder_consent(ctx: Ctx, reminder: str) -> None:
+    """On WhatsApp, daily reminders need explicit opt-in naming us and the channel.
+
+    Without it the plan still works — "Start today's portion" delivers on demand —
+    but no reminder is pushed (memorize.push_plan_day checks before it claims).
+    """
+    if ctx.platform != WHATSAPP:
+        return
+    row = await ctx.store.identity.get_by_user(ctx.user_id, WHATSAPP)
+    if row is not None and row.consented:
+        return
+    await ctx.reply(
+        ctx.tr("wa_reminder_consent", time=reminder),
+        [
+            [
+                Choice(ctx.tr("daily_btn_yes"), data="hm:cy"),
+                Choice(ctx.tr("daily_btn_no"), data="hm:cn"),
+            ]
+        ],
+    )
+
+
+async def _tap_reminder_consent(ctx: Ctx, allowed: bool) -> None:
+    await ctx.answer()
+    if allowed:
+        await ctx.store.identity.opt_in(ctx.user_id, WHATSAPP, datetime.now(timezone.utc))
+        await ctx.reply(ctx.tr("wa_reminders_on"))
+    else:
+        await ctx.reply(ctx.tr("wa_reminders_off"))

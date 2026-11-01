@@ -259,3 +259,11 @@ class TestTheRest:
         assert (built.wa_id, built.chat_id, built.caps.can_edit) == (WA_ID, UID, False)
         with pytest.raises(ValueError):
             for_platform(WHATSAPP, external_id=WA_ID)
+
+
+class TestNumberedMenuLifetime:
+    async def test_a_later_message_retires_the_menu(self, channel, graph):
+        await channel.send_text("Pick", taps(*["Option %d" % n for n in range(12)]))
+        assert choice_memory.pick(UID, "2") == "d:1"
+        await channel.send_text("How many ayat a day?")
+        assert choice_memory.pick(UID, "2") is None  # now a typed answer, not option 2

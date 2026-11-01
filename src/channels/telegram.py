@@ -121,6 +121,9 @@ class TelegramChannel:
 
     def _opts(self, choices: Optional[Choices], html: bool, opts: dict) -> dict:
         """Merge the neutral arguments into Telegram kwargs; explicit ones win."""
+        if isinstance(opts.get("reply_markup"), list):
+            # Choices passed where Telegram markup was expected: a missed conversion.
+            raise TypeError("pass Choices as choices=, not reply_markup=")
         markup = to_markup(choices)
         if markup is not None:
             opts.setdefault("reply_markup", markup)

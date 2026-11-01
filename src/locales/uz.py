@@ -288,4 +288,7 @@ strings = {
     "daily_btn_no": "Hozir emas",
     "daily_enabled": "Tayyor. Kun oyati har kuni soat {time} da keladi.",
     "daily_disabled": "Kun oyati oʻchirildi.",
+    "wa_reminder_consent": "BismillahBot sizga har kuni soat {time} da shu yerda, WhatsApp'da, yodlashni eslatib tursinmi? Toʻxtatish uchun istalgan vaqtda STOP deb yozing.",
+    "wa_reminders_on": "Eslatmalar yoqildi. Toʻxtatish uchun STOP deb yozing.",
+    "wa_reminders_off": "Eslatmasiz. Tayyor boʻlganingizda yodlash deb yozing va boshlash tugmasini bosing.",
 }

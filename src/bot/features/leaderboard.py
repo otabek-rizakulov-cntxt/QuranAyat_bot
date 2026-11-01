@@ -23,9 +23,9 @@
 # user-supplied, and the surest way to keep a name out of the markup parser is to
 # have no markup parser. Nothing is escaped because nothing is interpreted.
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.features import Ctx, callback, command
+from channels import Choice
 from services.leaderboard import weekly_board
 
 # --- callback_data shapes ------------------------------------------------------
@@ -46,7 +46,7 @@ ANONYMOUS = "—"
 async def leaderboard(ctx: Ctx) -> None:
     """`/leaderboard` — this week's global board, in DM."""
     text, markup = await _board_message(ctx)
-    await ctx.reply(text, reply_markup=markup)
+    await ctx.reply(text, choices=markup)
 
 
 @callback("hl:")
@@ -58,7 +58,7 @@ async def on_leaderboard(ctx: Ctx, cb_data: str) -> None:
 
 
 async def _board_message(ctx: Ctx):
-    """(text, reply_markup) for the current week as this caller sees it."""
+    """(text, choices) for the current week as this caller sees it."""
     board = await weekly_board(ctx.user_id)
     lines = [ctx.tr("leaderboard_title")]
 
@@ -85,8 +85,6 @@ async def _board_message(ctx: Ctx):
     markup = None
     if not board.opted_in:
         lines.append(ctx.tr("leaderboard_not_opted_in"))
-        markup = InlineKeyboardMarkup(
-            [[InlineKeyboardButton(ctx.tr("btn_join_board"), callback_data=CB_JOIN)]]
-        )
+        markup = [[Choice(ctx.tr("btn_join_board"), data=CB_JOIN)]]
 
     return "\n".join(lines), markup

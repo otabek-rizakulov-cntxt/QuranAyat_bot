@@ -338,17 +338,17 @@ Real-phone steps are gated by P0.2–P0.4; all code and tests can land before.
 
 ### Phase 3 — Hifz on WhatsApp
 
-- [ ] **P3.1 — Convert the hifz features** to `Choices` + channel, with
+- [x] **P3.1 — Convert the hifz features** ✅ 2026-11-02 to `Choices` + channel, with
   snapshots first, as in P1.3:
   - `features/_plan_*`, `memorize.py`;
   - `check.py`, `progress.py`, `streak.py`, `leaderboard.py`, `profile.py`.
-- [ ] **P3.2 — Plan wizard** over list messages + numbered replies;
+- [x] **P3.2 — Plan wizard** ✅ 2026-11-02 over list messages + numbered replies;
   `router.dispatch_wizard` unchanged.
-- [ ] **P3.3 — Recall checks** with 3 reply buttons (✅ knew it / 🟨 partly /
+- [x] **P3.3 — Recall checks** ✅ 2026-11-02 with 3 reply buttons (✅ knew it / 🟨 partly /
   ❌ forgot), mapped to the `services/check` outcomes.
-- [ ] **P3.4 — `push_plan_day` through `deliver_push`** with the
+- [x] **P3.4 — `push_plan_day` through `deliver_push`** ✅ 2026-11-02 with the
   `drill_reminder` template.
-- [ ] **P3.5 — Remove `Ctx.bot` / `SendCtx.bot`.** Group code keeps a
+- [x] ~~**P3.5 — Remove `Ctx.bot` / `SendCtx.bot`.**~~ **Changed 2026-11-02** (see §12). Group code keeps a
   `TelegramChannel`.
 
 *Done when (phase):* one hifz scenario suite, parametrized over fake Telegram and
@@ -505,6 +505,25 @@ cost of daily pushes, and whether groups matter.
   `vc:tr:S:A`, so tapping it opens the card *and* reopens the free window.
   **P0.3 must submit** `daily_ayah` with body params {{1}} reference,
   {{2}} translation (≤600 chars) and one quick-reply button, in en/ru/uz.
+- 2026-11-02 — **Phase 3 done.** Every hifz feature (plan wizard, drill,
+  check, progress, streak, leaderboard, profile) sends through `ctx.channel`
+  with `Choices`; 76 keyboard snapshots recorded beforehand still match. The
+  drill push goes through `deliver_push` with a `drill_reminder` template whose
+  button is `hm:go` (the day stays due until completed, so the tap delivers it).
+  WhatsApp needs opt-in for reminders: saving a plan there asks (`hm:cy`/`hm:cn`);
+  without it no reminder is pushed — checked *before* the day is claimed — but
+  "start today's portion" still works. Plan pushes are queued on the user's
+  `identity.home_platform`. A numbered WhatsApp menu now answers only while it is
+  the latest message, so numbers typed into wizard prompts are not hijacked.
+  `/start <payload>` (a Telegram deep link) is ignored on WhatsApp.
+  **P3.5 changed:** `Ctx.bot` stays — it is the Telegram client behind the
+  Telegram channel and the Telegram-only group feature (forum topics, membership
+  checks have no channel form). `tests/test_channel_seam.py` pins which modules
+  may still touch Telegram, so nothing cross-platform can regress onto it.
+  Done-when met: `tests/test_hifz_cross_platform.py` runs a week of drills on
+  both platforms through their real entry points and asserts identical state
+  trails. **P0.3 must also submit** `drill_reminder` ({{1}} portion reference,
+  one quick-reply button).
 
 ## References
 

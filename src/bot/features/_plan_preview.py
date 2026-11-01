@@ -42,9 +42,7 @@ async def _show_preview(ctx: Ctx) -> None:
         return
 
     portions = build_plan(ref, int(data.get("pace") or AUTO_PACE), days, start_date)
-    await ctx.edit(
-        _preview_text(portions, ctx.ui_lang), reply_markup=_preview_keyboard(ctx.ui_lang)
-    )
+    await ctx.edit(_preview_text(portions, ctx.ui_lang), choices=_preview_keyboard(ctx.ui_lang))
 
 
 def _preview_text(portions: Sequence[Portion], ui_lang: str) -> str:

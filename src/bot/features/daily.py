@@ -30,7 +30,7 @@ from channels import WHATSAPP, Choice
 from domain.daily_ayah import ayah_for
 from domain.localtime import local_date
 from infra.scheduler import SendCtx, schedule_daily, send_handler
-from infra.scheduler.push import DROPPED, Template, deliver_push
+from infra.scheduler.push import DROPPED, Template, deliver_push, template_lang
 from locales import t
 from services.user_settings import UserSettings
 
@@ -40,9 +40,6 @@ SEND_KIND = "daily_ayah"
 CB = "hd:"
 TIMES = ("05:00", "06:00", "07:00", "08:00", "09:00", "12:00", "18:00", "20:00", "21:00")
 
-# WhatsApp template languages approved for `daily_ayah` (MULTI_PLATFORM_PLAN P0.3).
-# A UI language without its own template gets the English one.
-TEMPLATE_LANGS = {"en": "en", "ru": "ru", "uz": "uz", "uz-Cyrl": "uz"}
 TEMPLATE_TEXT_MAX = 600  # leaves room in the 1,024-char body for the template's own words
 
 
@@ -179,7 +176,7 @@ async def push_daily(ctx: SendCtx) -> None:
     card = await build_verse_text(surah, ayah, "translation", ui_lang, translation_lang, ctx.data)
     template = Template(
         SEND_KIND,
-        TEMPLATE_LANGS.get(ui_lang, "en"),
+        template_lang(ui_lang),
         [reference(surah, ayah, ui_lang), _template_text(card)],
         ["vc:tr:%d:%d" % (surah, ayah)],
     )

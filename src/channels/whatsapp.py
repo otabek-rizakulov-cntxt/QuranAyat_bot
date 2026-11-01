@@ -230,13 +230,14 @@ class WhatsAppChannel:
                 "action": {"button": LIST_BUTTON, "sections": [{"title": " ", "rows": rows}]},
             }
             return await self._send({"type": "interactive", "interactive": message})
-        # Too many for a list: numbered lines, answered by typing the number.
-        choice_memory.remember(self.chat_id, [c.data for c in taps])
+        # Too many for a list: numbered lines, answered by typing the number —
+        # remembered after sending, since every send forgets the previous menu.
         lines = "\n".join("%d. %s" % (n, c.label) for n, c in enumerate(taps, 1))
         text = body + "\n\n" + lines if body != CHOICES_BODY else lines
         last = None
         for chunk in split(text):
             last = await self._send({"type": "text", "text": {"body": chunk}})
+        choice_memory.remember(self.chat_id, [c.data for c in taps])
         return last
 
     async def edit_text(
@@ -350,6 +351,8 @@ class WhatsAppChannel:
         return await self._send({"type": "template", "template": template})
 
     async def _send(self, message: dict) -> Optional[str]:
+        # Anything sent supersedes a numbered menu (infra/choice_memory.py).
+        choice_memory.forget(self.chat_id)
         return await self.client.send(self.wa_id, message)
 
 

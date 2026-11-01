@@ -202,10 +202,14 @@ class TestReader:
 
 
 class TestBoundaries:
-    async def test_hifz_commands_are_not_offered_yet(self, client, data, graph):
+    async def test_telegram_only_features_are_not_offered(self, client, data, graph):
+        # hifz groups live in Telegram supergroups; there is no WhatsApp form yet
         await known_user(client, data, graph)
-        await handle_message(client, data, text("/memorize"))
-        await handle_message(client, data, tap("hm:ok"))
+        await handle_message(client, data, text("/start gs_-100123"))
+        assert "*" in bodies(graph)[0]  # the plain welcome, not group setup
+        graph.clear()
+        await handle_message(client, data, tap("gr:ok"))
+        await handle_message(client, data, text("/admin"))
         assert bodies(graph) == [t("wa_not_here", "uz")] * 2
 
     async def test_media_we_cannot_read(self, client, data, graph):

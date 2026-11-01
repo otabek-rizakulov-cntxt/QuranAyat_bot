@@ -38,6 +38,14 @@ DROPPED = "dropped"
 
 _whatsapp_client = None
 
+# Languages each WhatsApp template is approved in (MULTI_PLATFORM_PLAN P0.3); a
+# UI language without its own template version gets the English one.
+TEMPLATE_LANGS = {"en": "en", "ru": "ru", "uz": "uz", "uz-Cyrl": "uz"}
+
+
+def template_lang(ui_lang: str) -> str:
+    return TEMPLATE_LANGS.get(ui_lang, "en")
+
 
 def set_whatsapp_client(client) -> None:
     """Hand the scheduler the Graph client (app startup, when WhatsApp is on)."""

@@ -6,9 +6,10 @@ type, a tapped reply button or list row carries the same `callback_data` a
 Telegram button does, and a number answers the last numbered menu. Everything
 then goes through `bot.dispatch.handle_incoming`, exactly like a Telegram update.
 
-Only features already converted to the channel seam are reachable here. The rest
-(hifz plans, drills, checks — Phase 3) answer "not available on WhatsApp yet"
-rather than failing against a Telegram client that cannot reach this user.
+Only features converted to the channel seam are reachable here: the reader,
+the verse of the day and, since Phase 3, the hifz platform (plans, drills,
+checks, progress, streak, leaderboard, profile). Hifz *groups* and inline mode
+stay Telegram-only and answer "not available on WhatsApp yet".
 """
 
 import logging
@@ -43,6 +44,15 @@ COMMANDS = {
     "sajda",
     "random",
     "daily",
+    # hifz (Phase 3)
+    "memorize",
+    "progress",
+    "check",
+    "forgot",
+    "streak",
+    "leaderboard",
+    "profile",
+    "cancel",
 }
 CALLBACK_PREFIXES = (
     "vc:",
@@ -59,6 +69,14 @@ CALLBACK_PREFIXES = (
     "reciter_search",
     "setreciter:",
     "hd:",  # verse of the day
+    # hifz (Phase 3): plan wizard, profile, progress, check, streak, leaderboard, shared
+    "hm:",
+    "hp:",
+    "hg:",
+    "hc:",
+    "hs:",
+    "hl:",
+    "hx:",
 )
 
 # A typed word -> the command it stands for, in English, Uzbek (both scripts)
@@ -75,6 +93,13 @@ KEYWORDS = {
     "about": ("about",),
     "index": ("index", "suralar", "суралар", "суры"),
     "daily": ("daily", "kunlik", "кунлик", "ежедневно"),
+    "memorize": ("memorize", "yodlash", "ёдлаш", "заучивать"),
+    "progress": ("progress", "natija", "натижа", "прогресс"),
+    "check": ("check", "tekshirish", "текшириш", "проверка"),
+    "streak": ("streak", "ketma-ketlik", "кетма-кетлик", "серия"),
+    "leaderboard": ("leaderboard", "reyting", "рейтинг"),
+    "profile": ("profile", "profil", "профил", "профиль"),
+    "cancel": ("cancel", "bekor", "бекор", "отмена"),
 }
 _COMMAND_BY_WORD = {word: name for name, words in KEYWORDS.items() for word in words}
 
@@ -205,6 +230,9 @@ async def handle_message(client, data: dict, message: dict, bot=None, now=None) 
         return
 
     command = as_command(text)
+    if command.lower().startswith("/start "):
+        # A /start payload is a Telegram deep link (group setup, board join).
+        command = "/start"
     if first_contact and command.startswith("/help"):
         return  # the welcome above already answered it
     if command.startswith("/") and not _allowed_command(command):

@@ -16,6 +16,7 @@ import bot.features as hifz
 import bot.router as router
 from bot.features import Ctx
 from bot.features import profile as profile_feature
+from channels.telegram import to_markup
 from infra.store import get_store
 
 USER_ID = 900123
@@ -433,7 +434,9 @@ class TestReminderTime:
         assert profile_feature.next_push_utc(await _profile_row()) is None
 
     def test_the_reminder_helpers_are_reusable_by_another_wizard(self):
-        markup = profile_feature.reminder_keyboard("en", off_data="hm:rem:off", cancel_data="hm:x")
+        markup = to_markup(
+            profile_feature.reminder_keyboard("en", off_data="hm:rem:off", cancel_data="hm:x")
+        )
         assert _callback_data(markup) == ["hm:rem:off", "hm:x"]
         assert profile_feature.parse_reminder_time("07:30") == time(7, 30)
         assert profile_feature.parse_reminder_time("nope") is None
