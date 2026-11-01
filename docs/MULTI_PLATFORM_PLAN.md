@@ -253,7 +253,7 @@ CREATE SEQUENCE IF NOT EXISTS non_telegram_user_id START 4503599627370496;
     is empty.
   - a manual Telegram smoke test passes: lookup, each verse view, audio,
     page + page audio, reciter search, language change, a hifz drill.
-- [ ] **P1.4 — HTML → WhatsApp markup converter**
+- [x] **P1.4 — HTML → WhatsApp markup converter** ✅ 2026-11-01
   (`channels/whatsapp_format.py`).
   - `to_whatsapp(html)` converts `<b>`, `<i>`, `<s>`, `<code>`/`<pre>`,
     `<a href>`, unescapes entities and strips unknown tags.
@@ -470,6 +470,13 @@ cost of daily pushes, and whether groups matter.
   normalizes to `Incoming` and routes through the shared `handle_incoming`.
   `resolve_settings` now takes `(user_id, lang_hint)` instead of a Telegram user.
   226 keyboard snapshots, recorded before the change, match exactly.
+- 2026-11-01 — P1.4 done: `channels/whatsapp_format.py`. Messages use only
+  `<b>` (locales, verse header) and `<code>` (`/index`), plus `html.escape`
+  entities; the converter also covers the rest of Telegram's tag set. Known
+  limit: WhatsApp has no escape for a literal `*`, `_` or `~`, so corpus text
+  containing them could pick up formatting. **Phase 1 code complete**;
+  outstanding before Phase 2 ships: the manual Telegram smoke test (P1.3) and
+  the Postgres leg of the store contract tests (P1.2).
 
 ## References
 
