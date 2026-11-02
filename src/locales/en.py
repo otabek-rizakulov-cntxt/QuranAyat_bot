@@ -240,7 +240,8 @@ strings = {
     "group_board_empty": "No one has completed a session yet this week. Be the first!",
     # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
     "web_loading": "Loading…",
-    "web_open_in_telegram": "Open this app from Telegram to continue.",
+    "web_open_in_telegram": "Open this app from Telegram, or send “app” to the bot on WhatsApp for a sign-in link.",
+    "web_link_expired": "This sign-in link has expired or was already used. Send “app” to the bot on WhatsApp for a new one.",
     "web_auth_failed": "Couldn't sign you in. Please try again.",
     "web_retry": "Try again",
     "web_greeting": "Assalamu alaikum, {name}",
