@@ -267,7 +267,8 @@ class TestWhatsApp:
         assert await _due_rows(store) == []
         assert graph.bodies()[-1] == t("daily_status_off", "uz")
 
-    async def test_outside_the_window_the_template_goes_out(self, graph, data):
+    async def test_outside_the_window_the_template_goes_out(self, graph, data, monkeypatch):
+        monkeypatch.setenv("WHATSAPP_TEMPLATES", "1")
         store, uid = await self._set_up(graph, data)
         await handle_message(graph.client, data, wa_tap("hd:t:07:00"))
         await handle_message(graph.client, data, wa_tap("hd:ok:07:00"))
@@ -295,6 +296,19 @@ class TestWhatsApp:
         await daily.push_daily(ctx)
         assert [m["type"] for m in graph.sent] == ["text", "interactive"]
         assert graph.sent[0]["text"]["body"].startswith("🌅 *")
+
+    async def test_free_mode_skips_outside_the_window_and_keeps_the_subscription(self, graph, data):
+        store, uid = await self._set_up(graph, data)
+        await handle_message(graph.client, data, wa_tap("hd:t:07:00"))
+        await handle_message(graph.client, data, wa_tap("hd:ok:07:00"))
+        (row,) = await _due_rows(store)
+        graph.sent.clear()
+        later = NOW + timedelta(days=2)  # no message from the user since: no free window
+        ctx = SendCtx(bot=None, data=data, file=None, store=store, send=row, now=later)
+        await daily.push_daily(ctx)
+        assert graph.sent == []  # nothing billed
+        assert (await store.daily.get(uid)).enabled is True  # still subscribed
+        assert len(await _due_rows(store)) == 2  # and tomorrow is queued
 
     async def test_stop_turns_it_off_and_later_sends_are_dropped(self, graph, data):
         store, uid = await self._set_up(graph, data)

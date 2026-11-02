@@ -138,7 +138,7 @@ class WhatsApp:
 
 
 async def _week(user, data):
-    """Create a plan, drill the first portion by hand, then six scheduled pushes.
+    """Create a plan, then seven scheduled pushes, each marked known.
     Returns the state trail: each day's state after each step, plus the totals."""
     store = await get_store()
     trail = []
@@ -162,22 +162,17 @@ async def _week(user, data):
     async def states():
         return [d.state for d in await store.plans.list_plan_days(plan.id)][:DAYS]
 
-    # Day 1 by hand: "Start today's portion", then "I know this by heart".
-    await user.tap("hm:go")
-    trail.append(("go", await states()))
-    day = next(d for d in await store.plans.list_plan_days(plan.id) if d.state == "sent")
-    await user.tap("hm:kn:%d" % day.id)
-    trail.append(("known", await states()))
-
-    # Days 2..7 by the scheduler: each push delivers, then the user marks it known.
-    for _ in range(DAYS - 1):
+    # Every portion arrives by the scheduler, at its own due instant, so the run
+    # does not depend on the wall clock (a hand-started drill would: before or
+    # after today's 07:00 decides whether day 1 is already due).
+    for _ in range(DAYS):
         done = {d.id for d in await store.plans.list_plan_days(plan.id) if d.state != "pending"}
         pending = [
             r
             for r in store.state.scheduled_send.values()
             if r.state == "pending"
             and r.kind == "plan_day"
-            and r.payload["plan_day_id"] not in done  # day 1's push was overtaken by hand
+            and r.payload["plan_day_id"] not in done
         ]
         assert pending, "the chain must keep one push queued"
         row = min(pending, key=lambda r: r.due_at)
@@ -198,6 +193,7 @@ async def _week(user, data):
 
 
 async def test_a_week_on_whatsapp_matches_a_week_on_telegram(data, monkeypatch):
+    monkeypatch.setenv("WHATSAPP_TEMPLATES", "1")  # reminders may use the paid template
     tg_trail, tg_totals = await _week(Telegram(data), data)
     whatsapp = WhatsApp(data, monkeypatch)
     wa_trail, wa_totals = await _week(whatsapp, data)

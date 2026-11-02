@@ -16,7 +16,7 @@ import channels.whatsapp as wa
 import infra.scheduler.push as push
 from channels.whatsapp import GraphClient
 from infra.scheduler import SendCtx
-from infra.scheduler.push import DROPPED, SESSION, TEMPLATE, Template, deliver_push
+from infra.scheduler.push import DROPPED, SESSION, SKIPPED, TEMPLATE, Template, deliver_push
 from infra.store import InMemoryStore
 from infra.store.schedule import ScheduledSend
 
@@ -54,6 +54,12 @@ def graph(monkeypatch):
 @pytest.fixture
 def store():
     return InMemoryStore()
+
+
+@pytest.fixture(autouse=True)
+def templates_allowed(monkeypatch):
+    """Most tests here are about the paid path; TestFreeMode turns it off."""
+    monkeypatch.setenv("WHATSAPP_TEMPLATES", "1")
 
 
 def ctx_for(store, user_id, platform, bot=None):
@@ -133,8 +139,39 @@ class TestWhatsApp:
 
     async def test_no_template_outside_the_window_sends_nothing(self, store, graph):
         uid = await wa_user(store, wrote_ago=timedelta(hours=30))
-        assert await deliver_push(ctx_for(store, uid, "whatsapp"), session=say_hi) == DROPPED
+        assert await deliver_push(ctx_for(store, uid, "whatsapp"), session=say_hi) == SKIPPED
         assert graph.sent == []
+
+
+class TestFreeMode:
+    """WHATSAPP_TEMPLATES unset: WhatsApp never sends a billed message."""
+
+    @pytest.fixture(autouse=True)
+    def templates_off(self, monkeypatch):
+        monkeypatch.delenv("WHATSAPP_TEMPLATES")
+
+    async def test_outside_the_window_is_skipped_not_billed(self, store, graph):
+        uid = await wa_user(store, wrote_ago=timedelta(hours=30))
+        outcome = await deliver_push(
+            ctx_for(store, uid, "whatsapp"), session=say_hi, template=TEMPLATE_
+        )
+        assert outcome == SKIPPED and graph.sent == []
+
+    async def test_inside_the_window_still_goes_out_free(self, store, graph):
+        uid = await wa_user(store, wrote_ago=timedelta(hours=2))
+        outcome = await deliver_push(
+            ctx_for(store, uid, "whatsapp"), session=say_hi, template=TEMPLATE_
+        )
+        assert outcome == SESSION and [m["type"] for m in graph.sent] == ["text"]
+
+    async def test_meta_saying_closed_is_skipped_too(self, store, graph):
+        uid = await wa_user(store, wrote_ago=timedelta(hours=1))
+        graph.queue = [httpx.Response(400, json={"error": {"code": 131047, "message": "closed"}})]
+        outcome = await deliver_push(
+            ctx_for(store, uid, "whatsapp"), session=say_hi, template=TEMPLATE_
+        )
+        assert outcome == SKIPPED
+        assert all(m["type"] != "template" for m in graph.sent)
 
 
 class TestConsent:
