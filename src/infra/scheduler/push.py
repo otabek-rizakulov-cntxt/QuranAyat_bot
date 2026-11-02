@@ -9,6 +9,10 @@ therefore goes one of three ways there:
     log line below is the record to estimate that cost from;
   * the user never opted in, or said STOP since: nothing at all.
 
+Templates are off unless `WHATSAPP_TEMPLATES=1`. With them off, WhatsApp is free:
+a push outside the window is **skipped** — the subscription stays on, and the
+next push inside a window (the user wrote that day) goes out as usual.
+
 Telegram has no window, no template and no consent rule, so it always gets the
 session message. A send handler describes both forms and lets this decide:
 
@@ -25,6 +29,7 @@ from typing import Awaitable, Callable, List, Optional
 
 from channels import TELEGRAM, WHATSAPP
 from channels.whatsapp import WhatsAppChannel, WindowClosed
+from config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +39,8 @@ SERVICE_WINDOW = timedelta(hours=24) - timedelta(minutes=10)
 
 SESSION = "session"
 TEMPLATE = "template"
-DROPPED = "dropped"
+DROPPED = "dropped"  # cannot or may not reach this user: stop pushing to them
+SKIPPED = "skipped"  # only this one: no free window and no template allowed
 
 _whatsapp_client = None
 
@@ -115,8 +121,11 @@ async def deliver_push(
         except WindowClosed:
             pass  # our clock and Meta's disagree; the template is still allowed
     if template is None:
-        _log(ctx, DROPPED, "window-closed")
-        return DROPPED
+        _log(ctx, SKIPPED, "window-closed")
+        return SKIPPED
+    if not get_settings().whatsapp_templates:
+        _log(ctx, SKIPPED, "templates-off")
+        return SKIPPED
     await channel.send_template(template.name, template.lang, template.params, template.payloads)
     _log(ctx, TEMPLATE, category, template.name)
     return TEMPLATE

@@ -47,6 +47,10 @@ class Settings:
     whatsapp_access_token: Optional[str] = None  # system-user token for /messages
     whatsapp_app_secret: Optional[str] = None  # signs each webhook (X-Hub-Signature-256)
     whatsapp_verify_token: Optional[str] = None  # our half of the GET handshake
+    # Paid template messages (pushes outside the 24-hour window). Off by default:
+    # WhatsApp then costs nothing — replies are free, and a push that would need
+    # a template is skipped (MULTI_PLATFORM_PLAN §4).
+    whatsapp_templates: bool = False
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -71,6 +75,7 @@ class Settings:
             whatsapp_access_token=env("WHATSAPP_ACCESS_TOKEN") or None,
             whatsapp_app_secret=env("WHATSAPP_APP_SECRET") or None,
             whatsapp_verify_token=env("WHATSAPP_VERIFY_TOKEN") or None,
+            whatsapp_templates=_flag(env("WHATSAPP_TEMPLATES")),
         )
 
     @property

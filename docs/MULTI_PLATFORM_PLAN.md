@@ -549,6 +549,14 @@ cost of daily pushes, and whether groups matter.
   plan chain ends. `unlink` from either side deletes the identity row; the
   number's next message starts a fresh account. Second platform and WhatsApp
   groups stay open (data- and API-gated).
+- 2026-11-02 — **Free mode.** New `WHATSAPP_TEMPLATES` setting, off by
+  default: no template (billed message) is ever sent, so WhatsApp costs nothing.
+  A push outside the 24-hour window is **skipped** — the subscription stays on and
+  the next in-window push goes out free — distinct from **dropped** (no consent or
+  no identity), which still stops the chain. Turn it on once templates are
+  approved and a payment method is set. The cross-platform week test no longer
+  depends on the wall clock (it failed after 07:00 local; all seven days now go
+  through the scheduler at their own due instants).
 
 ## References
 
