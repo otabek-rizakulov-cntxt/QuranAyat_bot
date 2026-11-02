@@ -557,6 +557,11 @@ cost of daily pushes, and whether groups matter.
   approved and a payment method is set. The cross-platform week test no longer
   depends on the wall clock (it failed after 07:00 local; all seven days now go
   through the scheduler at their own due instants).
+- 2026-11-02 — `GET /privacy` added (app/routes/privacy.py): Meta requires a
+  privacy-policy URL to publish the app, and an unpublished app receives no real
+  WhatsApp messages — not even from admins or test numbers, contrary to what this
+  plan assumed for P2.7. The page is written from schema.sql and the Redis keys;
+  keep it in step with what the bot stores.
 
 ## References
 

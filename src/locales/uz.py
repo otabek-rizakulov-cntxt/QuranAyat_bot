@@ -215,7 +215,8 @@ strings = {
     "group_board_empty": "Bu hafta hali hech kim mashgʻulotni tugatmadi. Birinchi boʻling!",
     # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
     "web_loading": "Yuklanmoqda…",
-    "web_open_in_telegram": "Davom etish uchun ilovani Telegram orqali oching.",
+    "web_open_in_telegram": "Ilovani Telegram orqali oching yoki kirish havolasini olish uchun WhatsApp'da botga “app” deb yozing.",
+    "web_link_expired": "Kirish havolasi eskirgan yoki allaqachon ishlatilgan. Yangisini olish uchun WhatsApp'da botga “app” deb yozing.",
     "web_auth_failed": "Kirib boʻlmadi. Qaytadan urinib koʻring.",
     "web_retry": "Qayta urinish",
     "web_greeting": "Assalomu alaykum, {name}",

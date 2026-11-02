@@ -221,7 +221,8 @@ strings = {
     "group_board_empty": "На этой неделе ещё никто не завершил занятие. Будьте первым!",
     # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
     "web_loading": "Загрузка…",
-    "web_open_in_telegram": "Откройте это приложение из Telegram, чтобы продолжить.",
+    "web_open_in_telegram": "Откройте это приложение из Telegram или отправьте боту в WhatsApp «app», чтобы получить ссылку для входа.",
+    "web_link_expired": "Ссылка для входа устарела или уже использована. Отправьте боту в WhatsApp «app», чтобы получить новую.",
     "web_auth_failed": "Не удалось войти. Попробуйте ещё раз.",
     "web_retry": "Повторить",
     "web_greeting": "Ассаляму алейкум, {name}",

@@ -215,7 +215,8 @@ strings = {
     "group_board_empty": "Бу ҳафта ҳали ҳеч ким машғулотни тугатмади. Биринчи бўлинг!",
     # --- Mini App (docs/MINI_APP_PLAN.md, web_* = en/ru/uz/uz-Cyrl only) ---
     "web_loading": "Юкланмоқда…",
-    "web_open_in_telegram": "Давом этиш учун иловани Telegram орқали очинг.",
+    "web_open_in_telegram": "Иловани Telegram орқали очинг ёки кириш ҳаволасини олиш учун WhatsApp'да ботга “app” деб ёзинг.",
+    "web_link_expired": "Кириш ҳаволаси эскирган ёки аллақачон ишлатилган. Янгисини олиш учун WhatsApp'да ботга “app” деб ёзинг.",
     "web_auth_failed": "Кириб бўлмади. Қайтадан уриниб кўринг.",
     "web_retry": "Қайта уриниш",
     "web_greeting": "Ассалому алайкум, {name}",
