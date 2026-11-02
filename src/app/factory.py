@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api import router as api_router
 from app.lifespan import lifespan
-from app.routes import health, media, webhook, whatsapp
+from app.routes import health, media, privacy, webhook, whatsapp
 from app.state import AppState
 from config.settings import get_settings
 
@@ -16,6 +16,7 @@ def create_app() -> FastAPI:
     app.include_router(api_router)
     app.include_router(health.router)
     app.include_router(media.router)
+    app.include_router(privacy.router)
     app.include_router(webhook.router)
     # Off unless fully configured: no route, no attack surface (MULTI_PLATFORM_PLAN P2.0).
     if get_settings().whatsapp_ready:
