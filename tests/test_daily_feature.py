@@ -274,7 +274,8 @@ class TestWhatsApp:
         await handle_message(graph.client, data, wa_tap("hd:ok:07:00"))
         (row,) = await _due_rows(store)
         graph.sent.clear()
-        later = NOW + timedelta(days=2)  # the user has not written since
+        # two days after they last wrote (now, in _set_up), whatever today is
+        later = datetime.now(timezone.utc) + timedelta(days=2)
         ctx = SendCtx(bot=None, data=data, file=None, store=store, send=row, now=later)
         await daily.push_daily(ctx)
         (message,) = graph.sent
@@ -303,7 +304,7 @@ class TestWhatsApp:
         await handle_message(graph.client, data, wa_tap("hd:ok:07:00"))
         (row,) = await _due_rows(store)
         graph.sent.clear()
-        later = NOW + timedelta(days=2)  # no message from the user since: no free window
+        later = datetime.now(timezone.utc) + timedelta(days=2)  # no message since: no window
         ctx = SendCtx(bot=None, data=data, file=None, store=store, send=row, now=later)
         await daily.push_daily(ctx)
         assert graph.sent == []  # nothing billed
