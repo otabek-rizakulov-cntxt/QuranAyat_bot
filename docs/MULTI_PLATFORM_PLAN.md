@@ -562,6 +562,28 @@ cost of daily pushes, and whether groups matter.
   WhatsApp messages — not even from admins or test numbers, contrary to what this
   plan assumed for P2.7. The page is written from schema.sql and the Redis keys;
   keep it in step with what the bot stores.
+- 2026-11-04 — **Usernames (BSUID).** Since April 2026 WhatsApp sends a
+  business-scoped user id (`from_user_id`, e.g. `UZ.1349…`) with every message,
+  and for someone who adopted a WhatsApp username it may be the only id — no
+  `from`. The webhook used to require `from` and would have failed on them.
+  `identity` gains `alt_id`; `resolve_sender` finds a sender by either id, stores
+  a new one under the number if known, else the BSUID, and the channel replies
+  with `recipient` instead of `to` when the address is not a number. The first
+  language guess also works from a BSUID's country.
+- 2026-11-04 — **WhatsApp look and feel.** First contact is one welcome card
+  (header, three buttons: verse of the day, menu, language) instead of three texts
+  and a 48-line language list; `request_welcome` sends it when the chat is opened.
+  `menu` is a 10-row list with a description per row (`Choice.hint`) and a
+  settings sub-list (bot/keyboards/menu.py, `wm:` taps run the typed command).
+  The language picker on WhatsApp shows 9 languages, then "More". `hd:now` sends
+  today's verse on demand and offers the subscription. WhatsApp-only About text.
+  The consent messages name the business as WhatsApp shows it, "Quran Ayah Bot".
+  `scripts/whatsapp_setup.py` sets the business profile (picture from
+  `assets/whatsapp/avatar.png`, drawn by `scripts/make_whatsapp_avatar.py`), the
+  conversation starters (`bot.whatsapp.STARTERS`) and the `/` command list, and
+  claims @quranayahbot once Meta allows it — dry run unless `--apply`. The display
+  name is set when the business registers its own number; the test number's
+  "Test Number" cannot change.
 
 ## References
 
