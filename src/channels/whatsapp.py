@@ -1,6 +1,6 @@
 """The WhatsApp channel: `Channel` calls onto Meta's WhatsApp Cloud API.
 
-One conversation is one WhatsApp user (`wa_id`). What WhatsApp cannot do, the
+One conversation is one WhatsApp user (their number, or their BSUID). What WhatsApp cannot do, the
 channel degrades rather than fails:
 
   * text is Telegram HTML converted to WhatsApp markers and split at 4,096 chars
@@ -43,6 +43,8 @@ ROW_TITLE_MAX = 24  # list-row title
 ROW_DESCRIPTION_MAX = 72  # list-row description
 INTERACTIVE_BODY_MAX = 1024  # body of a button or list message
 CAPTION_MAX = 1024  # image caption
+HEADER_MAX = 60  # text header of a button or list message
+FOOTER_MAX = 60  # footer of a button or list message
 CHOICES_BODY = "👇"  # body for buttons that follow media or a split text
 LIST_BUTTON = "☰"  # the button that opens a list message
 
@@ -117,8 +119,14 @@ class GraphClient:
         raise AssertionError("unreachable")
 
     async def send(self, to: str, message: dict) -> Optional[str]:
-        """POST one message to `to`; returns its WhatsApp message id."""
-        body = {"messaging_product": "whatsapp", "recipient_type": "individual", "to": to}
+        """POST one message to `to`; returns its WhatsApp message id.
+
+        `to` is a phone number (digits), or a business-scoped user id ("UZ.1349…")
+        for someone we only know by their WhatsApp username — that goes in
+        `recipient` instead.
+        """
+        field = "to" if to.isdigit() else "recipient"
+        body = {"messaging_product": "whatsapp", "recipient_type": "individual", field: to}
         body.update(message)
         result = await self._request("POST", "%s/messages" % self.phone_number_id, json=body)
         messages = result.get("messages") or [{}]
@@ -189,8 +197,19 @@ class WhatsAppChannel:
     # --- text and choices ---------------------------------------------------------
 
     async def send_text(
-        self, text: str, choices: Optional[Choices] = None, *, html: bool = False, **opts
+        self,
+        text: str,
+        choices: Optional[Choices] = None,
+        *,
+        html: bool = False,
+        header: Optional[str] = None,
+        footer: Optional[str] = None,
+        button: Optional[str] = None,
+        **opts,
     ) -> Any:
+        """Text, with `choices` as buttons or a list. `header`, `footer` and the
+        list's `button` label dress up a message that carries choices; a plain
+        text message has nowhere to put them."""
         body = to_whatsapp(text) if html else text
         taps, links = _split_choices(choices)
         if links:
@@ -210,26 +229,44 @@ class WhatsAppChannel:
         if len(tail) > INTERACTIVE_BODY_MAX:
             await self._send({"type": "text", "text": {"body": tail}})
             tail = CHOICES_BODY
-        return await self._send_choices(tail or CHOICES_BODY, taps)
+        dress = {"header": header, "footer": footer, "button": button}
+        return await self._send_choices(tail or CHOICES_BODY, taps, **dress)
 
-    async def _send_choices(self, body: str, taps: List[Choice]) -> Any:
+    async def _send_choices(
+        self,
+        body: str,
+        taps: List[Choice],
+        header: Optional[str] = None,
+        footer: Optional[str] = None,
+        button: Optional[str] = None,
+    ) -> Any:
+        def interactive(message: dict) -> dict:
+            if header:
+                message["header"] = {"type": "text", "text": _clip(header, HEADER_MAX)}
+            if footer:
+                message["footer"] = {"text": _clip(footer, FOOTER_MAX)}
+            return {"type": "interactive", "interactive": message}
+
         if len(taps) <= CAPS.max_buttons and all(len(c.label) <= BUTTON_TITLE_MAX for c in taps):
             buttons = [{"type": "reply", "reply": {"id": c.data, "title": c.label}} for c in taps]
             message = {"type": "button", "body": {"text": body}, "action": {"buttons": buttons}}
-            return await self._send({"type": "interactive", "interactive": message})
+            return await self._send(interactive(message))
         if len(taps) <= CAPS.list_rows:
             rows = []
             for c in taps:
                 row = {"id": c.data, "title": _clip(c.label, ROW_TITLE_MAX)}
-                if len(c.label) > ROW_TITLE_MAX:
+                if c.hint:
+                    row["description"] = _clip(c.hint, ROW_DESCRIPTION_MAX)
+                elif len(c.label) > ROW_TITLE_MAX:
                     row["description"] = _clip(c.label, ROW_DESCRIPTION_MAX)
                 rows.append(row)
+            label = _clip(button or LIST_BUTTON, BUTTON_TITLE_MAX)
             message = {
                 "type": "list",
                 "body": {"text": body},
-                "action": {"button": LIST_BUTTON, "sections": [{"title": " ", "rows": rows}]},
+                "action": {"button": label, "sections": [{"title": " ", "rows": rows}]},
             }
-            return await self._send({"type": "interactive", "interactive": message})
+            return await self._send(interactive(message))
         # Too many for a list: numbered lines, answered by typing the number —
         # remembered after sending, since every send forgets the previous menu.
         lines = "\n".join("%d. %s" % (n, c.label) for n, c in enumerate(taps, 1))

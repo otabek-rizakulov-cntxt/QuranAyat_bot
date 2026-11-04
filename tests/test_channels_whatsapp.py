@@ -286,3 +286,43 @@ class TestVoiceNotes:
         assert url == "https://lookaside.example/voice"
         assert await channel.client.download(url) == b"OggS-voice"
         assert graph.requests[-1].headers["Authorization"] == "Bearer TOKEN"
+
+
+class TestDressing:
+    """Header, footer, list-button label and row descriptions (the WhatsApp menus)."""
+
+    async def test_buttons_with_header_and_footer(self, channel, graph):
+        await channel.send_text("body", taps("A", "B"), header="Title", footer="Small print")
+        (message,) = graph.messages()
+        assert message["interactive"]["header"] == {"type": "text", "text": "Title"}
+        assert message["interactive"]["footer"] == {"text": "Small print"}
+
+    async def test_list_rows_carry_their_hint(self, channel, graph):
+        rows = [[Choice("Row %d" % n, data="r:%d" % n, hint="hint %d" % n)] for n in range(5)]
+        await channel.send_text("pick", rows, button="Open menu")
+        (message,) = graph.messages()
+        action = message["interactive"]["action"]
+        assert action["button"] == "Open menu"
+        assert action["sections"][0]["rows"][2] == {
+            "id": "r:2",
+            "title": "Row 2",
+            "description": "hint 2",
+        }
+
+    async def test_plain_text_has_nowhere_to_put_them(self, channel, graph):
+        await channel.send_text("hi", header="Title", footer="x")
+        (message,) = graph.messages()
+        assert message == {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": WA_ID,
+            "type": "text",
+            "text": {"body": "hi", "preview_url": False},
+        }
+
+
+async def test_a_bsuid_is_addressed_as_recipient(graph):
+    client = GraphClient("PHONE", "TOKEN", transport=httpx.MockTransport(graph))
+    await WhatsAppChannel(client, "UZ.13491208655302741918", UID).send_text("hi")
+    (message,) = graph.messages()
+    assert message["recipient"] == "UZ.13491208655302741918" and "to" not in message

@@ -36,3 +36,13 @@ def language_keyboard() -> Choices:
 def translation_language_keyboard() -> Choices:
     """The Qur'an *translation* language picker, independent of the UI language."""
     return language_picker(LANGUAGES, "settranslang:")
+
+
+SHORTLIST = 9  # + "More languages" = a 10-row WhatsApp list
+
+
+def language_shortlist(more_label: str, more_data: str) -> Choices:
+    """The first interface languages (UI_LANGUAGES is ordered by audience), one
+    per row, then a row that opens the full picker."""
+    flat = [choice for row in language_keyboard() for choice in row][:SHORTLIST]
+    return [[choice] for choice in flat] + [[Choice("🌍 " + more_label, data=more_data)]]

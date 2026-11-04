@@ -1,10 +1,16 @@
 """Routing a WhatsApp message into the shared dispatcher (MULTI_PLATFORM_PLAN P2.4).
 
-WhatsApp has no slash-command menu, so people type words: `menu`, `reciter`,
-`page 255` (in English, Uzbek or Russian) become the commands Telegram users
-type, a tapped reply button or list row carries the same `callback_data` a
-Telegram button does, and a number answers the last numbered menu. Everything
-then goes through `bot.dispatch.handle_incoming`, exactly like a Telegram update.
+People type words: `menu`, `reciter`, `page 255` (in English, Uzbek or Russian)
+become the commands Telegram users type, as do `/menu`, `/daily`… picked from the
+command list Meta shows when they type `/` (scripts/whatsapp_setup.py registers
+it). A tapped reply button or list row carries the same `callback_data` a
+Telegram button does, a number answers the last numbered menu, and a tapped
+conversation starter (`STARTERS`) means what it says. Everything then goes
+through `bot.dispatch.handle_incoming`, exactly like a Telegram update.
+
+A sender is their phone number and, since 2026, a business-scoped user id
+(BSUID); someone who adopted a WhatsApp username may send the BSUID alone. The
+identity store keeps both and gives back the address to reply to.
 
 Only features converted to the channel seam are reachable here: the reader,
 the verse of the day and, since Phase 3, the hifz platform (plans, drills,
@@ -18,13 +24,13 @@ from types import SimpleNamespace
 from typing import Optional
 
 from bot.dispatch import handle_incoming
-from bot.keyboards.language import language_keyboard
+from bot.keyboards.menu import MENU, welcome_choices
 from bot.settings import resolve_settings
 from channels import WHATSAPP, Incoming
 from channels.whatsapp import WhatsAppChannel
 from infra import choice_memory
 from infra.store import get_store
-from locales import t, welcome_text
+from locales import t
 from services.user_settings import UserSettings
 
 logger = logging.getLogger(__name__)
@@ -71,6 +77,7 @@ CALLBACK_PREFIXES = (
     "recpage_noop",
     "reciter_search",
     "setreciter:",
+    MENU,  # the WhatsApp menus
     "hd:",  # verse of the day
     # hifz (Phase 3): plan wizard, profile, progress, check, streak, leaderboard, shared
     "hm:",
@@ -109,6 +116,18 @@ KEYWORDS = {
 }
 _COMMAND_BY_WORD = {word: name for name, words in KEYWORDS.items() for word in words}
 
+# The conversation starters Meta shows on an empty chat (registered by
+# scripts/whatsapp_setup.py, in English: Meta takes one set for everyone).
+# Tapping one sends its text as a message; this is what each one means — a
+# typed reference/command, or a tap.
+STARTERS = {
+    "📖 Show me Ayat al-Kursi": ("text", "2:255"),
+    "🌅 Today's verse": ("tap", "hd:now"),
+    "🧠 Help me memorize the Qur'an": ("text", "/memorize"),
+    "📋 Open the menu": ("text", "/help"),
+}
+_STARTER_BY_TEXT = {text.casefold(): action for text, action in STARTERS.items()}
+
 STOP_WORDS = {"stop", "unsubscribe", "стоп", "отписаться", "toʻxtat", "to'xtat", "тўхтат"}
 
 # Calling code -> interface language, for the very first reply (the user can
@@ -138,8 +157,30 @@ _LANG_BY_PREFIX = {
     "974": "ar",
 }
 
+# The same, by the ISO country a BSUID ("UZ.1349…") starts with — all we know
+# of someone who wrote with a username and no number.
+_LANG_BY_COUNTRY = {
+    "UZ": "uz",
+    "TJ": "tg",
+    "AZ": "az",
+    "RU": "ru",
+    "KZ": "ru",
+    "TR": "tr",
+    "PK": "ur",
+    "IR": "fa",
+    "BD": "bn",
+    "IN": "hi",
+    "ID": "id",
+    "MY": "ms",
+    **dict.fromkeys(("EG", "MA", "JO", "SY", "IQ", "KW", "SA", "OM", "AE", "BH", "QA"), "ar"),
+}
 
-def lang_hint(wa_id: str) -> Optional[str]:
+
+def lang_hint(address: str) -> Optional[str]:
+    """A first guess at the interface language: by calling code, or by a BSUID's country."""
+    if not address.isdigit():
+        return _LANG_BY_COUNTRY.get(address.partition(".")[0].upper())
+    wa_id = address
     for size in (3, 2, 1):
         lang = _LANG_BY_PREFIX.get(wa_id[:size])
         if lang:
@@ -150,7 +191,8 @@ def lang_hint(wa_id: str) -> Optional[str]:
 def as_command(text: str) -> str:
     """`page 255` -> `/page 255` for a known keyword; anything else unchanged."""
     word, _, rest = text.strip().partition(" ")
-    name = _COMMAND_BY_WORD.get(word.lower())
+    # "/menu" from the command list Meta shows is the word "menu"
+    name = _COMMAND_BY_WORD.get(word.lower().removeprefix("/"))
     if name is None:
         return text
     return "/" + name + (" " + rest.strip() if rest.strip() else "")
@@ -177,26 +219,48 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+async def send_welcome(channel, ui_lang: str) -> None:
+    """The first-contact card: who we are, what to type, and three ways in."""
+    await channel.send_text(
+        t("wa_welcome", ui_lang),
+        welcome_choices(ui_lang),
+        html=True,
+        header=t("wa_welcome_title", ui_lang),
+        footer=t("wa_welcome_footer", ui_lang),
+    )
+
+
 async def handle_message(client, data: dict, message: dict, bot=None, now=None) -> None:
     """Process one inbound WhatsApp message (one entry of a webhook's `messages`)."""
     store = await get_store()
-    wa_id = str(message["from"])
-    first_contact = await store.identity.get(WHATSAPP, wa_id) is None
-    user_id = await store.identity.resolve(WHATSAPP, wa_id)
+    sender, first_contact = await store.identity.resolve_sender(
+        WHATSAPP, message.get("from"), message.get("from_user_id")
+    )
+    user_id, address = sender.user_id, sender.external_id
     await store.identity.touch_inbound(user_id, WHATSAPP, now or _now())
-    channel = WhatsAppChannel(client, wa_id, user_id)
-    hint = lang_hint(wa_id)
+    channel = WhatsAppChannel(client, address, user_id)
+    hint = lang_hint(address)
     settings = await resolve_settings(UserSettings(), user_id, user_id, hint)
     ui_lang = settings.ui_lang
 
+    if message.get("type") == "request_welcome":
+        # They opened the chat for the first time and haven't typed yet.
+        await send_welcome(channel, ui_lang)
+        return
     if first_contact:
-        await channel.send_text(welcome_text(ui_lang), html=True)
-        await channel.send_text(t("wa_welcome_hint", ui_lang), html=True)
-        await channel.send_text(t("choose_language", ui_lang), language_keyboard())
+        await send_welcome(channel, ui_lang)
 
     tapped = _tap(message)
     text = (message.get("text") or {}).get("body") if message.get("type") == "text" else None
 
+    if tapped is None and text is not None:
+        starter = _STARTER_BY_TEXT.get(text.strip().casefold())
+        if starter is not None:
+            kind, value = starter
+            if kind == "tap":
+                tapped = value
+            else:
+                text = value
     if tapped is None and text is not None:
         tapped = choice_memory.pick(user_id, text)
 
@@ -206,7 +270,7 @@ async def handle_message(client, data: dict, message: dict, bot=None, now=None) 
             return
         incoming = Incoming(
             platform=WHATSAPP,
-            external_id=wa_id,
+            external_id=address,
             user_id=user_id,
             chat_id=user_id,
             callback_data=tapped,
@@ -247,7 +311,7 @@ async def handle_message(client, data: dict, message: dict, bot=None, now=None) 
 
     incoming = Incoming(
         platform=WHATSAPP,
-        external_id=wa_id,
+        external_id=address,
         user_id=user_id,
         chat_id=user_id,
         text=command,

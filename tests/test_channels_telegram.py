@@ -202,3 +202,8 @@ class TestForPlatform:
     def test_unknown_platform(self, bot):
         with pytest.raises(ValueError):
             for_platform("carrier-pigeon", bot=bot, external_id="1")
+
+
+async def test_whatsapp_dressing_is_dropped(bot):
+    await TelegramChannel(bot, 42).send_text("hi", header="Title", footer="x", button="Open")
+    bot.send_message.assert_awaited_once_with(chat_id=42, text="hi")
