@@ -8,6 +8,12 @@
 # rule elsewhere never misfires, and below JavaScript's 2^53 safe-integer limit
 # for the Mini App's JSON.
 #
+# Since 2026 WhatsApp also sends a business-scoped user id (BSUID, e.g.
+# "UZ.1349…") with every message, and for someone who adopted a WhatsApp
+# username it may be the only id: no phone number at all. The row keeps it as
+# `alt_id`; `external_id` is the number when we have one, else the BSUID — either
+# way it is the address we reply to (channels/whatsapp.py tells them apart).
+#
 # The row also carries what WhatsApp's policy needs: when the sender last wrote
 # (the free 24-hour service window) and their consent to scheduled pushes.
 
@@ -36,6 +42,7 @@ class IdentityRow:
     last_inbound_at: Optional[datetime] = None
     opted_in_at: Optional[datetime] = None
     opted_out_at: Optional[datetime] = None
+    alt_id: Optional[str] = None
 
     @property
     def consented(self) -> bool:
@@ -43,7 +50,9 @@ class IdentityRow:
         return self.opted_in_at is not None and self.opted_out_at is None
 
 
-_COLUMNS = "platform, external_id, user_id, created_at, last_inbound_at, opted_in_at, opted_out_at"
+_COLUMNS = (
+    "platform, external_id, user_id, created_at, last_inbound_at, opted_in_at, opted_out_at, alt_id"
+)
 
 
 def _stored(platform: str) -> None:
@@ -63,6 +72,43 @@ class IdentityStore(abc.ABC):
         if platform == TELEGRAM:
             return int(external_id)
         return await self._resolve(platform, str(external_id))
+
+    async def resolve_sender(
+        self, platform: str, external_id: Optional[str], alt_id: Optional[str] = None
+    ) -> tuple[IdentityRow, bool]:
+        """The sender's row, found by either id, and whether this is first contact.
+
+        `external_id` is the platform's primary id (a WhatsApp number) and may be
+        missing; `alt_id` is the second one (the BSUID). A new sender is stored
+        under the number if we have it, else the BSUID; a known one gains the
+        BSUID the first time it arrives. Not for Telegram, which is never stored.
+        """
+        _stored(platform)
+        external_id = str(external_id) if external_id else None
+        alt_id = str(alt_id) if alt_id and alt_id != external_id else None
+        if external_id is None and alt_id is None:
+            raise ValueError("a sender needs at least one id")
+        row = await self.find(platform, external_id, alt_id)
+        first = row is None
+        if first:
+            await self._resolve(platform, external_id or alt_id)
+            row = await self.get(platform, external_id or alt_id)
+        known = alt_id is None or alt_id in (row.external_id, row.alt_id)
+        if not known and await self._set_alt(platform, row.external_id, alt_id):
+            row.alt_id = alt_id
+        return row, first
+
+    async def find(
+        self, platform: str, external_id: Optional[str], alt_id: Optional[str] = None
+    ) -> Optional[IdentityRow]:
+        """A sender by their primary id, or failing that their second one."""
+        if external_id:
+            row = await self.get(platform, external_id)
+            if row is not None:
+                return row
+        if alt_id:
+            return await self.get(platform, alt_id) or await self._get_by_alt(platform, alt_id)
+        return None
 
     async def external_id(self, user_id: int, platform: str) -> Optional[str]:
         """Where to send to reach `user_id` on `platform`, or None if they never wrote."""
@@ -87,6 +133,13 @@ class IdentityStore(abc.ABC):
 
     @abc.abstractmethod
     async def _resolve(self, platform: str, external_id: str) -> int: ...
+
+    @abc.abstractmethod
+    async def _get_by_alt(self, platform: str, alt_id: str) -> Optional[IdentityRow]: ...
+
+    @abc.abstractmethod
+    async def _set_alt(self, platform: str, external_id: str, alt_id: str) -> bool:
+        """Record a sender's second id; False if another sender already holds it."""
 
     @abc.abstractmethod
     async def get(self, platform: str, external_id: str) -> Optional[IdentityRow]:
@@ -154,6 +207,18 @@ class InMemoryIdentityStore(IdentityStore):
     async def get(self, platform, external_id):
         row = self._state.identity.get((platform, str(external_id)))
         return replace(row) if row is not None else None
+
+    async def _get_by_alt(self, platform, alt_id):
+        for row in self._state.identity.values():
+            if row.platform == platform and row.alt_id == alt_id:
+                return replace(row)
+        return None
+
+    async def _set_alt(self, platform, external_id, alt_id):
+        if await self._get_by_alt(platform, alt_id) is not None:
+            return False
+        self._state.identity[(platform, external_id)].alt_id = alt_id
+        return True
 
     async def get_by_user(self, user_id, platform):
         row = self._find(user_id, platform)
@@ -235,6 +300,27 @@ class PostgresIdentityStore(IdentityStore):
                 str(external_id),
             )
         )
+
+    async def _get_by_alt(self, platform, alt_id):
+        return self._row(
+            await self._pool.fetchrow(
+                "SELECT " + _COLUMNS + " FROM identity WHERE platform = $1 AND alt_id = $2",
+                platform,
+                alt_id,
+            )
+        )
+
+    async def _set_alt(self, platform, external_id, alt_id):
+        try:
+            await self._pool.execute(
+                "UPDATE identity SET alt_id = $3 WHERE platform = $1 AND external_id = $2",
+                platform,
+                external_id,
+                alt_id,
+            )
+        except asyncpg.UniqueViolationError:  # identity_alt_idx
+            return False
+        return True
 
     async def get_by_user(self, user_id, platform):
         return self._row(

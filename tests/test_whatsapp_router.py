@@ -12,7 +12,7 @@ import pytest
 import app.lifespan as lifespan
 import bot.media
 import channels.whatsapp as wa
-from bot.whatsapp import as_command, handle_message, lang_hint
+from bot.whatsapp import STARTERS, as_command, handle_message, lang_hint
 from channels import WHATSAPP
 from channels.whatsapp import GraphClient
 from infra import nav_state
@@ -122,19 +122,20 @@ class TestKeywords:
 
 
 class TestFirstContact:
-    async def test_welcome_hint_and_language_picker(self, client, data, graph):
+    async def test_one_welcome_card_with_three_ways_in(self, client, data, graph):
         await handle_message(client, data, text("menu"))
-        messages = graph.messages()
-        assert len(messages) == 3  # welcome, the WhatsApp hint, the language picker
-        assert "*" in messages[0]["text"]["body"]  # HTML converted, not raw <b>
-        assert "<b>" not in messages[1]["text"]["body"]
-        # 48 interface languages: more than a list holds, so a numbered menu
-        assert messages[2]["type"] == "text" and "\n1. " in messages[2]["text"]["body"]
+        (card,) = graph.messages()
+        interactive = card["interactive"]
+        assert interactive["type"] == "button"
+        assert interactive["header"]["text"] == t("wa_welcome_title", "uz")
+        assert "STOP" in interactive["footer"]["text"]
+        assert "<b>" not in interactive["body"]["text"]  # HTML converted
+        ids = [b["reply"]["id"] for b in interactive["action"]["buttons"]]
+        assert ids == ["hd:now", "wm:menu", "showlang"]
 
     async def test_uzbek_number_gets_uzbek(self, client, data, graph):
         await handle_message(client, data, text("menu"))
-        hint = graph.messages()[1]["text"]["body"]
-        assert "kunlik" in hint
+        assert "menyu" in graph.messages()[0]["interactive"]["body"]["text"]
 
     async def test_identity_and_window(self, client, data, graph):
         await handle_message(client, data, text("2:255"))
@@ -144,7 +145,123 @@ class TestFirstContact:
 
     async def test_a_first_message_is_also_answered(self, client, data, graph):
         await handle_message(client, data, text("2:255"))
-        assert len(graph.messages()) == 4  # the welcome trio, then the verse card
+        messages = graph.messages()
+        assert messages[0]["interactive"]["header"]["text"] == t("wa_welcome_title", "uz")
+        assert len(messages) == 2  # the welcome card, then the verse card
+
+    async def test_opening_the_chat_sends_the_welcome_before_they_type(self, client, data, graph):
+        await handle_message(client, data, {"from": WA_ID, "id": "w", "type": "request_welcome"})
+        (card,) = graph.messages()
+        assert card["interactive"]["header"]["text"] == t("wa_welcome_title", "uz")
+
+
+class TestUsernames:
+    """Since 2026 a sender may come with a business-scoped user id (BSUID), or only that."""
+
+    BSUID = "UZ.13491208655302741918"
+
+    async def test_bsuid_only_sender_is_answered_by_recipient(self, client, data, graph):
+        message = {"from_user_id": self.BSUID, "id": "u1", "type": "text"}
+        message["text"] = {"body": "2:255"}
+        await handle_message(client, data, message)
+        sent = graph.messages()
+        assert sent and all(m["recipient"] == self.BSUID and "to" not in m for m in sent)
+        # Uzbek from the BSUID's country, as a +998 number would be
+        assert "menyu" in sent[0]["interactive"]["body"]["text"]
+
+    async def test_number_and_bsuid_reply_by_number(self, client, data, graph):
+        message = text("2:255")
+        message["from_user_id"] = self.BSUID
+        await handle_message(client, data, message)
+        assert all(m["to"] == WA_ID for m in graph.messages())
+        store = await get_store()
+        assert (await store.identity.get(WHATSAPP, WA_ID)).alt_id == self.BSUID
+
+    def test_language_from_the_bsuid_country(self):
+        assert lang_hint("UZ.1349") == "uz" and lang_hint("RU.77") == "ru"
+        assert lang_hint("DE.1") is None
+
+
+def rows(message):
+    return message["interactive"]["action"]["sections"][0]["rows"]
+
+
+class TestMenu:
+    async def test_menu_is_a_list_of_ten_with_descriptions(self, client, data, graph):
+        await known_user(client, data, graph)
+        await handle_message(client, data, text("menu"))
+        (menu,) = graph.messages()
+        assert menu["interactive"]["type"] == "list"
+        assert menu["interactive"]["action"]["button"] == t("wa_menu_button", "uz")
+        assert len(rows(menu)) == 10 and all(r.get("description") for r in rows(menu))
+        assert all(len(r["title"]) <= 24 for r in rows(menu))
+
+    async def test_slash_commands_from_the_command_list(self, client, data, graph):
+        await known_user(client, data, graph)
+        await handle_message(client, data, text("/menu"))
+        assert graph.messages()[0]["interactive"]["type"] == "list"
+        assert as_command("/daily") == "/daily" and as_command("/page 3") == "/page 3"
+
+    @pytest.mark.parametrize("lang", ["en", "ru", "uz", "uz-Cyrl"])
+    def test_every_label_fits_whatsapp(self, lang):
+        from bot.keyboards.menu import main_menu, settings_menu, welcome_choices
+
+        for row in main_menu(lang) + settings_menu(lang):
+            assert len(row[0].label) <= 24 and len(row[0].hint) <= 72
+        assert all(len(c.label) <= 20 for c in welcome_choices(lang)[0])
+        assert len(t("wa_menu_button", lang)) <= 20
+        assert len(t("wa_welcome_footer", lang)) <= 60 and len(t("wa_menu_footer", lang)) <= 60
+
+    async def test_every_row_does_something(self, client, data, graph, monkeypatch):
+        from bot.keyboards.menu import main_menu, settings_menu
+
+        async def stitch(urls, name):  # the mushaf page row, without the network
+            page = io.BytesIO(b"jpeg")
+            page.name = name
+            return page
+
+        monkeypatch.setattr(bot.media, "fetch_and_stitch", stitch)
+        await known_user(client, data, graph)
+        for row in main_menu("uz") + settings_menu("uz"):
+            graph.clear()
+            await handle_message(client, data, tap(row[0].data, "list_reply"))
+            assert graph.messages(), row[0].data
+            assert t("wa_not_here", "uz") not in bodies(graph), row[0].data
+
+    async def test_settings_and_back(self, client, data, graph):
+        await known_user(client, data, graph)
+        await handle_message(client, data, tap("wm:settings", "list_reply"))
+        (settings,) = graph.messages()
+        assert [r["id"] for r in rows(settings)][-1] == "wm:menu"
+
+    async def test_todays_verse_then_the_offer(self, client, data, graph):
+        await known_user(client, data, graph)
+        await handle_message(client, data, tap("hd:now"))
+        sent = graph.messages()
+        assert sent[0]["text"]["body"].startswith("🌅 *")
+        offer = sent[-1]["interactive"]
+        assert offer["body"]["text"] == t("daily_offer", "uz")
+        assert offer["action"]["buttons"][0]["reply"]["id"] == "hd:on"
+
+    async def test_short_language_list_then_all(self, client, data, graph):
+        await known_user(client, data, graph)
+        await handle_message(client, data, tap("showlang"))
+        (short,) = graph.messages()
+        ids = [r["id"] for r in rows(short)]
+        assert len(ids) == 10 and ids[-1] == "showlang:all" and "setlang:uz" in ids
+        graph.clear()
+        await handle_message(client, data, tap("showlang:all", "list_reply"))
+        assert "\n48. " in graph.messages()[0]["text"]["body"]  # every language, numbered
+
+
+class TestStarters:
+    @pytest.mark.parametrize("starter", list(STARTERS))
+    async def test_each_starter_is_understood(self, client, data, graph, starter):
+        await known_user(client, data, graph)
+        await handle_message(client, data, text(starter))
+        sent = bodies(graph)
+        assert sent and t("wa_not_here", "uz") not in sent
+        assert not any(b.startswith(t("ayah_not_found", "uz")) for b in sent)
 
 
 class TestReader:

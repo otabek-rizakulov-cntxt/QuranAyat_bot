@@ -105,6 +105,11 @@ async def _build(source: MediaSource) -> Any:
     return await source() if callable(source) else source
 
 
+# A WhatsApp interactive message's header, footer and list-button label: shared
+# handlers may pass them; Telegram has no such slots, so they are dropped.
+WHATSAPP_ONLY = ("header", "footer", "button")
+
+
 class TelegramChannel:
     """One Telegram chat — a DM, or a group optionally pinned to a forum topic."""
 
@@ -124,6 +129,8 @@ class TelegramChannel:
         if isinstance(opts.get("reply_markup"), list):
             # Choices passed where Telegram markup was expected: a missed conversion.
             raise TypeError("pass Choices as choices=, not reply_markup=")
+        for dressing in WHATSAPP_ONLY:
+            opts.pop(dressing, None)
         markup = to_markup(choices)
         if markup is not None:
             opts.setdefault("reply_markup", markup)

@@ -834,6 +834,46 @@ class TestGroups:
         assert await store.groups.list_linked(-200) == [5]
 
 
+class TestSenderIds:
+    """WhatsApp's business-scoped user id (BSUID) next to, or instead of, the number."""
+
+    PHONE = "998901234567"
+    BSUID = "UZ.13491208655302741918"
+
+    async def test_number_and_bsuid_are_one_sender(self, store):
+        row, first = await store.identity.resolve_sender("whatsapp", self.PHONE, self.BSUID)
+        assert first and (row.external_id, row.alt_id) == (self.PHONE, self.BSUID)
+        again, first = await store.identity.resolve_sender("whatsapp", None, self.BSUID)
+        assert not first and again.user_id == row.user_id
+        assert again.external_id == self.PHONE  # still replied to by number
+
+    async def test_bsuid_only_sender_is_addressed_by_bsuid(self, store):
+        row, first = await store.identity.resolve_sender("whatsapp", None, self.BSUID)
+        assert first and row.external_id == self.BSUID and row.alt_id is None
+        assert await store.identity.external_id(row.user_id, "whatsapp") == self.BSUID
+        # the number turning up later does not split them into two users
+        again, first = await store.identity.resolve_sender("whatsapp", self.PHONE, self.BSUID)
+        assert not first and again.user_id == row.user_id
+
+    async def test_existing_number_user_gains_the_bsuid(self, store):
+        uid = await store.identity.resolve("whatsapp", self.PHONE)
+        row, first = await store.identity.resolve_sender("whatsapp", self.PHONE, self.BSUID)
+        assert not first and row.user_id == uid and row.alt_id == self.BSUID
+        assert (await store.identity.get("whatsapp", self.PHONE)).alt_id == self.BSUID
+        found = await store.identity.find("whatsapp", None, self.BSUID)
+        assert found.user_id == uid
+
+    async def test_number_only_still_works(self, store):
+        row, first = await store.identity.resolve_sender("whatsapp", self.PHONE)
+        assert first and row.alt_id is None
+        _, first = await store.identity.resolve_sender("whatsapp", self.PHONE)
+        assert not first
+
+    async def test_no_id_at_all_is_an_error(self, store):
+        with pytest.raises(ValueError):
+            await store.identity.resolve_sender("whatsapp", None, None)
+
+
 class TestIdentity:
     AT = datetime(2026, 11, 1, 9, 0, tzinfo=UTC)
 

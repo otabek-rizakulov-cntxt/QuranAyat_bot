@@ -9,6 +9,8 @@ on the channel seam, so the one implementation serves Telegram and WhatsApp:
     hd:t:07:00           -> Telegram: on. WhatsApp: the explicit consent message first,
     hd:ok:07:00          -> ...whose "Yes" records consent and turns it on
     hd:off               -> off (the row is kept, so the time is remembered)
+    hd:now               -> today's verse right away (the WhatsApp menu), then an
+                            offer to get it every day if they don't already
 
 Delivery is the `daily_ayah` send kind below, through `deliver_push`: a free
 message on Telegram and inside WhatsApp's 24-hour window, the approved
@@ -94,6 +96,32 @@ async def _enable(ctx: Ctx, send_time: time) -> None:
     await ctx.reply(ctx.tr("daily_enabled", time=_hhmm(send_time)))
 
 
+async def _send_today(channel, data, surah, ayah, ui_lang, translation_lang, reciter) -> None:
+    """Today's verse card: the header, then the verse with its usual buttons."""
+    await channel.send_text(t("daily_header", ui_lang), html=True)
+    await deliver_quran(
+        channel,
+        data,
+        surah,
+        ayah,
+        "translation",
+        reciter,
+        ui_lang,
+        translation_lang,
+        choices=verse_keyboard(surah, ayah, "translation", ui_lang, app=channel.caps.web_app),
+    )
+
+
+async def _today(ctx: Ctx) -> None:
+    surah, ayah = ayah_for(local_date(datetime.now(timezone.utc), await _offset(ctx) or "+00:00"))
+    await _send_today(
+        ctx.channel, ctx.data, surah, ayah, ctx.ui_lang, ctx.translation_lang, ctx.reciter
+    )
+    sub = await ctx.store.daily.get(ctx.user_id)
+    if sub is None or not sub.enabled:
+        await ctx.reply(ctx.tr("daily_offer"), [[Choice(ctx.tr("daily_btn_on"), data=CB + "on")]])
+
+
 @command("daily")
 async def daily(ctx: Ctx) -> None:
     await _status(ctx)
@@ -103,7 +131,9 @@ async def daily(ctx: Ctx) -> None:
 async def on_tap(ctx: Ctx, cb_data: str) -> None:
     await ctx.answer()
     action, _, value = cb_data[len(CB) :].partition(":")
-    if action == "on":
+    if action == "now":
+        await _today(ctx)
+    elif action == "on":
         if await _offset(ctx) is None:
             await ctx.reply(ctx.tr("daily_pick_timezone"), offset_choices(ctx.ui_lang, CB + "tz:"))
         else:
@@ -160,17 +190,8 @@ async def push_daily(ctx: SendCtx) -> None:
     ui_lang, translation_lang = settings.ui_lang, settings.translation_lang
 
     async def session(channel) -> None:
-        await channel.send_text(t("daily_header", ui_lang), html=True)
-        await deliver_quran(
-            channel,
-            ctx.data,
-            surah,
-            ayah,
-            "translation",
-            settings.reciter,
-            ui_lang,
-            translation_lang,
-            choices=verse_keyboard(surah, ayah, "translation", ui_lang, app=channel.caps.web_app),
+        await _send_today(
+            channel, ctx.data, surah, ayah, ui_lang, translation_lang, settings.reciter
         )
 
     card = await build_verse_text(surah, ayah, "translation", ui_lang, translation_lang, ctx.data)

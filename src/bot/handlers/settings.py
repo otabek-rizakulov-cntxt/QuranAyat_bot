@@ -3,15 +3,28 @@
 from telegram import ReplyKeyboardRemove
 
 from bot.context import Ctx
-from bot.keyboards.language import language_keyboard, translation_language_keyboard
+from bot.keyboards.language import (
+    language_keyboard,
+    language_shortlist,
+    translation_language_keyboard,
+)
 from bot.router import callback, command
+from channels import WHATSAPP
 from locales import get_language, normalize_lang, t
 from services.user_settings import UserSettings
 
 
+def _ui_picker(ctx: Ctx, everything: bool = False):
+    """All 48 interface languages, or on WhatsApp a short list first: 48 is
+    more than a list message holds, and a 48-line numbered menu is a wall."""
+    if ctx.platform == WHATSAPP and not everything:
+        return language_shortlist(t("wa_more_languages", ctx.ui_lang), "showlang:all")
+    return language_keyboard()
+
+
 @command("language")
 async def language(ctx: Ctx) -> None:
-    await ctx.reply(t("choose_language", ctx.ui_lang), language_keyboard())
+    await ctx.reply(t("choose_language", ctx.ui_lang), _ui_picker(ctx))
 
 
 @command("translation")
@@ -19,10 +32,11 @@ async def translation(ctx: Ctx) -> None:
     await ctx.reply(t("choose_translation_language", ctx.ui_lang), translation_language_keyboard())
 
 
-@callback("showlang")  # the 🌐 button on a verse card
+@callback("showlang")  # the 🌐 button on a verse card; "showlang:all" = every language
 async def show_languages(ctx: Ctx, cb_data: str) -> None:
     await ctx.answer()
-    await ctx.reply(t("choose_language", ctx.ui_lang), language_keyboard())
+    picker = _ui_picker(ctx, everything=cb_data == "showlang:all")
+    await ctx.reply(t("choose_language", ctx.ui_lang), picker)
 
 
 @callback("setlang:")  # UI language picked from the /language keyboard

@@ -66,7 +66,10 @@ class Apps:
         self.wa_sent.clear()
         message = {"from": wa_id, "id": "m%d" % self.n, "type": "text", "text": {"body": text}}
         await handle_message(self.client, self.data, message)
-        return self.wa_sent[-1]["text"]["body"] if self.wa_sent else None
+        if not self.wa_sent:
+            return None
+        last = self.wa_sent[-1]
+        return last["text"]["body"] if "text" in last else last["interactive"]["body"]["text"]
 
     async def wa_user(self, wa_id=WA_ID):
         store = await get_store()

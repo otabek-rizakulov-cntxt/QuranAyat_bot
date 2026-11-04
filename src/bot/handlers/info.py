@@ -4,9 +4,10 @@ from telegram import ReplyKeyboardRemove
 
 from bot.context import Ctx
 from bot.features import group as hifz_group
+from bot.handlers.menu import show_main_menu
 from bot.miniapp import app_choice_row, app_link
 from bot.router import command
-from channels import Choice
+from channels import WHATSAPP, Choice
 from locales import t, welcome_text
 
 
@@ -27,6 +28,10 @@ async def start(ctx: Ctx) -> None:
 
 @command("help")
 async def help_(ctx: Ctx) -> None:
+    if ctx.platform == WHATSAPP:
+        # The Telegram help lists /commands and inline mode; WhatsApp gets a menu.
+        await show_main_menu(ctx)
+        return
     await _welcome(ctx)
 
 
@@ -44,7 +49,8 @@ async def app(ctx: Ctx) -> None:
 
 @command("about")
 async def about(ctx: Ctx) -> None:
-    await ctx.reply(t("about", ctx.ui_lang), html=True)
+    key = "wa_about" if ctx.platform == WHATSAPP else "about"
+    await ctx.reply(t(key, ctx.ui_lang), html=True)
 
 
 @command("index")

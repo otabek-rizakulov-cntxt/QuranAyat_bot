@@ -31,6 +31,7 @@ class Choice:
     url: Optional[str] = None  # opens a link
     web_app: Optional[str] = None  # opens the Mini App at this URL (Telegram only)
     switch_inline: Optional[str] = None  # share via inline mode (Telegram only)
+    hint: Optional[str] = None  # a second line, where one shows (a WhatsApp list row)
 
     def __post_init__(self):
         actions = [self.data, self.url, self.web_app, self.switch_inline]
