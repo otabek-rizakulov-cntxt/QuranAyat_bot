@@ -236,6 +236,12 @@ CREATE TABLE IF NOT EXISTS identity (
     PRIMARY KEY (platform, external_id)
 );
 CREATE UNIQUE INDEX IF NOT EXISTS identity_user_platform_idx ON identity (user_id, platform);
+-- WhatsApp's business-scoped user id (BSUID, 2026): sent with every message, and
+-- the only id we get for someone who adopted a WhatsApp username and never shared
+-- their number with us. `external_id` stays the address (the number when known).
+ALTER TABLE identity ADD COLUMN IF NOT EXISTS alt_id TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS identity_alt_idx ON identity (platform, alt_id)
+    WHERE alt_id IS NOT NULL;
 
 -- Verse of the day (docs/MULTI_PLATFORM_PLAN.md P2.5): one row per subscriber,
 -- kept when turned off so turning it back on remembers the time. The time zone
