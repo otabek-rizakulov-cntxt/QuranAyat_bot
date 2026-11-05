@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """How the bot looks on WhatsApp: its business profile, conversation starters,
-`/` command list, and (once Meta allows it) its username.
+`/` command list, and (once Meta allows it) its username. Also the Telegram
+bot's description texts, per language, so both platforms say the same thing.
 
 Everything here is set on Meta's side through the Graph API, not in the bot's
 code, so it lives in this re-runnable script rather than at startup. Each part
@@ -11,6 +12,7 @@ first prints what is set now and what it would change; nothing changes without
     python3 scripts/whatsapp_setup.py automation [--apply]
     python3 scripts/whatsapp_setup.py username [--apply]
     python3 scripts/whatsapp_setup.py status
+    python3 scripts/whatsapp_setup.py telegram [--apply]
 
   profile     picture (assets/whatsapp/avatar.png), About, description, email,
               websites and category. The picture is uploaded through the app's
@@ -22,13 +24,19 @@ first prints what is set now and what it would change; nothing changes without
               higher messaging limit, so this fails until the business is
               verified and the number is your own, not the test number.
   status      the number's display name, its review status and the username.
+  telegram    the Telegram bot's description (shown on an empty chat, under the
+              picture from assets/telegram/description.png) and its short
+              description (profile page, shares), in English for everyone and in
+              Uzbek and Russian for people whose Telegram app is in those
+              languages. Through the Bot API; needs only the bot token.
 
 The display name ("Quran Ayah Bot") is not set through this API: it is chosen
 when registering your own number in WhatsApp Manager, and Meta reviews it.
 
-Reads the same WhatsApp settings as the bot, from the environment or `.env`.
-Meta takes one language for all of this, for everyone; it is English. Replies
-to each user stay in their own language.
+Reads the same settings as the bot, from the environment or `.env`. Meta takes
+one language for all of its part, for everyone; it is English. Replies to each
+user stay in their own language. The Telegram picture and name are set by hand
+in BotFather (Edit Description Picture, /setname); the Bot API cannot set them.
 """
 
 import argparse
@@ -80,6 +88,49 @@ COMMANDS = [
     ("app", "Open the web app: reader, mushaf and hifz"),
     ("about", "Sources and how this bot works"),
 ]
+
+# Telegram's texts by the language code of the reader's Telegram app; "" is the
+# default, shown to everyone else. (description, short description)
+TELEGRAM_TEXTS = {
+    "": (
+        "Assalamu alaykum 👋\n\n"
+        "Send an ayah like 2:255, a range like 59:22-24, or a surah name, and get the "
+        "Arabic text, a translation in your language, tafsir and audio by the reciter "
+        "you choose.\n\n"
+        "🌅 A verse of the day at a time you pick\n"
+        "📄 Mushaf pages and juz\n"
+        "🧠 Memorize with a daily hifz plan, recall checks and streaks\n"
+        "📱 A Mini App with the reader, mushaf and hifz\n\n"
+        "Free, no ads.",
+        "📖 The Holy Qur'an on Telegram: ayat, translations, recitation, verse of the day "
+        "and hifz.",
+    ),
+    "uz": (
+        "Assalomu alaykum 👋\n\n"
+        "Oyatni 2:255 kabi, oraliqni 59:22-24 kabi yoki sura nomini yuboring: arabcha "
+        "matn, oʻz tilingizdagi tarjima, tafsir va siz tanlagan qorining qiroatini "
+        "olasiz.\n\n"
+        "🌅 Siz tanlagan vaqtda kun oyati\n"
+        "📄 Mushaf sahifalari va poralar\n"
+        "🧠 Kunlik hifz rejasi, takrorlash va ketma-ketlik bilan yodlash\n"
+        "📱 Mini ilova: oʻqish, mushaf va hifz\n\n"
+        "Bepul, reklamasiz.",
+        "📖 Qurʼoni Karim Telegram'da: oyatlar, tarjimalar, qiroat, kun oyati va hifz.",
+    ),
+    "ru": (
+        "Ассаляму алейкум 👋\n\n"
+        "Отправьте аят, например 2:255, диапазон 59:22-24 или название суры, и получите "
+        "арабский текст, перевод на вашем языке, тафсир и чтение выбранного вами "
+        "чтеца.\n\n"
+        "🌅 Аят дня в удобное вам время\n"
+        "📄 Страницы мусхафа и джузы\n"
+        "🧠 Заучивание по ежедневному плану, с проверками и серией дней\n"
+        "📱 Мини-приложение: чтение, мусхаф и хифз\n\n"
+        "Бесплатно, без рекламы.",
+        "📖 Священный Коран в Telegram: аяты, переводы, чтение, аят дня и хифз.",
+    ),
+}
+TELEGRAM_DESCRIPTION_MAX, TELEGRAM_SHORT_MAX = 512, 120
 
 # Meta's limits, checked before anything is sent.
 ABOUT_MAX, DESCRIPTION_MAX, PROMPT_MAX, PROMPTS_MAX = 139, 512, 80, 4
@@ -223,14 +274,54 @@ def status(graph: Graph) -> None:
     )
 
 
+def _bot_api(token: str, method: str, **params) -> dict:
+    """One Bot API call. The token is part of the URL, so errors never print it."""
+    response = httpx.post("https://api.telegram.org/bot%s/%s" % (token, method), json=params)
+    body = response.json()
+    if not body.get("ok"):
+        sys.exit(
+            "Telegram refused %s: %s" % (method, body.get("description", response.status_code))
+        )
+    return body["result"]
+
+
+def telegram(settings: Settings, apply: bool) -> None:
+    if not settings.token:
+        sys.exit("The Telegram bot token must be set (see .env.example).")
+    for lang, (description, short) in TELEGRAM_TEXTS.items():
+        assert len(description) <= TELEGRAM_DESCRIPTION_MAX, lang
+        assert len(short) <= TELEGRAM_SHORT_MAX, lang
+        name = lang or "default"
+        now = _bot_api(settings.token, "getMyDescription", language_code=lang)
+        now_short = _bot_api(settings.token, "getMyShortDescription", language_code=lang)
+        changes = _show("%s description" % name, now.get("description") or None, description)
+        changes_short = _show(
+            "%s short description" % name, now_short.get("short_description") or None, short
+        )
+        if apply and changes:
+            _bot_api(
+                settings.token, "setMyDescription", description=description, language_code=lang
+            )
+        if apply and changes_short:
+            _bot_api(
+                settings.token, "setMyShortDescription", short_description=short, language_code=lang
+            )
+    print(
+        "\nTelegram texts updated." if apply else "\nDry run. Re-run with --apply to change this."
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("part", choices=("profile", "automation", "username", "status"))
+    parser.add_argument("part", choices=("profile", "automation", "username", "status", "telegram"))
     parser.add_argument("--apply", action="store_true", help="change it (default: dry run)")
     parser.add_argument("--app-id", help="the Meta app id, to upload the profile picture")
     args = parser.parse_args()
     load_dotenv(os.path.join(ROOT, ".env"))
     settings = Settings.from_env()
+    if args.part == "telegram":
+        telegram(settings, args.apply)
+        return
     graph = Graph(settings)
     if args.part == "profile":
         profile(graph, settings, args.apply, args.app_id)
