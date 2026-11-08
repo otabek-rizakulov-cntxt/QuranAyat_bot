@@ -29,7 +29,7 @@ on a free Colab GPU with `scripts/uz_audio/colab_transcribe.ipynb`:
 1. Open colab.research.google.com → *File → Upload notebook* and pick the `.ipynb` (or open it from
    GitHub once the branch is pushed).
 2. Set *Runtime → Change runtime type → T4 GPU*, then *Run all*.
-3. Section 4 compares large-v3, large-v3-turbo and an Uzbek fine-tune on the approved al-Baqarah
+3. Section 4 compares large-v3, large-v3-turbo (the default, best on timing) and an Uzbek fine-tune on the approved al-Baqarah
    cuts. Set `MODEL` to the winner, then run sections 5–7.
 4. Colab downloads the mp3s itself (to its temporary disk, never Drive). Results are saved to
    `MyDrive/quranayat_uz_audio/` after every surah, so after a disconnect you just *Run all* again.
