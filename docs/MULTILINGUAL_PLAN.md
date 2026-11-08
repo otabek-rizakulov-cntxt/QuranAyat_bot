@@ -489,6 +489,47 @@ minimum confidence, and the count of boundaries under 0.5.
 - `Track` gains optional `start`/`end` (seconds). The player seeks instead of reloading when `src` doesn't change, and advances on `timeupdate ≥ end`. One ayah, a range and the whole surah are then all just queues of segments over one URL. The highlighted ayah is the current track.
 - Reader, for `uz`/`uz-Cyrl`: a "🎧 Tarjima" toggle that plays translation segments instead of recitation, plays the whole surah with the current ayah highlighted, downloads the whole surah through `WebApp.downloadFile` (newbooks URL), and offers "Send to chat" for an ayah or range through the API above. An `estimated` surah shows a small "taxminiy" badge.
 
+#### 8.1.12 Cost of hosting the audio ourselves (estimate, 2026-11-08)
+
+Today nothing is hosted: clips are byte ranges of the newbooks.uz files, and only Telegram
+`file_id`s and the timing table are kept (§8.1.7). This section prices the alternative in case
+newbooks.uz goes away or proves too slow. **Not decided. Hosting would reverse the "never store the
+audio" decision.**
+
+**Size.** All 6236 ayah clips together are about 1.6 GB, the same bytes as the 114 surah files
+(33.8 h of audio). An average ayah is about 20 s, or about 250 KB (Baqara ayahs at 96 kbps average
+about 385 KB). Keeping per-ayah files *and* the whole surahs would double storage to about 3.2 GB.
+
+**What drives the cost is the Mini App, not the bot.**
+- **Bot:** each clip is uploaded to Telegram once and then replayed by `file_id`. Egress is about 1.6 GB once, then about 0 a month, whatever the number of users.
+- **Mini App:** streams from the host on every play. Assumption: 100 ayah plays plus 2 whole surahs (about 14 MB average) per user per month, about 53 MB per user.
+
+| Monthly Mini App users | Egress | Koyeb (volume + egress) | Cloudflare R2 | Backblaze B2 alone |
+|---|---|---|---|---|
+| 1,000 | ~53 GB | ~$0.25 | $0 | ~$0.50 |
+| 10,000 | ~530 GB | ~$17 | $0 | ~$5 |
+| 100,000 | ~5.3 TB | ~$210 | ~$1.50 | ~$53 |
+
+Prices used (looked up 2026-11-08):
+- **Koyeb:** volume storage $0.15/GB-month. Egress has 100 GB free a month, then $0.04/GB (the rate in §11.1 of `RECITATION_CHECKER_INVESTIGATION.md`; an aggregator lists $0.02). Koyeb would also have to *serve* the files. The free 0.1 vCPU instance can't at this volume, so add at least the "small" instance at $10.71/month.
+- **Cloudflare R2:** storage $0.015/GB-month with 10 GB free, so $0 here. Egress is always free. Reads are free up to 10 M a month, then $0.36 per million.
+- **Backblaze B2:** 10 GB of storage free. Free egress is only 3× what is stored (about 4.8 GB), then $0.01/GB. Egress through Cloudflare's CDN is free, which makes it about $0.
+
+**If we host it: Cloudflare R2.**
+- It costs about $0 below roughly 70,000 active Mini App users.
+- It removes the dependency on newbooks.uz (§8.1.6 Q3).
+- It's faster. newbooks.uz serves about 85 KB/s per connection, so a Baqara ayah takes about 4–5 s to start the first time.
+
+No need to cut the files: R2 supports the same Range requests, so uploading the 114 surah files
+unchanged works with the current code. Only `SOURCE_URL` in `infra/uz_audio.py` and the `url` in the
+web export change, and the timing table stays valid as long as the bytes are identical (`debug
+smoke` checks that).
+
+Sources:
+- [Cloudflare R2 pricing](https://developers.cloudflare.com/r2/platform/pricing/)
+- [Backblaze B2 pricing](https://backblaze.com/cloud-storage/pricing)
+- [Koyeb pricing comparison](https://getdeploying.com/backblaze-vs-koyeb)
+
 ---
 
 ## 9. Phased roadmap
