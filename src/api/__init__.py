@@ -8,11 +8,11 @@
 
 from fastapi import APIRouter
 
-from . import catalog, check, plans, progress, session, stats
+from . import catalog, check, plans, progress, session, stats, uz_audio
 from .auth import require_user
 
 __all__ = ["router", "require_user"]
 
 router = APIRouter(prefix="/api/v1")
-for module in (session, catalog, plans, check, progress, stats):
+for module in (session, catalog, plans, check, progress, stats, uz_audio):
     router.include_router(module.router)

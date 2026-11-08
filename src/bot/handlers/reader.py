@@ -5,7 +5,7 @@ prompt and any wizard have had their turn (see bot.dispatch).
 """
 
 from bot.context import Ctx
-from bot.keyboards.verse import TYPE_BY_CODE, verse_keyboard
+from bot.keyboards.verse import TYPE_BY_CODE, uz_audio_row, verse_keyboard
 from bot.limits import MAX_RANGE_AYAHS
 from bot.media import deliver_combined_audio, deliver_quran, deliver_repeated_audio
 from bot.router import callback, command
@@ -127,7 +127,8 @@ async def read_text(ctx: Ctx, text: str) -> None:
                 start,
                 end,
                 ctx.reciter,
-                choices=verse_keyboard(surah, end, "audio", ctx.ui_lang),
+                choices=uz_audio_row(surah, start, end, ctx.ui_lang)
+                + verse_keyboard(surah, end, "audio", ctx.ui_lang),
             )
     elif Quran.exists(surah, start):
         await _send_verse(ctx, surah, start, quran_type)

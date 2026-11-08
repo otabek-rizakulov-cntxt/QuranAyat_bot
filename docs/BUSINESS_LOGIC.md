@@ -201,6 +201,13 @@ appends a warning specific to which of the two it is.
 change which recording is sent; only `/reciter` does. `tests/test_reciter_picker.py`
 asserts this directly.
 
+The **Uzbek translation audio** (MULTILINGUAL_PLAN §8.1) does not break this rule:
+it is a separate row of buttons (`🎧 Tarjima`, `📚 Sura tarjimasi`, prefix `uz:`)
+shown to `uz`/`uz-Cyrl` UI users beside the recitation, never a different
+recording behind the existing audio button. Clips are byte ranges of the
+newbooks.uz surah mp3s (`infra/uz_audio.py`, `infra/uz_audio_delivery.py`),
+cached by file_id like every other media send.
+
 ### Repeat (memorization)
 
 `🔁 Repeat ×3` on a verse card sends the ayah recited `REPEAT_COUNT` times back to

@@ -367,4 +367,14 @@ strings = {
     "web_next_milestone": "Keyingi marra",
     "web_heat_less": "Kam",
     "web_heat_more": "Koʻp",
+    # Oʻzbekcha audio tarjima (newbooks.uz)
+    "uza_btn_ayah": "🎧 Tarjima",
+    "uza_btn_surah": "📚 Sura tarjimasi",
+    "uza_title": "Tarjima",
+    "uza_performer": "Oʻzbekcha tarjima",
+    "uza_credit": "🎧 Oʻzbekcha tarjima · newbooks.uz",
+    "uza_estimated": "⏱ Oyat chegaralari taxminiy",
+    "uza_part": "{name} — {i}/{n} ({first}–{last}-oyatlar)",
+    "uza_unavailable": "Bu uchun audio tarjima mavjud emas.",
+    "uza_failed": "Audio manbasi hozir javob bermayapti. Birozdan soʻng qayta urinib koʻring.",
 }
