@@ -3,7 +3,8 @@
     python3 -m scripts.uz_audio.transcribe [SURAH ...] [--force] [--wait]
 
 Writes, per surah, into the local cache (never the repo):
-    transcripts/NNN.json  Whisper segments + words, times in seconds from file start
+    transcripts/NNN.json  Whisper segments + words, times in seconds from file start,
+                          and the mp3's frame facts (`mp3`: kbps, frame_bytes, frames, size)
     energy/NNN.npy        RMS level in dB per 20 ms hop, for the pause detector
 
 Needs Apple Silicon + `pip install -r scripts/uz_audio/requirements.txt`
@@ -13,6 +14,7 @@ the server's Content-Length).
 """
 
 import argparse
+import dataclasses
 import os
 import sys
 import time
@@ -116,7 +118,13 @@ def transcribe(surah: int) -> None:
     del audio
     write_json(
         os.path.join(TRANSCRIPT_DIR, "%03d.json" % surah),
-        {"surah": surah, "model": MODEL, "duration": info.duration, "segments": segments},
+        {
+            "surah": surah,
+            "model": MODEL,
+            "duration": info.duration,
+            "mp3": dataclasses.asdict(info),  # lets export run without the mp3 (e.g. on Colab)
+            "segments": segments,
+        },
     )
     print(
         "%03d  %6.0fs audio  %5.0fs work  %d segments"

@@ -423,7 +423,9 @@ def main() -> None:
                 print("%03d  not transcribed yet" % surah)
             continue
         energy = np.load(os.path.join(ENERGY_DIR, "%03d.npy" % surah))
-        result = align(surah, ref, read_json(tpath), energy, pins)
+        transcript = read_json(tpath)
+        result = align(surah, ref, transcript, energy, pins)
+        result["mp3"] = transcript.get("mp3")  # frame facts, for export without the mp3
         write_json(os.path.join(ALIGN_DIR, "%03d.json" % surah), result, indent=1)
         confs = [a["conf"] for a in result["ayahs"]]
         print(
