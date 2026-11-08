@@ -42,7 +42,13 @@ HOP_S = 0.02  # energy resolution
 QUIET_DB = 10.0  # above the surah's noise floor (10th percentile) still counts as quiet
 MIN_PAUSE = 0.2
 LEAD_IN = 0.2  # cut this long before the next ayah's speech onset
-SPLIT_GAP = 0.45
+SPLIT_GAP = 0.45  # split a Whisper segment where two words are this far apart
+# Fallback for a surah where those units are fewer than its ayahs: split wherever the
+# audio has a pause this long near a word boundary. Word times smear real pauses
+# (faster-whisper put 1:3 and 1:4, ~1 s apart, in one segment with no gap between the
+# words). Only a fallback: finer units give the search more room to misplace a cut.
+SPLIT_PAUSE = 0.3
+MIN_VOICED = 0.3  # seconds of non-quiet audio a split-off piece must contain
 BLIP = 6  # hops (0.12 s)  # split a Whisper segment where two words are this far apart
 
 # --- text normalisation ----------------------------------------------------------
@@ -204,15 +210,31 @@ def quiet_runs(quiet: np.ndarray, a: float, b: float):
 # --- units ------------------------------------------------------------------------
 
 
-def units_from(transcript: dict, quiet: np.ndarray) -> list:
-    """Whisper segments, split where a long quiet gap separates two words."""
+def voiced(quiet: np.ndarray, a: float, b: float) -> float:
+    """Seconds of non-quiet audio in [a, b]."""
+    i, j = max(0, int(a / HOP_S)), min(len(quiet), int(b / HOP_S))
+    return float((~quiet[i:j]).sum()) * HOP_S if j > i else 0.0
+
+
+def units_from(transcript: dict, quiet: np.ndarray, fine: bool = False) -> list:
+    """Whisper segments, split where a long quiet gap separates two words.
+
+    `fine`: split at every real pause between words instead (see SPLIT_PAUSE)."""
     units = []
     for seg in transcript["segments"]:
         words = seg["words"] or [[seg["start"], seg["end"], seg["text"]]]
         cur = [words[0]]
         for prev, w in zip(words, words[1:]):
-            gap = w[0] - prev[1]
-            if gap >= SPLIT_GAP and quiet_runs(quiet, prev[1], w[0]):
+            if fine:
+                near = quiet_runs(quiet, prev[1] - 0.3, w[0] + 0.3)
+                # ...unless the piece before is barely spoken: a word Whisper smeared over
+                # the pause (1:3's "O" sat on the pause before it) stays with what follows.
+                split = any(b - a >= SPLIT_PAUSE for a, b in near) and (
+                    voiced(quiet, cur[0][0], prev[1]) >= MIN_VOICED
+                )
+            else:
+                split = w[0] - prev[1] >= SPLIT_GAP and bool(quiet_runs(quiet, prev[1], w[0]))
+            if split:
                 units.append(cur)
                 cur = []
             cur.append(w)
@@ -256,9 +278,21 @@ def onset_cut(quiet: np.ndarray, prev_end: float, next_start: float, next_word_e
 
 
 def align(surah: int, ref: dict, transcript: dict, energy: np.ndarray, pins: dict) -> dict:
+    """Ayah boundaries for one surah; retries with finer units if there are too few."""
+    try:
+        return _align(surah, ref, transcript, energy, pins, fine=False)
+    except RuntimeError:
+        result = _align(surah, ref, transcript, energy, pins, fine=True)
+        result["fine_units"] = True  # worth a listen: see SPLIT_PAUSE
+        return result
+
+
+def _align(
+    surah: int, ref: dict, transcript: dict, energy: np.ndarray, pins: dict, fine: bool
+) -> dict:
     n = AYAH_COUNTS[surah - 1]
     quiet = quiet_mask(energy)
-    units = units_from(transcript, quiet)
+    units = units_from(transcript, quiet, fine)
     U = len(units)
     ref_sk = [skeleton(strip_notes(ref[(surah, a)])) for a in range(1, n + 1)]
     ref_tri = [trigrams(sk) for sk in ref_sk]
@@ -416,6 +450,7 @@ def main() -> None:
     ap.add_argument("surahs", nargs="*", type=int, help="default: every transcribed surah")
     args = ap.parse_args()
     ref, pins = load_reference(), load_pins()
+    failed = []
     for surah in args.surahs or range(1, 115):
         tpath = os.path.join(TRANSCRIPT_DIR, "%03d.json" % surah)
         if not os.path.exists(tpath):
@@ -424,7 +459,12 @@ def main() -> None:
             continue
         energy = np.load(os.path.join(ENERGY_DIR, "%03d.npy" % surah))
         transcript = read_json(tpath)
-        result = align(surah, ref, transcript, energy, pins)
+        try:
+            result = align(surah, ref, transcript, energy, pins)
+        except RuntimeError as err:  # one surah must not stop the other 113
+            print("%03d  FAILED: %s" % (surah, err), flush=True)
+            failed.append(surah)
+            continue
         result["mp3"] = transcript.get("mp3")  # frame facts, for export without the mp3
         write_json(os.path.join(ALIGN_DIR, "%03d.json" % surah), result, indent=1)
         confs = [a["conf"] for a in result["ayahs"]]
@@ -433,6 +473,9 @@ def main() -> None:
             % (surah, len(confs), result["intro_end"], min(confs), sum(c < 0.5 for c in confs)),
             flush=True,
         )
+
+    if failed:
+        print("failed: %s (export leaves them out; see debug report)" % failed)
 
 
 if __name__ == "__main__":
