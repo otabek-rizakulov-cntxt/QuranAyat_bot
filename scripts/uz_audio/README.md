@@ -21,6 +21,29 @@ Whisper large-v3-turbo needs about 3 GB free RAM. On an 8 GB Mac, close the
 browser and other heavy apps first. Under memory pressure macOS kills the
 process without a traceback, and it just disappears.
 
+## Transcribing on Colab (preferred)
+
+Transcribing 33.8 h of audio is too heavy for an 8 GB Mac: it swaps and gets killed. So run stage 1
+on a free Colab GPU with `scripts/uz_audio/colab_transcribe.ipynb`:
+
+1. Open colab.research.google.com → *File → Upload notebook* and pick the `.ipynb` (or open it from
+   GitHub once the branch is pushed).
+2. Set *Runtime → Change runtime type → T4 GPU*, then *Run all*.
+3. Section 4 compares large-v3, large-v3-turbo and an Uzbek fine-tune on the approved al-Baqarah
+   cuts. Set `MODEL` to the winner, then run sections 5–7.
+4. Colab downloads the mp3s itself (to its temporary disk, never Drive). Results are saved to
+   `MyDrive/quranayat_uz_audio/` after every surah, so after a disconnect you just *Run all* again.
+5. Section 7 downloads `uz_audio_colab.zip` (a few MB). On the Mac:
+
+```bash
+unzip -o ~/Downloads/uz_audio_colab.zip -d ~/.cache/quranayat/uz_audio
+python3 -m scripts.uz_audio.align && python3 -m scripts.uz_audio.export   # seconds, low memory
+```
+
+Align was tuned on large-v3-turbo output. After switching models, check that `debug show 2:284`
+still matches the approved cuts (the CI test `test_baqarah_matches_the_cuts_approved_by_ear` does
+this too).
+
 ## Pipeline
 
 ```bash
