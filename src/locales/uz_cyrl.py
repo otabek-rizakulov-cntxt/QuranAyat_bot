@@ -367,4 +367,14 @@ strings = {
     "web_next_milestone": "Кейинги марра",
     "web_heat_less": "Кам",
     "web_heat_more": "Кўп",
+    # Ўзбекча аудио таржима (newbooks.uz)
+    "uza_btn_ayah": "🎧 Таржима",
+    "uza_btn_surah": "📚 Сура таржимаси",
+    "uza_title": "Таржима",
+    "uza_performer": "Ўзбекча таржима",
+    "uza_credit": "🎧 Ўзбекча таржима · newbooks.uz",
+    "uza_estimated": "⏱ Оят чегаралари тахминий",
+    "uza_part": "{name} — {i}/{n} ({first}–{last}-оятлар)",
+    "uza_unavailable": "Бу учун аудио таржима мавжуд эмас.",
+    "uza_failed": "Аудио манбаси ҳозир жавоб бермаяпти. Бироздан сўнг қайта уриниб кўринг.",
 }

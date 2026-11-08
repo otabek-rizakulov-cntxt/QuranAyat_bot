@@ -392,4 +392,14 @@ strings = {
     "web_next_milestone": "Next milestone",
     "web_heat_less": "Less",
     "web_heat_more": "More",
+    # Uzbek translation audio (newbooks.uz) — shown to uz/uz-Cyrl users only
+    "uza_btn_ayah": "🎧 Uzbek audio",
+    "uza_btn_surah": "📚 Whole surah (Uzbek)",
+    "uza_title": "Uzbek translation",
+    "uza_performer": "Uzbek translation",
+    "uza_credit": "🎧 Uzbek translation · newbooks.uz",
+    "uza_estimated": "⏱ Ayah timing is approximate",
+    "uza_part": "{name} — {i}/{n} (ayahs {first}–{last})",
+    "uza_unavailable": "Uzbek audio isn't available for this.",
+    "uza_failed": "The audio source isn't responding right now. Please try again a bit later.",
 }

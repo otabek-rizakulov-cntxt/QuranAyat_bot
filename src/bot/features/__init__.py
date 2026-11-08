@@ -70,6 +70,7 @@ PREFIXES: Dict[str, str] = {
     "leaderboard": "hl:",  # hl:me  hl:join
     "group": "gr:",  # gr:tl:ru  gr:rc:...  gr:ok — Phase 2 group setup
     "daily": "hd:",  # hd:on  hd:tz:+05:00  hd:t:07:00  hd:ok:07:00  hd:off — verse of the day
+    "uz_audio": "uz:",  # uz:a:2:284  uz:r:2:284:285  uz:s:2 — Uzbek translation audio
     "shared": "hx:",  # hx:cancel  hx:back — the seam's own controls
 }
 

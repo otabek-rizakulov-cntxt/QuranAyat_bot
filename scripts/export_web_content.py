@@ -15,6 +15,9 @@
 #                                   ayah 1 is lifted into `"bismillah": true`
 #   translations/{code}/{surah}.json   every bundled translation (+ `translit`)
 #   tafsir/{surah}.json             Tafsir al-Jalalayn (English)
+#   uz-audio/{surah}.json           Uzbek translation audio: the newbooks.uz mp3 URL,
+#                                   whether the cuts are verified, and each ayah's
+#                                   [start, end] in seconds (MULTILINGUAL_PLAN §8.1)
 #
 # Everything is read through `modules.Quran`, the same parser the bot uses, so
 # the app and the bot can never disagree on an ayah boundary.
@@ -32,6 +35,7 @@ from domain.quran import (  # noqa: E402
     Quran,
     TranslationRegistry,
 )
+from infra import uz_audio  # noqa: E402
 
 DEFAULT_OUT_DIR = os.path.join(ROOT, "build", "web-content")
 ARABIC = "ar"
@@ -110,9 +114,26 @@ def export(out_dir: str = DEFAULT_OUT_DIR) -> dict:
     for n, ayahs in enumerate(tafsir.text, start=1):
         _write(os.path.join(out_dir, "tafsir", "%d.json" % n), {"n": n, "ayahs": ayahs})
 
+    for n in range(1, 115):
+        if uz_audio.available(n):
+            _write(os.path.join(out_dir, "uz-audio", "%d.json" % n), uz_audio_doc(n))
+
     meta = build_meta(codes)
     _write(os.path.join(out_dir, "meta.json"), meta)
     return meta
+
+
+def uz_audio_doc(n: int) -> dict:
+    """One surah's Uzbek audio for the Mini App, which seeks inside the mp3."""
+    return {
+        "n": n,
+        "url": uz_audio.url(n),
+        "verified": not uz_audio.estimated(n),
+        "ayahs": [
+            [round(x, 3) for x in uz_audio.seconds(n, a, a)]
+            for a in range(1, Quran.get_surah_length(n) + 1)
+        ],
+    }
 
 
 def main() -> int:

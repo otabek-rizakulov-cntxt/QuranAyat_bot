@@ -85,7 +85,12 @@ WA_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
 # Verse of the day (`daily_*`, MULTI_PLATFORM_PLAN P2.5): same policy.
 DAILY_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
 
+# Uzbek translation audio (`uza_*`, MULTILINGUAL_PLAN §8.1): only Uzbek UI users
+# see these buttons, so only the Uzbek tables (and English, the fallback) carry them.
+UZ_AUDIO_LOCALES = frozenset({"en", "uz", "uz-Cyrl"})
+
 PARTIAL_KEY_PREFIXES = {
+    "uza_": UZ_AUDIO_LOCALES,
     "group_": GROUP_LOCALES,
     "web_": WEB_LOCALES,
     "wa_": WA_LOCALES,
