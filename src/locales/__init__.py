@@ -89,7 +89,11 @@ DAILY_LOCALES = frozenset({"en", "ru", "uz", "uz-Cyrl"})
 # see these buttons, so only the Uzbek tables (and English, the fallback) carry them.
 UZ_AUDIO_LOCALES = frozenset({"en", "uz", "uz-Cyrl"})
 
+# Tajweed lessons (`tj_*`, docs/TAJWEED_PLAN.md): Uzbek only in v1, English fallback.
+TAJWEED_LOCALES = frozenset({"en", "uz", "uz-Cyrl"})
+
 PARTIAL_KEY_PREFIXES = {
+    "tj_": TAJWEED_LOCALES,
     "uza_": UZ_AUDIO_LOCALES,
     "group_": GROUP_LOCALES,
     "web_": WEB_LOCALES,
@@ -157,6 +161,12 @@ BOT_COMMANDS = (
     ("link", "link_cmd"),
     ("about", "cmd_about"),
 )
+
+# Commands that exist only in some languages' menus (Telegram's language_code), kept
+# out of BOT_COMMANDS so the other menus and /start lists stay as they are.
+LANG_COMMANDS = {
+    "uz": (("tajvid", "tj_cmd"),),  # tajweed lessons: Uzbek only (docs/TAJWEED_PLAN.md)
+}
 
 
 def command_lines(lang: str) -> str:

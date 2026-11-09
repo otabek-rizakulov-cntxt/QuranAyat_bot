@@ -27,7 +27,7 @@ from infra.scheduler import run_scheduler
 from infra.scheduler.push import set_whatsapp_client
 from infra.store import apply_schema
 from infra.telegram import create_bot
-from locales import BOT_COMMANDS, DEFAULT_LANG, UI_LANGUAGES, t
+from locales import BOT_COMMANDS, DEFAULT_LANG, LANG_COMMANDS, UI_LANGUAGES, t
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,8 @@ _COMMAND_MENU_LANGS = tuple(
 
 def _commands_for(lang: str) -> list:
     # Same source of truth as the /start message's command list (see BOT_COMMANDS).
-    return [BotCommand(command, t(key, lang)) for command, key in BOT_COMMANDS]
+    commands = BOT_COMMANDS + LANG_COMMANDS.get(lang, ())
+    return [BotCommand(command, t(key, lang)) for command, key in commands]
 
 
 async def _set_bot_commands(bot) -> None:
