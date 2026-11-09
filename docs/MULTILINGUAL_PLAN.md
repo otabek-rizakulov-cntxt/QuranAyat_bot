@@ -350,7 +350,7 @@ it if on-demand slicing shows load issues.
 - This is **not** a `performers.json` entry. That catalog is everyayah's one-file-per-ayah layout. It's a separate source module (`infra/nb_audio.py`: URL builder, Range slicer, timing lookup).
 - It does **not** change the reciter. "Audio never follows language" (`BUSINESS_LOGIC.md` § Audio catalog kinds, `tests/test_reciter_picker.py`) still holds: this is an extra button beside the recitation, shown only to `uz`/`uz-Cyrl`.
 - WhatsApp: whole surahs via cached media id (parts ≤ 16 MB, the WhatsApp audio cap) and ayah slices the same way. Later; not in the first cut.
-- Attribution: identify the translator and narrator (the files carry no tags). Record them in `ATTRIBUTIONS.md` and the audio caption. Credit the newbooks.uz mirror as the source.
+- Attribution: identify the translator and narrator (the files carry no tags). Record them in `ATTRIBUTIONS.md` and the audio caption. **No external site is named in anything users see** (owner's decision, 2026-11-09): the caption is just "🎧 Oʻzbekcha tarjima"; the source is recorded only in `ATTRIBUTIONS.md`.
 
 #### 8.1.6 Open questions
 
