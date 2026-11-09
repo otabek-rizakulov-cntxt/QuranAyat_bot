@@ -108,7 +108,15 @@ async def _send_today(channel, data, surah, ayah, ui_lang, translation_lang, rec
         reciter,
         ui_lang,
         translation_lang,
-        choices=verse_keyboard(surah, ayah, "translation", ui_lang, app=channel.caps.web_app),
+        # web_app doubles as "is Telegram": the Uzbek audio row is Telegram-only too
+        choices=verse_keyboard(
+            surah,
+            ayah,
+            "translation",
+            ui_lang,
+            app=channel.caps.web_app,
+            uz_audio=channel.caps.web_app,
+        ),
     )
 
 

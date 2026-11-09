@@ -489,6 +489,24 @@ minimum confidence, and the count of boundaries under 0.5.
 - `Track` gains optional `start`/`end` (seconds). The player seeks instead of reloading when `src` doesn't change, and advances on `timeupdate ≥ end`. One ayah, a range and the whole surah are then all just queues of segments over one URL. The highlighted ayah is the current track.
 - Reader, for `uz`/`uz-Cyrl`: a "🎧 Tarjima" toggle that plays translation segments instead of recitation, plays the whole surah with the current ayah highlighted, downloads the whole surah through `WebApp.downloadFile` (newbooks URL), and offers "Send to chat" for an ayah or range through the API above. An `estimated` surah shows a small "taxminiy" badge.
 
+#### 8.1.11a Results of the first full run (2026-11-09)
+
+Transcribed on a Colab T4 with large-v3-turbo via faster-whisper. Section 4 of the notebook chose
+it with a mean cut error of 0.28 s on the approved al-Baqarah cuts, against 0.41 s for large-v3 and
+8.67 s for an Uzbek fine-tune. It ran at about 27× real time, so all 33.8 h took about 75 min.
+Align and export ran locally in about 3 min and 61 MB of RAM.
+
+- **110 surahs, 5855 ayahs** are in `data/uz_audio_timings.json` and `data/uz_audio_manifest.csv`. All are `estimated`; 681 boundaries have confidence < 0.5 and are the first to listen to (`debug report`).
+- **al-Baqarah check:** 2:284 starts at 9034.13 s (approved 9034.1). The 284|285 cut is at 9067.97 s, inside the measured pause 9066.6–9068.2 (approved mid-pause 9067.4). 285|286 is at 9114.37 s (approved 9114.2).
+- **Excluded, because the source file is only part of the surah:** 12 (starts at about 12:75), 16 (only about 119–128), 17 (only about 105–111) and 76 (starts at about 76:6). See `INCOMPLETE_SOURCE` in `scripts/uz_audio/common.py`. The bot shows no Uzbek audio for these until complete recordings are found; newbooks.uz has no other parts under other file names.
+- **Fixes the run needed** (all in the repo):
+  - the CUDA 12 libraries on Colab;
+  - chunked transcription (al-Baqarah in one call ran out of RAM);
+  - a pause-based unit split as a fallback, when Whisper merges two ayahs into one segment (1:3–4);
+  - rejecting a false basmala match that leaves fewer units than ayahs (84);
+  - a minimum ayah length of 0.8 s (10:27 came out 0 s);
+  - the Uzbek row made Telegram-only (`verse_keyboard(..., uz_audio=True)`), because the row broke WhatsApp verse cards.
+
 #### 8.1.12 Cost of hosting the audio ourselves (estimate, 2026-11-08)
 
 Today nothing is hosted: clips are byte ranges of the newbooks.uz files, and only Telegram

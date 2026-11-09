@@ -10,6 +10,7 @@ from bot.limits import MAX_RANGE_AYAHS
 from bot.media import deliver_combined_audio, deliver_quran, deliver_repeated_audio
 from bot.router import callback, command
 from bot.text import build_verse_text
+from channels import TELEGRAM
 from domain.parsing import parse_ayah_range
 from domain.quran import Quran
 from infra import nav_state
@@ -27,6 +28,11 @@ async def reader_position(ctx: Ctx) -> tuple:
     return surah, ayah, quran_type
 
 
+def _telegram(ctx: Ctx) -> bool:
+    """Uzbek translation audio is Telegram-only for now (MULTILINGUAL_PLAN §8.1.7)."""
+    return ctx.platform == TELEGRAM
+
+
 async def _send_verse(ctx: Ctx, surah: int, ayah: int, quran_type: str, choices=None) -> None:
     """deliver_quran with the caller's settings, under a fresh verse card."""
     await deliver_quran(
@@ -38,7 +44,8 @@ async def _send_verse(ctx: Ctx, surah: int, ayah: int, quran_type: str, choices=
         ctx.reciter,
         ctx.ui_lang,
         ctx.translation_lang,
-        choices=choices or verse_keyboard(surah, ayah, quran_type, ctx.ui_lang),
+        choices=choices
+        or verse_keyboard(surah, ayah, quran_type, ctx.ui_lang, uz_audio=_telegram(ctx)),
     )
 
 
@@ -61,7 +68,7 @@ async def repeat(ctx: Ctx, cb_data: str) -> None:
             ayah,
             ctx.reciter,
             ctx.ui_lang,
-            choices=verse_keyboard(surah, ayah, "audio", ctx.ui_lang),
+            choices=verse_keyboard(surah, ayah, "audio", ctx.ui_lang, uz_audio=_telegram(ctx)),
         )
 
 
@@ -76,7 +83,9 @@ async def verse_card(ctx: Ctx, cb_data: str) -> None:
     if not Quran.exists(surah, ayah):
         await ctx.answer()
         return
-    choices = verse_keyboard(surah, ayah, quran_type, ctx.ui_lang, app=not ctx.from_inline)
+    choices = verse_keyboard(
+        surah, ayah, quran_type, ctx.ui_lang, app=not ctx.from_inline, uz_audio=_telegram(ctx)
+    )
     if quran_type in ("translation", "tafsir"):
         text = await build_verse_text(
             surah, ayah, quran_type, ctx.ui_lang, ctx.translation_lang, ctx.data
@@ -127,8 +136,8 @@ async def read_text(ctx: Ctx, text: str) -> None:
                 start,
                 end,
                 ctx.reciter,
-                choices=uz_audio_row(surah, start, end, ctx.ui_lang)
-                + verse_keyboard(surah, end, "audio", ctx.ui_lang),
+                choices=(uz_audio_row(surah, start, end, ctx.ui_lang) if _telegram(ctx) else [])
+                + verse_keyboard(surah, end, "audio", ctx.ui_lang, uz_audio=_telegram(ctx)),
             )
     elif Quran.exists(surah, start):
         await _send_verse(ctx, surah, start, quran_type)

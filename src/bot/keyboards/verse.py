@@ -54,7 +54,12 @@ def uz_audio_row(surah: int, first: int, last: int, ui_lang: str) -> Choices:
 
 
 def verse_keyboard(
-    surah: int, ayah: int, quran_type: str, ui_lang: str, app: bool = True
+    surah: int,
+    ayah: int,
+    quran_type: str,
+    ui_lang: str,
+    app: bool = True,
+    uz_audio: bool = False,
 ) -> Choices:
     """The keyboard attached to a verse card — localized and RTL-aware.
 
@@ -66,8 +71,9 @@ def verse_keyboard(
     `ui_lang` only: this keyboard's labels are bot UI text, independent of the
     user's chosen translation language.
 
-    Uzbek UI users get one more row for the Uzbek translation audio
-    (`uz_audio_row`). With the Mini App configured, a last row opens this ayah in
+    With `uz_audio` (Telegram only: the clips are sent as Telegram audio, and a
+    WhatsApp card has no room for more buttons), Uzbek UI users get one more row
+    for the Uzbek translation audio (`uz_audio_row`). With the Mini App configured, a last row opens this ayah in
     it — except on an inline-mode message (`app=False`), where Telegram rejects
     web_app buttons.
     """
@@ -101,7 +107,7 @@ def verse_keyboard(
                 Choice("📤", switch_inline="%d:%d" % (surah, ayah)),
             ],
         ]
-        + uz_audio_row(surah, ayah, ayah, ui_lang)
+        + (uz_audio_row(surah, ayah, ayah, ui_lang) if uz_audio else [])
         + (
             app_choice_row("📱 " + t("web_btn_open_app", ui_lang), "/read/%d?a=%d" % (surah, ayah))
             if app

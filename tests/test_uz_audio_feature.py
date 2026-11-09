@@ -143,18 +143,25 @@ def _data(choices):
 
 @pytest.mark.parametrize("lang", ["uz", "uz-Cyrl"])
 def test_uzbek_users_get_the_row(lang):
-    data = _data(verse_keyboard(2, 284, "translation", lang))
+    data = _data(verse_keyboard(2, 284, "translation", lang, uz_audio=True))
     assert "uz:a:2:284" in data and "uz:s:2" in data
+
+
+def test_whatsapp_cards_never_get_the_row():
+    # uz_audio defaults off: WhatsApp callers don't opt in (Telegram-only, §8.1.7)
+    assert not any(d.startswith("uz:") for d in _data(verse_keyboard(2, 284, "translation", "uz")))
 
 
 @pytest.mark.parametrize("lang", ["en", "ru", "tr"])
 def test_other_users_do_not(lang):
-    assert not any(d.startswith("uz:") for d in _data(verse_keyboard(2, 284, "translation", lang)))
+    data = _data(verse_keyboard(2, 284, "translation", lang, uz_audio=True))
+    assert not any(d.startswith("uz:") for d in data)
 
 
 def test_no_row_without_timings():
     uz_audio.reset_for_tests({})
-    assert not any(d.startswith("uz:") for d in _data(verse_keyboard(2, 284, "translation", "uz")))
+    data = _data(verse_keyboard(2, 284, "translation", "uz", uz_audio=True))
+    assert not any(d.startswith("uz:") for d in data)
 
 
 # --- sending -------------------------------------------------------------------------
@@ -310,3 +317,41 @@ async def test_api_send_runs_the_bot_feature(monkeypatch, fetched):
         assert r.status_code == 404  # no timings for surah 3 in this table
         r = await client.post("/api/v1/uz-audio/send", headers=h, json={"surah": 2, "start": 290})
         assert r.status_code == 422
+
+
+# --- end to end through the Telegram reader ------------------------------------------
+
+
+async def test_telegram_reader_shows_the_row_to_an_uzbek_user():
+    """A real `vc:` tap from a Telegram user whose UI is Uzbek gets the row."""
+    import telegram
+
+    import app.lifespan as lifespan
+    import bot.dispatch as dispatch
+    from services.user_settings import UserSettings
+
+    user = 556001
+    await UserSettings().set_ui_lang(user, user, "uz")
+    update = telegram.Update.de_json(
+        {
+            "update_id": 1,
+            "callback_query": {
+                "id": "cbq",
+                "from": {"id": user, "is_bot": False, "first_name": "T", "language_code": "uz"},
+                "chat_instance": "ci",
+                "data": "vc:tr:2:284",
+                "message": {
+                    "message_id": 10,
+                    "date": 1700000000,
+                    "chat": {"id": user, "type": "private"},
+                    "text": "x",
+                },
+            },
+        },
+        telegram.Bot("123456:TEST-abcdefghijklmnopqrstuvwxyz"),
+    )
+    fake_bot = AsyncMock()
+    await dispatch.handle_update(fake_bot, lifespan.build_data(), update)
+    markup = fake_bot.edit_message_text.await_args.kwargs["reply_markup"]
+    data = [b.callback_data for row in markup.inline_keyboard for b in row]
+    assert "uz:a:2:284" in data and "uz:s:2" in data

@@ -29,6 +29,7 @@ import os
 from scripts.uz_audio.align import ALIGN_DIR, strip_notes
 from scripts.uz_audio.common import (
     AYAH_COUNTS,
+    INCOMPLETE_SOURCE,
     OVERRIDES_PATH,
     REPO,
     SOURCE_URL,
@@ -143,6 +144,9 @@ def main() -> None:
     reference = load_reference()
     surahs, total, flagged, rows = {}, 0, 0, []
     for surah in range(1, 115):
+        if surah in INCOMPLETE_SOURCE:
+            print("%03d  skipped: source audio incomplete (%s)" % (surah, INCOMPLETE_SOURCE[surah]))
+            continue
         aligned = read_json(os.path.join(ALIGN_DIR, "%03d.json" % surah))
         if aligned is None:
             continue
