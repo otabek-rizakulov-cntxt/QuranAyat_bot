@@ -208,6 +208,20 @@ project: only Telegram file ids and the ayah timing table
 """
 
 
+TAJWEED_ATTRIBUTION = """
+## Tajweed data
+
+The tajweed section (`docs/TAJWEED_PLAN.md`) uses, verbatim, in `data/tajweed/`:
+
+- **Tajweed annotations** from [cpfair/quran-tajweed](https://github.com/cpfair/quran-tajweed),
+  licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **The Uthmani Qur'an text** those annotations index, from [Tanzil.net](http://tanzil.net)
+  (Tanzil terms: verbatim, source indicated; the notice is kept in the file).
+
+The lesson texts and the articulation diagram are written for this project.
+"""
+
+
 def write_attributions(meta: dict) -> None:
     """Record each bundled translation's edition/source for /about and licensing review."""
     lines = [
@@ -242,6 +256,7 @@ def write_attributions(meta: dict) -> None:
             "| `%s` | %s | `%s` | %s |" % (lang.code, lang.english, edition_id, translator)
         )
     lines += UZ_AUDIO_ATTRIBUTION.splitlines()
+    lines += TAJWEED_ATTRIBUTION.splitlines()
     lines.append("")
     with open(os.path.join(REPO_ROOT, "ATTRIBUTIONS.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
