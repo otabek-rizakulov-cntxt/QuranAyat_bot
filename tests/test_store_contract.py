@@ -988,3 +988,19 @@ class TestDaily:
         again = await store.daily.upsert(1, "whatsapp", time(20, 30), True)
         assert (again.platform, again.send_time) == ("whatsapp", time(20, 30))
         assert again.created_at == first.created_at
+
+
+class TestTajweedApprovals:
+    async def test_empty_until_approved(self, store):
+        assert await store.tajweed.approvals() == {}
+        assert await store.tajweed.revoke("qalqala") is False
+
+    async def test_approve_replace_and_revoke(self, store):
+        row = await store.tajweed.approve("qalqala", "abc123", 42)
+        assert (row.lesson_id, row.content_hash, row.approved_by) == ("qalqala", "abc123", 42)
+        assert row.approved_at is not None
+        again = await store.tajweed.approve("qalqala", "def456", 43)  # re-approval of new text
+        assert (again.content_hash, again.approved_by) == ("def456", 43)
+        assert set(await store.tajweed.approvals()) == {"qalqala"}
+        assert await store.tajweed.revoke("qalqala") is True
+        assert await store.tajweed.approvals() == {}

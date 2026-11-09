@@ -1,0 +1,313 @@
+{
+ "version": 1,
+ "language": "uz",
+ "note": "Uzbek Latin; Cyrillic is generated (src/domain/uz_translit.py). Written for this project. Every lesson is a draft until a reviewer approves it in the bot (docs/TAJWEED_PLAN.md §6).",
+ "units": [
+  {"id": "harflar", "title": "Harflar va maxrajlar"},
+  {"id": "harakatlar", "title": "Harakatlar"},
+  {"id": "mad", "title": "Mad (choʻzib oʻqish)"},
+  {"id": "nun", "title": "Nun sokin va tanvin"},
+  {"id": "mim", "title": "Mim sokin"},
+  {"id": "boshqa", "title": "Boshqa qoidalar"}
+ ],
+ "lessons": [
+  {
+   "id": "maxraj-kirish",
+   "unit": "harflar",
+   "title": "Maxraj nima?",
+   "rules": [],
+   "body": [
+    "<b>Maxraj</b> — harf talaffuz qilinganda tovush chiqadigan joy. Arab alifbosidagi har bir harfning oʻz maxraji bor; harfni toʻgʻri joydan chiqarish tajvidning birinchi qadami.",
+    "Maxrajlar besh hududga boʻlinadi: <b>javf</b> (ogʻiz va tomoqdagi ichki boʻshliq), <b>halq</b> (boʻgʻiz), <b>til</b>, <b>lablar</b> va <b>xayshum</b> (burun boʻshligʻi). Ulamolarning mashhur hisobi boʻyicha jami 17 ta maxraj bor: javfda 1, boʻgʻizda 3, tilda 10, lablarda 2 va xayshumda 1.",
+    "Keyingi darslarda har bir hududni alohida koʻrib chiqamiz. Harfning maxrajini bilish uchun uni sukun bilan, oldiga hamzali alif qoʻyib ayting (masalan, «ab», «at»): tovush toʻxtagan joy — oʻsha harfning maxraji."
+   ],
+   "examples": []
+  },
+  {
+   "id": "maxraj-bogiz",
+   "unit": "harflar",
+   "title": "Boʻgʻiz harflari",
+   "rules": [],
+   "body": [
+    "Boʻgʻizdan oltita harf chiqadi va ular uch maxrajga boʻlinadi:",
+    "• <b>Boʻgʻizning eng chuqur qismi</b> (koʻkrakka yaqin): ء (hamza) va ه (ho).\n• <b>Boʻgʻizning oʻrtasi</b>: ع (ayn) va ح (ha).\n• <b>Boʻgʻizning yuqori qismi</b> (ogʻizga yaqin): غ (gʻoyn) va خ (xo).",
+    "Oʻzbek tilida bu tovushlarning baʼzilari yoʻq, shuning uchun ح ni ه dan, ع ni hamzadan farqlashga alohida eʼtibor bering. ح — boʻgʻiz oʻrtasidan chiqadigan, shovqinsiz, ammo kuchli nafasli tovush."
+   ],
+   "examples": [[1, 2], [112, 1], [1, 7]]
+  },
+  {
+   "id": "maxraj-til",
+   "unit": "harflar",
+   "title": "Til harflari",
+   "rules": [],
+   "body": [
+    "Tildan oʻn sakkizta harf chiqadi — bu eng katta hudud. Asosiylari:",
+    "• Til orqasi yumshoq tanglay bilan: ق (qof); undan biroz oldinroq: ك (kof).\n• Til oʻrtasi tanglay bilan: ج, ش va harakatli yoki madsiz ي.\n• Tilning yon tomoni yuqori jagʻ tishlari bilan: ض.\n• Til uchi qismlari: ل, ن, ر — har biri biroz farqli joydan.\n• Til uchi yuqori old tishlar ildizi bilan: ت, د, ط.\n• Til uchi old tishlar yonida, hushtak tovushi bilan: ص, س, ز.\n• Til uchi yuqori old tishlar uchi bilan: ث, ذ, ظ.",
+    "Eng koʻp uchraydigan xatolar: ق ni ك ga, ض ni د ga yoki ظ ga, ث ni س ga oʻxshatib aytish. Harflarni sukun bilan alohida mashq qiling."
+   ],
+   "examples": [[112, 2], [113, 1], [1, 7]]
+  },
+  {
+   "id": "maxraj-lab",
+   "unit": "harflar",
+   "title": "Lab harflari",
+   "rules": [],
+   "body": [
+    "Lablardan toʻrtta harf chiqadi, ular ikki maxrajga boʻlinadi:",
+    "• <b>ف</b> — pastki labning ichki tomoni yuqori old tishlarning uchiga tegadi.\n• <b>ب, م</b> va harakatli yoki madsiz <b>و</b> — ikki lab ishtirokida: ب va م da lablar yopiladi, و da esa lablar yumaloqlanib, toʻliq yopilmaydi.",
+    "و ni oʻzbekcha «v» tovushiga oʻxshatib, tishni labga tekkizib aytmang: arabcha و da tish ishtirok etmaydi."
+   ],
+   "examples": [[112, 4], [108, 2], [103, 1]]
+  },
+  {
+   "id": "maxraj-javf-xayshum",
+   "unit": "harflar",
+   "title": "Javf va xayshum",
+   "rules": [],
+   "body": [
+    "<b>Javf</b> — ogʻiz va tomoqdagi ichki boʻshliq. Undan uchta <b>mad harfi</b> chiqadi: oldi fathali sokin ا, oldi dammali sokin و va oldi kasrali sokin ي. Bu harflar boʻshliqda havo tugaguncha choʻziladi, shuning uchun ularning aniq bir nuqtasi yoʻq.",
+    "<b>Xayshum</b> — burun boʻshligʻi. Bu yerdan <b>gʻunna</b> chiqadi: nun va mimga hamroh boʻladigan burun ovozi. Burunni barmoq bilan qissangiz, gʻunna toʻxtaydi — bu uning xayshumdan chiqishini koʻrsatadi."
+   ],
+   "examples": [[1, 4], [112, 3], [114, 1]]
+  },
+  {
+   "id": "harakatlar",
+   "unit": "harakatlar",
+   "title": "Fatha, kasra, damma va sukun",
+   "rules": [],
+   "body": [
+    "Harakatlar — harfni qanday unli bilan oʻqishni koʻrsatadigan belgilar:",
+    "• <b>Fatha</b> (harf ustidagi qiya chiziq, ـَ) — «a» tovushi.\n• <b>Kasra</b> (harf ostidagi qiya chiziq, ـِ) — «i» tovushi.\n• <b>Damma</b> (harf ustidagi kichik vov, ـُ) — «u» tovushi.\n• <b>Sukun</b> (harf ustidagi kichik doira, ـْ) — harf unlisiz, qisqa va aniq aytiladi.",
+    "Harakatlar qisqa oʻqiladi — bir harakat vaqti. Ularni choʻzib yuborish mad qoidalariga zid boʻlib, maʼnoni oʻzgartirib qoʻyishi mumkin."
+   ],
+   "examples": [[112, 1], [1, 2], [108, 1]]
+  },
+  {
+   "id": "tashdid",
+   "unit": "harakatlar",
+   "title": "Tashdid (shadda)",
+   "rules": [],
+   "body": [
+    "<b>Tashdid</b> (ـّ) harf ikki marta aytilishini bildiradi: birinchisi sokin, ikkinchisi harakatli. Masalan, رَبِّ soʻzida ب ikki marta: «rab-bi».",
+    "Tashdidli harfni bir oz ushlab, keyin harakati bilan ayting. Tashdidni tashlab ketish soʻzning maʼnosini oʻzgartirishi mumkin, shuning uchun unga alohida eʼtibor bering. Nun va mim tashdidli boʻlsa, ular gʻunna bilan aytiladi (gʻunna darsiga qarang)."
+   ],
+   "examples": [[1, 2], [1, 7], [114, 1]]
+  },
+  {
+   "id": "tanvin",
+   "unit": "harakatlar",
+   "title": "Tanvin",
+   "rules": [],
+   "body": [
+    "<b>Tanvin</b> — soʻz oxiridagi qoʻsh harakat (ـً ـٍ ـٌ). U yozilmaydigan, ammo talaffuz qilinadigan sokin <b>nun</b> tovushini bildiradi: «-an», «-in», «-un».",
+    "Tanvindan keyingi harfga qarab, bu nun ochiq aytiladi, yashiriladi yoki keyingi harfga qoʻshib yuboriladi — bu qoidalar «Nun sokin va tanvin» boʻlimida.",
+    "Fathali tanvinda toʻxtalsa (vaqf), u uzun «a» boʻlib oʻqiladi; kasrali va dammali tanvinda toʻxtalsa, harf sukun bilan tugaydi."
+   ],
+   "examples": [[112, 4], [103, 2], [106, 4]]
+  },
+  {
+   "id": "mad-tabiiy",
+   "unit": "mad",
+   "title": "Tabiiy mad",
+   "rules": ["madd_2"],
+   "body": [
+    "<b>Mad</b> — tovushni choʻzib aytish. Uchta mad harfi bor: oldi fathali sokin ا, oldi dammali sokin و, oldi kasrali sokin ي.",
+    "Mad harfidan keyin hamza yoki sukun kelmasa, bu <b>tabiiy mad</b>: ikki harakat miqdorida choʻziladi — bir harakatning ikki baravari. Uni qisqartirish ham, ortiqcha choʻzish ham xato.",
+    "Misollarda belgilangan joylarni tinglab, choʻzish miqdorini qorining tilovatiga solishtiring."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mad-muttasil",
+   "unit": "mad",
+   "title": "Muttasil mad",
+   "rules": ["madd_muttasil"],
+   "body": [
+    "Mad harfidan keyin <b>hamza bir soʻzning ichida</b> kelsa, bu <b>muttasil</b> (bogʻlangan) mad. Hafs rivoyatida u <b>4 yoki 5 harakat</b> choʻziladi va qisqartirib oʻqilmaydi — shuning uchun «vojib mad» ham deyiladi.",
+    "Masalan: جَآءَ, ٱلسَّمَآءِ. Bir tilovat davomida tanlangan miqdorni (4 yoki 5) bir xil saqlang."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mad-munfasil",
+   "unit": "mad",
+   "title": "Munfasil mad",
+   "rules": ["madd_munfasil"],
+   "body": [
+    "Mad harfi <b>bir soʻzning oxirida</b>, hamza esa <b>keyingi soʻzning boshida</b> kelsa, bu <b>munfasil</b> (ajralgan) mad. Hafs rivoyatida mashhur yoʻl boʻyicha <b>4 yoki 5 harakat</b> choʻziladi.",
+    "Masalan: يَـٰٓأَيُّهَا, إِنَّآ أَعْطَيْنَـٰكَ. Muttasil mad bilan farqi — hamza boshqa soʻzda turibdi."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mad-lozim",
+   "unit": "mad",
+   "title": "Lozim mad",
+   "rules": ["madd_6"],
+   "body": [
+    "Mad harfidan keyin <b>asliy sukun yoki tashdid</b> bir soʻzning ichida kelsa, bu <b>lozim</b> (majburiy) mad — u doim <b>6 harakat</b> choʻziladi.",
+    "Eng mashhur misol — Fotiha surasining oxiridagi ٱلضَّآلِّينَ. Shuningdek, ayrim suralar boshidagi alohida oʻqiladigan harflarda ham lozim mad bor (masalan, الٓمٓ dagi «lom» va «mim»)."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mad-oriz-lin",
+   "unit": "mad",
+   "title": "Oriz va lin mad",
+   "rules": ["madd_246"],
+   "body": [
+    "Oyat yoki soʻz oxirida toʻxtalganda (vaqf), mad harfidan keyingi harf vaqf sababli sokin boʻlib qoladi. Bunda <b>oriz</b> (vaqtinchalik) mad paydo boʻladi va u <b>2, 4 yoki 6 harakat</b> choʻzilishi mumkin. Masalan, ٱلْعَـٰلَمِينَ da toʻxtalganda.",
+    "<b>Lin mad</b> — oldi fathali sokin و yoki ي dan keyin vaqf qilinganda: خَوْفٍ, ٱلْبَيْتِ. U ham 2, 4 yoki 6 harakat boʻladi. Oʻqib ketilganda (vaqfsiz) bu madlar choʻzilmaydi."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "nun-izhor",
+   "unit": "nun",
+   "title": "Izhor",
+   "rules": [],
+   "body": [
+    "Nun sokin (نْ) yoki tanvindan keyin <b>boʻgʻiz harflaridan</b> biri kelsa — ء ه ع ح غ خ — nun <b>ochiq va aniq</b>, gʻunnasiz aytiladi. Bu <b>izhor</b> (ochiq aytish) deyiladi.",
+    "Sababi: boʻgʻiz harflari nundan uzoq joydan chiqadi, shuning uchun ikki tovush qoʻshilmaydi. Masalan: أَنْعَمْتَ (Fotiha, 7-oyat), مِّنْ خَوْفٍ, كُفُوًا أَحَدٌ."
+   ],
+   "examples": [[1, 7], [106, 4], [112, 4]]
+  },
+  {
+   "id": "nun-idgom",
+   "unit": "nun",
+   "title": "Idgʻom",
+   "rules": ["idghaam_ghunnah", "idghaam_no_ghunnah"],
+   "body": [
+    "Nun sokin yoki tanvindan keyin <b>ي ر م ل و ن</b> harflaridan biri kelsa, nun keyingi harfga qoʻshib yuboriladi — bu <b>idgʻom</b>. Bu harflarni eslab qolish uchun «yarmalun» (يَرْمَلُونَ) soʻzi ishlatiladi.",
+    "• <b>Gʻunnali idgʻom</b>: ي ن م و harflarida — qoʻshilish gʻunna bilan, ikki harakat miqdorida.\n• <b>Gʻunnasiz idgʻom</b>: ل va ر harflarida — nun toʻliq yoʻqoladi, gʻunna boʻlmaydi.",
+    "Idgʻom faqat ikki soʻz orasida boʻladi. Nun va bu harflar bir soʻzning ichida kelsa (masalan, دُنْيَا), nun ochiq aytiladi."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "nun-iqlob",
+   "unit": "nun",
+   "title": "Iqlob",
+   "rules": ["iqlab"],
+   "body": [
+    "Nun sokin yoki tanvindan keyin <b>ب</b> kelsa, nun <b>mim</b> tovushiga aylantiriladi va gʻunna bilan, lablarni yengil yumib aytiladi. Bu <b>iqlob</b> (aylantirish) deyiladi.",
+    "Mushafda bunday joylarda nun yoki tanvin ustiga kichik mim (ۢ yoki ۭ) yoziladi — bu iqlob belgisi. Masalan: مِنۢ بَعْدِ, كِرَامٍۭ بَرَرَةٍ."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "nun-ixfo",
+   "unit": "nun",
+   "title": "Ixfo",
+   "rules": ["ikhfa"],
+   "body": [
+    "Nun sokin yoki tanvindan keyin qolgan <b>15 harfdan</b> biri kelsa — ص ذ ث ك ج ش ق س د ط ز ف ت ض ظ — nun <b>yashirib</b>, gʻunna bilan aytiladi. Bu <b>ixfo</b> deyiladi.",
+    "Ixfo izhor bilan idgʻom oʻrtasidagi holat: nun toʻliq ochiq ham emas, keyingi harfga toʻliq qoʻshilmaydi ham. Til nunning joyiga tegmaydi, tovush burundan gʻunna boʻlib, keyingi harfning maxrajiga tayyorlanib chiqadi; gʻunna ikki harakat davom etadi."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mim-ixfo",
+   "unit": "mim",
+   "title": "Shafaviy ixfo",
+   "rules": ["ikhfa_shafawi"],
+   "body": [
+    "Mim sokin (مْ) dan keyin <b>ب</b> kelsa, mim lablarni yengil yumib, gʻunna bilan yashirib aytiladi. Bu <b>shafaviy</b> (lab) <b>ixfo</b> deyiladi, chunki ikkala harf ham labdan chiqadi.",
+    "Masalan: تَرْمِيهِم بِحِجَارَةٍ (Fil surasi). Gʻunna ikki harakat."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mim-idgom",
+   "unit": "mim",
+   "title": "Shafaviy idgʻom",
+   "rules": ["idghaam_shafawi"],
+   "body": [
+    "Mim sokin dan keyin yana <b>mim</b> kelsa, ikkalasi bitta tashdidli mim boʻlib, gʻunna bilan aytiladi. Bu <b>shafaviy idgʻom</b> (yoki ikki bir xil harfning idgʻomi) deyiladi.",
+    "Masalan: لَهُم مَّا. Gʻunna ikki harakat."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mim-izhor",
+   "unit": "mim",
+   "title": "Shafaviy izhor",
+   "rules": [],
+   "body": [
+    "Mim sokin dan keyin <b>ب va م dan boshqa</b> har qanday harf kelsa, mim <b>ochiq</b>, gʻunnasiz aytiladi. Bu <b>shafaviy izhor</b>.",
+    "Ayniqsa <b>و</b> va <b>ف</b> oldidan ehtiyot boʻling: ular ham labga yaqin chiqqani uchun mimni yashirib yuborish xavfi bor. Masalan: عَلَيْهِمْ غَيْرِ, أَلَمْ تَرَ, هُمْ فِيهَا."
+   ],
+   "examples": [[1, 7], [105, 1], [107, 5]]
+  },
+  {
+   "id": "gunna",
+   "unit": "boshqa",
+   "title": "Gʻunna",
+   "rules": ["ghunnah"],
+   "body": [
+    "<b>Gʻunna</b> — burun boʻshligʻidan chiqadigan ovoz. U nun va mimning ajralmas xususiyati.",
+    "<b>Tashdidli nun</b> (نّ) va <b>tashdidli mim</b> (مّ) da gʻunna eng toʻliq holatida — <b>ikki harakat</b> davom ettiriladi. Masalan: إِنَّ, ثُمَّ, ٱلنَّاسِ. Bu harflarni tez oʻtib ketmang."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "qalqala",
+   "unit": "boshqa",
+   "title": "Qalqala",
+   "rules": ["qalqalah"],
+   "body": [
+    "<b>Qalqala</b> harflari beshta: <b>ق ط ب ج د</b>. Ularni eslab qolish uchun «qutbu jad» (قُطْبُ جَدٍّ) iborasi ishlatiladi.",
+    "Bu harflar sokin boʻlganda, maxrajdan ajralayotganda yengil «aks-sado», qaytish tovushi beriladi. Soʻz oʻrtasida qalqala yengil, oyat oxirida toʻxtalganda esa kuchliroq boʻladi. Masalan: ٱلصَّمَدُ da toʻxtalganda, يَخْلُقْ.",
+    "Qalqalani harakatga aylantirib yubormang: u «a», «i» yoki «u» tovushi emas, faqat qisqa sakrash."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "lom-hamza",
+   "unit": "boshqa",
+   "title": "Shamsiy va qamariy lom, hamzai vasl",
+   "rules": ["lam_shamsiyyah", "hamzat_wasl", "silent"],
+   "body": [
+    "Aniqlik artikli <b>ال</b> dagi lom ikki xil oʻqiladi:",
+    "• <b>Qamariy lom</b> — ochiq aytiladi. Keyin kelgan harflar «ابغ حجك وخف عقيمه» iborasida jamlangan: ٱلْقَمَرُ, ٱلْحَمْدُ.\n• <b>Shamsiy lom</b> — aytilmaydi, keyingi harf tashdidli boʻladi. Qolgan 14 harf: ٱلشَّمْسُ, ٱلرَّحْمَـٰنِ, ٱلنَّاسِ.",
+    "<b>Hamzai vasl</b> (ٱ) faqat soʻz bilan boshlaganda aytiladi; oldingi soʻzga qoʻshib oʻqilganda tushib qoladi. Shuningdek, mushafda yozilgan, ammo oʻqilmaydigan harflar ham bor — misollarda ular belgilangan."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "mutajonis-mutaqorib",
+   "unit": "boshqa",
+   "title": "Mutajonis va mutaqorib idgʻom",
+   "rules": ["idghaam_mutajanisayn", "idghaam_mutaqaribayn"],
+   "body": [
+    "Sokin harfdan keyin u bilan <b>bir maxrajdan</b> chiqadigan, ammo sifati farqli harf kelsa, birinchisi ikkinchisiga qoʻshib yuboriladi — bu <b>mutajonis idgʻom</b>. Masalan: قَد تَّبَيَّنَ (د → ت), إِذ ظَّلَمُوٓا۟.",
+    "Maxrajlari <b>yaqin</b> ikki harf uchrashsa — <b>mutaqorib idgʻom</b>. Masalan: أَلَمْ نَخْلُقكُّم (ق → ك), قُل رَّبِّ.",
+    "Bu holatlar Qurʼonda kam uchraydi, shuning uchun mushafdagi tashdid belgisiga diqqat qiling."
+   ],
+   "examples": "auto"
+  },
+  {
+   "id": "ro-alloh",
+   "unit": "boshqa",
+   "title": "Ro harfi va «Alloh» lafzi",
+   "rules": [],
+   "body": [
+    "<b>Ro (ر)</b> ikki xil aytiladi:\n• <b>Qalin (tafxim)</b> — fatha yoki damma bilan kelganda, yoki sokin boʻlib, oldidagi harf fatha yoki damma boʻlganda: رَبِّ, قُرْءَانٌ.\n• <b>Ingichka (tarqiq)</b> — kasra bilan kelganda, yoki sokin boʻlib, oldidagi harf kasra boʻlganda (keyin qalin harf kelmasa): رِجَالٌ, فِرْعَوْنَ.",
+    "<b>«Alloh» lafzidagi lom</b>: oldidagi harf fatha yoki damma boʻlsa, qalin aytiladi (قُلْ هُوَ ٱللَّهُ, شَهِدَ ٱللَّهُ); kasra boʻlsa, ingichka (بِسْمِ ٱللَّهِ, لِلَّهِ)."
+   ],
+   "examples": [[1, 2], [112, 1], [1, 1]]
+  },
+  {
+   "id": "vaqf",
+   "unit": "boshqa",
+   "title": "Vaqf belgilari",
+   "rules": [],
+   "body": [
+    "Mushafda oyatlar ichida toʻxtash (vaqf) qayerda mumkinligini koʻrsatadigan belgilar bor:",
+    "• <b>مـ</b> — toʻxtash lozim: oʻqib ketilsa, maʼno buzilishi mumkin.\n• <b>لا</b> — bu yerda toʻxtamang.\n• <b>ج</b> — toʻxtash ham, oʻqib ketish ham joiz.\n• <b>صلى</b> — oʻqib ketish afzal.\n• <b>قلى</b> — toʻxtash afzal.\n• <b>∴ ∴</b> (ikki uch nuqta) — ikki joydan faqat bittasida toʻxtang.",
+    "Toʻxtaganda soʻz oxiri sukun bilan tugaydi (fathali tanvin bundan mustasno). Nafas yetmay qolsa, mos joyda toʻxtab, bir-ikki soʻz orqaga qaytib oʻqing."
+   ],
+   "examples": []
+  }
+ ]
+}

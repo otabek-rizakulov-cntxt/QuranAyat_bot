@@ -37,6 +37,7 @@ class MemoryState:
     # Multi-platform — (platform, external_id) -> IdentityRow.
     identity: Dict[tuple, object] = field(default_factory=dict)
     daily_ayah_sub: Dict[int, object] = field(default_factory=dict)  # user_id -> DailySubRow
+    tajweed_approval: Dict[str, object] = field(default_factory=dict)  # lesson_id -> ApprovalRow
     sequence: int = 0
     # Stands in for the `non_telegram_user_id` sequence; see store/identity.py.
     user_id_sequence: int = 2**52 - 1
@@ -72,5 +73,6 @@ class MemoryState:
         self.group_member_link.clear()
         self.identity.clear()
         self.daily_ayah_sub.clear()
+        self.tajweed_approval.clear()
         self.sequence = 0
         self.user_id_sequence = 2**52 - 1

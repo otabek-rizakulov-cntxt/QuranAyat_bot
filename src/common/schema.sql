@@ -254,3 +254,12 @@ CREATE TABLE IF NOT EXISTS daily_ayah_sub (
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Tajweed lesson approvals (docs/TAJWEED_PLAN.md §6): a lesson is published while
+-- content_hash equals its current text's hash, so an edit sends it back to draft.
+CREATE TABLE IF NOT EXISTS tajweed_approval (
+    lesson_id         TEXT PRIMARY KEY,
+    content_hash      TEXT NOT NULL,
+    approved_by       BIGINT NOT NULL,
+    approved_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
