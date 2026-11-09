@@ -27,6 +27,17 @@ _BITRATES = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320]
 _SAMPLE_RATES = [44100, 48000, 32000]
 SAMPLES_PER_FRAME = 1152
 
+# Surahs whose newbooks.uz file holds only part of the surah (checked 2026-11-09 by
+# comparing audio length with text length, then reading the transcripts). They get
+# no timings, so the bot shows no Uzbek audio for them, until a complete recording
+# is found. No other file names for the missing parts exist on newbooks.uz.
+INCOMPLETE_SOURCE = {
+    12: "15.6 min; starts mid-surah at about 12:75 (expected ~51 min)",
+    16: "3.8 min; only about 16:119-128 (expected ~53 min)",
+    17: "5.0 min; only about 17:105-111 (expected ~46 min)",
+    76: "4.1 min; starts at about 76:6 (expected ~8 min)",
+}
+
 AYAH_COUNTS = [
     7,
     286,

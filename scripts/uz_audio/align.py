@@ -43,6 +43,7 @@ QUIET_DB = 10.0  # above the surah's noise floor (10th percentile) still counts 
 MIN_PAUSE = 0.2
 LEAD_IN = 0.2  # cut this long before the next ayah's speech onset
 SPLIT_GAP = 0.45  # split a Whisper segment where two words are this far apart
+MIN_AYAH_S = 0.8  # no ayah clip shorter than this (export's gate uses the same floor)
 # Fallback for a surah where those units are fewer than its ayahs: split wherever the
 # audio has a pause this long near a word boundary. Word times smear real pauses
 # (faster-whisper put 1:3 and 1:4, ~1 s apart, in one segment with no gap between the
@@ -328,9 +329,13 @@ def _align(
         ),
         None,
     )
-    if 0 not in pinned_unit and anchor is not None and surah != 9:
-        first_unit = anchor if surah == 1 else anchor + 1
-        intro_starts = [first_unit] if first_unit < U else list(range(U))
+    first_unit = None if anchor is None else (anchor if surah == 1 else anchor + 1)
+    # A "basmala" that leaves fewer units than ayahs is a false match late in the
+    # surah (84: the real one was misheard, a phrase at unit 57 of 66 matched).
+    if first_unit is not None and U - first_unit < n:
+        first_unit = None
+    if 0 not in pinned_unit and first_unit is not None and surah != 9:
+        intro_starts = [first_unit]
     else:
         intro_starts = [u for u in range(U) if units[u]["start"] - first <= window]
 
@@ -414,6 +419,13 @@ def _align(
                 "text": " | ".join(units[u]["text"] for u in range(u0, u1)),
             }
         )
+    # Two neighbouring cuts can land in the same pause (10:27 came out 0 s long).
+    # Keep every ayah at least MIN_AYAH_S long; such an ayah keeps its low confidence.
+    for k in range(1, n):
+        floor = ayahs[k - 1]["start"] + MIN_AYAH_S + 0.05  # margin for frame rounding
+        if ayahs[k]["start"] < floor:
+            ayahs[k]["start"] = round(floor, 3)
+            ayahs[k]["pause"] = 0.0
     end_unit = units[U - 1]
     tail = quiet_runs(quiet, end_unit["end"], end_unit["end"] + 2.0)
     last_end = tail[0][0] + 0.15 if tail else end_unit["end"] + 0.3
