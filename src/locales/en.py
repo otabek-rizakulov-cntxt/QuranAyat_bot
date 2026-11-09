@@ -397,7 +397,7 @@ strings = {
     "uza_btn_surah": "📚 Whole surah (Uzbek)",
     "uza_title": "Uzbek translation",
     "uza_performer": "Uzbek translation",
-    "uza_credit": "🎧 Uzbek translation · newbooks.uz",
+    "uza_credit": "🎧 Uzbek translation",
     "uza_estimated": "⏱ Ayah timing is approximate",
     "uza_part": "{name} — {i}/{n} (ayahs {first}–{last})",
     "uza_unavailable": "Uzbek audio isn't available for this.",

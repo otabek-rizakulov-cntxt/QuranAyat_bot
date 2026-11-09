@@ -372,7 +372,7 @@ strings = {
     "uza_btn_surah": "📚 Sura tarjimasi",
     "uza_title": "Tarjima",
     "uza_performer": "Oʻzbekcha tarjima",
-    "uza_credit": "🎧 Oʻzbekcha tarjima · newbooks.uz",
+    "uza_credit": "🎧 Oʻzbekcha tarjima",
     "uza_estimated": "⏱ Oyat chegaralari taxminiy",
     "uza_part": "{name} — {i}/{n} ({first}–{last}-oyatlar)",
     "uza_unavailable": "Bu uchun audio tarjima mavjud emas.",

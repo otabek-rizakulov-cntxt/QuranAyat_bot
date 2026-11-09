@@ -355,3 +355,15 @@ async def test_telegram_reader_shows_the_row_to_an_uzbek_user():
     markup = fake_bot.edit_message_text.await_args.kwargs["reply_markup"]
     data = [b.callback_data for row in markup.inline_keyboard for b in row]
     assert "uz:a:2:284" in data and "uz:s:2" in data
+
+
+@pytest.mark.parametrize("lang", ["en", "uz", "uz-Cyrl"])
+def test_user_facing_strings_name_no_external_site(lang):
+    """Owner's decision (2026-11-09): nothing users see names the audio's source site."""
+    import re
+
+    from locales import LOCALES
+
+    for key, text in LOCALES[lang].items():
+        if key.startswith("uza_"):
+            assert not re.search(r"https?://|www\.|\b[\w-]+\.(uz|com|org|net|ru)\b", text), key

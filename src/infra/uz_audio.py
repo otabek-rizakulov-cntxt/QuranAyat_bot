@@ -22,7 +22,6 @@ _PATH = os.path.join(
     "uz_audio_timings.json",
 )
 SOURCE_URL = "https://newbooks.uz/audio/t1/%03d.mp3"
-PAGE_URL = "https://newbooks.uz/ms.php?t=%03d"
 
 # Telegram fetches a URL itself only up to 20 MB; bigger surahs go out in parts
 # that we upload. Parts stay a little under so a part never trips the limit.
