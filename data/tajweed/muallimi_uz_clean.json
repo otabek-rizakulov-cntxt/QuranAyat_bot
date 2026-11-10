@@ -1,0 +1,499 @@
+{
+ "about": "Hand-cleaned Uzbek lines of the Muallimi soniy narration, keyed by the raw Whisper line they replace (applied by scripts/tajweed/align_text.py). An empty value drops the line: it was a leftover of the Arabic reading or a Whisper loop, not Uzbek talk. Lessons listed in 'unsure' were reconstructed from very garbled transcripts: check them by ear.",
+ "unsure": [
+  "ms-013",
+  "ms-027",
+  "ms-029",
+  "ms-032",
+  "ms-035",
+  "ms-040",
+  "ms-059",
+  "ms-066",
+  "ms-073"
+ ],
+ "lessons": {
+  "ms-001": {
+   "Arab, alif ba, sa,": "Arab alifbosi."
+  },
+  "ms-002": {
+   "АЛИФ ҚАРФА АРАБ АЛИФ БАСЫДАГИ БАРЧА ҚАРФЛАР ОНДАШ ҚАРФЛАРДИР УЛАРДАН КИН КИЛУЧЮ ОНЛИТАВЩ ҚИСКА ОНЛИЛАРНИ ХАРАКЦЛАР ИФАДАЛАЙДА БУЛАР": "Alif harfi. Arab alifbosidagi barcha harflar undosh harflardir. Ulardan keyin keluvchi unli tovushlarni, qisqa unlilarni harakatlar ifodalaydi. Bular",
+   "КУЙДАГИЛАР": "quyidagilar:",
+   "АЛИФ ҚАРФА ҚУБУ ХАРАКЦЛАР БЛАН БЕРГИ КИЛИП ə, i, u tavuşlarını ifadələyda. Arab tələdə yapıq boğunlu ya ki, tuxtəşni ifadələş": "Alif harfi quyidagi harakatlar bilan birga kelib, a, i, u tovushlarini ifodalaydi. Arab tilida yopiq boʻgʻinni yoki toʻxtashni ifodalash",
+   "üçün maxsus belgə. Squndan faydələniləda.": "uchun maxsus belgi, sukundan foydalaniladi."
+  },
+  "ms-003": {
+   "Ра қарфы.": "Ro harfi.",
+   "Ра қарфы узбектілі дэгі Р таушіны ифа дейтады. Фақат У, уздан кейін қайыс харекет кейлішігі қарап, ингечке рақ, яки, йоган рақ талафуз қылынады.": "Ro harfi oʻzbek tilidagi «r» tovushini ifodalaydi. Faqat undan keyin qaysi harakat kelishiga qarab ingichkaroq yoki yoʻgʻonroq talaffuz qilinadi."
+  },
+  "ms-004": {
+   "ЗАХАРФА": "Za harfi.",
+   "ЗАХАРФА УЗБЕКТИЛІДАГИ ЗЫ ТАУШИБЛАН БАРХАЛ": "Za harfi oʻzbek tilidagi «z» tovushi bilan bir xil.",
+   "Zuhu.": ""
+  },
+  "ms-005": {
+   "Mimkharifah. Mimkharifahinin telafuzo uzbek tila daga ma taushublan berkhil.": "Mim harfi. Mim harfining talaffuzi oʻzbek tilidagi «m» tovushi bilan bir xil."
+  },
+  "ms-006": {
+   "Ta xarifa. Ta xarifainin telafuzu uzbek tila dagi t taushubilan bir xil.": "Ta harfi. Ta harfining talaffuzi oʻzbek tilidagi «t» tovushi bilan bir xil.",
+   "مررتم": ""
+  },
+  "ms-007": {
+   "NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE OZBEEK TILA DAGEE NU TAOUSHU BILAN BIRXHIL NU NU NU NU": "Nun harfi. Nun harfining talaffuzi oʻzbek tilidagi «n» tovushi bilan bir xil."
+  },
+  "ms-008": {
+   "Ya xarifah. Ya xarifah. Ya xarifahnin talafuzah uzbek tila daga ye taushublan bərxal.": "Ya harfi. Ya harfining talaffuzi oʻzbek tilidagi «y» tovushi bilan bir xil.",
+   "zaynu,": "",
+   "Ramyayni": ""
+  },
+  "ms-009": {
+   "Ba xarafa. Ba xarafa nii ng talafuzu uzbek tila dagi ba ta uši bilan bir xil.": "Ba harfi. Ba harfining talaffuzi oʻzbek tilidagi «b» tovushi bilan bir xil.",
+   "Bi": "",
+   "Zaynabayni": ""
+  },
+  "ms-010": {
+   "Kaf harifa. Kaf harifa ning telafuze uzbek telada ge k tavooshu bilan berkhil.": "Kaf harfi. Kaf harfining talaffuzi oʻzbek tilidagi «k» tovushi bilan bir xil."
+  },
+  "ms-011": {
+   "Lam harfa. Lam harfinin telafuzu uzbek teladagi l -taoshi bilan barxal.": "Lam harfi. Lam harfining talaffuzi oʻzbek tilidagi «l» tovushi bilan bir xil."
+  },
+  "ms-012": {
+   "Vav xarifah Vav xarifinin telafuzi Uzbek teladagi v -tauushidan b 'ras farxli. Onda lablar tishke tegimai aldiingi b 'ras chozilada. V": "Vav harfi. Vav harfining talaffuzi oʻzbek tilidagi «v» tovushidan biroz farqli: unda lablar tishga tegmay, oldinga biroz choʻziladi.",
+   "اولو وزنو ويلو كونو يومو": "",
+   "رومو": "",
+   "وزنتم": ""
+  },
+  "ms-013": {
+   "XARFienia XARF 진행 XARF greninIOg XARFcir Khalfin��오 XARF circumänger": "Ha harfi.",
+   "XARF": "",
+   "XARF XARF XARF": "",
+   "XARF ZARF EXARF": ""
+  },
+  "ms-014": {
+   "Fā kharifinin telafuzı uzbek tlidakī fā": "Fa harfining talaffuzi oʻzbek tilidagi «f» tovushi bilan bir xil."
+  },
+  "ms-015": {
+   "Qaf xarifah Qaf xarifinin telafuzi Uzbek tlidagi qi taoshi bilan bir xil Bu xarif fatxali bolub kilian vaqtda Yohan raq telafuz qilnada": "Qof harfi. Qof harfining talaffuzi oʻzbek tilidagi «q» tovushi bilan bir xil. Bu harf fathali boʻlib kelgan vaqtda yoʻgʻonroq talaffuz qilinadi."
+  },
+  "ms-016": {
+   "Shinxarifa. Shinxarifinin telafuzu ozbektilidagi": "Shin harfi. Shin harfining talaffuzi oʻzbek tilidagi «sh» tovushi bilan bir xil."
+  },
+  "ms-017": {
+   "SINXARFY.": "Sin harfi.",
+   "SINXARFYNIN TALAFUZU OZB Applause from Uzbek diladzagy sû tauxgillan birxalw!?": "Sin harfining talaffuzi oʻzbek tilidagi «s» tovushi bilan bir xil.",
+   "مسلك مسكن مسلم مسرف سمسم": "",
+   "أسلم يسلم": "",
+   "استيسر": "",
+   "يستيسر": ""
+  },
+  "ms-018": {
+   "Sa xarfi. Sa xarfi 'ni ifadolubçu xarfi və tavuş Uzbek dildə yox. U, tildin uçunu paski və yuqarit işlərinin orasigə qoygan xalda təlafuz qilnədə.": "Sa harfi. Sa harfini ifodalovchi harf va tovush oʻzbek tilida yoʻq. U tilning uchini pastki va yuqori tishlarning orasiga qoʻygan holda talaffuz qilinadi.",
+   "Masal": "Masalan:"
+  },
+  "ms-019": {
+   "Saad xarifa.": "Sod harfi.",
+   "Saad xarifa ni aynan ifad alaydiyyan xarifa uzbek tila da mawgud imas. Bu tavuish pastgi alt tishilari ni yukari qismiga tila ni trab qatdiq talafuz qilish bilan hasil": "Sod harfini aynan ifodalaydigan harf oʻzbek tilida mavjud emas. Bu tovush pastki old tishlarning yuqori qismiga tilni tirab, qattiq talaffuz qilish bilan hosil",
+   "qilinada. Saad xarifa fatxali bolub kelyanda yogan o qilada.": "qilinadi. Sod harfi fathali boʻlib kelganda yoʻgʻon oʻqiladi.",
+   "نصر": "",
+   "سفر صفر سيفو صيفو": ""
+  },
+  "ms-020": {
+   "TA XARFI TA XARFINI AYNAN IFADALAYDIGAN XARF VA TAVUJ OZBEKTILIDA MAVCUD EMAZ. BU": "To harfi. To harfini aynan ifodalaydigan harf va tovush oʻzbek tilida mavjud emas. U",
+   "YUQARDAGI ALT TISHLARNIN TUB QISMIGA TILNI TEKIZIŞ BILAN XASIL QILNADA. TA XARFI FATXALI BOLUB GELGENDA YOGAN OQILADA. طا": "yuqoridagi old tishlarning tub qismiga tilni tekkizish bilan hosil qilinadi. To harfi fathali boʻlib kelganda yoʻgʻon oʻqiladi.",
+   "طي طو": "",
+   "فقط": "",
+   "Faraf Faraf": ""
+  },
+  "ms-021": {
+   "ким binmari. Jim kharifini tellafuzu Uzbektile dagyi ca taufi fashion bilan bar axil. g Nou.\" g,": "Jim harfi. Jim harfining talaffuzi oʻzbek tilidagi «j» tovushi bilan bir xil.",
+   "جورب": ""
+  },
+  "ms-022": {
+   "XAXARF XAXARF": "Xo harfi.",
+   "استخبار يستخبار يستخبرو": "",
+   "استخرج": "",
+   "يستخرج": ""
+  },
+  "ms-023": {
+   "Xa xarfa. Xa xarfa uzbek tilda mawujud emas. Bu taurj boğuzdan hech kandai tusksiz chikada.": "Ha harfi. Ha harfi oʻzbek tilida mavjud emas. Bu tovush boʻgʻizdan hech qanday toʻsiqsiz chiqadi.",
+   "hi,": "",
+   "hil,": "",
+   "امتحن": "",
+   "يمتحنوا": "",
+   "احتملا": "",
+   "يحتمنوا": "",
+   "استحسن": "",
+   "يستحسنوا": "",
+   "arham, arham, arham.": ""
+  },
+  "ms-024": {
+   "ғاين خرف. ғاين خرفنی تلفوز ازبیک تلده گه ғا تاوشبلن برخل. بو خرف فتخلی بولب گیلگنده یوғان تلفوز خلنده.": "Gʻayn harfi. Gʻayn harfining talaffuzi oʻzbek tilidagi «gʻ» tovushi bilan bir xil. Bu harf fathali boʻlib kelganda yoʻgʻon talaffuz qilinadi.",
+   "ғا ғي": "",
+   "ғو": "",
+   "ғم ғاب": "",
+   "ғیل ғایرو": "",
+   "ғغلو": "",
+   "ғرғو": "",
+   "يستغفر U.": ""
+  },
+  "ms-025": {
+   "Ayn xarifah. Ayn xarifinin uzbek tildan muqabili yok. Bu xarif xalqum arastan chikada. Unin telafuzda kichik tildjanin aqamiyat ketda.": "Ayn harfi. Ayn harfining oʻzbek tilida muqobili yoʻq. Bu harf halqum oʻrtasidan chiqadi. Uning talaffuzida kichik tilning ahamiyati katta.",
+   "A.": "",
+   "H.": "",
+   "B.": "",
+   "ʔjamʔu ʔjālʔu": "",
+   "ʔʔanbar ʔarabʔ": ""
+  },
+  "ms-026": {
+   "ДАЛХАРФА ДАЛХАРФНИНИН ТАЛАФУЗУ ОЗБЕКТЛАДАГИ ДЫ ТАУШИ КАБАДАР.": "Dal harfi. Dal harfining talaffuzi oʻzbek tilidagi «d» tovushi kabidir.",
+   "دهرو دهنو دل": ""
+  },
+  "ms-027": {
+   "ZAD KHARIFE ZAD KHARIFE NING OZBIK TILIDA AYINAN AUK SHASHI YOG ZAD KHARIFE TILINING ONG VE CHAP YANLAR BILAN USTGY VE PASKET SHLAR NING ARALGDAN CHKADA BU": "Zod harfi. Zod harfining oʻzbek tilida aynan oʻxshashi yoʻq. Zod harfi tilning oʻng va chap yonlari bilan ustki va pastki tishlarning orasidan chiqadi. Bu",
+   "KHARIF FATKALI BOLUB KILGYANDA YOGAN AUKLADA": "harf fathali boʻlib kelganda yoʻgʻon oʻqiladi.",
+   "ضي ضو": ""
+  },
+  "ms-028": {
+   "zal harfa": "Zal harfi.",
+   "zal harfa nشifadhalo ce harfa ta oj is O Ojbayk halda youk. O talni ka qini pastila ha yukari šhti langar ni arasig guguyan hualda Telafoiz qylnada.": "Zal harfini ifodalovchi harf va tovush oʻzbek tilida yoʻq. U tilning uchini pastki va yuqori tishlarning orasiga qoʻygan holda talaffuz qilinadi.",
+   "مذهب ذهل": ""
+  },
+  "ms-029": {
+   "ZA XARFI Uzbek tlidda ZA XARFINI IFADALAWCHA XARF VA TAVUSH MAVCUD EMAZ U tlnin ikki yan qismini yoyib, unin yuqardagi tanglayinin altishlargi yakın caigeti": "Zo harfi. Oʻzbek tilida zo harfini ifodalovchi harf va tovush mavjud emas. U tilning ikki yon qismini yoyib, uchini yuqoridagi old tishlarga yaqin joyga tekkizgan",
+   "gizgan xalda, talafuz qilnada.": "holda talaffuz qilinadi.",
+   "نظم": "",
+   "ظلف": "",
+   "ظفل حظل ظلم": "",
+   "ظهر": ""
+  },
+  "ms-030": {
+   "Madli xariflar.": "Madli harflar.",
+   "Madsuzuzuzuzuz, uzaytiruz, manosuzuzuz da keeladi.": "Mad soʻzi «uzaytirish» maʼnosida keladi.",
+   "Madsarifu uchta. Ular quyda gilar. Alif,": "Mad harflari uchta. Ular quyidagilar: alif,",
+   "vau,": "vov,",
+   "ya. Fatxadan kiyin alif,": "yo. Fathadan keyin alif,",
+   "kasaradan kiyin ya va, zamadan kiyin vau kilsa, çözub oqaladi. Quyda ularini korup chıxamiz.": "kasradan keyin yo va zammadan keyin vov kelsa, choʻzib oʻqiladi. Quyida ularni koʻrib chiqamiz.",
+   "terifu.": "",
+   "Tātidhu.": "",
+   "Sāsidhu.": "",
+   "Dja -jiju . Ha -che -jeechu.": "",
+   "Bu": "",
+   "Lu -i -ha,": "",
+   "Yukarıda berilgən musallarını kunt ila urgenip čıqeyin. Bu blankiyengi darslarını uzlaştırışıngiz Osamboladi.": "Yuqorida berilgan misollarni puxta oʻrganib chiqing. Bu keyingi darslarni oʻzlashtirishingizni osonlashtiradi.",
+   "kamal": "",
+   "يقال يطاف": "",
+   "ya": "",
+   "انصراء": "",
+   "يعلماء اشكري": "",
+   "انصري i 'lami": "",
+   "بيحة ميلا عيشة يبيعوا": "",
+   "yameenu, ta 'ishu,": ""
+  },
+  "ms-031": {
+   "Tashditli xariflar. Tashdit sözu ikkilantirish manasida bolib, iki -bir xil undash yanmayan kelib, birincisi sükunli, keyingisi xarakatli bolsa, yazuda ularinin faqat": "Tashdidli harflar. Tashdid soʻzi «ikkilantirish» maʼnosida boʻlib, ikki bir xil undosh yonma-yon kelib, birinchisi sukunli, keyingisi harakatli boʻlsa, yozuvda ularning faqat",
+   "bitdasi yazılıb, üstüge tashdit belgesi qoyilada.": "bittasi yozilib, ustiga tashdid belgisi qoʻyiladi.",
+   "Quyda misallar blan, tanishams.": "Quyida misollar bilan tanishamiz.",
+   "أما": "",
+   "برّ": "",
+   "جرّ حجّ شكّ": "",
+   "Siddab,": ""
+  },
+  "ms-032": {
+   "TANWINLI XARFLAR XARF OSTYOKI USTUDA QUYDAGY BELGELERDAN BIR KILSA, BIR SKUNLI NUN ORTTYR BOGILADY.": "Tanvinli harflar. Harf ostida yoki ustida quyidagi belgilardan biri kelsa, bir sukunli nun orttirib oʻqiladi.",
+   "FATHA TANWINI AN KASRA": "Fatha tanvini, kasra tanvini",
+   "ZAMMA": "va zamma tanvini.",
+   "din": "",
+   "zin": "",
+   "rin": "",
+   "LAYثAN FOWJIN LOHUN": ""
+  },
+  "ms-033": {
+   "TASHDIT": "Tanvinli tashdid."
+  },
+  "ms-034": {
+   "Alif ve Hamza": "Alif va hamza.",
+   "Hamza toqqis qil korunışta mawujud ular Quyda gilar. Indi ularini misallar yardamda korub ciqhamis.": "Hamza toʻqqiz xil koʻrinishda mavjud. Ular quyidagilar. Endi ularni misollar yordamida koʻrib chiqamiz.",
+   "Shaaah Saaaah Jaa 'a Yasha": "",
+   "'a": "",
+   "Masaa 'a Shia 'a Ji 'a Yajii 'u": "",
+   "Yusii 'u Musii 'u": "",
+   "امرئ": ""
+  },
+  "ms-035": {
+   "Ta marbutta. Ta marbutta tini asasa.": "Ta marbuta. Ta marbuta «t» tovushini beruvchi",
+   "un dashi bolib u muannas. Ayal cinsige dalalat qiluči sozlar ahirida kollanilada. Quyida unge misallar kildaramis.": "undosh boʻlib, u muannas, yaʼni ayol jinsiga dalolat qiluvchi soʻzlar oxirida qoʻllaniladi. Quyida unga misollar keltiramiz."
+  },
+  "ms-036": {
+   "Yazılmasa xam uqiladigyan xariflar.": "Yozilmasa ham oʻqiladigan harflar.",
+   "Artdırilgen alif. Üstuda fatxalomat bilan tike yazilgen kiçik alif xarifi hudda alif kabir çözib uqiladi. Quyuda misallar bilan tanışib çıxamiz.": "Orttirilgan alif. Ustida fatha alomati bilan tik yozilgan kichik alif harfi xuddi alif kabi choʻzib oʻqiladi. Quyida misollar bilan tanishib chiqamiz."
+  },
+  "ms-037": {
+   "artdırilgan ya. Soz ahirda kilgan kəsirali ha -dan aldingi xarif xam kəsirali bolsa, ha -dan kin bir ya xarifı qoşıb çözilib oquladı. Bu belgi Usman": "Orttirilgan yo. Soʻz oxirida kelgan kasrali ha harfidan oldingi harf ham kasrali boʻlsa, ha harfidan keyin bir yo harfi qoʻshib, choʻzib oʻqiladi. Bu belgi Usmoniy",
+   "mushafıda quyudakce kornishda kilgan.": "mushafda quyidagi koʻrinishda kelgan."
+  },
+  "ms-038": {
+   "ОРТТРИЛГЕН ВАВ СОЗ АХИРДА КЕЛГЕН ЗАММАЛИ ХА ХАРФДАН АЛДИНГЕ ХАРФХАМ ЗАММАЛИ ЯКИ ФАТХАЛИП ОЛСА ХА ХАРФДАН СОЙН БР": "Orttirilgan vov. Soʻz oxirida kelgan zammali ha harfidan oldingi harf ham zammali yoki fathali boʻlsa, ha harfidan soʻng bir",
+   "ВАВ КОШЮП ЧОЗБОКЛАДА КУЙДА ОНГЕ МСАЛЛАР КЕЛТРАМИЗ": "vov qoʻshib choʻzib oʻqiladi. Quyida unga misollar keltiramiz."
+  },
+  "ms-039": {
+   "Sos ahirda fatqadankin nuktalarsız gelgan ya -xarfi alfi maksura dip atalada. O, çözıq A tarzda uqalada. Quyda bunga misallar keldirilgan.": "Soʻz oxirida fathadan keyin nuqtasiz kelgan yo harfi alifi maqsura deb ataladi. U choʻziq «a» tarzida oʻqiladi. Quyida bunga misollar keltirilgan.",
+   "A 'la, Mousa,": "",
+   "Shunindik qoydagi sozlar ortasta keelgan": "Shuningdek, quyidagi soʻzlar oʻrtasida kelgan",
+   "talafuz qılınada.": "talaffuz qilinadi."
+  },
+  "ms-040": {
+   "Fatqadan ki in kelgan vav, un dashi kham, chozik aqilip uqilada. Quyida musallarini korib chikhamis.": "Fathadan keyin kelgan vov «a» kabi choʻzib oʻqiladi. Quyida misollarni koʻrib chiqamiz."
+  },
+  "ms-041": {
+   "Yazılsakam uqilmeydigyan xarflar. Quydaqi sözlarinin başıdagi əlif, Vov blan yazılgen bolsa da, Vov matqilip yani çözib uqilmeydi, balki addi zem makabu": "Yozilsa ham oʻqilmaydigan harflar. Quyidagi soʻzlarning boshidagi alif vov bilan yozilgan boʻlsa-da, vov oʻqilmaydi, yaʼni choʻzib oʻqilmaydi, balki oddiy zamma kabi",
+   "uqiladi.": "oʻqiladi.",
+   "Shunindek sözlar ahirdaqi kəlimelarinin cem, Qublik alamati bolgan": "Shuningdek, soʻzlar oxiridagi koʻplik alomati boʻlgan",
+   "Quydaagi misallar kabhi sozlardah ham orta dagi alif uqilmeyda.": "Quyidagi misollar kabi soʻzlarda ham oʻrtadagi alif oʻqilmaydi.",
+   "wa Jalākhira kaalfarash wal 'asr wal 'har": "",
+   "kāalafrāsh waal 'a srāt al -lazīn ghayri al -maghdub. Siylatul Qadr": ""
+  },
+  "ms-042": {
+   "IDGHAM SHAMSIYA Quyidagi misallar ka bu sozlar da xam ortadagi lam uqilmeyda": "Idgʻom shamsiya. Quyidagi misollar kabi soʻzlarda ham oʻrtadagi lom oʻqilmaydi.",
+   "al -dararu, al": "",
+   "al": "",
+   "Quy dagi misallar ki abu sozlar daxam, orta dagi alif vallam uqilmeyda. هو التبعو هو السمرو": "Quyidagi misollar kabi soʻzlarda ham oʻrtadagi alif va lom oʻqilmaydi.",
+   "هو الدخلو هو الذهبو": ""
+  },
+  "ms-043": {
+   "Ishar, Qamariya. Quyidagi misallar kabi sözlar qošip oqilganda, aval keleotgen söz, mat xariflari blan tukilgan bolsa xam, kengi söznin baş xarifu blan yapıq boğun xasil": "Izhor qamariya. Quyidagi misollar kabi soʻzlar qoʻshib oʻqilganda, avval kelayotgan soʻz mad harflari bilan tugagan boʻlsa ham, keyingi soʻzning bosh harfi bilan yopiq boʻgʻin hosil",
+   "qilganligi uçun qisqa onli kabi oqiladi.": "qilganligi uchun qisqa unli kabi oʻqiladi.",
+   "Bundai xallarda ikta xarif oqilmeyi tuship qalada.": "Bunday hollarda ikkita harf oʻqilmay tushib qoladi.",
+   "هذا الذي من ذا الذي تحتها الأنهار": "",
+   "فقلنا انضرب بئس الاسم": "",
+   "اهدنا الصراط يا أيها الناس": "",
+   "قالوا اتخذ قالوا ادعوا": "",
+   "لقوا الذين أوتوا الكتاب": ""
+  },
+  "ms-044": {
+   "Vasil": "Vasl.",
+   "Koshubokush": "Qoʻshib oʻqish.",
+   "ni birga koshubokush dar. Vasil Ali, alif üstuda xamza bilgis bolmayda. 2 söz birga koshubokul ganda, xar daim orta lardagi bir, 2 ya ki, 3 xarf okulmay chupqalada.": "Vasl ikki, uch yoki toʻrt soʻzni birga qoʻshib oʻqishdir. Vasl alifi ustida hamza belgisi boʻlmaydi. Ikki soʻz birga qoʻshib oʻqilganda, har doim oʻrtalaridagi bir, ikki yoki uch harf oʻqilmay tushib qoladi.",
+   "Bunday vaxte 2 söz niy ortasta keliyatgan bir alif, hec bir bilgisiz xalda, fatqa zama ya ki, kasrasiz tura da. Quydagi misalarda, 3 söz vasil qilingan.": "Bunday vaqtda ikki soʻzning oʻrtasida kelayotgan bir alif hech bir belgisiz, fatha, zamma yoki kasrasiz turadi. Quyidagi misollarda uchta soʻz vasl qilingan.",
+   "نار الله الموقدة": "",
+   "كمثل الذي استوقد": "",
+   "ذو الفضل العظيم": "",
+   "أنت العزيز الحكيم PLEASE PLEASE PLEASE PLEASE": ""
+  },
+  "ms-045": {
+   "Vaqf sozı toqtash manasada kilib, Qur 'an karimda uniyin belgilari kilgan jayda braz toqtashge aytilada. Toqtash alamata aldada gie sozniin halatiga qarab ya sikun,": "Vaqf soʻzi «toʻxtash» maʼnosida kelib, Qurʼoni karimda uning belgilari kelgan joyda biroz toʻxtashga aytiladi. Toʻxtash alomati oldidagi soʻzning holatiga qarab yo sukun,",
+   "ya alif, ya khud sikunli hablan vaqf qilnada. Quyida ularege misallar berilgan.": "yo alif, yoxud sukunli ha bilan vaqf qilinadi. Quyida ularga misollar berilgan."
+  },
+  "ms-046": {
+   "uqış qaydalara. Maddeb unli tavşlarini iki xarakat mqtarda ya ki, ondan kubraq çözüb uqışiga aytilishini va madxariflar uçda. Alif, vao,": "Mad, choʻzib oʻqish qoidalari. Mad unli tovushlarni ikki harakat miqdorida yoki undan koʻproq choʻzib oʻqishga aytilishini va mad harflari uchta: alif, vov,",
+   "yalar ekanini yukarda takidlab utgan edik. Yindi madxariflarinin çözüb uqilishiga sabab boladigyan belgilar haqda bilbalamiz. Madga": "yo ekanini yuqorida taʼkidlab oʻtgan edik. Endi mad harflarining choʻzib oʻqilishiga sabab boʻladigan belgilar haqida bilib olamiz.",
+   "Skunnin ozu iki xil boladi. Birincisi, lazım sikun. Xarf üstuda əvvəldən bar bolub, daima turadigən sikundur. Misallar.": "Sukunning oʻzi ikki xil boʻladi. Birinchisi, lozim sukun: harf ustida avvaldan bor boʻlib, doimo turadigan sukundir. Misollar:",
+   "Yukarıdagi sözlarda təşdid içi dəgi birinci ha, birinci lam və birinci sinlərin sikunu lazım sikundur. 2.": "Yuqoridagi soʻzlarda tashdid ichidagi birinchi ha, birinchi lom va birinchi sinlarning sukuni lozim sukundir. Ikkinchisi,",
+   "Aruz sikun Vaqf qilish sabapli payda boladigan sikundir. Agar söz ozdan ki ingi jumlaga ulab uqilsa, unda oz harakatiga muhafiq uqla": "oriz sukun: vaqf qilish sababli paydo boʻladigan sukundir. Agar soʻz oʻzidan keyingi jumlaga ulab oʻqilsa, unda oʻz harakatiga muvofiq oʻqiladi.",
+   "-alamin": "",
+   "Al -rahim Al -nas Yukaridagi sözlar ahiridagi nun, mim və sinlərнің yuskını": "Yuqoridagi soʻzlar oxiridagi nun, mim va sinlarning sukuni",
+   "orz kındır.": "oriz sukundir."
+  },
+  "ms-047": {
+   "Tabi mat. Mat, kharafı songidan sabab mat kelimasa tabi mat boladi wa bir alif miktarca çozu boquladi. Tabi mat ke misallar.": "Tabiiy mad. Mad harfidan soʻng mad sababi kelmasa, tabiiy mad boʻladi va bir alif miqdoricha choʻzib oʻqiladi. Tabiiy madga misollar:",
+   "Inna, ra,": "",
+   "ta,": "",
+   "bu,": "",
+   "nu,": "",
+   "hu.": "",
+   "伊غ ۷ۃ ذي قِيلَ طيني فیها ما": "",
+   "اعلمي": "",
+   "اشكرا": "",
+   "انصرا": "",
+   "اعلمى": "",
+   "Ushkuri": ""
+  },
+  "ms-048": {
+   "Muttasil mat. Mat xarifı sungidan sabab mat xamza bolub, ikis xam bir kalimada kelsa, muttasil mat bolada. Muttasil mat tort alif mxtarca chozulada.": "Muttasil mad. Mad harfidan soʻng mad sababi hamza boʻlib, ikkisi ham bir kalimada kelsa, muttasil mad boʻladi. Muttasil mad toʻrt alif miqdoricha choʻziladi.",
+   "Muttasil mat ge musallar.": "Muttasil madga misollar:",
+   "Ja -a,": "",
+   "su -a,": "",
+   "ji -a,": "",
+   "alfa -i -za.": "",
+   "۱۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲ damn sayא": "",
+   "MSA sea Qulu o Qulu o": ""
+  },
+  "ms-049": {
+   "MUNFASIL MAD Agar MAD kharafartadan sabab MAD khamza bolub, başqa sözda kilse, MUNFASIL MAD bolada. MUNFASIL MAD na bir alifdan tort alifkače çözış": "Munfasil mad. Agar mad harfidan soʻng mad sababi hamza boʻlib, boshqa soʻzda kelsa, munfasil mad boʻladi. Munfasil madni bir alifdan toʻrt alifgacha choʻzish",
+   "caiz. MUNFASIL MAD kem saallar.": "joiz. Munfasil madga misollar:",
+   "Inna ilayhi": "",
+   "Inna a'tadna": "",
+   "Maza a 'rada wa inna in bima unzila": "",
+   "ya ayyuhaa inna arsalna": "",
+   "innama amwalukum.": ""
+  },
+  "ms-050": {
+   "ЛАЗММАТ Әгер мад харфы сонгиды келген сабаб, мад сукону лазым болса, лазым мад болады. Лазым мад, торт әлиф мықтарча чозылыши шарт. Лазым мад": "Lozim mad. Agar mad harfidan soʻng kelgan mad sababi lozim sukun boʻlsa, lozim mad boʻladi. Lozim madni toʻrt alif miqdoricha choʻzish shart. Lozim mad",
+   "ке мысалдар.": "ga misollar:",
+   "Әлиф ләммим сады Әлиф ләммим сады Әлиф ләммим сады Әлиф ләммим сады Al": "",
+   "-Amiim": "",
+   "Walallallin": "",
+   "Qaf": "",
+   "Saad": "",
+   "Yasin": "",
+   "Alif Laam Meem": "",
+   "Noon Alif Laam Ra": ""
+  },
+  "ms-051": {
+   "Arzmat. Agar mad kharafı songida kilgan sabab mad arz kun bolsa, arzmat bolada. Arizmat ikki aliften tord alifkaçya çozu boqulada. Arizmat ke misallar.": "Oriz mad. Agar mad harfidan soʻng kelgan mad sababi oriz sukun boʻlsa, oriz mad boʻladi. Oriz mad ikki alifdan toʻrt alifgacha choʻzib oʻqiladi. Oriz madga misollar:",
+   "Yash 'uroon,": "",
+   "Ya 'lamoon,": "",
+   "Tek -siboon,": "",
+   "Walil mu'minin,": "",
+   "ملع المحسنين": "",
+   "يشتهون": "",
+   "وتقضعون": "",
+   "مفسدين": ""
+  },
+  "ms-052": {
+   "LIN LAZIMMAT LIN YUMŞAX MANASINI BILDIRADI LIN XARIFLARI 2D SÜKÜNLİ VAV VA SÜKÜNLİ YA XARIFLARI LIN XARIFI SÜKÜNLİ LAZIMGƏ": "Lin lozim mad. Lin «yumshoq» maʼnosini bildiradi. Lin harflari ikkita: sukunli vov va sukunli yo. Lin harfi lozim sukunga",
+   "YOLQQANIDA LIN LAZIMMAT BOLADY LIN LAZIMMAT TORT ALIF MĞTARCYI CHOZUB OQILADY MISALLAR": "yoʻliqqanida lin lozim mad boʻladi. Lin lozim mad toʻrt alif miqdoricha choʻzib oʻqiladi. Misollar:",
+   "KÄF HƏYƏ AIN SAD": "",
+   "Hamim Aynsinqaf": ""
+  },
+  "ms-053": {
+   "Lin arizmat. Lin xarifis kunli arizge yoluqanda lin arizmat bolada. Lin arizmatna ikki aliften tord alifkecha chozish mumkun. Musallar.": "Lin oriz mad. Lin harfi oriz sukunga yoʻliqqanda lin oriz mad boʻladi. Lin oriz madni ikki alifdan toʻrt alifgacha choʻzish mumkin. Misollar:",
+   "Wassayif": "",
+   "Amrain": "",
+   "Assu": "",
+   "Shauq": "",
+   "қوص": "",
+   "ғایض": "",
+   "қوف": ""
+  },
+  "ms-054": {
+   "Исхар, скунли нун, яки танвейн қуйдаги алтитақ арфнин бірге йолыққаныда нунны білдіріп оқыш. Мысалылар.": "Izhor: sukunli nun yoki tanvin quyidagi oltita harfning biriga yoʻliqqanida nunni bildirib oʻqish. Misollar:",
+   "Lobeika Ni ha juguka Ukrautik ila bukmun umyun wa minhum": "",
+   "walahum azabun alim haqqan alal muttaqin.": ""
+  },
+  "ms-055": {
+   "Skunli nun yaki tanwin bax harfiqi yolqqanida nunni mimga almaştirib dmaqı bulan iki xarakat maxtarca uşlab duruş.": "Iqlob: sukunli nun yoki tanvin ba harfiga yoʻliqqanida nunni mimga almashtirib, dimogʻ bilan ikki harakat miqdoricha ushlab turish.",
+   "bil ma 'ruf.": "",
+   "غرفة بيده كثيرة بإذن الله": "",
+   "أمدا بعيدا من بعض": ""
+  },
+  "ms-056": {
+   "ғұннали": "Gʻunnali idgʻom.",
+   "ғұннабу дымақ, yani, бұрынбошлығдан чықадиган аваздар. ғұннали харфлар тортта улар, куиләгелар.": "Gʻunna — dimogʻ, yaʼni burun boʻshligʻidan chiqadigan ovoz. Gʻunnali harflar toʻrtta, ular quyidagilar:",
+   "Үләу,": "vov,",
+   "нун,": "nun,",
+   "мим,": "mim,",
+   "я. Скунли нун, яки, танвин ғұннали харфларны бірге, еолыққанды нунны, ұша харфның ичеге киргызып, дымағы білен, икі харакат мақтарчы оқыш ғұннали": "yo. Sukunli nun yoki tanvin gʻunnali harflarning biriga yoʻliqqanda nunni oʻsha harfning ichiga kiritib, dimogʻ bilan ikki harakat miqdoricha oʻqish gʻunnali",
+   "идиғам қса біленады. Misallar.": "idgʻom deyiladi. Misollar:",
+   "صبرا وثبت": ""
+  },
+  "ms-057": {
+   "ғұннасыз итіғам Үскүңли нұн яки тәнвіні ра яки лам қарфлардан бірге йол қаныда нұнну оша қарфның ечіге кирғызып ғұннасыз оқыш": "Gʻunnasiz idgʻom: sukunli nun yoki tanvin ro yoki lom harflaridan biriga yoʻliqqanida nunni oʻsha harfning ichiga kiritib, gʻunnasiz oʻqish",
+   "ғұннасыз итіғамдар Мысалдар": "gʻunnasiz idgʻom deyiladi. Misollar:",
+   "همزت اللمزه ما لن نبدأ": ""
+  },
+  "ms-058": {
+   "Ихфа. Скунли нун яки, танвин хуйдаги 15 -та Ихфа харфлардан бирге йолканда нунни яшырыб, дымағ билан 2 харакат мүхтарча ғуна қылып": "Ixfo: sukunli nun yoki tanvin quyidagi 15 ta ixfo harfidan biriga yoʻliqqanda nunni yashirib, dimogʻ bilan ikki harakat miqdoricha gʻunna qilib",
+   "оқылада.": "oʻqiladi.",
+   "wa ve fa civ misal oughtlar Musibatu": "",
+   "qaloo": "",
+   "min douni wa ansulunak": "",
+   "rahmetun famen famen": "",
+   "kh purch down": "",
+   "حلالا طيبا": "",
+   "منفقين من كتاب فمن جاء": ""
+  },
+  "ms-059": {
+   "Tachvimlii ra. Ra xarifu 6 -da xalatda tachvim, yani yoghan qilib uqiladi. Bular qiidagilar.": "Tafximli ro. Ro harfi oltita holatda tafxim, yaʼni yoʻgʻon qilib oʻqiladi. Ular quyidagilar.",
+   "Ra xarifu zammali ya ki fathali bolsa.": "Ro harfi zammali yoki fathali boʻlsa.",
+   "Rahim, birabbikum.": "",
+   "Ra xarifu sikunli bolib, undan avvalgi xarif zammali ya ki fathali bolsa.": "Ro harfi sukunli boʻlib, undan avvalgi harf zammali yoki fathali boʻlsa.",
+   "وَلْأَرْضُ": "",
+   "مَرْيَم Ra kharaf sikunli bolib, undan ki ingi kharaf, istila kharaflerden bolsa.": "Ro harfi sukunli boʻlib, undan keyingi harf istiʼlo harflaridan boʻlsa.",
+   "فِرْقَ": "",
+   "قِرْطَاس Ra kharaf sikunli bolib, undan avvalgi kharaf kəsrali bolsa, kəsrasi arzi ya ki, başqa sözda bolsa. Iroji 'hu": "Ro harfi sukunli boʻlib, undan avvalgi harf kasrali boʻlsa-yu, kasrasi oriz yoki boshqa soʻzda boʻlsa.",
+   "Amiru tabu Skun bilan tukhtalgan raadan awalgi kharf Istila kharf lardan bolib O khams kuli bolsa Aynal qidr": "Sukun bilan toʻxtalgan rodan avvalgi harf istiʼlo harflaridan boʻlib, oʻzi sukunli boʻlsa.",
+   "Skun bilan tukhtalgan raadan awalgi kharf Khams kuli bolib Ondan awalgi kharf Zammali ya ki Fadhali bolsa Walfajr": "Sukun bilan toʻxtalgan rodan avvalgi harf sukunli boʻlib, undan avvalgi harf zammali yoki fathali boʻlsa.",
+   "بالكفر": ""
+  },
+  "ms-060": {
+   "Tarkiqli ra. Ra xarifi turdda xolatda tarqiq, yani ingička qilib oqulada. Bular kuyidagilar.": "Tarqiqli ro. Ro harfi toʻrt holatda tarqiq, yaʼni ingichka qilib oʻqiladi. Ular quyidagilar.",
+   "Birincisi, ra xarifi kəsrali bolsa.": "Birinchisi, ro harfi kasrali boʻlsa.",
+   "İkinciisi, ra xarifi skuli bolib, uzdan avvalgi xarif kəsrali bolsa. Фағуфир 3. Скунбылан тоқталген": "Ikkinchisi, ro harfi sukunli boʻlib, undan avvalgi harf kasrali boʻlsa. Uchinchisi, sukun bilan toʻxtalgan",
+   "Ра харфыдан аввәлгі харф, лин харфы болса 4.": "ro harfidan avvalgi harf lin harfi boʻlsa. Toʻrtinchisi,",
+   "Скунбылан тоқталген Ра дан алдингі харф, скунли болып, ондан аввәлгі харф, кәсралли болса 4. Хичари PANASY": "sukun bilan toʻxtalgan rodan oldingi harf sukunli boʻlib, undan avvalgi harf kasrali boʻlsa."
+  },
+  "ms-061": {
+   "Allah ləvzi Allah ləvzinin lamıda ikta qayda bar Təvhim və tərqiq Allah ləvzinin lamı qaçanki Uş bu sözdan": "Alloh lafzi. Alloh lafzining lomida ikkita qoida bor: tafxim va tarqiq. Alloh lafzining lomi, qachonki shu soʻzdan",
+   "aldingi xərf Fatxayaki zəmməli bolsa Təvhim, yəni yogan qılıb o qilada Misallar": "oldingi harf fathali yoki zammali boʻlsa, tafxim, yaʼni yoʻgʻon qilib oʻqiladi. Misollar:",
+   "إِنَّ اللَّهَ": "",
+   "lafzıdan əvvəlgi xarif kəsirəli bulsa, lam tarqiq, yəni ingiçikə qılıb oxuladı. Misallar Billə": "Lafzdan avvalgi harf kasrali boʻlsa, lom tarqiq, yaʼni ingichka qilib oʻqiladi. Misollar:",
+   "Lillah": ""
+  },
+  "ms-062": {
+   "Qur 'ani kərimdə bazı surələr Allahıda xarflər bilən başlanədə. Misallər": "Qurʼoni karimda baʼzi suralar alohida harflar bilan boshlanadi. Misollar:"
+  },
+  "ms-063": {
+   "SAKTA İki kalima rasta nafas almastan bir az tohtab otisna SAKTA deyil adi. Qur 'an -i kerimnin turta surasda KAHF, YASN, Qiyamat,": "Sakta. Ikki kalima orasida nafas olmasdan biroz toʻxtab oʻtishga sakta deyiladi. Qurʼoni karimning toʻrtta surasida: Kahf, Yosin, Qiyomat",
+   "Mutafifim suralarda SAKTA qilish vacibdir.": "va Mutaffifin suralarida sakta qilish vojibdir.",
+   "KAHF surasdagi SAKTA ayata.": "Kahf surasidagi sakta oyati.",
+   "ولم يجعل له عوجا قيما لينذر بأسا": "",
+   "شديدا من لدنه ويبشر المؤمنين الذين": "",
+   "يعملون الصالحات": "",
+   "Yosun surasidagi sakta ayatda.": "Yosin surasidagi sakta oyati.",
+   "Qiyamat surasidagi sakti ayatda.": "Qiyomat surasidagi sakta oyati.",
+   "Mutafifun surasidagi sakti ayatda.": "Mutaffifin surasidagi sakta oyati.",
+   "Yukarıdagi sakti ayatlarini ustaz yardamda urgenişini tafsiyye qılamız.": "Yuqoridagi sakta oyatlarini ustoz yordamida oʻrganishni tavsiya qilamiz."
+  },
+  "ms-064": {
+   "Istiaza Istiaza, Qur 'an -ı kərimini, qiraat qilişini, quyidəgi cümlə bilən başləşdir. Ə": "Istiʼoza. Istiʼoza Qurʼoni karimni qiroat qilishni quyidagi jumla bilan boshlashdir.",
+   "Istiaza ni mənası pənax soraş və ilticab olub yuqardəgi cümləni mənası şeytanin yamanliklərdən Allah qə sığınəmən digənidir.": "Istiʼozaning maʼnosi panoh soʻrash va iltijo boʻlib, yuqoridagi jumlaning maʼnosi «Shaytonning yomonliklaridan Allohga sigʻinaman» deganidir."
+  },
+  "ms-065": {
+   "Basmala, Basmala Qur 'an -ı Kerimdagi xarbir surana, Tavva surastan tashqara, Quydagi cümlə bilan başlashdir.": "Basmala. Basmala Qurʼoni karimdagi har bir surani, Tavba surasidan tashqari, quyidagi jumla bilan boshlashdir.",
+   "Yani, bu cümlə asli Nəmil surasinin 30 -cı ayatı dagi cümlə bolub, Qiraatda xarbir suranı ubilan başlash sünnəttir.": "Yaʼni bu jumla aslida Naml surasining 30-oyatidagi jumla boʻlib, qiroatda har bir surani u bilan boshlash sunnatdir."
+  },
+  "ms-066": {
+   "хамза хақыда хамза халқумның ең юқар таманы, yani, көкірәкі яқын жайдан талафуз қылына деген таушдыр. О тауш пайларды пайда болган jarансыз": "Hamza haqida. Hamza halqumning eng quyi tomoni, yaʼni koʻkrakka yaqin joydan talaffuz qilinadigan tovushdir. U tovush paychalarida paydo boʻlgan jarangsiz",
+   "шауқынли портловчо ондашдыр. Партлап чыққан хава ағыз пошлығыге отгэнда еңгел тамақ қыршыяки, юталге оқшап кетаде. Узбек тілді бұндай тавыш йоқ. Бірақ,": "shovqinli portlovchi undoshdir. Portlab chiqqan havo ogʻiz boʻshligʻiga oʻtganda yengil tomoq qirish yoki yoʻtalga oʻxshab ketadi. Oʻzbek tilida bunday tovush yoʻq. Biroq",
+   "айрым араб тілдан узлашкен созларнин талапузыда оны сезеш мүмкун.": "arab tilidan oʻzlashgan ayrim soʻzlarning talaffuzida uni sezish mumkin."
+  },
+  "ms-067": {
+   "KALIMATI IYMAN KALIMATI IYMAN": "Kalimai iymon."
+  },
+  "ms-068": {
+   "إلا الله وأشهد أن محمدا عبده ورسوله": ""
+  },
+  "ms-069": {
+   "أشهد أن لا إله إلا الله وحده لا شريك": "",
+   "وهو حي لا يموت بيده الخير وهو على كل شيء": "",
+   "قدير": ""
+  },
+  "ms-070": {
+   "ايمان مفصل": "",
+   "آمنت بالله وملائكته وكتبه ورسله": ""
+  },
+  "ms-071": {
+   "من كل ذنب أذنبته عمدا أو خطأا سرا أو علانية": ""
+  },
+  "ms-072": {
+   "لا حول": "",
+   "ما شاء الله كان": "",
+   "الإيمان إقرار باللسان وتصديق بالقلب بما جاء به من": "",
+   "عند الله": "",
+   "من عند الله محمد رسول الله صلى الله عليه": "",
+   "وسلم": ""
+  },
+  "ms-073": {
+   "Sözbaşı Bütün barlıq Yer -Oasman kainat egiasi bolgan zat Allah ta 'alaga uzunin ululugi qadar Xamdu sanalarımız": "Soʻz boshi. Butun borliq, yeru osmon, koinot egasi boʻlgan zot Alloh taologa Uning ulugʻligi qadar hamdu sanolarimiz,",
+   "Alamlarga rahmat qilip yubarilgan Paiğambarimiz Muhammad Mustafa sallallahu aleyhi və sallamga Duru du salavatlarımız bolsin Immatimnin en yaxshisi": "olamlarga rahmat qilib yuborilgan Paygʻambarimiz Muhammad Mustafo sollallohu alayhi va sallamga durudu salavotlarimiz boʻlsin. «Ummatimning eng yaxshisi,",
+   "Hayrlisi Quran okşini organib Sonura Başqalarga orga toqcidir Canacan yurtimizda qadimda xam, xazirgi kullarimizda xam, anasunday uluq": "xayrlisi Qurʼon oʻqishni oʻrganib, soʻngra boshqalarga oʻrgatuvchidir». Jonajon yurtimizda qadimda ham, hozirgi kunlarimizda ham ana shunday ulugʻ",
+   "ustazlarimiz bar. Shunin uchun xam, bu zamindan xariyili onlap, yüzlap, qarilar,": "ustozlarimiz bor. Shuning uchun ham bu zamindan xayrli oʻnlab, yuzlab qorilar,",
+   "Quran bilimdanlar yetishib çiqmaqda. Quranlı uqish büyük fazilet, tügemma saadatdır. Shun deyikin, xarbirimiz ilahi dasturnu beynuxsan uqish və uqish": "Qurʼon bilimdonlari yetishib chiqmoqda. Qurʼonni oʻqish buyuk fazilat, tugamas saodatdir. Shunday ekan, har birimiz ilohiy dasturni benuqson oʻqish va uqish",
+   "baqtiga irishish yolu da xarakat qilmaqimiz lazim boladi. Qol ingizda ki ušbu risala anasho saadatli manzilgi yitiklochi kharihda dar. Bu kitab": "baxtiga erishish yoʻlida harakat qilmogʻimiz lozim boʻladi. Qoʻlingizdagi ushbu risola ana shu saodatli manzilga yetaklovchi qoʻllanmadir. Bu kitob",
+   "azalden yurtumizda mashquur bolib gilgan. Sababe organochi uchun saadda wa asanligi dar. Bu uku qolla masajudakob nashir bolgan. Biraq ular nii kharbrada ozgi khas": "azaldan yurtimizda mashhur boʻlib kelgan. Sababi, oʻrganuvchi uchun soddaligi va osonligidir. Bu qoʻllanmaning koʻplab nashrlari mavjud. Biroq ularning har birida oʻziga xos",
+   "juzi yangiliklar bar. Kitab nii ušbu nashir khambra sada lashkan usulubta čap itil maqda. Maksad ukuji ga asan bolsan. Shunindegi qollama songiga": "juzʼiy yangiliklar bor. Kitobning ushbu nashri soddalashgan uslubda chop etilmoqda. Maqsad, oʻquvchiga oson boʻlsin. Shuningdek, qoʻllanma soʻngiga",
+   "eynmuxum dualar və kəlimelar xam ila vaqilina da.": "ayrim muhim duolar va kalimalar ham ilova qilinadi.",
+   "Oylaymiz ki, mubarək Quran -ı kərimini uqşuna niyat qilgan muxtaram uqucularimiz uçun bu xam faydali bolada. Allah taala bu acizanı işlarimizin uzu xayirli": "Oʻylaymizki, muborak Qurʼoni karimni oʻqishni niyat qilgan muhtaram oʻquvchilarimiz uchun bu ham foydali boʻladi. Alloh taolo bu ojizona ishlarimizni Oʻzi xayrli",
+   "qılsın. Qollanma muallifi Ahmed Xadi Maxsudi xazaratlarina rəhmatiga olsun.": "qilsin. Qoʻllanma muallifi Ahmad Hodiy Maqsudiy hazratlarini Alloh rahmatiga olsin."
+  }
+ }
+}

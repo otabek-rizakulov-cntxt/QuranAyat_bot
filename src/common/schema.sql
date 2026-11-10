@@ -254,3 +254,46 @@ CREATE TABLE IF NOT EXISTS daily_ayah_sub (
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Tajweed lesson approvals (docs/TAJWEED_PLAN.md §6): a lesson is published while
+-- content_hash equals its current text's hash, so an edit sends it back to draft.
+CREATE TABLE IF NOT EXISTS tajweed_approval (
+    lesson_id         TEXT PRIMARY KEY,
+    content_hash      TEXT NOT NULL,
+    approved_by       BIGINT NOT NULL,
+    approved_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Tajweed lessons a user has marked done (✅ Oʻqidim), in either track
+-- (docs/TAJWEED_PLAN.md). One row per (user, lesson); marking again is a no-op.
+CREATE TABLE IF NOT EXISTS tajweed_progress (
+    user_id           BIGINT NOT NULL,
+    lesson_id         TEXT NOT NULL,
+    done_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, lesson_id)
+);
+
+-- Tajweed practice (quizzes and reading drills) per user and lesson: how many
+-- sessions, and the best score in percent (docs/TAJWEED_PLAN.md P3).
+CREATE TABLE IF NOT EXISTS tajweed_practice (
+    user_id           BIGINT NOT NULL,
+    lesson_id         TEXT NOT NULL,
+    sessions          INT NOT NULL DEFAULT 0,
+    best_pct          INT NOT NULL DEFAULT 0,
+    last_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, lesson_id)
+);
+
+-- Tajweed spaced-repetition cards (docs/TAJWEED_PLAN.md P4): one row per card a
+-- user has seen. `due` and `last_seen` are the user's local dates.
+CREATE TABLE IF NOT EXISTS tajweed_card (
+    user_id           BIGINT NOT NULL,
+    card_id           TEXT NOT NULL,
+    interval_days     INT NOT NULL,
+    due               DATE NOT NULL,
+    last_seen         DATE NOT NULL,
+    first_seen        DATE NOT NULL,
+    reps              INT NOT NULL DEFAULT 0,
+    lapses            INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, card_id)
+);

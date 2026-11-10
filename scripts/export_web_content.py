@@ -18,10 +18,16 @@
 #   uz-audio/{surah}.json           Uzbek translation audio: the newbooks.uz mp3 URL,
 #                                   whether the cuts are verified, and each ayah's
 #                                   [start, end] in seconds (MULTILINGUAL_PLAN §8.1)
+#   tajweed/{uz,uz-Cyrl}.json       the tajweed lessons in both tracks (TAJWEED_PLAN):
+#                                   units, audio lessons (file under the R2 base the
+#                                   API reports, and their timed lines) and rules
+#                                   lessons with marked examples.
+#                                   Drafts are included; GET /tajweed says which to show.
 #
 # Everything is read through `modules.Quran`, the same parser the bot uses, so
 # the app and the bot can never disagree on an ayah boundary.
 
+import html
 import json
 import os
 import sys
@@ -29,6 +35,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
+from domain import tajweed, tajweed_lessons, tajweed_practice  # noqa: E402
 from domain.quran import (  # noqa: E402
     _QURAN_DATA,  # noqa: E402
     TRANSLATIONS_DIR,
@@ -118,6 +125,9 @@ def export(out_dir: str = DEFAULT_OUT_DIR) -> dict:
         if uz_audio.available(n):
             _write(os.path.join(out_dir, "uz-audio", "%d.json" % n), uz_audio_doc(n))
 
+    for lang in tajweed_lessons.LANGS:
+        _write(os.path.join(out_dir, "tajweed", "%s.json" % lang), tajweed_doc(lang))
+
     meta = build_meta(codes)
     _write(os.path.join(out_dir, "meta.json"), meta)
     return meta
@@ -133,6 +143,63 @@ def uz_audio_doc(n: int) -> dict:
             [round(x, 3) for x in uz_audio.seconds(n, a, a)]
             for a in range(1, Quran.get_surah_length(n) + 1)
         ],
+    }
+
+
+def tajweed_doc(lang: str) -> dict:
+    """Both tajweed tracks in one script (Latin or Cyrillic), ready to render."""
+    audio = [
+        {
+            "id": x.id,
+            "unit": x.unit,
+            "n": x.n,
+            "title": x.title,
+            "file": x.file,
+            "seconds": x.seconds,
+            "quiz": bool(tajweed_practice.rules_for(x.id)),  # else reading drills only
+            # line-by-line text with times (P2); GET /tajweed says if it is approved
+            "lines": [
+                {"kind": y.kind, "text": y.text, "start": y.start, "end": y.end}
+                for y in tajweed_lessons.audio_timings(x.id, lang)
+            ],
+        }
+        for x in tajweed_lessons.audio_lessons(lang)
+    ]
+    rules = [
+        {
+            "id": x.id,
+            "unit": x.unit,
+            "title": x.title,
+            "body": list(x.body),
+            "quiz": bool(tajweed_practice.rules_for(x.id)),
+            "examples": [
+                {
+                    "surah": s,
+                    "ayah": a,
+                    "html": tajweed.marked_html(s, a, r) if r else html.escape(tajweed.text(s, a)),
+                }
+                for s, a, r in x.examples
+            ],
+        }
+        for x in tajweed_lessons.lessons(lang)
+    ]
+
+    def units(us):
+        return [{"id": u.id, "title": u.title} for u in us]
+
+    return {
+        "tracks": [
+            {
+                "id": tajweed_lessons.TRACK_AUDIO,
+                "units": units(tajweed_lessons.audio_units(lang)),
+                "lessons": audio,
+            },
+            {
+                "id": tajweed_lessons.TRACK_RULES,
+                "units": units(tajweed_lessons.units(lang)),
+                "lessons": rules,
+            },
+        ]
     }
 
 

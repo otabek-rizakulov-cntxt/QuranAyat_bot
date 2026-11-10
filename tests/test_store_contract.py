@@ -988,3 +988,60 @@ class TestDaily:
         again = await store.daily.upsert(1, "whatsapp", time(20, 30), True)
         assert (again.platform, again.send_time) == ("whatsapp", time(20, 30))
         assert again.created_at == first.created_at
+
+
+class TestTajweedApprovals:
+    async def test_empty_until_approved(self, store):
+        assert await store.tajweed.approvals() == {}
+        assert await store.tajweed.revoke("qalqala") is False
+
+    async def test_approve_replace_and_revoke(self, store):
+        row = await store.tajweed.approve("qalqala", "abc123", 42)
+        assert (row.lesson_id, row.content_hash, row.approved_by) == ("qalqala", "abc123", 42)
+        assert row.approved_at is not None
+        again = await store.tajweed.approve("qalqala", "def456", 43)  # re-approval of new text
+        assert (again.content_hash, again.approved_by) == ("def456", 43)
+        assert set(await store.tajweed.approvals()) == {"qalqala"}
+        assert await store.tajweed.revoke("qalqala") is True
+        assert await store.tajweed.approvals() == {}
+
+
+class TestTajweedProgress:
+    async def test_mark_done_once_per_user(self, store):
+        assert await store.tajweed.done(1) == set()
+        assert await store.tajweed.mark_done(1, "ms-073") is True
+        assert await store.tajweed.mark_done(1, "ms-073") is False  # already done
+        assert await store.tajweed.mark_done(1, "qalqala") is True
+        assert await store.tajweed.done(1) == {"ms-073", "qalqala"}
+        assert await store.tajweed.done(2) == set()  # per user
+
+
+class TestTajweedCards:
+    async def test_save_and_replace_a_card(self, store):
+        from datetime import date
+
+        from infra.store.tajweed import CardRow
+
+        assert await store.tajweed.cards(1) == {}
+        day = date(2026, 11, 10)
+        await store.tajweed.save_card(1, CardRow("L:ز", 0, day, day, day))
+        await store.tajweed.save_card(1, CardRow("L:ز", 3, date(2026, 11, 13), day, day, 1, 0))
+        rows = await store.tajweed.cards(1)
+        assert set(rows) == {"L:ز"}
+        assert (rows["L:ز"].interval_days, rows["L:ز"].due, rows["L:ز"].reps) == (
+            3,
+            date(2026, 11, 13),
+            1,
+        )
+        assert rows["L:ز"].first_seen == day  # kept from the first save
+        assert await store.tajweed.cards(2) == {}
+
+
+class TestTajweedPractice:
+    async def test_sessions_count_and_best_score_is_kept(self, store):
+        assert await store.tajweed.practice(1) == {}
+        assert await store.tajweed.record_practice(1, "ms-056", 60) == (1, 60)
+        assert await store.tajweed.record_practice(1, "ms-056", 40) == (2, 60)  # best kept
+        assert await store.tajweed.record_practice(1, "ms-056", 100) == (3, 100)
+        assert await store.tajweed.practice(1) == {"ms-056": (3, 100)}
+        assert await store.tajweed.practice(2) == {}
