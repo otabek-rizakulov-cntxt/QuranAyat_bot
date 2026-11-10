@@ -19,3 +19,11 @@ def test_only_the_api_is_exported():
 def test_me_requires_bearer_auth():
     doc = exporter.build()
     assert doc["paths"]["/api/v1/me"]["get"]["security"] == [{"HTTPBearer": []}]
+
+
+def test_schema_names_are_unique():
+    # Two response models with one class name make FastAPI rename *both* to
+    # module-prefixed names (api__check__QuestionOut), which silently breaks the
+    # Mini App's generated types (S["QuestionOut"]). Give new models unique names.
+    doc = exporter.build()
+    assert not [n for n in doc["components"]["schemas"] if n.startswith("api__")]

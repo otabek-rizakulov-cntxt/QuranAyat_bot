@@ -87,23 +87,23 @@ async def review(body: ReviewIn, user_id: int = Depends(require_user)) -> Review
     return ReviewOut(approved=body.approve)
 
 
-class AyahOut(BaseModel):
+class TajweedAyahOut(BaseModel):
     surah: int
     ayah: int
     html: str  # the ayah, the asked-about spans in <u><b>
 
 
-class QuestionOut(BaseModel):
+class TajweedQuestionOut(BaseModel):
     kind: str  # name | find | listen | count
     rule: str
     prompt_rule: str  # the rule's Uzbek name, in the user's script
-    ayahs: List[AyahOut]
+    ayahs: List[TajweedAyahOut]
     options: List[str]
     answer: int
     audio: Optional[List[int]] = None  # [surah, ayah] to play first
 
 
-class DrillOut(BaseModel):
+class TajweedDrillOut(BaseModel):
     surah: int
     ayah: int
     word: str
@@ -111,8 +111,8 @@ class DrillOut(BaseModel):
 
 class PracticeOut(BaseModel):
     seed: int
-    quiz: List[QuestionOut]  # empty: this lesson has no annotated rule, drills only
-    drill: List[DrillOut]
+    quiz: List[TajweedQuestionOut]  # empty: this lesson has no annotated rule, drills only
+    drill: List[TajweedDrillOut]
 
 
 @router.get("/tajweed/practice/{lesson_id}", response_model=PracticeOut)
@@ -129,11 +129,11 @@ async def practice(
     return PracticeOut(
         seed=seed,
         quiz=[
-            QuestionOut(
+            TajweedQuestionOut(
                 kind=q.kind,
                 rule=q.rule,
                 prompt_rule=script(tajweed.RULES[q.rule].name_uz),
-                ayahs=[AyahOut(surah=s, ayah=a, html=h) for s, a, h in q.ayahs],
+                ayahs=[TajweedAyahOut(surah=s, ayah=a, html=h) for s, a, h in q.ayahs],
                 options=[script(o) for o in q.options],
                 answer=q.answer,
                 audio=list(q.audio) if q.audio else None,
@@ -141,7 +141,7 @@ async def practice(
             for q in tajweed_practice.quiz(lesson_id, seed)
         ],
         drill=[
-            DrillOut(surah=d.surah, ayah=d.ayah, word=d.word)
+            TajweedDrillOut(surah=d.surah, ayah=d.ayah, word=d.word)
             for d in tajweed_practice.drill(lesson_id, seed)
         ],
     )
