@@ -272,3 +272,14 @@ CREATE TABLE IF NOT EXISTS tajweed_progress (
     done_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, lesson_id)
 );
+
+-- Tajweed practice (quizzes and reading drills) per user and lesson: how many
+-- sessions, and the best score in percent (docs/TAJWEED_PLAN.md P3).
+CREATE TABLE IF NOT EXISTS tajweed_practice (
+    user_id           BIGINT NOT NULL,
+    lesson_id         TEXT NOT NULL,
+    sessions          INT NOT NULL DEFAULT 0,
+    best_pct          INT NOT NULL DEFAULT 0,
+    last_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, lesson_id)
+);

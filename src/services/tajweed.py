@@ -103,3 +103,12 @@ async def review(store, user_id: int, lesson_id: str, approve: bool) -> bool:
     else:
         await store.tajweed.revoke(lesson_id)
     return True
+
+
+async def finish_practice(store, user_id: int, lesson_id: str, correct: int, total: int):
+    """A finished quiz or reading drill: keep the score, log a `tajweed` streak session.
+    Returns (best_pct, outcome). The caller has already checked `can_open`."""
+    total = max(1, total)
+    pct = round(100 * max(0, min(correct, total)) / total)
+    _, best = await store.tajweed.record_practice(user_id, lesson_id, pct)
+    return best, await record_session(user_id, KIND_TAJWEED)

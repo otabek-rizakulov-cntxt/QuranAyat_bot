@@ -155,7 +155,8 @@ async def test_unit_lists_lessons_with_ticks(store):
 async def test_audio_card_listen_and_done(store, sessions):
     ctx = _ctx(store)
     await feature.on_tajweed(ctx, "tj:l:ms-073")
-    assert _buttons(ctx.edit)[:2] == ["tj:a:ms-073", "tj:d:ms-073"]
+    assert {"tj:a:ms-073", "tj:d:ms-073"} <= set(_buttons(ctx.edit))
+    assert any(b.startswith("tj:r:ms-073:") for b in _buttons(ctx.edit))  # reading practice
     assert "tj:l:ms-001" in _buttons(ctx.edit)  # ▶ to the alphabet
 
     await feature.on_tajweed(ctx, "tj:a:ms-073")
@@ -234,6 +235,7 @@ async def test_api_state_and_done(client):
         "done": [],
         "reviewer": False,
         "tracking": [],
+        "practice": {},
     }
 
     r = await client.post("/api/v1/tajweed/done", headers=h, json={"lesson_id": "ms-001"})

@@ -1014,3 +1014,13 @@ class TestTajweedProgress:
         assert await store.tajweed.mark_done(1, "qalqala") is True
         assert await store.tajweed.done(1) == {"ms-073", "qalqala"}
         assert await store.tajweed.done(2) == set()  # per user
+
+
+class TestTajweedPractice:
+    async def test_sessions_count_and_best_score_is_kept(self, store):
+        assert await store.tajweed.practice(1) == {}
+        assert await store.tajweed.record_practice(1, "ms-056", 60) == (1, 60)
+        assert await store.tajweed.record_practice(1, "ms-056", 40) == (2, 60)  # best kept
+        assert await store.tajweed.record_practice(1, "ms-056", 100) == (3, 100)
+        assert await store.tajweed.practice(1) == {"ms-056": (3, 100)}
+        assert await store.tajweed.practice(2) == {}

@@ -9,8 +9,18 @@
     tj:d:<lesson>           ✅ Oʻqidim: mark the lesson done (a streak session, once)
     tj:m:<lesson>           📄 Matn: send an audio lesson's text (once its tracking is approved)
     tj:p:<lesson>:<n>       play example n of a rules lesson in the user's reciter
+    tj:q:<lesson>:<seed>:<i>:<score>        quiz question i (i == N: the result)
+    tj:qa:<lesson>:<seed>:<i>:<score>:<c>   answer c to question i
+    tj:qp:<lesson>:<seed>:<i>               play question i's ayah (listen questions)
+    tj:r:<lesson>:<seed>:<i>:<score>        reading drill word i (i == N: the result)
+    tj:ra:<lesson>:<seed>:<i>:<score>:<k|x> self-graded: read right (k) or not (x)
+    tj:rp:<lesson>:<seed>:<i>               play drill word i's ayah
     tj:ok:<lesson>          reviewer: approve this exact text (rules) or timed text (audio)
     tj:no:<lesson>          reviewer: back to draft
+
+Practice (P3) is rebuilt from (lesson, seed) by domain.tajweed_practice on every tap,
+so nothing is stored until the end; the score rides in the callback data. Forging it
+only changes the forger's own best score, and a session counts one streak day.
 
 Who may open what is services.tajweed (shared with the Mini App API): the audio
 track once its base URL is configured, rules lessons once approved (drafts for
@@ -18,12 +28,14 @@ reviewers). Uzbek UI only for now.
 """
 
 import html
+import random
 
 from bot.features import Ctx, callback, command
 from bot.media import deliver_quran
 from channels import Choice
-from domain import tajweed, tajweed_lessons
+from domain import tajweed, tajweed_lessons, tajweed_practice
 from domain.tajweed_lessons import TRACK_AUDIO, TRACK_RULES
+from domain.uz_translit import to_cyrillic
 from services import tajweed as service
 
 _PREFIX = "tj:"
@@ -143,6 +155,15 @@ def _done_row(ctx: Ctx, lesson_id: str, done: set) -> list:
     return [Choice(ctx.tr("tj_mark_done"), data="tj:d:" + lesson_id)]
 
 
+def _practice_row(ctx: Ctx, lesson_id: str) -> list:
+    seed = random.randrange(1, 100000)
+    row = []
+    if tajweed_practice.rules_for(lesson_id):
+        row.append(Choice(ctx.tr("tj_quiz"), data="tj:q:%s:%d:0:0" % (lesson_id, seed)))
+    row.append(Choice(ctx.tr("tj_drill"), data="tj:r:%s:%d:0:0" % (lesson_id, seed)))
+    return row
+
+
 def _nav_row(ctx: Ctx, lesson_id: str, unit_id: str, ids: list) -> list:
     prev_id, next_id = tajweed_lessons.neighbours(lesson_id, ids)
     nav = []
@@ -179,7 +200,12 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
         listen = [Choice(ctx.tr("tj_listen"), data="tj:a:" + audio.id)]
         if has_text and (tracked or reviewer):
             listen.append(Choice(ctx.tr("tj_text"), data="tj:m:" + audio.id))
-        rows = [listen, _done_row(ctx, audio.id, done), _nav_row(ctx, audio.id, audio.unit, ids)]
+        rows = [
+            listen,
+            _practice_row(ctx, audio.id),
+            _done_row(ctx, audio.id, done),
+            _nav_row(ctx, audio.id, audio.unit, ids),
+        ]
         if reviewer and has_text:
             text += "\n\n" + ctx.tr("tj_status_approved" if tracked else "tj_status_draft")
             rows.append(
@@ -200,6 +226,7 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
                 for n in range(1, len(lesson.examples) + 1)
             ]
         )
+    rows.append(_practice_row(ctx, lesson.id))
     rows.append(_done_row(ctx, lesson.id, done))
     rows.append(_nav_row(ctx, lesson.id, lesson.unit, [x.id for x in lessons]))
     if service.is_reviewer(ctx.user_id):
@@ -263,6 +290,172 @@ async def _mark_done(ctx: Ctx, lesson_id: str) -> None:
     await _lesson(ctx, lesson_id)  # the button turns into ✓
 
 
+# --- practice (P3) -----------------------------------------------------------------
+
+
+def _ints(*parts) -> list:
+    """Parsed non-negative ints, or None if any part isn't one (untrusted input)."""
+    return [int(p) for p in parts] if all(p.isdigit() for p in parts) else None
+
+
+async def _quiz(ctx: Ctx, args: list, answer: bool) -> None:
+    lesson_id, rest = args[0], args[1:]
+    nums = _ints(*rest)
+    want = 4 if answer else 3
+    if (
+        nums is None
+        or len(nums) != want
+        or not await service.can_open(ctx.store, ctx.user_id, lesson_id)
+    ):
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    seed, i, score = nums[:3]
+    questions = tajweed_practice.quiz(lesson_id, seed)
+    if not questions or i > len(questions) or score > i:
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    back = [Choice(ctx.tr("tj_back_lesson"), data="tj:l:" + lesson_id)]
+    if i == len(questions):  # the end
+        await _finish(ctx, lesson_id, score, len(questions), "tj:q:%s:%d:0:0", back)
+        return
+    q = questions[i]
+    if answer:
+        choice = nums[3]
+        right = choice == q.answer
+        score += right
+        verdict = (
+            ctx.tr("tj_right")
+            if right
+            else ctx.tr("tj_wrong").format(answer=_script(ctx, q.options[q.answer]))
+        )
+        text = "%s\n\n%s" % (_question_text(ctx, q, i, len(questions)), verdict)
+        label = ctx.tr("tj_finish") if i + 1 == len(questions) else ctx.tr("tj_next")
+        nxt = [Choice(label, data="tj:q:%s:%d:%d:%d" % (lesson_id, seed, i + 1, score))]
+        await ctx.answer()
+        await ctx.edit(text, [nxt, back], html=True)
+        return
+    await ctx.answer()
+    rows = []
+    if q.audio:
+        rows.append([Choice(ctx.tr("tj_hear"), data="tj:qp:%s:%d:%d" % (lesson_id, seed, i))])
+    options = [
+        Choice(_script(ctx, o), data="tj:qa:%s:%d:%d:%d:%d" % (lesson_id, seed, i, score, k))
+        for k, o in enumerate(q.options)
+    ]
+    if q.kind in ("find", "count"):
+        rows.append(options)  # "1".."4" fit on one row
+    else:
+        rows += [[o] for o in options]  # rule names: one per row
+    rows.append(back)
+    await ctx.edit(_question_text(ctx, q, i, len(questions)), rows, html=True)
+
+
+def _script(ctx: Ctx, text: str) -> str:
+    """Rule names are written in Latin; the Cyrillic UI gets them in Cyrillic."""
+    return to_cyrillic(text) if ctx.ui_lang == "uz-Cyrl" else text
+
+
+def _question_text(ctx: Ctx, q, i: int, n: int) -> str:
+    name = _script(ctx, tajweed.RULES[q.rule].name_uz)
+    prompt = ctx.tr("tj_q_" + q.kind).format(rule=name)
+    if q.kind == "find":
+        body = "\n\n".join("%d. %s" % (k + 1, h) for k, (_, _, h) in enumerate(q.ayahs))
+    else:
+        body = q.ayahs[0][2]
+    return "<i>%s</i>\n<b>%s</b>\n\n%s" % (ctx.tr("tj_q_of").format(i=i + 1, n=n), prompt, body)
+
+
+async def _drill(ctx: Ctx, args: list, answer: bool) -> None:
+    lesson_id, rest = args[0], args[1:]
+    graded = rest[-1] if answer and rest else None
+    nums = _ints(*(rest[:-1] if answer else rest))
+    if (
+        nums is None
+        or len(nums) != 3
+        or (answer and graded not in ("k", "x"))
+        or not await service.can_open(ctx.store, ctx.user_id, lesson_id)
+    ):
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    seed, i, score = nums
+    items = tajweed_practice.drill(lesson_id, seed)
+    if not items or i > len(items) or score > i:
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    back = [Choice(ctx.tr("tj_back_lesson"), data="tj:l:" + lesson_id)]
+    if answer:
+        score += graded == "k"
+        i += 1
+    if i == len(items):
+        await _finish(ctx, lesson_id, score, len(items), "tj:r:%s:%d:0:0", back)
+        return
+    item = items[i]
+    await ctx.answer()
+    text = "<i>%s</i>\n%s\n\n<b>%s</b>\n\n(%d:%d)" % (
+        ctx.tr("tj_q_of").format(i=i + 1, n=len(items)),
+        ctx.tr("tj_drill_prompt"),
+        html.escape(item.word),
+        item.surah,
+        item.ayah,
+    )
+    key = "%s:%d:%d:%d" % (lesson_id, seed, i, score)
+    rows = [
+        [Choice(ctx.tr("tj_hear"), data="tj:rp:%s:%d:%d" % (lesson_id, seed, i))],
+        [
+            Choice(ctx.tr("tj_drill_ok"), data="tj:ra:%s:k" % key),
+            Choice(ctx.tr("tj_drill_bad"), data="tj:ra:%s:x" % key),
+        ],
+        back,
+    ]
+    await ctx.edit(text, rows, html=True)
+
+
+async def _finish(ctx: Ctx, lesson_id: str, score: int, total: int, again: str, back: list) -> None:
+    best, outcome = await service.finish_practice(ctx.store, ctx.user_id, lesson_id, score, total)
+    pct = round(100 * score / total)
+    await ctx.answer()
+    text = ctx.tr("tj_result").format(
+        correct=score, total=total, pct=pct, best=best, days=outcome.streak.current
+    )
+    rows = [
+        [Choice(ctx.tr("tj_again"), data=again % (lesson_id, random.randrange(1, 100000)))],
+        back,
+    ]
+    await ctx.edit(text, rows, html=True)
+
+
+async def _practice_audio(ctx: Ctx, args: list, quiz: bool) -> None:
+    nums = _ints(*args[1:])
+    if (
+        nums is None
+        or len(nums) != 2
+        or not await service.can_open(ctx.store, ctx.user_id, args[0])
+    ):
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    seed, i = nums
+    if quiz:
+        items = tajweed_practice.quiz(args[0], seed)
+        ref = items[i].audio if i < len(items) else None
+    else:
+        items = tajweed_practice.drill(args[0], seed)
+        ref = (items[i].surah, items[i].ayah) if i < len(items) else None
+    if ref is None:
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    await ctx.answer()
+    await deliver_quran(
+        ctx.channel,
+        ctx.data,
+        ref[0],
+        ref[1],
+        "audio",
+        ctx.reciter,
+        ctx.ui_lang,
+        ctx.translation_lang,
+    )
+
+
 async def _play(ctx: Ctx, lesson_id: str, n: str) -> None:
     lessons, _ = await _rules_visible(ctx)
     lesson = next((x for x in lessons if x.id == lesson_id), None)
@@ -318,6 +511,12 @@ async def on_tajweed(ctx: Ctx, cb_data: str) -> None:
         await _mark_done(ctx, args[0])
     elif kind == "m" and len(args) == 1:
         await _send_text(ctx, args[0])
+    elif kind in ("q", "qa") and len(args) >= 4:
+        await _quiz(ctx, args, answer=kind == "qa")
+    elif kind in ("r", "ra") and len(args) >= 4:
+        await _drill(ctx, args, answer=kind == "ra")
+    elif kind in ("qp", "rp") and len(args) == 3:
+        await _practice_audio(ctx, args, quiz=kind == "qp")
     elif kind == "p" and len(args) == 2:
         await _play(ctx, args[0], args[1])
     elif kind in ("ok", "no") and len(args) == 1:

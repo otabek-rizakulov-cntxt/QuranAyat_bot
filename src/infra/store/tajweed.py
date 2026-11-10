@@ -6,11 +6,12 @@
 # lesson back into a draft until a reviewer looks at it again.
 #
 # Progress: the lessons each user has marked done (✅ Oʻqidim), in either track.
+# Practice: per user and lesson, how many quiz/drill sessions and the best score.
 
 import abc
 from dataclasses import dataclass, replace
 from datetime import datetime
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, Tuple
 
 from ._state import MemoryState
 
@@ -49,6 +50,14 @@ class TajweedStore(abc.ABC):
     async def mark_done(self, user_id: int, lesson_id: str) -> bool:
         """Mark a lesson done. True if it was not done before."""
 
+    @abc.abstractmethod
+    async def practice(self, user_id: int) -> Dict[str, Tuple[int, int]]:
+        """lesson_id -> (sessions, best_pct) for this user."""
+
+    @abc.abstractmethod
+    async def record_practice(self, user_id: int, lesson_id: str, pct: int) -> Tuple[int, int]:
+        """Count one session and keep the best score; returns (sessions, best_pct)."""
+
 
 class InMemoryTajweedStore(TajweedStore):
     def __init__(self, state: MemoryState):
@@ -74,6 +83,15 @@ class InMemoryTajweedStore(TajweedStore):
             return False
         mine.add(lesson_id)
         return True
+
+    async def practice(self, user_id):
+        return {k[1]: v for k, v in self._state.tajweed_practice.items() if k[0] == user_id}
+
+    async def record_practice(self, user_id, lesson_id, pct):
+        sessions, best = self._state.tajweed_practice.get((user_id, lesson_id), (0, 0))
+        row = (sessions + 1, max(best, pct))
+        self._state.tajweed_practice[(user_id, lesson_id)] = row
+        return row
 
 
 class PostgresTajweedStore(TajweedStore):
@@ -116,3 +134,23 @@ class PostgresTajweedStore(TajweedStore):
             lesson_id,
         )
         return status.endswith(" 1")
+
+    async def practice(self, user_id):
+        rows = await self._pool.fetch(
+            "SELECT lesson_id, sessions, best_pct FROM tajweed_practice WHERE user_id = $1",
+            user_id,
+        )
+        return {r["lesson_id"]: (r["sessions"], r["best_pct"]) for r in rows}
+
+    async def record_practice(self, user_id, lesson_id, pct):
+        row = await self._pool.fetchrow(
+            "INSERT INTO tajweed_practice (user_id, lesson_id, sessions, best_pct) "
+            "VALUES ($1, $2, 1, $3) ON CONFLICT (user_id, lesson_id) DO UPDATE SET "
+            "sessions = tajweed_practice.sessions + 1, "
+            "best_pct = GREATEST(tajweed_practice.best_pct, EXCLUDED.best_pct), "
+            "last_at = now() RETURNING sessions, best_pct",
+            user_id,
+            lesson_id,
+            pct,
+        )
+        return row["sessions"], row["best_pct"]
