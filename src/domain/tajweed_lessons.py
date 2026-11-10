@@ -26,6 +26,7 @@ _DATA = os.path.join(
 )
 _PATH = os.path.join(_DATA, "lessons.uz.json")
 _AUDIO_PATH = os.path.join(_DATA, "muallimi.json")
+_TEXT_PATH = os.path.join(_DATA, "muallimi_text.txt")
 TRACK_AUDIO, TRACK_RULES = "alifbo", "qoidalar"
 TRACKS = (TRACK_AUDIO, TRACK_RULES)
 AUTO_EXAMPLES = 3  # examples per lesson when the lesson says "auto"
@@ -160,6 +161,33 @@ def audio_lesson(lesson_id: str, lang: str = "uz") -> Optional[AudioLesson]:
     return next((x for x in audio_lessons(lang) if x.id == lesson_id), None)
 
 
+class TextLine(NamedTuple):
+    kind: str  # "ar" (an exercise row, as printed) or "uz" (a line of the narration)
+    text: str
+
+
+_text_cache: Dict[str, Dict[str, Tuple[TextLine, ...]]] = {}
+
+
+def audio_text(lesson_id: str, lang: str = "uz") -> Tuple[TextLine, ...]:
+    """The lines an audio lesson reads (data/tajweed/muallimi_text.txt), empty while
+    that lesson has none yet. Arabic rows are never transliterated."""
+    if lang not in _text_cache:
+        tr = to_cyrillic if lang == "uz-Cyrl" else (lambda s: s)
+        lessons: Dict[str, list] = {}
+        current = None
+        with open(_TEXT_PATH, encoding="utf-8") as fp:
+            for raw in fp:
+                line = raw.strip()
+                if line.startswith("## "):
+                    current = lessons.setdefault("ms-%03d" % int(line[3:]), [])
+                elif line[:3] in ("ar:", "uz:") and current is not None:
+                    kind, text = line[:2], line[3:].strip()
+                    current.append(TextLine(kind, text if kind == "ar" else tr(text)))
+        _text_cache[lang] = {k: tuple(v) for k, v in lessons.items()}
+    return _text_cache[lang].get(lesson_id, ())
+
+
 def audio_url(lesson: AudioLesson, base: str) -> str:
     return base.rstrip("/") + "/" + lesson.file
 
@@ -184,3 +212,4 @@ def neighbours(lesson_id: str, ids: List[str]) -> Tuple[Optional[str], Optional[
 def reset_for_tests() -> None:
     _cache.clear()
     _audio_cache.clear()
+    _text_cache.clear()
