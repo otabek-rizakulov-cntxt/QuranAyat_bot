@@ -270,3 +270,28 @@ The original T2–T4 (quizzes, diagram + Learn tab, Reader colours) fold into P1
 - The Mini App uses `GET /api/v1/tajweed/practice/{lesson}?seed=` and `POST /api/v1/tajweed/practice`.
 
 **Audio lessons and quizzes.** Audio lessons map to rule ids in `AUDIO_RULES`. The letter, harakat, izhor, ro and Alloh lessons have no rule annotations, so they get drills only.
+
+## 17. P4: spaced-repetition cards (built 2026-11-10)
+
+**Deck.** `src/domain/tajweed_cards.py` has 304 cards, built from the lessons:
+- 28 letters: the letter's forms → its name and articulation group (throat, tongue, lips, jawf).
+- 13 harakat and spelling signs: the sign → its name and how it reads.
+- 18 rules, each both ways, with a marked example ayah.
+- 227 words from short ayahs, to read and then hear in the user's reciter.
+
+A card joins the user's deck when any lesson that teaches it is marked done. For example, ز comes from both the Za lesson and the «Til harflari» lesson. Card texts state only standard names and groupings.
+
+**Schedule.**
+- Grades are **Bilmadim / Qiyin / Bildim** (didn't know / hard / knew).
+- A new card's first interval is 0, 1 or 3 days by grade.
+- After that: Bilmadim → 1 day (a lapse), Qiyin → ×1.2, Bildim → ×2.5, at most 365 days.
+- Each local day: every due card not yet seen today, plus up to 5 new ones, 25 at most.
+- Only the card on top can be graded, so double taps and forged callbacks change nothing.
+- Finishing the day's cards counts a `tajweed` streak day.
+
+**Surfaces.**
+- **Bot:** 🧠 Takrorlash on `/tajvid`: front → turn over → grade, with 🔊 for an ayah.
+- **Mini App:** `/learn/cards`.
+- **API:** `GET /api/v1/tajweed/cards` and `POST /api/v1/tajweed/cards/grade` (409 when the card isn't on top). Bot and app share one queue.
+
+**Still open.** The owner should read the letter and sign card texts (`SIGNS`, `GROUPS`) once, like the lessons.
