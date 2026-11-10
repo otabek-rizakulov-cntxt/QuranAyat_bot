@@ -211,3 +211,28 @@ the exported `tajweed/{uz,uz-Cyrl}.json` and `GET /api/v1/tajweed`, and marks do
 
 The original T2–T4 (quizzes, diagram + Learn tab, Reader colours) fold into P1 (Learn tab), P3
 (quizzes), P5 (diagram); Reader tajweed colours stay as a later item.
+
+## 15. P2: line-by-line text tracking (built 2026-11-10)
+
+**Text.**
+- `data/tajweed/muallimi_text.txt` (`## NNN`, then `ar:` / `uz:` lines) holds the Arabic exercise rows. They were typed from the primer's exercise pages, pages 1–32 of a 2009 printed edition.
+  - Its Uzbek prose belongs to that edition and is not used.
+  - 59 of 73 lessons have rows. The edition has no pages for lessons 47–54, 58–60, 63, 66 or 73; those lessons are tracked from the narration alone.
+- The Uzbek lines come from the narration itself (Whisper), which is covered by the CC0 grant.
+
+**Pipeline.**
+1. `scripts/tajweed/colab_muallimi.ipynb` is self-contained: upload it to Colab, choose a T4 GPU and Run all. It writes Whisper word timings and pause profiles to Drive (no audio), then downloads one zip.
+2. Run `TAJWEED_CACHE=<unzipped> python3 -m scripts.tajweed.align_text`. It writes `data/tajweed/muallimi_timings.json`.
+   - Rows are romanised (زَرْ → "zar") and matched in order against the words, which are folded to one sound alphabet whether Whisper wrote Latin, Cyrillic or Arabic.
+   - Words between rows become Uzbek lines, and boundaries snap into pauses.
+3. `python3 -m scripts.tajweed.text_debug show|report|clip|set|nudge|unpin` finds and fixes lines.
+   - Pins live in `data/tajweed/muallimi_overrides.json`; re-run `align_text` after editing them.
+
+**Review.**
+- A lesson's tracking is shown only after a reviewer approves it, in the bot (lesson card) or the Mini App (lesson page).
+- The approval stores the hash of the lines and times, so re-aligning puts the lesson back to draft.
+- `GET /api/v1/tajweed` lists approved `tracking`. `POST /api/v1/tajweed/review` is for reviewers only.
+
+**Surfaces.**
+- **Mini App:** the lines sit under the player. The line being read is highlighted and kept in view, and tapping a line plays from there.
+- **Bot:** 📄 Matn sends the whole text, with the Arabic rows as printed and the Uzbek lines in italics.
