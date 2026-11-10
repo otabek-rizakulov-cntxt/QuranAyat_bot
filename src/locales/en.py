@@ -438,6 +438,7 @@ strings = {
     "tj_finish": "Result ▶",
     "tj_result": "<b>Result: {correct}/{total} ({pct}%)</b>\nBest: {best}%\n🔥 Streak: {days} days",
     "tj_again": "🔁 Again",
+    "tj_best": "Best: {best}%",
     "tj_back_lesson": "◀ To the lesson",
     "tj_hear": "🔊 Listen",
     "tj_drill_prompt": "Read this word aloud, then listen to check:",

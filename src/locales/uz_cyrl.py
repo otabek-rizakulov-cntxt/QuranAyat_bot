@@ -413,6 +413,7 @@ strings = {
     "tj_finish": "Натижа ▶",
     "tj_result": "<b>Натижа: {correct}/{total} ({pct}%)</b>\nЭнг яхши натижа: {best}%\n🔥 Серия: {days} кун",
     "tj_again": "🔁 Яна",
+    "tj_best": "Энг яхши натижа: {best}%",
     "tj_back_lesson": "◀ Дарсга",
     "tj_hear": "🔊 Эшитиш",
     "tj_drill_prompt": "Ушбу сўзни овоз чиқариб ўқинг, кейин тинглаб текширинг:",

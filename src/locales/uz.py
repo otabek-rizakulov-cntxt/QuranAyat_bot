@@ -413,6 +413,7 @@ strings = {
     "tj_finish": "Natija ▶",
     "tj_result": "<b>Natija: {correct}/{total} ({pct}%)</b>\nEng yaxshi natija: {best}%\n🔥 Seriya: {days} kun",
     "tj_again": "🔁 Yana",
+    "tj_best": "Eng yaxshi natija: {best}%",
     "tj_back_lesson": "◀ Darsga",
     "tj_hear": "🔊 Eshitish",
     "tj_drill_prompt": "Ushbu soʻzni ovoz chiqarib oʻqing, keyin tinglab tekshiring:",
