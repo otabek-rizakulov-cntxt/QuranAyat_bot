@@ -139,9 +139,9 @@
     "semantic_hash": "5d98d10a82b3a4cb67e321982dd463df"
   },
   "src/locales/en.py": {
-    "mtime": 1794301730.1928174,
-    "seen": 1794301927.7735229,
-    "ast_hash": "171504bb6cfa8dbe49b28e0ec80414e6",
+    "mtime": 1794313716.0242925,
+    "seen": 1794313825.441879,
+    "ast_hash": "7f4262896614bec2ad6469551178aec4",
     "semantic_hash": ""
   },
   "src/locales/es.py": {
@@ -349,15 +349,15 @@
     "semantic_hash": "6c8d90c1f931a7c82069e5135bf069d5"
   },
   "src/locales/uz.py": {
-    "mtime": 1794301730.190945,
-    "seen": 1794301927.773566,
-    "ast_hash": "7c055523ceda9819893074fd5d90e123",
+    "mtime": 1794313716.0230572,
+    "seen": 1794313825.4419048,
+    "ast_hash": "5259b47db9cf1834c792f018e85f5b94",
     "semantic_hash": ""
   },
   "src/locales/uz_cyrl.py": {
-    "mtime": 1794301744.197435,
-    "seen": 1794301927.773567,
-    "ast_hash": "aa8e0afb907b30df8cec237e78e35f15",
+    "mtime": 1794313716.0238307,
+    "seen": 1794313825.441906,
+    "ast_hash": "dd01a63344480c3afc6ea4bf44dc56eb",
     "semantic_hash": ""
   },
   "src/locales/zh.py": {
@@ -631,9 +631,9 @@
     "semantic_hash": "6d1aac037ec7c7917a9c2060933c32bd"
   },
   "scripts/export_web_content.py": {
-    "mtime": 1794301810.6628633,
-    "seen": 1794301927.7733219,
-    "ast_hash": "dd03e50b71127202fb59e1b9aaff2559",
+    "mtime": 1794313679.6153324,
+    "seen": 1794313825.441752,
+    "ast_hash": "f2cc75903015e99fe25104115932f5a9",
     "semantic_hash": ""
   },
   "src/api/__init__.py": {
@@ -1795,15 +1795,15 @@
     "semantic_hash": ""
   },
   "src/bot/features/tajweed.py": {
-    "mtime": 1794301718.7636662,
-    "seen": 1794301927.7734022,
-    "ast_hash": "91218630e577a105bca83c8abc1b0324",
+    "mtime": 1794313746.016603,
+    "seen": 1794313825.441803,
+    "ast_hash": "551f2c83d416f7a4e36f2f23562fbc4e",
     "semantic_hash": ""
   },
   "src/domain/tajweed_lessons.py": {
-    "mtime": 1794303433.1794372,
-    "seen": 1794303467.961928,
-    "ast_hash": "88013bb9a1594b7f3e3c2a9098b77288",
+    "mtime": 1794313746.015773,
+    "seen": 1794313825.441841,
+    "ast_hash": "24888e43758fe3eb52157e23634e790e",
     "semantic_hash": ""
   },
   "src/domain/uz_translit.py": {
@@ -1837,21 +1837,21 @@
     "semantic_hash": ""
   },
   "src/api/tajweed.py": {
-    "mtime": 1794301770.5607307,
-    "seen": 1794301927.773359,
-    "ast_hash": "7322ea6f0570ea9723bb12b413307da4",
+    "mtime": 1794313716.01213,
+    "seen": 1794313825.441778,
+    "ast_hash": "fd84ce9390ab663853f5fa0892061562",
     "semantic_hash": ""
   },
   "src/services/tajweed.py": {
-    "mtime": 1794301679.4499564,
-    "seen": 1794301927.773581,
-    "ast_hash": "cd3bd6d33cac8d8dded43b1f952dcdbe",
+    "mtime": 1794313659.3812785,
+    "seen": 1794313825.441914,
+    "ast_hash": "5575e45b64ec0c4dc0535c678340c166",
     "semantic_hash": ""
   },
   "tests/test_tajweed_audio.py": {
-    "mtime": 1794301849.565091,
-    "seen": 1794301927.773664,
-    "ast_hash": "f95f4496160b4e91a143ad6ca847cadc",
+    "mtime": 1794313746.015773,
+    "seen": 1794313825.441965,
+    "ast_hash": "02ef6a076a27bf00c7e4bc6ae1a7b76b",
     "semantic_hash": ""
   },
   "scripts/tajweed/__init__.py": {
@@ -1870,6 +1870,24 @@
     "mtime": 1794303711.5637577,
     "seen": 1794303864.953407,
     "ast_hash": "6847848730d9193459409445d7fc9d7e",
+    "semantic_hash": ""
+  },
+  "scripts/tajweed/align_text.py": {
+    "mtime": 1794313284.8964853,
+    "seen": 1794313330.8657222,
+    "ast_hash": "1206d21237e71b52c970194a8829877b",
+    "semantic_hash": ""
+  },
+  "scripts/tajweed/text_debug.py": {
+    "mtime": 1794313284.8961108,
+    "seen": 1794313330.865727,
+    "ast_hash": "463d7b7d4378126b56dffe25add05b8a",
+    "semantic_hash": ""
+  },
+  "tests/test_tajweed_align.py": {
+    "mtime": 1794313284.8960235,
+    "seen": 1794313330.8660538,
+    "ast_hash": "82d4a3641516050841c560a6731b64f1",
     "semantic_hash": ""
   }
 }
