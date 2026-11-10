@@ -9,7 +9,7 @@ import re
 from domain import tajweed_lessons
 
 # Arabic letters, harakat, tatweel, the dash and full stop used between word pairs.
-_ARABIC_ROW = re.compile(r"^[ء-يً-ْٰٱـ .–-]+$")
+_ARABIC_ROW = re.compile(r"^[ء-يً-ْٓ-ٰٕٱـ .–-]+$")
 
 
 def _ids_with_text():
