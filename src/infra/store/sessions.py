@@ -18,6 +18,7 @@ from ._state import MemoryState
 
 KIND_DRILL = "drill"
 KIND_RECALL_CHECK = "recall_check"
+KIND_TAJWEED = "tajweed"  # a tajweed lesson marked done for the first time
 
 
 @dataclass

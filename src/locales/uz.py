@@ -394,4 +394,12 @@ strings = {
     "tj_not_reviewer": "Faqat tekshiruvchilar uchun.",
     "tj_unavailable": "Bu dars hozircha mavjud emas.",
     "tj_uzbek_only": "Tajvid darslari hozircha faqat oʻzbek tilida. Tilni /language orqali oʻzgartirishingiz mumkin.",
+    "tj_pick_track": "Yoʻnalishni tanlang:",
+    "tj_track_alifbo": "🔤 Alifbo va oʻqish",
+    "tj_track_qoidalar": "📖 Tajvid qoidalari",
+    "tj_tracks": "⬅️ Yoʻnalishlar",
+    "tj_listen": "🎧 Tinglash",
+    "tj_mark_done": "✅ Oʻqidim",
+    "tj_done_already": "✓ Oʻqilgan",
+    "tj_done_ok": "✓ Belgilandi. 🔥 Seriya: {days} kun",
 }

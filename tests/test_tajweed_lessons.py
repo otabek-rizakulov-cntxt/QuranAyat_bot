@@ -61,6 +61,7 @@ def test_cyrillic_is_real_cyrillic_and_round_trips():
         ("Isʼhoq", "Исъҳоқ"),
         ("OʻQISH", "ЎҚИШ"),
         ("<b>gʻunna</b> /language", "<b>ғунна</b> /language"),
+        ("Seriya: {days} kun", "Серия: {days} кун"),
     ],
 )
 def test_transliteration_cases(lat, cyr):
@@ -79,6 +80,7 @@ def store():
 @pytest.fixture(autouse=True)
 def reviewers(monkeypatch):
     monkeypatch.setenv("TAJWEED_REVIEWERS", str(REVIEWER))
+    monkeypatch.delenv("TAJWEED_AUDIO_BASE_URL", raising=False)  # rules track only here
 
 
 def _ctx(store, user=USER, lang="uz"):

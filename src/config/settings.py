@@ -54,6 +54,9 @@ class Settings:
     # Telegram user ids who review tajweed lessons (docs/TAJWEED_PLAN.md §6): they see
     # drafts and can approve them. Not a secret; comma-separated in the environment.
     tajweed_reviewers: tuple = ()
+    # Public base URL of the Muallimi soniy lesson audio on R2 (…/tajweed/muallimi-soniy/).
+    # Unset = the audio lessons track stays hidden.
+    tajweed_audio_base_url: Optional[str] = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -82,6 +85,7 @@ class Settings:
             tajweed_reviewers=tuple(
                 int(x) for x in (env("TAJWEED_REVIEWERS") or "").split(",") if x.strip().isdigit()
             ),
+            tajweed_audio_base_url=(env("TAJWEED_AUDIO_BASE_URL") or "").strip() or None,
         )
 
     @property

@@ -77,8 +77,8 @@ def _word_to_cyr(word: str) -> str:
     return _case(word, "".join(out))
 
 
-# HTML tags, entities and /commands stay as they are
-_MARKUP = re.compile(r"(<[^>]*>|&[#\w]+;|/[A-Za-z_]+)")
+# HTML tags, entities, /commands and {placeholders} stay as they are
+_MARKUP = re.compile(r"(<[^>]*>|&[#\w]+;|/[A-Za-z_]+|\{\w*\})")
 
 
 def to_cyrillic(text: str) -> str:

@@ -40,3 +40,6 @@ graphify-out/cost.json
 graphify-out/.graphify_analysis.json
 graphify-out/.cloud-cta-shown
 graphify-out/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/
+
+# Muallimi soniy lesson audio: hosted on R2, never in git
+data/tajweed/downloads/

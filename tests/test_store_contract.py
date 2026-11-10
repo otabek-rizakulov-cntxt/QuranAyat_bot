@@ -1004,3 +1004,13 @@ class TestTajweedApprovals:
         assert set(await store.tajweed.approvals()) == {"qalqala"}
         assert await store.tajweed.revoke("qalqala") is True
         assert await store.tajweed.approvals() == {}
+
+
+class TestTajweedProgress:
+    async def test_mark_done_once_per_user(self, store):
+        assert await store.tajweed.done(1) == set()
+        assert await store.tajweed.mark_done(1, "ms-073") is True
+        assert await store.tajweed.mark_done(1, "ms-073") is False  # already done
+        assert await store.tajweed.mark_done(1, "qalqala") is True
+        assert await store.tajweed.done(1) == {"ms-073", "qalqala"}
+        assert await store.tajweed.done(2) == set()  # per user

@@ -419,4 +419,12 @@ strings = {
     "tj_not_reviewer": "Reviewers only.",
     "tj_unavailable": "This lesson isn't available yet.",
     "tj_uzbek_only": "Tajweed lessons are in Uzbek for now. You can switch the language with /language.",
+    "tj_pick_track": "Choose a track:",
+    "tj_track_alifbo": "🔤 Alphabet and reading",
+    "tj_track_qoidalar": "📖 Tajweed rules",
+    "tj_tracks": "⬅️ Tracks",
+    "tj_listen": "🎧 Listen",
+    "tj_mark_done": "✅ Done",
+    "tj_done_already": "✓ Done",
+    "tj_done_ok": "✓ Marked. 🔥 Streak: {days} days",
 }

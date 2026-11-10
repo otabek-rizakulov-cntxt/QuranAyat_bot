@@ -263,3 +263,12 @@ CREATE TABLE IF NOT EXISTS tajweed_approval (
     approved_by       BIGINT NOT NULL,
     approved_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Tajweed lessons a user has marked done (✅ Oʻqidim), in either track
+-- (docs/TAJWEED_PLAN.md). One row per (user, lesson); marking again is a no-op.
+CREATE TABLE IF NOT EXISTS tajweed_progress (
+    user_id           BIGINT NOT NULL,
+    lesson_id         TEXT NOT NULL,
+    done_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, lesson_id)
+);

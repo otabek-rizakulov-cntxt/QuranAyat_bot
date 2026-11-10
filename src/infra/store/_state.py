@@ -6,7 +6,7 @@
 # MemoryState instance is what keeps those joins honest.
 
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Set
 
 
 @dataclass
@@ -38,6 +38,7 @@ class MemoryState:
     identity: Dict[tuple, object] = field(default_factory=dict)
     daily_ayah_sub: Dict[int, object] = field(default_factory=dict)  # user_id -> DailySubRow
     tajweed_approval: Dict[str, object] = field(default_factory=dict)  # lesson_id -> ApprovalRow
+    tajweed_progress: Dict[int, Set[str]] = field(default_factory=dict)  # user_id -> lesson ids
     sequence: int = 0
     # Stands in for the `non_telegram_user_id` sequence; see store/identity.py.
     user_id_sequence: int = 2**52 - 1
@@ -74,5 +75,6 @@ class MemoryState:
         self.identity.clear()
         self.daily_ayah_sub.clear()
         self.tajweed_approval.clear()
+        self.tajweed_progress.clear()
         self.sequence = 0
         self.user_id_sequence = 2**52 - 1
