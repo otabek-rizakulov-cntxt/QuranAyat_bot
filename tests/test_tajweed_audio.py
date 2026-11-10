@@ -228,7 +228,13 @@ async def _login(client, user_id):
 async def test_api_state_and_done(client):
     h = await _login(client, USER)
     r = await client.get("/api/v1/tajweed", headers=h)
-    assert r.json() == {"audio_base": BASE, "approved": [], "done": [], "reviewer": False}
+    assert r.json() == {
+        "audio_base": BASE,
+        "approved": [],
+        "done": [],
+        "reviewer": False,
+        "tracking": [],
+    }
 
     r = await client.post("/api/v1/tajweed/done", headers=h, json={"lesson_id": "ms-001"})
     assert r.status_code == 200
@@ -249,3 +255,64 @@ async def test_api_refuses_unknown_and_draft_lessons(client):
         assert r.status_code == 404
     r = await client.get("/api/v1/tajweed", headers=await _login(client, REVIEWER))
     assert r.json()["reviewer"] is True
+
+
+# --- text tracking (P2) ----------------------------------------------------------------
+
+LINES = (
+    tajweed_lessons.TimedLine("uz", "Endi za harfini oʻrganamiz.", 0.5, 2.7),
+    tajweed_lessons.TimedLine("ar", "زَ زِ زُ", 2.7, 5.1),
+)
+
+
+@pytest.fixture
+def timed(monkeypatch):
+    """Lesson 4 aligned (the real timings come from Colab + align_text)."""
+    table = {"ms-004": LINES}
+    monkeypatch.setattr(
+        tajweed_lessons, "audio_timings", lambda lesson_id, lang="uz": table.get(lesson_id, ())
+    )
+    return table
+
+
+async def test_text_tracking_is_shown_once_a_reviewer_approves_it(store, timed):
+    user = _ctx(store)
+    await feature.on_tajweed(user, "tj:l:ms-004")
+    assert "tj:m:ms-004" not in _buttons(user.edit)  # a draft: hidden from users
+    await feature.on_tajweed(user, "tj:m:ms-004")
+    user.reply.assert_not_awaited()
+
+    rev = _ctx(store, REVIEWER)
+    await feature.on_tajweed(rev, "tj:l:ms-004")
+    assert {"tj:m:ms-004", "tj:ok:ms-004"} <= set(_buttons(rev.edit))
+    await feature.on_tajweed(rev, "tj:ok:ms-004")
+    assert await service.tracking_ids(store) == {"ms-004"}
+
+    await feature.on_tajweed(user, "tj:m:ms-004")
+    sent = user.reply.await_args.args[0]
+    assert "زَ زِ زُ" in sent and "<i>Endi za harfini oʻrganamiz.</i>" in sent
+
+    timed["ms-004"] = LINES[:1]  # re-aligned: the approval no longer matches
+    assert await service.tracking_ids(store) == set()
+
+
+async def test_lessons_without_timings_have_nothing_to_review(store, timed):
+    rev = _ctx(store, REVIEWER)
+    await feature.on_tajweed(rev, "tj:l:ms-005")
+    assert not {"tj:m:ms-005", "tj:ok:ms-005"} & set(_buttons(rev.edit))
+    assert await service.review(store, REVIEWER, "ms-005", True) is False
+
+
+async def test_api_review(client, timed):
+    user = await _login(client, USER)
+    body = {"lesson_id": "ms-004", "approve": True}
+    assert (await client.post("/api/v1/tajweed/review", headers=user, json=body)).status_code == 403
+
+    rev = await _login(client, REVIEWER)
+    r = await client.post("/api/v1/tajweed/review", headers=rev, json=body)
+    assert r.status_code == 200
+    assert (await client.get("/api/v1/tajweed", headers=user)).json()["tracking"] == ["ms-004"]
+    missing = {"lesson_id": "ms-005", "approve": True}
+    assert (
+        await client.post("/api/v1/tajweed/review", headers=rev, json=missing)
+    ).status_code == 404

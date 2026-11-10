@@ -399,6 +399,7 @@ strings = {
     "tj_track_qoidalar": "📖 Tajvid qoidalari",
     "tj_tracks": "⬅️ Yoʻnalishlar",
     "tj_listen": "🎧 Tinglash",
+    "tj_text": "📄 Matn",
     "tj_mark_done": "✅ Oʻqidim",
     "tj_done_already": "✓ Oʻqilgan",
     "tj_done_ok": "✓ Belgilandi. 🔥 Seriya: {days} kun",

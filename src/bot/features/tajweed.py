@@ -7,8 +7,9 @@
     tj:l:<lesson>           a lesson card
     tj:a:<lesson>           send an audio lesson (alifbo)
     tj:d:<lesson>           ✅ Oʻqidim: mark the lesson done (a streak session, once)
+    tj:m:<lesson>           📄 Matn: send an audio lesson's text (once its tracking is approved)
     tj:p:<lesson>:<n>       play example n of a rules lesson in the user's reciter
-    tj:ok:<lesson>          reviewer: approve this exact text
+    tj:ok:<lesson>          reviewer: approve this exact text (rules) or timed text (audio)
     tj:no:<lesson>          reviewer: back to draft
 
 Who may open what is services.tajweed (shared with the Mini App API): the audio
@@ -172,11 +173,20 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
             _duration(audio.seconds),
         )
         ids = [x.id for x in tajweed_lessons.audio_lessons()]
-        rows = [
-            [Choice(ctx.tr("tj_listen"), data="tj:a:" + audio.id)],
-            _done_row(ctx, audio.id, done),
-            _nav_row(ctx, audio.id, audio.unit, ids),
-        ]
+        reviewer = service.is_reviewer(ctx.user_id)
+        has_text = bool(tajweed_lessons.audio_timings(audio.id))
+        tracked = audio.id in await service.tracking_ids(ctx.store)
+        listen = [Choice(ctx.tr("tj_listen"), data="tj:a:" + audio.id)]
+        if has_text and (tracked or reviewer):
+            listen.append(Choice(ctx.tr("tj_text"), data="tj:m:" + audio.id))
+        rows = [listen, _done_row(ctx, audio.id, done), _nav_row(ctx, audio.id, audio.unit, ids)]
+        if reviewer and has_text:
+            text += "\n\n" + ctx.tr("tj_status_approved" if tracked else "tj_status_draft")
+            rows.append(
+                [Choice(ctx.tr("tj_unapprove"), data="tj:no:" + audio.id)]
+                if tracked
+                else [Choice(ctx.tr("tj_approve"), data="tj:ok:" + audio.id)]
+            )
         await ctx.edit(text, rows, html=True)
         return True
 
@@ -218,6 +228,29 @@ async def _listen(ctx: Ctx, lesson_id: str) -> None:
     )
 
 
+async def _send_text(ctx: Ctx, lesson_id: str) -> None:
+    """An audio lesson's lines as messages: Arabic rows as printed, the Uzbek talk
+    in italics. Telegram can't highlight along with the audio, so this is the whole
+    text at once, split under the message limit."""
+    lines = tajweed_lessons.audio_timings(lesson_id, ctx.ui_lang)
+    allowed = service.is_reviewer(ctx.user_id) or lesson_id in await service.tracking_ids(ctx.store)
+    if not lines or not allowed:
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    await ctx.answer()
+    lesson = tajweed_lessons.audio_lesson(lesson_id, ctx.ui_lang)
+    parts = ["<b>%s</b>" % html.escape(lesson.title)] + [
+        html.escape(x.text) if x.kind == "ar" else "<i>%s</i>" % html.escape(x.text) for x in lines
+    ]
+    chunk = ""
+    for part in parts:
+        if chunk and len(chunk) + len(part) + 2 > _MAX_TEXT:
+            await ctx.reply(chunk, None, html=True)
+            chunk = ""
+        chunk = chunk + "\n\n" + part if chunk else part
+    await ctx.reply(chunk, None, html=True)
+
+
 async def _mark_done(ctx: Ctx, lesson_id: str) -> None:
     if not await service.can_open(ctx.store, ctx.user_id, lesson_id):
         await ctx.answer(ctx.tr("tj_unavailable"))
@@ -244,16 +277,11 @@ async def _play(ctx: Ctx, lesson_id: str, n: str) -> None:
 
 
 async def _review(ctx: Ctx, lesson_id: str, approve: bool) -> None:
-    lesson = tajweed_lessons.lesson(lesson_id, ctx.ui_lang)
-    if not service.is_reviewer(ctx.user_id) or lesson is None:
+    if not await service.review(ctx.store, ctx.user_id, lesson_id, approve):
         await ctx.answer(ctx.tr("tj_not_reviewer"))
         return
-    if approve:
-        await ctx.store.tajweed.approve(lesson.id, lesson.content_hash, ctx.user_id)
-    else:
-        await ctx.store.tajweed.revoke(lesson.id)
     await ctx.answer(ctx.tr("tj_approved_ok") if approve else ctx.tr("tj_unapproved_ok"))
-    await _lesson(ctx, lesson.id)  # a reviewer always sees it
+    await _lesson(ctx, lesson_id)  # a reviewer always sees it
 
 
 @command("tajvid")
@@ -288,6 +316,8 @@ async def on_tajweed(ctx: Ctx, cb_data: str) -> None:
         await _listen(ctx, args[0])
     elif kind == "d" and len(args) == 1:
         await _mark_done(ctx, args[0])
+    elif kind == "m" and len(args) == 1:
+        await _send_text(ctx, args[0])
     elif kind == "p" and len(args) == 2:
         await _play(ctx, args[0], args[1])
     elif kind in ("ok", "no") and len(args) == 1:

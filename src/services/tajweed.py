@@ -10,6 +10,10 @@ open this lesson?" the same way:
   content hash, so an edited lesson is a draft again.
 
 Marking a lesson done counts as a `tajweed` streak session, once per lesson.
+
+Text tracking (P2): an audio lesson's lines and times are shown to everyone once a
+reviewer approved them; the approval row (same table, id `ms-NNN`) holds the hash
+of the timings, so re-aligning a lesson puts it back to draft.
 """
 
 from typing import Optional, Set
@@ -66,3 +70,36 @@ async def complete(store, user_id: int, lesson_id: str) -> Optional[SessionOutco
     if not await store.tajweed.mark_done(user_id, lesson_id):
         return None
     return await record_session(user_id, KIND_TAJWEED)
+
+
+async def tracking_ids(store) -> Set[str]:
+    """Audio lessons whose current text tracking is the one a reviewer approved."""
+    approvals = await store.tajweed.approvals()
+    out = set()
+    for x in tajweed_lessons.audio_lessons():
+        row = approvals.get(x.id)
+        if row is not None and row.content_hash == tajweed_lessons.timings_hash(x.id):
+            out.add(x.id)
+    return out
+
+
+def review_hash(lesson_id: str) -> Optional[str]:
+    """What approving this lesson pins: the timings of an audio lesson, the text of
+    a rules lesson; None when there is nothing to review yet."""
+    if tajweed_lessons.track_of(lesson_id) == TRACK_AUDIO:
+        return tajweed_lessons.timings_hash(lesson_id)
+    lesson = tajweed_lessons.lesson(lesson_id)
+    return lesson.content_hash if lesson is not None else None
+
+
+async def review(store, user_id: int, lesson_id: str, approve: bool) -> bool:
+    """A reviewer approves (or withdraws) a lesson. False when not allowed or there
+    is nothing to review."""
+    content_hash = review_hash(lesson_id)
+    if not is_reviewer(user_id) or content_hash is None:
+        return False
+    if approve:
+        await store.tajweed.approve(lesson_id, content_hash, user_id)
+    else:
+        await store.tajweed.revoke(lesson_id)
+    return True

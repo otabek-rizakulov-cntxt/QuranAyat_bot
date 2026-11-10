@@ -27,6 +27,7 @@ _DATA = os.path.join(
 _PATH = os.path.join(_DATA, "lessons.uz.json")
 _AUDIO_PATH = os.path.join(_DATA, "muallimi.json")
 _TEXT_PATH = os.path.join(_DATA, "muallimi_text.txt")
+_TIMINGS_PATH = os.path.join(_DATA, "muallimi_timings.json")
 TRACK_AUDIO, TRACK_RULES = "alifbo", "qoidalar"
 TRACKS = (TRACK_AUDIO, TRACK_RULES)
 AUTO_EXAMPLES = 3  # examples per lesson when the lesson says "auto"
@@ -188,6 +189,51 @@ def audio_text(lesson_id: str, lang: str = "uz") -> Tuple[TextLine, ...]:
     return _text_cache[lang].get(lesson_id, ())
 
 
+class TimedLine(NamedTuple):
+    kind: str  # "ar" or "uz"
+    text: str
+    start: Optional[float]  # seconds into the lesson; None for a row the narrator skips
+    end: Optional[float]
+
+
+_timings_cache: Dict[str, Dict[str, Tuple[TimedLine, ...]]] = {}
+
+
+def audio_timings(lesson_id: str, lang: str = "uz") -> Tuple[TimedLine, ...]:
+    """The lesson's lines with their times (data/tajweed/muallimi_timings.json, made
+    by scripts/tajweed/align_text.py), empty until that lesson is aligned. Uzbek lines
+    are transliterated for uz-Cyrl; Arabic rows never are."""
+    if lang not in _timings_cache:
+        raw = {}
+        if os.path.exists(_TIMINGS_PATH):
+            with open(_TIMINGS_PATH, encoding="utf-8") as fp:
+                raw = json.load(fp).get("lessons", {})
+        tr = to_cyrillic if lang == "uz-Cyrl" else (lambda s: s)
+        _timings_cache[lang] = {
+            k: tuple(
+                TimedLine(
+                    x["kind"],
+                    x["text"] if x["kind"] == "ar" else tr(x["text"]),
+                    x["start"],
+                    x["end"],
+                )
+                for x in v
+            )
+            for k, v in raw.items()
+        }
+    return _timings_cache[lang].get(lesson_id, ())
+
+
+def timings_hash(lesson_id: str) -> Optional[str]:
+    """What a reviewer approves for an audio lesson's text tracking: every line and
+    time. None while the lesson has no timings, so there is nothing to approve."""
+    lines = audio_timings(lesson_id)
+    if not lines:
+        return None
+    payload = json.dumps([list(x) for x in lines], ensure_ascii=False)
+    return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:12]
+
+
 def audio_url(lesson: AudioLesson, base: str) -> str:
     return base.rstrip("/") + "/" + lesson.file
 
@@ -213,3 +259,4 @@ def reset_for_tests() -> None:
     _cache.clear()
     _audio_cache.clear()
     _text_cache.clear()
+    _timings_cache.clear()

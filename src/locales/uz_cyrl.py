@@ -399,6 +399,7 @@ strings = {
     "tj_track_qoidalar": "📖 Тажвид қоидалари",
     "tj_tracks": "⬅️ Йўналишлар",
     "tj_listen": "🎧 Тинглаш",
+    "tj_text": "📄 Матн",
     "tj_mark_done": "✅ Ўқидим",
     "tj_done_already": "✓ Ўқилган",
     "tj_done_ok": "✓ Белгиланди. 🔥 Серия: {days} кун",

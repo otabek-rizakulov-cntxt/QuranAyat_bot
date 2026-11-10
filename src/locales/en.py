@@ -424,6 +424,7 @@ strings = {
     "tj_track_qoidalar": "📖 Tajweed rules",
     "tj_tracks": "⬅️ Tracks",
     "tj_listen": "🎧 Listen",
+    "tj_text": "📄 Text",
     "tj_mark_done": "✅ Done",
     "tj_done_already": "✓ Done",
     "tj_done_ok": "✓ Marked. 🔥 Streak: {days} days",

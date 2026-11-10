@@ -20,7 +20,8 @@
 #                                   [start, end] in seconds (MULTILINGUAL_PLAN §8.1)
 #   tajweed/{uz,uz-Cyrl}.json       the tajweed lessons in both tracks (TAJWEED_PLAN):
 #                                   units, audio lessons (file under the R2 base the
-#                                   API reports) and rules lessons with marked examples.
+#                                   API reports, and their timed lines) and rules
+#                                   lessons with marked examples.
 #                                   Drafts are included; GET /tajweed says which to show.
 #
 # Everything is read through `modules.Quran`, the same parser the bot uses, so
@@ -155,6 +156,11 @@ def tajweed_doc(lang: str) -> dict:
             "title": x.title,
             "file": x.file,
             "seconds": x.seconds,
+            # line-by-line text with times (P2); GET /tajweed says if it is approved
+            "lines": [
+                {"kind": y.kind, "text": y.text, "start": y.start, "end": y.end}
+                for y in tajweed_lessons.audio_timings(x.id, lang)
+            ],
         }
         for x in tajweed_lessons.audio_lessons(lang)
     ]
