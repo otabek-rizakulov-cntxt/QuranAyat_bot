@@ -214,18 +214,16 @@ The original T2–T4 (quizzes, diagram + Learn tab, Reader colours) fold into P1
 
 ## 15. P2: line-by-line text tracking (built 2026-11-10)
 
-> **Status (2026-11-10): code done; waiting for the owner's Colab results.** The aligner, review
-> buttons, bot 📄 Matn and Mini App highlighting are built and tested on synthetic data. No lesson
-> has timings yet, so nothing is visible to users. Next, once the owner sends the Colab zip
-> (`quranayat_muallimi.zip`):
+> **Status (2026-11-10): first timings committed (`1db997b`). Not yet visible to users.**
 >
-> 1. Run `align_text` on it.
-> 2. Fix the weak lines.
-> 3. Commit `muallimi_timings.json`.
-> 4. Re-export the Mini App content.
-> 5. The owner reviews and approves each lesson.
->
-> The same check confirms which lesson the rows of 41–45 and 55–57/61 belong to.
+> - **Transcripts:** the owner's Colab zip (73 lessons) has been aligned.
+> - **Arabic rows (345):** 207 matched by sound, 37 placed between matched rows as estimates, 62 weak, 39 not placed.
+>   Whisper writes little or nothing for bare syllables, as in lessons 4 and 62.
+> - **Uzbek lines:** still Whisper's raw spelling. They need a cleaning pass before review.
+> - **Next:**
+>   1. Clean the Uzbek lines.
+>   2. Fix the weakest rows with `text_debug` (report / clip / set).
+>   3. The owner approves lessons one by one in the bot or the Mini App.
 
 **Text.**
 - `data/tajweed/muallimi_text.txt` (`## NNN`, then `ar:` / `uz:` lines) holds the Arabic exercise rows. They were typed from the primer's exercise pages, pages 1–32 of a 2009 printed edition.
