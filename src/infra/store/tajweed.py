@@ -7,10 +7,11 @@
 #
 # Progress: the lessons each user has marked done (✅ Oʻqidim), in either track.
 # Practice: per user and lesson, how many quiz/drill sessions and the best score.
+# Cards: the spaced-repetition state of each card a user has seen (P4).
 
 import abc
 from dataclasses import dataclass, replace
-from datetime import datetime
+from datetime import date, datetime
 from typing import Dict, Optional, Set, Tuple
 
 from ._state import MemoryState
@@ -27,6 +28,22 @@ class ApprovalRow:
 
 
 _COLUMNS = "lesson_id, content_hash, approved_by, approved_at"
+
+
+@dataclass
+class CardRow:
+    """A row of `tajweed_card`: where one card stands for one user."""
+
+    card_id: str
+    interval_days: int
+    due: date
+    last_seen: date
+    first_seen: date
+    reps: int = 0
+    lapses: int = 0
+
+
+_CARD_COLUMNS = "card_id, interval_days, due, last_seen, first_seen, reps, lapses"
 
 
 class TajweedStore(abc.ABC):
@@ -53,6 +70,14 @@ class TajweedStore(abc.ABC):
     @abc.abstractmethod
     async def practice(self, user_id: int) -> Dict[str, Tuple[int, int]]:
         """lesson_id -> (sessions, best_pct) for this user."""
+
+    @abc.abstractmethod
+    async def cards(self, user_id: int) -> Dict[str, CardRow]:
+        """Every card this user has seen, by card id."""
+
+    @abc.abstractmethod
+    async def save_card(self, user_id: int, row: CardRow) -> None:
+        """Insert or replace one card's state."""
 
     @abc.abstractmethod
     async def record_practice(self, user_id: int, lesson_id: str, pct: int) -> Tuple[int, int]:
@@ -86,6 +111,12 @@ class InMemoryTajweedStore(TajweedStore):
 
     async def practice(self, user_id):
         return {k[1]: v for k, v in self._state.tajweed_practice.items() if k[0] == user_id}
+
+    async def cards(self, user_id):
+        return {k[1]: replace(v) for k, v in self._state.tajweed_card.items() if k[0] == user_id}
+
+    async def save_card(self, user_id, row):
+        self._state.tajweed_card[(user_id, row.card_id)] = replace(row)
 
     async def record_practice(self, user_id, lesson_id, pct):
         sessions, best = self._state.tajweed_practice.get((user_id, lesson_id), (0, 0))
@@ -154,3 +185,25 @@ class PostgresTajweedStore(TajweedStore):
             pct,
         )
         return row["sessions"], row["best_pct"]
+
+    async def cards(self, user_id):
+        rows = await self._pool.fetch(
+            "SELECT " + _CARD_COLUMNS + " FROM tajweed_card WHERE user_id = $1", user_id
+        )
+        return {r["card_id"]: CardRow(**dict(r)) for r in rows}
+
+    async def save_card(self, user_id, row):
+        await self._pool.execute(
+            "INSERT INTO tajweed_card (user_id, " + _CARD_COLUMNS + ") "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (user_id, card_id) DO UPDATE SET "
+            "interval_days = EXCLUDED.interval_days, due = EXCLUDED.due, "
+            "last_seen = EXCLUDED.last_seen, reps = EXCLUDED.reps, lapses = EXCLUDED.lapses",
+            user_id,
+            row.card_id,
+            row.interval_days,
+            row.due,
+            row.last_seen,
+            row.first_seen,
+            row.reps,
+            row.lapses,
+        )

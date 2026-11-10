@@ -1016,6 +1016,27 @@ class TestTajweedProgress:
         assert await store.tajweed.done(2) == set()  # per user
 
 
+class TestTajweedCards:
+    async def test_save_and_replace_a_card(self, store):
+        from datetime import date
+
+        from infra.store.tajweed import CardRow
+
+        assert await store.tajweed.cards(1) == {}
+        day = date(2026, 11, 10)
+        await store.tajweed.save_card(1, CardRow("L:ز", 0, day, day, day))
+        await store.tajweed.save_card(1, CardRow("L:ز", 3, date(2026, 11, 13), day, day, 1, 0))
+        rows = await store.tajweed.cards(1)
+        assert set(rows) == {"L:ز"}
+        assert (rows["L:ز"].interval_days, rows["L:ز"].due, rows["L:ز"].reps) == (
+            3,
+            date(2026, 11, 13),
+            1,
+        )
+        assert rows["L:ز"].first_seen == day  # kept from the first save
+        assert await store.tajweed.cards(2) == {}
+
+
 class TestTajweedPractice:
     async def test_sessions_count_and_best_score_is_kept(self, store):
         assert await store.tajweed.practice(1) == {}

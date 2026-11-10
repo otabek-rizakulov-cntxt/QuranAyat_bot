@@ -15,6 +15,10 @@
     tj:r:<lesson>:<seed>:<i>:<score>        reading drill word i (i == N: the result)
     tj:ra:<lesson>:<seed>:<i>:<score>:<k|x> self-graded: read right (k) or not (x)
     tj:rp:<lesson>:<seed>:<i>               play drill word i's ayah
+    tj:s                    🧠 Takrorlash: the next card due (P4 spaced repetition)
+    tj:sv:<card>            turn the card over
+    tj:sg:<card>:<0|1|2>    grade it: Bilmadim / Qiyin / Bildim
+    tj:sp:<card>            play the card's ayah
     tj:ok:<lesson>          reviewer: approve this exact text (rules) or timed text (audio)
     tj:no:<lesson>          reviewer: back to draft
 
@@ -33,7 +37,7 @@ import random
 from bot.features import Ctx, callback, command
 from bot.media import deliver_quran
 from channels import Choice
-from domain import tajweed, tajweed_lessons, tajweed_practice
+from domain import tajweed, tajweed_cards, tajweed_lessons, tajweed_practice
 from domain.tajweed_lessons import TRACK_AUDIO, TRACK_RULES
 from domain.uz_translit import to_cyrillic
 from services import tajweed as service
@@ -69,6 +73,7 @@ async def _start(ctx: Ctx, edit: bool) -> None:
     else:
         text = "<b>%s</b>\n\n%s" % (ctx.tr("tj_title"), ctx.tr("tj_pick_track"))
         choices = [[Choice(ctx.tr(_TRACK_KEYS[t]), data="tj:t:" + t)] for t in tracks]
+        choices.append([Choice(ctx.tr("tj_srs"), data="tj:s")])
         await _say(ctx, edit, text, choices)
 
 
@@ -87,7 +92,9 @@ async def _track(ctx: Ctx, track: str, edit: bool = True, alone: bool = False) -
         if mine:
             count = sum(1 for i in mine if i in done)
             rows.append([Choice("%s  %d/%d" % (u.title, count, len(mine)), data="tj:u:" + u.id)])
-    if not alone:
+    if alone:
+        rows.append([Choice(ctx.tr("tj_srs"), data="tj:s")])
+    else:
         rows.append([Choice(ctx.tr("tj_tracks"), data="tj:units")])
     text = "<b>%s</b>\n\n%s" % (ctx.tr(_TRACK_KEYS[track]), ctx.tr("tj_pick_unit"))
     await _say(ctx, edit, text, rows)
@@ -456,6 +463,70 @@ async def _practice_audio(ctx: Ctx, args: list, quiz: bool) -> None:
     )
 
 
+# --- spaced-repetition cards (P4) ----------------------------------------------------
+
+
+async def _cards(ctx: Ctx, card_id: str = "", flip: bool = False, outcome=None) -> None:
+    """The card on top of today's queue (front, or back when `flip`), or the end."""
+    queue = await service.card_queue(ctx.store, ctx.user_id)
+    home = [Choice(ctx.tr("tj_back"), data="tj:units")]
+    if queue.next is None:
+        if not tajweed_cards.unlocked(await ctx.store.tajweed.done(ctx.user_id)):
+            text = ctx.tr("tj_srs_empty")
+        else:
+            text = ctx.tr("tj_srs_done")
+            if outcome is not None:
+                text += "\n" + ctx.tr("tj_srs_streak").format(days=outcome.streak.current)
+        await ctx.edit(text, [home], html=True)
+        return
+    card = tajweed_cards.card(queue.next)
+    head = "<b>%s</b> · <i>%s</i>" % (
+        ctx.tr("tj_srs"),
+        ctx.tr("tj_srs_count").format(due=queue.due, new=queue.new),
+    )
+    rows = []
+    if flip and card_id == card.id:
+        text = "%s\n\n%s\n\n— — —\n\n%s" % (head, _script(ctx, card.front), _script(ctx, card.back))
+        if card.ayah:
+            rows.append([Choice(ctx.tr("tj_hear"), data="tj:sp:" + card.id)])
+        rows.append(
+            [
+                Choice(ctx.tr("tj_srs_%d" % g), data="tj:sg:%s:%d" % (card.id, g))
+                for g in service.GRADES
+            ]
+        )
+    else:
+        text = "%s\n\n%s" % (head, _script(ctx, card.front))
+        rows.append([Choice(ctx.tr("tj_srs_show"), data="tj:sv:" + card.id)])
+    rows.append(home)
+    await ctx.edit(text, rows, html=True)
+
+
+async def _grade(ctx: Ctx, card_id: str, grade: str) -> None:
+    result = None
+    if grade.isdigit():
+        result = await service.grade_card(ctx.store, ctx.user_id, card_id, int(grade))
+    if result is None:  # a stale or forged tap: show what is really on top
+        await ctx.answer()
+        await _cards(ctx)
+        return
+    await ctx.answer()
+    await _cards(ctx, outcome=result[1])
+
+
+async def _card_audio(ctx: Ctx, card_id: str) -> None:
+    card = tajweed_cards.card(card_id)
+    done = await ctx.store.tajweed.done(ctx.user_id)
+    if card is None or card.ayah is None or not card.lessons & done:
+        await ctx.answer(ctx.tr("tj_unavailable"))
+        return
+    await ctx.answer()
+    s, a = card.ayah
+    await deliver_quran(
+        ctx.channel, ctx.data, s, a, "audio", ctx.reciter, ctx.ui_lang, ctx.translation_lang
+    )
+
+
 async def _play(ctx: Ctx, lesson_id: str, n: str) -> None:
     lessons, _ = await _rules_visible(ctx)
     lesson = next((x for x in lessons if x.id == lesson_id), None)
@@ -515,6 +586,16 @@ async def on_tajweed(ctx: Ctx, cb_data: str) -> None:
         await _quiz(ctx, args, answer=kind == "qa")
     elif kind in ("r", "ra") and len(args) >= 4:
         await _drill(ctx, args, answer=kind == "ra")
+    elif kind == "s" and not args:
+        await ctx.answer()
+        await _cards(ctx)
+    elif kind == "sv" and args:
+        await ctx.answer()
+        await _cards(ctx, ":".join(args), flip=True)
+    elif kind == "sg" and len(args) >= 2:
+        await _grade(ctx, ":".join(args[:-1]), args[-1])
+    elif kind == "sp" and args:
+        await _card_audio(ctx, ":".join(args))
     elif kind in ("qp", "rp") and len(args) == 3:
         await _practice_audio(ctx, args, quiz=kind == "qp")
     elif kind == "p" and len(args) == 2:

@@ -283,3 +283,17 @@ CREATE TABLE IF NOT EXISTS tajweed_practice (
     last_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, lesson_id)
 );
+
+-- Tajweed spaced-repetition cards (docs/TAJWEED_PLAN.md P4): one row per card a
+-- user has seen. `due` and `last_seen` are the user's local dates.
+CREATE TABLE IF NOT EXISTS tajweed_card (
+    user_id           BIGINT NOT NULL,
+    card_id           TEXT NOT NULL,
+    interval_days     INT NOT NULL,
+    due               DATE NOT NULL,
+    last_seen         DATE NOT NULL,
+    first_seen        DATE NOT NULL,
+    reps              INT NOT NULL DEFAULT 0,
+    lapses            INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, card_id)
+);

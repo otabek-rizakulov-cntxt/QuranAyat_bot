@@ -136,7 +136,7 @@ async def test_without_the_audio_base_url_there_is_nothing_yet(store, monkeypatc
 async def test_reviewer_picks_between_both_tracks(store):
     ctx = _ctx(store, REVIEWER)
     await feature.tajvid(ctx)
-    assert _buttons(ctx.reply) == ["tj:t:alifbo", "tj:t:qoidalar"]
+    assert _buttons(ctx.reply) == ["tj:t:alifbo", "tj:t:qoidalar", "tj:s"]
     await feature.on_tajweed(ctx, "tj:t:qoidalar")
     assert "tj:units" in _buttons(ctx.edit)
 

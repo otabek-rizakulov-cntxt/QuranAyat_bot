@@ -1,6 +1,7 @@
 # Tajweed lessons in the Mini App (docs/TAJWEED_PLAN.md): GET /tajweed, POST /tajweed/done,
 # POST /tajweed/review (reviewers: approve a rules lesson or an audio lesson's text tracking),
-# GET /tajweed/practice/{lesson} and POST /tajweed/practice (P3 quizzes and reading drills).
+# GET /tajweed/practice/{lesson} and POST /tajweed/practice (P3 quizzes and reading drills),
+# GET /tajweed/cards and POST /tajweed/cards/grade (P4 spaced repetition).
 #
 # The lesson texts and the audio manifest are static content (export_web_content.py
 # -> public/content/tajweed/{uz,uz-Cyrl}.json); this route adds what is per user or per
@@ -13,7 +14,7 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from domain import tajweed, tajweed_practice
+from domain import tajweed, tajweed_cards, tajweed_practice
 from domain.uz_translit import to_cyrillic
 from infra.store import get_store
 from services import tajweed as service
@@ -172,3 +173,62 @@ async def practice_done(body: PracticeIn, user_id: int = Depends(require_user)) 
         store, user_id, body.lesson_id, min(body.correct, body.total), body.total
     )
     return PracticeDoneOut(best_pct=best, streak=outcome.streak.current)
+
+
+class TajweedCardOut(BaseModel):
+    id: str
+    kind: str  # letter | sign | rule | rule_back | word
+    front: str  # HTML (Arabic and/or Uzbek; <u><b>, <b> only)
+    back: str
+    ayah: Optional[List[int]] = None  # [surah, ayah] to play
+
+
+class TajweedCardsOut(BaseModel):
+    card: Optional[TajweedCardOut]  # null: nothing left today
+    due: int
+    new: int
+    unlocked: int  # cards in the user's deck (0: no lesson done yet)
+    streak: Optional[int] = None  # set when this grade finished the day's cards
+
+
+class GradeIn(BaseModel):
+    card_id: str = Field(min_length=1, max_length=64)
+    grade: int = Field(ge=0, le=2)  # Bilmadim, Qiyin, Bildim
+
+
+async def _cards_out(store, user_id: int, queue, streak=None) -> TajweedCardsOut:
+    script = to_cyrillic if (await _ui_lang(user_id)) == "uz-Cyrl" else (lambda s: s)
+    card = tajweed_cards.card(queue.next) if queue.next else None
+    return TajweedCardsOut(
+        card=TajweedCardOut(
+            id=card.id,
+            kind=card.kind,
+            front=script(card.front),
+            back=script(card.back),
+            ayah=list(card.ayah) if card.ayah else None,
+        )
+        if card
+        else None,
+        due=queue.due,
+        new=queue.new,
+        unlocked=len(tajweed_cards.unlocked(await store.tajweed.done(user_id))),
+        streak=streak,
+    )
+
+
+@router.get("/tajweed/cards", response_model=TajweedCardsOut)
+async def cards(user_id: int = Depends(require_user)) -> TajweedCardsOut:
+    store = await get_store()
+    return await _cards_out(store, user_id, await service.card_queue(store, user_id))
+
+
+@router.post("/tajweed/cards/grade", response_model=TajweedCardsOut)
+async def grade(body: GradeIn, user_id: int = Depends(require_user)) -> TajweedCardsOut:
+    """Grade the card on top; 409 if it isn't the one on top any more (another
+    device, a double tap), with nothing changed."""
+    store = await get_store()
+    result = await service.grade_card(store, user_id, body.card_id, body.grade)
+    if result is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "not the card on top")
+    queue, outcome = result
+    return await _cards_out(store, user_id, queue, outcome.streak.current if outcome else None)

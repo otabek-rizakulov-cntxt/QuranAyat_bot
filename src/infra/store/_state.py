@@ -41,6 +41,7 @@ class MemoryState:
     tajweed_progress: Dict[int, Set[str]] = field(default_factory=dict)  # user_id -> lesson ids
     # (user_id, lesson_id) -> (sessions, best_pct)
     tajweed_practice: Dict[tuple, tuple] = field(default_factory=dict)
+    tajweed_card: Dict[tuple, object] = field(default_factory=dict)  # (user, card) -> CardRow
     sequence: int = 0
     # Stands in for the `non_telegram_user_id` sequence; see store/identity.py.
     user_id_sequence: int = 2**52 - 1
@@ -79,5 +80,6 @@ class MemoryState:
         self.tajweed_approval.clear()
         self.tajweed_progress.clear()
         self.tajweed_practice.clear()
+        self.tajweed_card.clear()
         self.sequence = 0
         self.user_id_sequence = 2**52 - 1
