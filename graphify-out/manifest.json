@@ -1771,9 +1771,9 @@
     "semantic_hash": ""
   },
   "docs/TAJWEED_PLAN.md": {
-    "mtime": 1794317245.9884434,
-    "seen": 1794317252.183294,
-    "ast_hash": "e5df798d7eb94ced1ac956b2ef14fb78",
+    "mtime": 1794317917.0463412,
+    "seen": 1794317922.1352918,
+    "ast_hash": "e4d65177f1d5a28a3bf2ea6c76c591cf",
     "semantic_hash": ""
   },
   "scripts/tajweed/build.py": {
@@ -1873,9 +1873,9 @@
     "semantic_hash": ""
   },
   "scripts/tajweed/align_text.py": {
-    "mtime": 1794313284.8964853,
-    "seen": 1794313330.8657222,
-    "ast_hash": "1206d21237e71b52c970194a8829877b",
+    "mtime": 1794317841.604996,
+    "seen": 1794317901.588508,
+    "ast_hash": "7b83b18d75d51a8469f3da454061e12f",
     "semantic_hash": ""
   },
   "scripts/tajweed/text_debug.py": {
@@ -1885,9 +1885,9 @@
     "semantic_hash": ""
   },
   "tests/test_tajweed_align.py": {
-    "mtime": 1794313284.8960235,
-    "seen": 1794313330.8660538,
-    "ast_hash": "82d4a3641516050841c560a6731b64f1",
+    "mtime": 1794317854.5341518,
+    "seen": 1794317901.588713,
+    "ast_hash": "9d7a8a0c82bf44639b4d89cfd536c795",
     "semantic_hash": ""
   },
   "src/domain/tajweed_practice.py": {
