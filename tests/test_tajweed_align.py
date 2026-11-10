@@ -118,3 +118,18 @@ def test_words_of_flattens_segments():
         ]
     }
     assert at.words_of(t) == [[0.0, 0.5, "a"], [0.5, 1.0, "b"]]
+
+
+def test_rows_whisper_skipped_get_the_untranscribed_speech():
+    # Whisper heard the intro and the outro, but wrote nothing while the rows were read
+    words = [[0.0, 0.8, "Endi"], [0.9, 2.0, "oʻqiymiz."], [20.0, 20.8, "Yaxshi."]]
+    energy = [-80.0] * int(22 / at.HOP_S)
+    for k in range(int(3.0 / at.HOP_S), int(18.0 / at.HOP_S)):
+        energy[k] = -20.0  # someone is speaking from 3 s to 18 s
+    lines = at.align(ROWS, words, energy)
+    rows = [x for x in lines if x["kind"] == "ar"]
+    assert all(x.get("estimated") and x["conf"] == at.GAP_CONF for x in rows)
+    assert 2.0 <= rows[0]["start"] <= 3.05  # in the silence just before the speech
+    assert 17.95 <= rows[-1]["end"] <= 20.0  # in the silence after it
+    assert [x["kind"] for x in lines] == ["uz", "ar", "ar", "ar", "uz"]  # back in time order
+    assert lines[0]["end"] <= 2.6  # the intro isn't stretched over the long gap

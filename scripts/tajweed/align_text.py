@@ -229,7 +229,13 @@ def _quietest(energy: Optional[Sequence[float]], a: float, b: float) -> float:
     i, j = int(a / HOP_S), min(len(energy), int(b / HOP_S) + 1)
     if j <= i:
         return round((a + b) / 2, 2)
-    k = min(range(i, j), key=lambda n: energy[n])
+    low = min(energy[i:j])
+    quiet = [n for n in range(i, j) if energy[n] <= low + 1.0]  # within 1 dB of the quietest
+    # the middle of the first quiet run: a flat silence is cut in its middle
+    run_end = quiet[0]
+    while run_end + 1 in quiet:
+        run_end += 1
+    k = (quiet[0] + run_end) // 2
     return round(k * HOP_S + HOP_S / 2, 2)
 
 
@@ -346,7 +352,73 @@ def align(rows: Sequence[str], words: Sequence[list], energy=None, pins: Optiona
         )
         cursor = last + 1
     lines += _uz_lines(words[cursor:])
+    lines = _fill_gaps(lines, sounds, words, energy)
     return _snap(lines, energy, pins)
+
+
+MAX_SNAP_GAP = 2.0  # seconds: a wider gap between two lines is left as a gap
+GAP_CONF = 0.3  # a row placed by gap filling: a guess the reviewer must check
+MIN_VOICED_S = 0.4
+
+
+def _voiced(energy, a: float, b: float) -> float:
+    """Seconds of speech between a and b (within 35 dB of the lesson's loudest)."""
+    if not energy or b <= a:
+        return 0.0
+    top = max(energy)
+    i, j = int(a / HOP_S), min(len(energy), int(b / HOP_S))
+    return sum(1 for e in energy[i:j] if e > top - 35) * HOP_S
+
+
+def _fill_gaps(lines: list, sounds: list, words: Sequence[list], energy) -> list:
+    """Rows Whisper wrote nothing for (it often skips bare syllables like "za zi zu")
+    still come in order between rows it did hear. In that time window, the longest
+    stretch of speech with no transcribed word is given to the missing rows, shared
+    by their length and marked `estimated` with a low confidence for the reviewer.
+    Lines are then put back in time order."""
+    total = words[-1][1] if words else 0.0
+    rows = [x for x in lines if x["kind"] == "ar"]
+    i = 0
+    while i < len(rows):
+        if rows[i]["start"] is not None:
+            i += 1
+            continue
+        j = i
+        while j < len(rows) and rows[j]["start"] is None:
+            j += 1
+        lo = rows[i - 1]["end"] if i > 0 else 0.0
+        hi = rows[j]["start"] if j < len(rows) else total + 2.0
+        gap = _longest_silent_speech(words, energy, lo, hi)
+        if gap is not None and _voiced(energy, *gap) >= MIN_VOICED_S * (j - i):
+            a, b = gap
+            weights = [max(1, len(sounds[x["row"]])) for x in rows[i:j]]
+            t = a
+            for x, w in zip(rows[i:j], weights):
+                x["start"], t = round(t, 2), t + (b - a) * w / sum(weights)
+                x["end"], x["conf"], x["estimated"] = round(t, 2), GAP_CONF, True
+        i = j
+    # time order; a row still without time stays right after the line before it
+    keyed, last = [], -1.0
+    for n, x in enumerate(lines):
+        last = x["start"] if x["start"] is not None else last
+        keyed.append(((last, 0 if x["start"] is not None else 1, n), x))
+    return [x for _, x in sorted(keyed, key=lambda kv: kv[0])]
+
+
+def _longest_silent_speech(words: Sequence[list], energy, lo: float, hi: float):
+    """The longest stretch in [lo, hi] that no word covers, trimmed to its speech."""
+    edges = sorted((max(lo, w[0]), min(hi, w[1])) for w in words if w[1] > lo and w[0] < hi)
+    best, t = None, lo
+    for a, b in edges + [(hi, hi)]:
+        if a - t > 0.8 and (best is None or a - t > best[1] - best[0]):
+            best = (t, a)
+        t = max(t, b)
+    if best is None or not energy:
+        return best
+    top = max(energy)
+    i, j = int(best[0] / HOP_S), min(len(energy), int(best[1] / HOP_S))
+    loud = [k for k in range(i, j) if energy[k] > top - 35]
+    return (loud[0] * HOP_S, (loud[-1] + 1) * HOP_S) if loud else None
 
 
 def _uz_lines(words: Sequence[list]) -> list:
@@ -386,6 +458,10 @@ def _snap(lines: list, energy, pins: dict) -> list:
             b["start"] = max(b["start"], a["end"])
         elif id(b) in pinned:
             a["end"] = min(a["end"], b["start"])
+        elif b["start"] - a["end"] > MAX_SNAP_GAP:
+            # a long silence (or untranscribed speech): don't stretch either line over it
+            a["end"] = _quietest(energy, a["end"], a["end"] + MAX_SNAP_GAP / 2)
+            b["start"] = _quietest(energy, b["start"] - MAX_SNAP_GAP / 2, b["start"])
         else:
             cut = _quietest(energy, a["end"], b["start"])
             a["end"], b["start"] = cut, cut

@@ -1,0 +1,5314 @@
+{
+ "version": 1,
+ "lessons": {
+  "ms-001": [
+   {
+    "kind": "uz",
+    "text": "Arab, alif ba, sa,",
+    "start": 0.0,
+    "end": 3.23,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ا ب ت ث ج ح خ",
+    "start": 3.23,
+    "end": 15.81,
+    "conf": 0.91
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "د ذ ر ز س ش ص",
+    "start": 15.81,
+    "end": 27.23,
+    "conf": 0.92
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "ض ط ظ ع غ ف ق",
+    "start": 27.23,
+    "end": 42.52,
+    "conf": 0.8
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "ك ل م ن و ه لا ي",
+    "start": 42.52,
+    "end": 48.58,
+    "conf": 0.51
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "الف با تا ثا جيم حا خا دال ذال را زا سين",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "شين صاد ضاد طا ظا عين غين فا قاف كاف لام ميم",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "نون واو ها لام الف يا",
+    "start": 48.58,
+    "end": 58.72,
+    "conf": 0.58
+   }
+  ],
+  "ms-002": [
+   {
+    "kind": "uz",
+    "text": "АЛИФ ҚАРФА АРАБ АЛИФ БАСЫДАГИ БАРЧА ҚАРФЛАР ОНДАШ ҚАРФЛАРДИР УЛАРДАН КИН КИЛУЧЮ ОНЛИТАВЩ ҚИСКА ОНЛИЛАРНИ ХАРАКЦЛАР ИФАДАЛАЙДА БУЛАР",
+    "start": 0.0,
+    "end": 11.74,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "КУЙДАГИЛАР",
+    "start": 11.74,
+    "end": 12.96,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اَ اِ اُ",
+    "start": 12.96,
+    "end": 17.52,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "АЛИФ ҚАРФА ҚУБУ ХАРАКЦЛАР БЛАН БЕРГИ КИЛИП ə, i, u tavuşlarını ifadələyda. Arab tələdə yapıq boğunlu ya ki, tuxtəşni ifadələş",
+    "start": 17.52,
+    "end": 29.38,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "üçün maxsus belgə. Squndan faydələniləda.",
+    "start": 29.38,
+    "end": 33.56,
+    "conf": 1.0
+   }
+  ],
+  "ms-003": [
+   {
+    "kind": "uz",
+    "text": "Ра қарфы.",
+    "start": 0.0,
+    "end": 1.11,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "رَ رِ رُ",
+    "start": 1.11,
+    "end": 5.73,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ра қарфы узбектілі дэгі Р таушіны ифа дейтады. Фақат У, уздан кейін қайыс харекет кейлішігі қарап, ингечке рақ, яки, йоган рақ талафуз қылынады.",
+    "start": 5.73,
+    "end": 18.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَرْ اِرْ اُرْ",
+    "start": 18.71,
+    "end": 22.94,
+    "conf": 0.91
+   }
+  ],
+  "ms-004": [
+   {
+    "kind": "uz",
+    "text": "ЗАХАРФА",
+    "start": 0.0,
+    "end": 1.53,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ЗАХАРФА УЗБЕКТИЛІДАГИ ЗЫ ТАУШИБЛАН БАРХАЛ",
+    "start": 1.53,
+    "end": 5.21,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "زَ زِ زُ",
+    "start": 5.21,
+    "end": 9.24,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَزْ اِزْ اُزْ زَرْ زِرْ زُرْ",
+    "start": 9.24,
+    "end": 19.28,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اَزْرُ اِزْرُ اُزْرُ اُرْزُ",
+    "start": 19.28,
+    "end": 30.0,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "Zuhu.",
+    "start": 30.0,
+    "end": 30.86,
+    "conf": 1.0
+   }
+  ],
+  "ms-005": [
+   {
+    "kind": "uz",
+    "text": "Mimkharifah. Mimkharifahinin telafuzo uzbek tila daga ma taushublan berkhil.",
+    "start": 0.0,
+    "end": 6.29,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "مَ ـمِـ ـمُ",
+    "start": 6.29,
+    "end": 9.67,
+    "conf": 0.8
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَمْ اِمْ اُمْ مُرْ مُزْ رُمْ",
+    "start": 9.67,
+    "end": 22.67,
+    "conf": 0.8
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اَمَرَ اُمِرَ اَمْرُ اِمْرُ رَمْزُ اِرْمِ",
+    "start": 22.67,
+    "end": 35.87,
+    "conf": 0.95
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "مَرْمَرْ رَمْرَمْ زَمْزَمْ اَرْزَمْ",
+    "start": 35.87,
+    "end": 45.38,
+    "conf": 0.74
+   }
+  ],
+  "ms-006": [
+   {
+    "kind": "uz",
+    "text": "Ta xarifa. Ta xarifainin telafuzu uzbek tila dagi t taushubilan bir xil.",
+    "start": 0.0,
+    "end": 6.25,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "تَ ـتِـ ـتُ",
+    "start": 6.25,
+    "end": 12.09,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "مَتْ مِتْ مُتْ تَمَرْ تَرِرْ",
+    "start": 12.09,
+    "end": 21.79,
+    "conf": 0.95
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "زُرْتَ اَمَرْتِ مَرَرْتُ اُمِرْتُ اَمَرَتْ",
+    "start": 21.79,
+    "end": 35.52,
+    "conf": 0.84
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اَمَرْتُمْ اُمِرْتُمْ مَرَرْتُمْ مُرِرْتُمْ",
+    "start": 35.52,
+    "end": 42.02,
+    "conf": 0.57
+   },
+   {
+    "kind": "uz",
+    "text": "مررتم",
+    "start": 42.02,
+    "end": 43.16,
+    "conf": 1.0
+   }
+  ],
+  "ms-007": [
+   {
+    "kind": "uz",
+    "text": "NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE OZBEEK TILA DAGEE NU TAOUSHU BILAN BIRXHIL NU NU NU NU",
+    "start": 0.0,
+    "end": 10.33,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "نَ ـنِـ ـنُ",
+    "start": 10.33,
+    "end": 11.56,
+    "conf": 0.5
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَنْ اِنْ زِنْ مَنْ مِنْ نَمْ",
+    "start": 11.56,
+    "end": 21.72,
+    "conf": 0.94
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اَنْتَ نِمْتَ اَنْتُمْ نِمْتُمْ نَزِرُ نَزِنُ",
+    "start": 21.72,
+    "end": 36.16,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اَمَرْنَ اُمِرْنَ مَرَرْنَ مُرِرْنَ اَمْرَرْنَ",
+    "start": 36.16,
+    "end": 49.44,
+    "conf": 0.99
+   }
+  ],
+  "ms-008": [
+   {
+    "kind": "uz",
+    "text": "Ya xarifah. Ya xarifah. Ya xarifahnin talafuzah uzbek tila daga ye taushublan bərxal.",
+    "start": 0.0,
+    "end": 6.67,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "يَ ـيِـ ـيُ",
+    "start": 6.67,
+    "end": 12.25,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَيْ اَيْمُ زَيْتُ مَيْتُ رَاْيُ رَمْيُ",
+    "start": 12.25,
+    "end": 25.93,
+    "conf": 0.92
+   },
+   {
+    "kind": "uz",
+    "text": "zaynu,",
+    "start": 25.93,
+    "end": 27.61,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "يَمَنْ مَرْيَمْ مَيْزَرْ مَيْمَنْ اَيْمَنْ",
+    "start": 27.61,
+    "end": 39.49,
+    "conf": 0.86
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اَمْرَيْنِ زَيْتَيْنِ اَيْمَيْنِ مَيْتَيْنِ",
+    "start": 39.95,
+    "end": 50.97,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ramyayni",
+    "start": 51.75,
+    "end": 54.08,
+    "conf": 1.0
+   }
+  ],
+  "ms-009": [
+   {
+    "kind": "uz",
+    "text": "Ba xarafa. Ba xarafa nii ng talafuzu uzbek tila dagi ba ta uši bilan bir xil.",
+    "start": 0.0,
+    "end": 6.79,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "بَ ـبِـ ـبُ",
+    "start": 6.79,
+    "end": 11.83,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَبْ اِبْنُ بِنْتُ بَيْتُ بَيْنُ رَيْبُ",
+    "start": 11.83,
+    "end": 25.41,
+    "conf": 0.98
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "زَيْنَبْ بَرْبَرْ بَيْرَمْ اَبْرَمْ مِنْبَرْ",
+    "start": 25.41,
+    "end": 34.55,
+    "conf": 0.79
+   },
+   {
+    "kind": "uz",
+    "text": "Bi",
+    "start": 34.55,
+    "end": 36.4,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "بِاَمْرَيْنِ بِبَيْتَيْنِ مِنْبَرَيْنِ زَيْنَبَيْنِ",
+    "start": 36.4,
+    "end": 54.47,
+    "conf": 0.86
+   },
+   {
+    "kind": "uz",
+    "text": "Zaynabayni",
+    "start": 54.47,
+    "end": 54.98,
+    "conf": 1.0
+   }
+  ],
+  "ms-010": [
+   {
+    "kind": "uz",
+    "text": "Kaf harifa. Kaf harifa ning telafuze uzbek telada ge k tavooshu bilan berkhil.",
+    "start": 0.0,
+    "end": 6.69,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "كَ ـكِـ ـكُ",
+    "start": 6.69,
+    "end": 13.21,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "كَمْ كُمْ كُنْ كَيْ",
+    "start": 14.33,
+    "end": 21.55,
+    "conf": 0.92
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "بَكْرُ مَكْرُ كَرْمُ كَنْزُ تَرْكُ",
+    "start": 21.55,
+    "end": 38.68,
+    "conf": 0.91
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "كَتَبَ يَكْتُبُ تَرَكَ يَتْرُكُ كَتَبْتُمْ",
+    "start": 38.68,
+    "end": 54.89,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اَمَرَكَ اَمَرْتُكَ كُنْتُ مُمْكِنْ",
+    "start": 56.85,
+    "end": 66.62,
+    "conf": 0.77
+   }
+  ],
+  "ms-011": [
+   {
+    "kind": "uz",
+    "text": "Lam harfa. Lam harfinin telafuzu uzbek teladagi l -taoshi bilan barxal.",
+    "start": 0.0,
+    "end": 7.51,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "لَ ـلِـ ـلُ",
+    "start": 7.51,
+    "end": 12.85,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَلْ بَلْ لَمْ لُمْ لَنْ كِلْ",
+    "start": 12.85,
+    "end": 23.05,
+    "conf": 0.88
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "نَزَلَ لَزِمَ كَمُلَ اَنْزَلَ اَلْزَمَ اَكْمَلَ",
+    "start": 23.05,
+    "end": 37.01,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اَكَلَتْ اَكَلْنَ اَكَلْتَ اَكَلْتِ اَكَلْتُ اَكَلْتُمْ",
+    "start": 37.01,
+    "end": 51.59,
+    "conf": 0.97
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "بُلْبُلْ يَلَمْلَمْ تَزَلْزَلَ يَتَزَلْزَلُ مُتَزَلْزِلْ",
+    "start": 51.59,
+    "end": 63.34,
+    "conf": 0.91
+   }
+  ],
+  "ms-012": [
+   {
+    "kind": "uz",
+    "text": "Vav xarifah Vav xarifinin telafuzi Uzbek teladagi v -tauushidan b 'ras farxli. Onda lablar tishke tegimai aldiingi b 'ras chozilada. V",
+    "start": 0.0,
+    "end": 11.82,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "وَ وِ وُ",
+    "start": 11.82,
+    "end": 14.68,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَوْ رَوْ نَوْ لَوْ",
+    "start": 14.68,
+    "end": 22.34,
+    "conf": 0.64
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "وَرَمْ وَتَرْ وَمَنْ وَلَنْ وَلَمْ وَكَمْ",
+    "start": 22.34,
+    "end": 32.94,
+    "conf": 0.75
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اَوْلُ رَوْمُ يَوْمُ كَوْنُ وَيْلُ وَزْنُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "اولو وزنو ويلو كونو يومو",
+    "start": 32.94,
+    "end": 44.78,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "رومو",
+    "start": 44.78,
+    "end": 47.44,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "كَوْكَبْ مَوْكِبْ اَوْلَمْتُمْ اَوْتَرْتُمْ",
+    "start": 47.44,
+    "end": 58.13,
+    "conf": 0.78
+   },
+   {
+    "kind": "uz",
+    "text": "وزنتم",
+    "start": 58.13,
+    "end": 60.72,
+    "conf": 1.0
+   }
+  ],
+  "ms-013": [
+   {
+    "kind": "uz",
+    "text": "XARFienia XARF 진행 XARF greninIOg XARFcir Khalfin��오 XARF circumänger",
+    "start": 0.0,
+    "end": 4.83,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "XARF",
+    "start": 4.83,
+    "end": 8.11,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "XARF XARF XARF",
+    "start": 8.11,
+    "end": 9.68,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "هَ ـهِـ ـهُ",
+    "start": 9.68,
+    "end": 12.1,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "XARF ZARF EXARF",
+    "start": 12.1,
+    "end": 15.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "هَبْ هَمْ هَلْ هُوَ هِيَ هُمْ زُهْ",
+    "start": 15.92,
+    "end": 26.04,
+    "conf": 0.65
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اَهَمْ وَهَبْ لَهَبْ وَهَمْ لَهُمْ بِهِمْ",
+    "start": 26.04,
+    "end": 39.38,
+    "conf": 0.74
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "مِنْهُ مِنْهُمْ اِلَيْهِ اِلَيْهِمْ اَمْهِلْهُمْ",
+    "start": 39.38,
+    "end": 52.26,
+    "conf": 0.73
+   }
+  ],
+  "ms-014": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "فَ ـفِـ ـفُ",
+    "start": 0.0,
+    "end": 1.15,
+    "conf": 0.62
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "فَمْ فَنْ كَفْ فَلَكْ كَفَنْ نَفَرْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "Fā kharifinin telafuzı uzbek tlidakī fā",
+    "start": 1.15,
+    "end": 5.22,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "فَوْرُ فَوْزُ فَهْمُ فِكْرُ زِفْرُ كِفْلُ",
+    "start": 5.22,
+    "end": 37.01,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "فُلْفُلْ نَوْفَرْ نَوْفَلْ فَهِمَ يَفْهَمُ اِفْهَمْ",
+    "start": 37.01,
+    "end": 50.38,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِفْتَتَنَ يَفْتَتِنُ اِفْتَكَرَ يَفْتَكِرُ",
+    "start": 50.38,
+    "end": 60.84,
+    "conf": 0.92
+   }
+  ],
+  "ms-015": [
+   {
+    "kind": "uz",
+    "text": "Qaf xarifah Qaf xarifinin telafuzi Uzbek tlidagi qi taoshi bilan bir xil Bu xarif fatxali bolub kilian vaqtda Yohan raq telafuz qilnada",
+    "start": 0.0,
+    "end": 11.38,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "قَ ـقِـ ـقُ",
+    "start": 11.38,
+    "end": 16.78,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "زُقْ قِنْ قُلْ قُمْ قِفْ قِهْ",
+    "start": 16.78,
+    "end": 25.56,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "قَلْبُ قَبْلُ فَوْقُ قَلَمْ قَمَرْ لَقَبْ قُمْقُمْ",
+    "start": 25.56,
+    "end": 40.82,
+    "conf": 0.97
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اِقْتَرَبَ يَقْتَرِبُ اِنْقَلَبَ يَنْقَلِبُ",
+    "start": 40.82,
+    "end": 47.11,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "كَدَرْ – قَدَرْ . فَلَكْ – فَلَقْ . فَرْكُ – فَرْقُ",
+    "start": 47.11,
+    "end": 62.4,
+    "conf": 0.65
+   }
+  ],
+  "ms-016": [
+   {
+    "kind": "uz",
+    "text": "Shinxarifa. Shinxarifinin telafuzu ozbektilidagi",
+    "start": 0.0,
+    "end": 4.56,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "شَ ـشِـ ـشُ",
+    "start": 4.56,
+    "end": 5.26,
+    "conf": 0.5
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "رَشْ بُشْ شَرْ شَقْ شَمْ شَكْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "بِشْرُ شِرْبَ شَهْرُ نَشْرُ شُكْرُ شُرْبُ",
+    "start": 5.26,
+    "end": 38.49,
+    "conf": 0.73
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "مَشْرَبْ مَشْرِبْ مَشْرِقْ مُشْتَهِرْ مُشْتَرَكْ",
+    "start": 38.49,
+    "end": 51.79,
+    "conf": 0.99
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِشْتَهَرَ يَشْتَهِرُ اِبْرَنْشَقَ يَبْرَنْشِقُ",
+    "start": 51.79,
+    "end": 63.34,
+    "conf": 0.94
+   }
+  ],
+  "ms-017": [
+   {
+    "kind": "uz",
+    "text": "SINXARFY.",
+    "start": 0.0,
+    "end": 1.57,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "SINXARFYNIN TALAFUZU OZB Applause from Uzbek diladzagy sû tauxgillan birxalw!?",
+    "start": 1.57,
+    "end": 7.05,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "سَ ـسِـ ـسُ",
+    "start": 7.05,
+    "end": 12.37,
+    "conf": 0.91
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "بَسْ سَمْ سِرْ سِنْ سِلْ",
+    "start": 12.37,
+    "end": 21.07,
+    "conf": 0.93
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "سَفَرْ سَقَرْ سَبَقْ سَلَفْ سَمَكْ فَرَسْ",
+    "start": 21.07,
+    "end": 31.58,
+    "conf": 0.72
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "مَسْلَكْ مَسْكَنْ مُسْلِمْ مُسْرِفْ سِمْسِمْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اَسْلَمَ يُسْلِمُ اِسْتَيْسَرَ يَسْتَيْسِرُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "مسلك مسكن مسلم مسرف سمسم",
+    "start": 31.58,
+    "end": 42.12,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "أسلم يسلم",
+    "start": 42.12,
+    "end": 48.13,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "استيسر",
+    "start": 48.13,
+    "end": 50.93,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يستيسر",
+    "start": 50.93,
+    "end": 52.9,
+    "conf": 1.0
+   }
+  ],
+  "ms-018": [
+   {
+    "kind": "uz",
+    "text": "Sa xarfi. Sa xarfi 'ni ifadolubçu xarfi və tavuş Uzbek dildə yox. U, tildin uçunu paski və yuqarit işlərinin orasigə qoygan xalda təlafuz qilnədə.",
+    "start": 0.0,
+    "end": 11.25,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ثَ ـثِـ ـثُ",
+    "start": 11.25,
+    "end": 17.27,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "بَثْ ثِبْ ثَمْ ثِنْ ثَمَرْ ثَمَنْ",
+    "start": 17.27,
+    "end": 27.73,
+    "conf": 0.95
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "ثَوْرُ ثَوْبُ ثَيْبُ مِثْلُ مُثْلُ مَثَلْ",
+    "start": 27.73,
+    "end": 39.92,
+    "conf": 0.93
+   },
+   {
+    "kind": "uz",
+    "text": "Masal",
+    "start": 39.92,
+    "end": 41.63,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "كَوْثَرْ اَكْثَرَ يُكْثِرُ اَثْبَتَ يُثْبِتُ",
+    "start": 41.63,
+    "end": 52.04,
+    "conf": 0.98
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِسْتَكْثَرَ يَسْتَكْثِرُ اِسْتَثْقَلَ يَسْتَثْقِلُ",
+    "start": 52.04,
+    "end": 62.9,
+    "conf": 0.92
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "سَمَرْ – ثَمَرْ . سَبْتُ – ثَبْتُ . سَلْسُ – ثَلْثُ",
+    "start": 62.9,
+    "end": 70.8,
+    "conf": 0.84
+   }
+  ],
+  "ms-019": [
+   {
+    "kind": "uz",
+    "text": "Saad xarifa.",
+    "start": 0.0,
+    "end": 1.31,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Saad xarifa ni aynan ifad alaydiyyan xarifa uzbek tila da mawgud imas. Bu tavuish pastgi alt tishilari ni yukari qismiga tila ni trab qatdiq talafuz qilish bilan hasil",
+    "start": 1.31,
+    "end": 13.54,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "qilinada. Saad xarifa fatxali bolub kelyanda yogan o qilada.",
+    "start": 13.54,
+    "end": 19.29,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "صَ ـصِـ ـصُ",
+    "start": 19.29,
+    "end": 24.81,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "صُمْ صِفْ فَصْ صَرَفْ صَبَرْ بَصَرْ قَصَبْ",
+    "start": 24.81,
+    "end": 36.54,
+    "conf": 0.78
+   },
+   {
+    "kind": "uz",
+    "text": "نصر",
+    "start": 36.54,
+    "end": 38.52,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "نَصَرَ يَنْصُرُ اِسْتَبْصَرَ يَسْتَبْصِرُ",
+    "start": 38.52,
+    "end": 46.8,
+    "conf": 0.64
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "سَفَرْ – صَفَرْ . سَيْفُ – صَيْفُ . اِنْتَسَبَ – اِنْتَصَبَ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "سفر صفر سيفو صيفو",
+    "start": 46.8,
+    "end": 55.02,
+    "conf": 1.0
+   }
+  ],
+  "ms-020": [
+   {
+    "kind": "uz",
+    "text": "TA XARFI TA XARFINI AYNAN IFADALAYDIGAN XARF VA TAVUJ OZBEKTILIDA MAVCUD EMAZ. BU",
+    "start": 0.0,
+    "end": 7.16,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "طَ طِ طُ",
+    "start": 7.16,
+    "end": 7.54,
+    "conf": 0.55
+   },
+   {
+    "kind": "uz",
+    "text": "YUQARDAGI ALT TISHLARNIN TUB QISMIGA TILNI TEKIZIŞ BILAN XASIL QILNADA. TA XARFI FATXALI BOLUB GELGENDA YOGAN OQILADA. طا",
+    "start": 7.54,
+    "end": 18.96,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "طي طو",
+    "start": 18.96,
+    "end": 20.86,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "طَلْ طَيْ شَطْ بَطْ قَطْ فَقَطْ",
+    "start": 20.86,
+    "end": 29.22,
+    "conf": 0.75
+   },
+   {
+    "kind": "uz",
+    "text": "فقط",
+    "start": 29.22,
+    "end": 30.72,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "وَطَنْ طَلَبْ طَرَفْ طُهْرُ طِفْلُ مَطَرْ",
+    "start": 30.72,
+    "end": 42.26,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "مَطْلَبْ مَسْقَطْ مَوْطِنْ مَرْبِطْ",
+    "start": 42.26,
+    "end": 52.27,
+    "conf": 0.96
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِصْطَبَرَ يَصْطَبِرُ اِسْتَوْطَنَ يَسْتَوْطِنُ",
+    "start": 52.27,
+    "end": 61.08,
+    "conf": 0.81
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "تَرَفْ – طَرَفْ . سَبْتُ – سَبْطُ . مُسْتَتِرْ – مُسْتَطِرْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "Faraf Faraf",
+    "start": 61.08,
+    "end": 63.6,
+    "conf": 1.0
+   }
+  ],
+  "ms-021": [
+   {
+    "kind": "uz",
+    "text": "ким binmari. Jim kharifini tellafuzu Uzbektile dagyi ca taufi fashion bilan bar axil. g Nou.\" g,",
+    "start": 0.0,
+    "end": 8.56,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "جَ ـجِـ ـجُ",
+    "start": 8.56,
+    "end": 11.67,
+    "conf": 0.6
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "جَمْ جَرْ جِنْ جَبْ جُلْ",
+    "start": 11.67,
+    "end": 20.43,
+    "conf": 0.8
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "جَبَلْ جَمَلْ اَجْرُ فَجْرُ جَوْهَرْ جَوْرَبْ",
+    "start": 20.43,
+    "end": 30.88,
+    "conf": 0.69
+   },
+   {
+    "kind": "uz",
+    "text": "جورب",
+    "start": 30.88,
+    "end": 32.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "تَجَوْرَبَ يَتَجَوْرَبُ اِسْتَجْلَبَ يَسْتَجْلِبُ",
+    "start": 32.92,
+    "end": 44.88,
+    "conf": 0.72
+   }
+  ],
+  "ms-022": [
+   {
+    "kind": "uz",
+    "text": "XAXARF XAXARF",
+    "start": 0.0,
+    "end": 2.1,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "خَ ـخِـ ـخُ",
+    "start": 2.1,
+    "end": 2.26,
+    "conf": 0.5
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "خَبْ خَلْ خَرَجْ خَبَرْ خَشَبْ خَلَفْ",
+    "start": 2.26,
+    "end": 4.77,
+    "conf": 0.62
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "خَيْرُ خَتْمُ خَمْرُ خَوْفُ مَخْرَجْ مُخْبِرْ",
+    "start": 27.71,
+    "end": 40.38,
+    "conf": 0.68
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اَخْرَجَ يُخْرِجُ اَخْبَرَ يُخْبِرُ",
+    "start": 40.38,
+    "end": 50.28,
+    "conf": 0.7
+   },
+   {
+    "kind": "uz",
+    "text": "استخبار يستخبار يستخبرو",
+    "start": 50.28,
+    "end": 56.7,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِسْتَخْبَرَ يَسْتَخْبِرُ اِسْتَخْرَجَ يَسْتَخْرِجُ",
+    "start": 56.7,
+    "end": 58.92,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "استخرج",
+    "start": 58.92,
+    "end": 61.51,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يستخرج",
+    "start": 61.51,
+    "end": 63.64,
+    "conf": 1.0
+   }
+  ],
+  "ms-023": [
+   {
+    "kind": "uz",
+    "text": "Xa xarfa. Xa xarfa uzbek tilda mawujud emas. Bu taurj boğuzdan hech kandai tusksiz chikada.",
+    "start": 0.0,
+    "end": 8.41,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "حَ ـحِـ ـحُ",
+    "start": 8.41,
+    "end": 13.21,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "hi,",
+    "start": 13.21,
+    "end": 15.03,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "hil,",
+    "start": 15.03,
+    "end": 16.91,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "حَيْ حِلْ حَجْ حَسَنْ حَسَبْ حَسَدْ",
+    "start": 16.91,
+    "end": 24.19,
+    "conf": 0.86
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "مُحْسِنْ مَحْشَرْ مِنْحَرْ مَحْفَلْ اَحْسَنْ",
+    "start": 24.19,
+    "end": 38.93,
+    "conf": 0.87
+   },
+   {
+    "kind": "uz",
+    "text": "امتحن",
+    "start": 38.93,
+    "end": 42.43,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يمتحنوا",
+    "start": 43.09,
+    "end": 46.43,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "احتملا",
+    "start": 46.43,
+    "end": 48.87,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يحتمنوا",
+    "start": 48.87,
+    "end": 52.69,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "استحسن",
+    "start": 52.69,
+    "end": 54.77,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يستحسنوا",
+    "start": 55.63,
+    "end": 57.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اِمْتَحَنَ يَمْتَحِنُ اِحْتَمَلَ يَحْتَمِلُ",
+    "start": 57.92,
+    "end": 62.85,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِسْتَحْسَنَ يَسْتَحْسِنُ اِحْرَنْجَمَ يَحْرَنْجِمُ",
+    "start": 62.85,
+    "end": 65.89,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "خَلْقُ – حَلْقُ . خَتْمُ – حَتْمُ . اَرْخَمْ – اَرْحَمْ",
+    "start": 65.89,
+    "end": 82.01,
+    "conf": 0.97
+   },
+   {
+    "kind": "uz",
+    "text": "arham, arham, arham.",
+    "start": 82.01,
+    "end": 84.2,
+    "conf": 1.0
+   }
+  ],
+  "ms-024": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "غَ ـغِـ ـغُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "غَمْ غَبْ غِلْ غَيْرُ بَغْلُ فَرْغُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғاين خرف. ғاين خرفنی تلفوز ازبیک تلده گه ғا تاوشبلن برخل. بو خرف فتخلی بولب گیلگنده یوғان تلفوز خلنده.",
+    "start": 0.0,
+    "end": 11.65,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғا ғي",
+    "start": 11.65,
+    "end": 14.93,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғو",
+    "start": 14.93,
+    "end": 16.63,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғم ғاب",
+    "start": 16.63,
+    "end": 19.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғیل ғایرو",
+    "start": 19.71,
+    "end": 22.69,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғغلو",
+    "start": 22.69,
+    "end": 25.41,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғرғو",
+    "start": 25.41,
+    "end": 27.18,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "غَبْغَبْ مَبْلَغْ مَغْرِبْ اِغْلِبْ اِغْفِرْ",
+    "start": 27.18,
+    "end": 39.01,
+    "conf": 0.78
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اِشْتَغَلَ يَشْتَغِلُ اِسْتَغْفَرَ يَسْتَغْفِرُ",
+    "start": 39.01,
+    "end": 48.61,
+    "conf": 0.69
+   },
+   {
+    "kind": "uz",
+    "text": "يستغفر U.",
+    "start": 48.61,
+    "end": 49.76,
+    "conf": 1.0
+   }
+  ],
+  "ms-025": [
+   {
+    "kind": "uz",
+    "text": "Ayn xarifah. Ayn xarifinin uzbek tildan muqabili yok. Bu xarif xalqum arastan chikada. Unin telafuzda kichik tildjanin aqamiyat ketda.",
+    "start": 0.0,
+    "end": 11.65,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "A.",
+    "start": 11.65,
+    "end": 13.41,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "عَ ـعِـ ـعُ",
+    "start": 13.41,
+    "end": 15.01,
+    "conf": 0.5
+   },
+   {
+    "kind": "uz",
+    "text": "H.",
+    "start": 15.01,
+    "end": 16.19,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "B.",
+    "start": 16.19,
+    "end": 17.33,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "بِعْ عَنْ عَمْ سَعْ مَعَ عَرَبَ عَجَمْ",
+    "start": 17.33,
+    "end": 30.12,
+    "conf": 0.72
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "عَجَبْ عَمَلْ عِلْمُ عُمْرُ جَمْعُ جَعْلُ",
+    "start": 30.12,
+    "end": 41.5,
+    "conf": 0.94
+   },
+   {
+    "kind": "uz",
+    "text": "ʔjamʔu ʔjālʔu",
+    "start": 41.5,
+    "end": 42.96,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "عَبْعَبْ عَسْكَرْ عَيْلَمْ جَعْفَرْ عَنْبَرْ",
+    "start": 42.96,
+    "end": 54.14,
+    "conf": 0.91
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "غَيْنُ – عَيْنُ . بَغْلُ – بَعْلُ . بَلْغُ – بَلْعُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "ʔʔanbar ʔarabʔ",
+    "start": 54.14,
+    "end": 54.58,
+    "conf": 1.0
+   }
+  ],
+  "ms-026": [
+   {
+    "kind": "uz",
+    "text": "ДАЛХАРФА ДАЛХАРФНИНИН ТАЛАФУЗУ ОЗБЕКТЛАДАГИ ДЫ ТАУШИ КАБАДАР.",
+    "start": 0.0,
+    "end": 6.06,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "دَ دِ دُ",
+    "start": 6.06,
+    "end": 8.92,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "دُمْ دُبْ دُفْ رِدْ زِدْ تَدْ",
+    "start": 8.92,
+    "end": 17.48,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "دَرْسُ دَفْعُ دَبْغُ دَلْكُ دَهْرُ دُهْنُ",
+    "start": 17.48,
+    "end": 31.28,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "دهرو دهنو دل",
+    "start": 31.28,
+    "end": 35.98,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "دُلْدُلْ فُدْ فُدْ هُدْ هُدْ اُشْدُدْ",
+    "start": 35.98,
+    "end": 44.12,
+    "conf": 0.64
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِعْتَدَلَ يَعْتَدِلُ اِسْتَرْشَدَ يَسْتَرْشِدُ",
+    "start": 44.12,
+    "end": 54.74,
+    "conf": 0.69
+   }
+  ],
+  "ms-027": [
+   {
+    "kind": "uz",
+    "text": "ZAD KHARIFE ZAD KHARIFE NING OZBIK TILIDA AYINAN AUK SHASHI YOG ZAD KHARIFE TILINING ONG VE CHAP YANLAR BILAN USTGY VE PASKET SHLAR NING ARALGDAN CHKADA BU",
+    "start": 0.0,
+    "end": 11.62,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "KHARIF FATKALI BOLUB KILGYANDA YOGAN AUKLADA",
+    "start": 11.62,
+    "end": 14.78,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ضَ ـضِـ ـضُ",
+    "start": 14.78,
+    "end": 16.36,
+    "conf": 0.62
+   },
+   {
+    "kind": "uz",
+    "text": "ضي ضو",
+    "start": 16.36,
+    "end": 19.88,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "ضَيْفُ عَضْلُ ضَهْبُ ضَبْطُ ضَعْفُ عَرْضُ",
+    "start": 19.88,
+    "end": 35.93,
+    "conf": 0.51
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "مَضْرِبْ مِضْرَبْ اِضْرِبْ تَضْرِبُ اَضْرِبُ نَضْرِبُ",
+    "start": 35.93,
+    "end": 52.84,
+    "conf": 0.68
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اِضْطَرَبَ يَضْطَرِبُ اِسْتَضْعَفَ يَسْتَضْعِفُ",
+    "start": 52.84,
+    "end": 62.36,
+    "conf": 0.68
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "دَرْسُ – ضَرْسُ . وَدْعُ – وَضْعُ . بَعْدُ – بَعْضُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   }
+  ],
+  "ms-028": [
+   {
+    "kind": "uz",
+    "text": "zal harfa",
+    "start": 0.0,
+    "end": 1.03,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "zal harfa nشifadhalo ce harfa ta oj is O Ojbayk halda youk. O talni ka qini pastila ha yukari šhti langar ni arasig guguyan hualda Telafoiz qylnada.",
+    "start": 1.03,
+    "end": 12.29,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ذَ ذِ ذُ",
+    "start": 12.29,
+    "end": 17.41,
+    "conf": 0.91
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اِذْ مُذْ خُذْ عُذْ ذُبْ ذُقْ ذَرْ مُنْذُ",
+    "start": 17.41,
+    "end": 32.04,
+    "conf": 0.7
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اِذْنُ بَذْلُ ذِكْرُ ذِهْنُ ذَهَبْ مَذْهَبْ",
+    "start": 32.04,
+    "end": 42.74,
+    "conf": 0.5
+   },
+   {
+    "kind": "uz",
+    "text": "مذهب ذهل",
+    "start": 42.74,
+    "end": 46.68,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "ذَهَلَ يَذْهَلُ بَذَلَ يَبْذُلُ اَذْهَبَ يُذْهِبُ",
+    "start": 46.68,
+    "end": 58.34,
+    "conf": 0.57
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "ذِفْرُ – زِفْرُ . بَذْلُ – بَزْلُ . اَبْذَلْ – اَبْزَلْ",
+    "start": 58.34,
+    "end": 58.86,
+    "conf": 0.3,
+    "estimated": true
+   }
+  ],
+  "ms-029": [
+   {
+    "kind": "uz",
+    "text": "ZA XARFI Uzbek tlidda ZA XARFINI IFADALAWCHA XARF VA TAVUSH MAVCUD EMAZ U tlnin ikki yan qismini yoyib, unin yuqardagi tanglayinin altishlargi yakın caigeti",
+    "start": 0.0,
+    "end": 11.76,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "gizgan xalda, talafuz qilnada.",
+    "start": 11.76,
+    "end": 14.55,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ظَ ـظِـ ـظُ",
+    "start": 14.55,
+    "end": 20.19,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "ظَنْ ظِلْ قَظْ حَظْ عَظْ لَظْ",
+    "start": 20.19,
+    "end": 32.11,
+    "conf": 0.72
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "ظَفَرْ نَظَرْ حَظَرْ ظَمَرْ ظَلَفْ عِظَمْ",
+    "start": 32.11,
+    "end": 44.53,
+    "conf": 0.7
+   },
+   {
+    "kind": "uz",
+    "text": "نظم",
+    "start": 44.53,
+    "end": 47.49,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ظلف",
+    "start": 47.49,
+    "end": 50.47,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ظفل حظل ظلم",
+    "start": 50.47,
+    "end": 58.33,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ظهر",
+    "start": 58.33,
+    "end": 60.44,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "نَظْمُ ظَلْفُ ظِلْفُ حِظْلُ ظُلْمُ ظُهْرُ",
+    "start": 60.44,
+    "end": 63.36,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اَظْهَرْ اَظْفَرْ مَظْهَرْ مَنْظَرْ مَظْهِرْ مُظْلِمْ",
+    "start": 63.36,
+    "end": 76.22,
+    "conf": 0.79
+   },
+   {
+    "kind": "uz",
+    "text": "ظهر",
+    "start": 76.22,
+    "end": 78.8,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "ظَهَرَ يَظْهَرُ نَظَرَ يَنْظُرُ ظَلَمَ يَظْلِمُ",
+    "start": 78.8,
+    "end": 92.76,
+    "conf": 0.6
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "اِنْتَظَمَ يَنْتَظِمُ اِسْتَعْظَمَ يَسْتَعْظِمُ",
+    "start": 92.76,
+    "end": 98.76,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 7,
+    "text": "ذَفَرْ – ظَفَرْ . حَظَرْ – حَضَرْ . ظَهْرُ – ضَهْرُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 8,
+    "text": "زَهَرْ – ظَهَرْ . اَزْهَرْ – اَظْهَرْ . اَعْزَمْ – اَعْظَمْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   }
+  ],
+  "ms-030": [
+   {
+    "kind": "uz",
+    "text": "Madli xariflar.",
+    "start": 0.0,
+    "end": 2.37,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Madsuzuzuzuzuz, uzaytiruz, manosuzuzuz da keeladi.",
+    "start": 2.37,
+    "end": 5.75,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Madsarifu uchta. Ular quyda gilar. Alif,",
+    "start": 5.75,
+    "end": 11.23,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "vau,",
+    "start": 11.23,
+    "end": 12.47,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ya. Fatxadan kiyin alif,",
+    "start": 12.47,
+    "end": 15.75,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "kasaradan kiyin ya va, zamadan kiyin vau kilsa, çözub oqaladi. Quyda ularini korup chıxamiz.",
+    "start": 15.75,
+    "end": 23.22,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اٰ اِى اُو  بٰا بِى بُو  تٰا تِى تُو",
+    "start": 23.22,
+    "end": 26.3,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "ثٰا ثِى ثُو  جٰا جِى جُو  حٰا حِى حُو",
+    "start": 26.3,
+    "end": 30.0,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "terifu.",
+    "start": 30.0,
+    "end": 31.85,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Tātidhu.",
+    "start": 33.07,
+    "end": 35.57,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Sāsidhu.",
+    "start": 36.03,
+    "end": 39.33,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Dja -jiju . Ha -che -jeechu.",
+    "start": 39.33,
+    "end": 47.35,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "خٰا خِى خُو  دٰا دِى دُو  ذٰا ذِى ذُو",
+    "start": 49.69,
+    "end": 61.09,
+    "conf": 0.83
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "رٰا رِى رُو  زٰا زِى زُو  سٰا سِى سُو",
+    "start": 62.97,
+    "end": 74.83,
+    "conf": 0.94
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "شٰا شِى شُو  صٰا صِى صُو  ضٰا ضِى ضُو",
+    "start": 77.63,
+    "end": 88.43,
+    "conf": 0.86
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "طٰا طِى طُو  ظٰا ظِى ظُو  عٰا عِى عُو",
+    "start": 90.55,
+    "end": 97.3,
+    "conf": 0.59
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "غٰا غِى غُو  فٰا فِى فُو  قٰا قِى قُو",
+    "start": 97.3,
+    "end": 116.05,
+    "conf": 0.8
+   },
+   {
+    "kind": "ar",
+    "row": 7,
+    "text": "كٰا كِى كُو  لٰا لِى لُو  مٰا مِى مُو",
+    "start": 118.59,
+    "end": 129.51,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 8,
+    "text": "نٰا نِى نُو  وٰا وِى وُو  هٰا هِى هُو",
+    "start": 129.51,
+    "end": 143.37,
+    "conf": 0.97
+   },
+   {
+    "kind": "uz",
+    "text": "Bu",
+    "start": 144.11,
+    "end": 146.2,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 9,
+    "text": "يٰا يِى يُو",
+    "start": 146.2,
+    "end": 147.12,
+    "conf": 0.5
+   },
+   {
+    "kind": "ar",
+    "row": 10,
+    "text": "بُو يِى بٰا  يُو بِى يٰا  تُو هِى تٰا",
+    "start": 147.12,
+    "end": 157.79,
+    "conf": 0.81
+   },
+   {
+    "kind": "ar",
+    "row": 11,
+    "text": "هُو تِى هٰا  ثُو وِى ثٰا  وُو تِى وٰا",
+    "start": 157.79,
+    "end": 171.49,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 12,
+    "text": "جُو نِى جٰا  نُو جِى نٰا  حُو مِى حٰا",
+    "start": 173.51,
+    "end": 184.47,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 13,
+    "text": "مُو حِى مٰا  خُو لِى خٰا  لُو خِى لٰا",
+    "start": 185.75,
+    "end": 227.48,
+    "conf": 0.77
+   },
+   {
+    "kind": "ar",
+    "row": 14,
+    "text": "دُو كِى دٰا  كُو دِى كٰا  ذُو قِى ذٰا",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 15,
+    "text": "قُو ذِى قٰا  رُو فِى رٰا  فُو رِى فٰا",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 16,
+    "text": "زُو غِى زٰا  غُو زِى غٰا  سُو عِى سٰا",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 17,
+    "text": "عُو سِى عٰا  شُو ظِى شٰا  ظُو شِى ظٰا",
+    "start": 227.48,
+    "end": 251.43,
+    "conf": 0.56
+   },
+   {
+    "kind": "ar",
+    "row": 18,
+    "text": "صُو طِى صٰا  طُو صِى طٰا  ضُو اِى ضٰا",
+    "start": 252.73,
+    "end": 261.93,
+    "conf": 0.53
+   },
+   {
+    "kind": "uz",
+    "text": "Lu -i -ha,",
+    "start": 261.93,
+    "end": 265.93,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Yukarıda berilgən musallarını kunt ila urgenip čıqeyin. Bu blankiyengi darslarını uzlaştırışıngiz Osamboladi.",
+    "start": 265.93,
+    "end": 274.23,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 19,
+    "text": "مٰالْ حٰالْ نٰارْ جٰاهْ شٰامْ سٰامْ",
+    "start": 274.23,
+    "end": 285.49,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 20,
+    "text": "بٰارِى عٰالِى رٰاضِى قٰاضِى هٰادِى حٰالِى",
+    "start": 286.61,
+    "end": 297.79,
+    "conf": 0.81
+   },
+   {
+    "kind": "ar",
+    "row": 21,
+    "text": "كَلٰامْ سَلٰامْ حَلٰالْ حَرٰامْ جَلٰالْ جَمٰالْ كَمٰالْ",
+    "start": 297.79,
+    "end": 312.74,
+    "conf": 0.97
+   },
+   {
+    "kind": "uz",
+    "text": "kamal",
+    "start": 312.74,
+    "end": 314.24,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 22,
+    "text": "اِمٰامْ حِسٰابْ نِظٰامْ غُرٰابْ غُلٰامْ غُبٰارْ تُرٰابْ",
+    "start": 314.24,
+    "end": 330.34,
+    "conf": 0.88
+   },
+   {
+    "kind": "ar",
+    "row": 23,
+    "text": "اَمْوٰالْ اَحْوٰالْ اَعْمٰالْ اَعْلٰامْ اَمْوٰاتْ اَمْرٰاضْ",
+    "start": 330.34,
+    "end": 345.36,
+    "conf": 0.83
+   },
+   {
+    "kind": "ar",
+    "row": 24,
+    "text": "قَوٰاعِدْ عَوٰامِلْ شَوٰاهِدْ جَوٰاهِرْ كَوٰاكِبْ مَكٰاتِبْ",
+    "start": 345.36,
+    "end": 362.71,
+    "conf": 0.74
+   },
+   {
+    "kind": "ar",
+    "row": 25,
+    "text": "اِكْرٰامْ اِعْلٰامْ اِخْلٰاصْ اِظْهٰارْ اِصْلٰاحْ اِفْسٰادْ",
+    "start": 362.71,
+    "end": 380.13,
+    "conf": 0.97
+   },
+   {
+    "kind": "ar",
+    "row": 26,
+    "text": "عٰالِمْ صٰابِرْ مٰاهِرْ طٰالِبْ فٰاتِحْ صٰالِحْ",
+    "start": 380.89,
+    "end": 397.83,
+    "conf": 0.87
+   },
+   {
+    "kind": "ar",
+    "row": 27,
+    "text": "قٰامٰا طٰافٰا تٰابٰا قُولِى طُوفِى تُوبِى",
+    "start": 397.83,
+    "end": 413.57,
+    "conf": 0.54
+   },
+   {
+    "kind": "uz",
+    "text": "يقال يطاف",
+    "start": 415.01,
+    "end": 419.56,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 28,
+    "text": "يُقٰالُ يُطٰافُ تُتٰابُ يَقُولُ تَقُومُ يَطُوفُ",
+    "start": 419.56,
+    "end": 446.17,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 29,
+    "text": "يَتُوبٰانِ يَقُولُونَ تَقُومُونَ يَطُوفُونَ تَقُولُونَ",
+    "start": 446.17,
+    "end": 455.73,
+    "conf": 0.58
+   },
+   {
+    "kind": "uz",
+    "text": "ya",
+    "start": 455.73,
+    "end": 457.08,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 30,
+    "text": "يَنْصُرُونَ تَدْخُلُونَ يَعْلَمُونَ تَعْمَلُونَ",
+    "start": 457.08,
+    "end": 462.89,
+    "conf": 0.58
+   },
+   {
+    "kind": "ar",
+    "row": 31,
+    "text": "يَشْهَدُونَ تَصْرِفُونَ يَرْجِعُونَ تَجْلِسُونَ",
+    "start": 462.89,
+    "end": 476.61,
+    "conf": 0.89
+   },
+   {
+    "kind": "ar",
+    "row": 32,
+    "text": "يُكْرِمُونَ تُسْلِمُونَ يُخْلِصُونَ تُكْرِمُونَ",
+    "start": 481.03,
+    "end": 491.85,
+    "conf": 0.9
+   },
+   {
+    "kind": "ar",
+    "row": 33,
+    "text": "يُنْصَرُونَ تُضْرَبُونَ يَجْتَمِعُونَ تَكْتَسِبُونَ",
+    "start": 491.85,
+    "end": 507.83,
+    "conf": 0.85
+   },
+   {
+    "kind": "ar",
+    "row": 34,
+    "text": "يَحْتَسِبُونَ تَسْتَشْهِدُونَ يَسْتَخْرِجُونَ",
+    "start": 509.05,
+    "end": 520.48,
+    "conf": 0.63
+   },
+   {
+    "kind": "ar",
+    "row": 35,
+    "text": "اُشْكُرٰا اُنْصُرٰا اِعْلَمٰا اُشْكُرِى اُنْصُرِى اِعْلَمِى",
+    "start": 520.48,
+    "end": 522.94,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "انصراء",
+    "start": 522.94,
+    "end": 525.29,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يعلماء اشكري",
+    "start": 525.29,
+    "end": 530.67,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "انصري i 'lami",
+    "start": 530.67,
+    "end": 536.16,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 36,
+    "text": "مُكْرِمٰانِ مُسْلِمٰانِ مُخْلِصٰانِ مُنْفِقٰانِ",
+    "start": 536.16,
+    "end": 546.55,
+    "conf": 0.84
+   },
+   {
+    "kind": "ar",
+    "row": 37,
+    "text": "مُكْرِمُونَ مُسْلِمُونَ مُخْلِصُونَ مُنْفِقُونَ",
+    "start": 547.63,
+    "end": 560.59,
+    "conf": 0.97
+   },
+   {
+    "kind": "ar",
+    "row": 38,
+    "text": "مُسْلِمٰاتْ مُخْلِصٰاتْ مَنْصُورُونَ مَطْلُوبُونَ",
+    "start": 560.59,
+    "end": 575.17,
+    "conf": 0.9
+   },
+   {
+    "kind": "ar",
+    "row": 39,
+    "text": "يـ ـيـ ى",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 40,
+    "text": "مِيلْ نِيلْ فِيلْ حِينْ سِينْ شِينْ",
+    "start": 575.17,
+    "end": 587.31,
+    "conf": 0.68
+   },
+   {
+    "kind": "ar",
+    "row": 41,
+    "text": "كَرِيمْ عَلِيمْ سَمِيعْ عَزِيزْ حَكِيمْ",
+    "start": 587.31,
+    "end": 597.42,
+    "conf": 0.62
+   },
+   {
+    "kind": "ar",
+    "row": 42,
+    "text": "مِسْكِينْ مِعْطِيرْ عِفْرِيتْ اِدْرِيسْ",
+    "start": 597.42,
+    "end": 608.46,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 43,
+    "text": "تَعْلِيمْ تَدْرِيسْ تَبْرِيكْ تَحْسِينْ",
+    "start": 608.46,
+    "end": 619.27,
+    "conf": 0.65
+   },
+   {
+    "kind": "uz",
+    "text": "بيحة ميلا عيشة يبيعوا",
+    "start": 619.87,
+    "end": 628.02,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 44,
+    "text": "بِيعَ مِيلَ عِيشَ يَبِيعُ يَمِيلُ تَعِيشُ",
+    "start": 628.02,
+    "end": 630.53,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "yameenu, ta 'ishu,",
+    "start": 630.53,
+    "end": 634.73,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 45,
+    "text": "تَبِيعِينَ تَوٰارِيخْ تَرٰاوِيحْ مُكْرِمِينَ مُسْلِمِينَ",
+    "start": 634.73,
+    "end": 650.4,
+    "conf": 0.94
+   }
+  ],
+  "ms-031": [
+   {
+    "kind": "uz",
+    "text": "Tashditli xariflar. Tashdit sözu ikkilantirish manasida bolib, iki -bir xil undash yanmayan kelib, birincisi sükunli, keyingisi xarakatli bolsa, yazuda ularinin faqat",
+    "start": 0.0,
+    "end": 11.58,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "bitdasi yazılıb, üstüge tashdit belgesi qoyilada.",
+    "start": 11.58,
+    "end": 15.65,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Quyda misallar blan, tanishams.",
+    "start": 15.65,
+    "end": 18.06,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ـَّ ـِّ ـُّ",
+    "start": 18.06,
+    "end": 18.73,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "رَبَّ – رَبْبَ . رَبِّ – رَبْبِ . رَبُّ – رَبْبُ",
+    "start": 18.73,
+    "end": 24.1,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اِنَّ اَنَّ اَمَّ بَرَّ جَرَّ حَجَّ شَكَّ",
+    "start": 24.1,
+    "end": 30.41,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "أما",
+    "start": 30.41,
+    "end": 33.59,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "برّ",
+    "start": 33.59,
+    "end": 35.91,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "جرّ حجّ شكّ",
+    "start": 35.91,
+    "end": 42.24,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "بَرُّ جَرُّ حَجُّ شَكُّ ذَمُّ حَقُّ شَرُّ",
+    "start": 42.24,
+    "end": 60.35,
+    "conf": 0.7
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "بِرُّ سِرُّ سِتُّ عِزُّ طِلُّ حِلُّ حِسُّ",
+    "start": 63.65,
+    "end": 79.05,
+    "conf": 0.9
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "بُرُّ دُرُّ خُفُّ كُلُّ دُبُّ زُقُّ اُمُّ",
+    "start": 79.05,
+    "end": 98.27,
+    "conf": 0.96
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "بُرَّ ذُمَّ سُبَّ فُكَّ سُرَّ سُمَّ ثُمَّ",
+    "start": 98.27,
+    "end": 116.19,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 7,
+    "text": "بُرِّ دُرِّ خُفِّ كُلِّ دُبِّ زُقِّ ضُرِّ",
+    "start": 116.19,
+    "end": 132.13,
+    "conf": 0.64
+   },
+   {
+    "kind": "ar",
+    "row": 8,
+    "text": "دَبَّرَ كَثَّرَ فَجَّرَ وَحَّدَ سَخَّرَ اَدَّبَ",
+    "start": 132.13,
+    "end": 146.7,
+    "conf": 0.65
+   },
+   {
+    "kind": "uz",
+    "text": "Siddab,",
+    "start": 146.7,
+    "end": 147.73,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 9,
+    "text": "حَرَّمَ رَزَّقَ يَسَّرَ بَشَّرَ فَصَّلَ فَضَّلَ",
+    "start": 147.73,
+    "end": 164.07,
+    "conf": 0.96
+   },
+   {
+    "kind": "ar",
+    "row": 10,
+    "text": "عَطَّرَ عَظَّمَ نَعَّمَ كَفَّنَ لَقَّبَ ذَكَّرَ",
+    "start": 164.07,
+    "end": 179.42,
+    "conf": 0.95
+   },
+   {
+    "kind": "ar",
+    "row": 11,
+    "text": "شَمَّرَ عَلَّمَ كَمَّلَ صَنَّفَ صَوَّرَ غَيَّرَ",
+    "start": 179.42,
+    "end": 196.81,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 12,
+    "text": "دُبِّرَ كُثِّرَ فُجِّرَ وُحِّدَ سُخِّرَ اُدِّبَ",
+    "start": 196.81,
+    "end": 212.77,
+    "conf": 0.99
+   },
+   {
+    "kind": "ar",
+    "row": 13,
+    "text": "حُرِّمَ رُزِّقَ يُسِّرَ بُشِّرَ فُصِّلَ فُضِّلَ",
+    "start": 212.77,
+    "end": 227.74,
+    "conf": 0.97
+   },
+   {
+    "kind": "ar",
+    "row": 14,
+    "text": "عُطِّرَ عُظِّمَ نُعِّمَ كُفِّنَ لُقِّبَ ذُكِّرَ",
+    "start": 227.74,
+    "end": 242.66,
+    "conf": 0.96
+   },
+   {
+    "kind": "ar",
+    "row": 15,
+    "text": "عُلِّمَ كُمِّلَ شُمِّرَ صُنِّفَ صُوِّرَ غُيِّرَ",
+    "start": 242.66,
+    "end": 257.61,
+    "conf": 0.99
+   },
+   {
+    "kind": "ar",
+    "row": 16,
+    "text": "تَدَبُّرْ تَكَبُّرْ تَحَجُّرْ تَوَحُّدْ تَسَخُّنْ تَبَدُّلْ",
+    "start": 257.61,
+    "end": 272.5,
+    "conf": 0.87
+   },
+   {
+    "kind": "ar",
+    "row": 17,
+    "text": "تَحَرُّزْ تَعَزُّزْ تَيَسُّرْ تَعَشُّقْ تَعَصُّبْ تَفَضُّلْ",
+    "start": 272.5,
+    "end": 288.99,
+    "conf": 0.88
+   },
+   {
+    "kind": "ar",
+    "row": 18,
+    "text": "تَوَطُّنْ تَنَعُّمْ تَوَغُّلْ تَنَفُّسْ تَرَقُّبْ تَفَكُّرْ",
+    "start": 288.99,
+    "end": 305.08,
+    "conf": 0.9
+   },
+   {
+    "kind": "ar",
+    "row": 19,
+    "text": "تَعَلُّمْ تَكَمُّلْ تَفَنُّنْ تَصَوُّرْ تَغَيُّرْ",
+    "start": 305.08,
+    "end": 319.75,
+    "conf": 0.96
+   },
+   {
+    "kind": "ar",
+    "row": 20,
+    "text": "مُتَكَبِّرْ مُتَكَثِّرْ مُتَحَجِّرْ مُتَوَحِّدْ مُتَسَخِّنْ",
+    "start": 320.93,
+    "end": 336.19,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 21,
+    "text": "مُتَبَدِّلْ مُتَهَذِّبْ مُتَحَرِّزْ مُتَعَزِّزْ مُتَيَسِّرْ",
+    "start": 337.31,
+    "end": 350.74,
+    "conf": 0.68
+   },
+   {
+    "kind": "ar",
+    "row": 22,
+    "text": "مُتَوَطِّنْ مُتَنَعِّمْ مُتَوَغِّلْ مُتَنَفِّسْ مُتَفَكِّرْ",
+    "start": 350.74,
+    "end": 366.98,
+    "conf": 0.99
+   },
+   {
+    "kind": "ar",
+    "row": 23,
+    "text": "مُتَعَلِّمْ مُتَكَمِّلْ مُتَفَنِّنْ مُتَصَوِّرْ مُتَغَيِّرْ",
+    "start": 366.98,
+    "end": 384.49,
+    "conf": 0.88
+   },
+   {
+    "kind": "ar",
+    "row": 24,
+    "text": "اِسْوَدَّ اِصْفَرَّ اَحْمَرَّ اَغْتَرَّ اِهْتَزَّ",
+    "start": 384.49,
+    "end": 399.61,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 25,
+    "text": "اِسْتَرَدَّ اِسْتَحَبَّ اِسْتَحَلَّ اِسْتَدَلَّ",
+    "start": 399.61,
+    "end": 412.26,
+    "conf": 0.81
+   }
+  ],
+  "ms-032": [
+   {
+    "kind": "uz",
+    "text": "TANWINLI XARFLAR XARF OSTYOKI USTUDA QUYDAGY BELGELERDAN BIR KILSA, BIR SKUNLI NUN ORTTYR BOGILADY.",
+    "start": 0.0,
+    "end": 9.07,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "FATHA TANWINI AN KASRA",
+    "start": 9.07,
+    "end": 12.5,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ـً ـٍ ـٌ",
+    "start": 12.5,
+    "end": 14.08,
+    "conf": 0.67
+   },
+   {
+    "kind": "uz",
+    "text": "ZAMMA",
+    "start": 14.08,
+    "end": 15.66,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اً – اَنْ . اٍ – اِنْ . اٌ – اُنْ",
+    "start": 15.66,
+    "end": 17.14,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اً بًا تًا ثًا جًا حًا خًا دًا ذًا",
+    "start": 17.14,
+    "end": 35.07,
+    "conf": 0.94
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "رًا زًا سًا شًا صًا ضًا طًا ظًا عًا غًا",
+    "start": 35.07,
+    "end": 86.04,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "فًا قًا كًا لًا مًا نًا وًا هًا يًا",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "din",
+    "start": 86.04,
+    "end": 87.09,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "zin",
+    "start": 87.09,
+    "end": 88.99,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "rin",
+    "start": 88.99,
+    "end": 90.91,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "اٍ بٍ تٍ ثٍ جٍ حٍ خٍ دٍ ذٍ",
+    "start": 90.91,
+    "end": 97.39,
+    "conf": 0.5
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "رٍ زٍ سٍ شٍ صٍ ضٍ طٍ ظٍ عٍ غٍ",
+    "start": 97.39,
+    "end": 107.11,
+    "conf": 0.53
+   },
+   {
+    "kind": "ar",
+    "row": 7,
+    "text": "فٍ قٍ كٍ لٍ مٍ نٍ وٍ هٍ يٍ",
+    "start": 107.11,
+    "end": 123.77,
+    "conf": 0.94
+   },
+   {
+    "kind": "ar",
+    "row": 8,
+    "text": "اٌ بٌ تٌ ثٌ جٌ حٌ خٌ دٌ ذٌ",
+    "start": 123.77,
+    "end": 142.43,
+    "conf": 0.96
+   },
+   {
+    "kind": "ar",
+    "row": 9,
+    "text": "رٌ زٌ سٌ شٌ صٌ ضٌ طٌ ظٌ عٌ غٌ",
+    "start": 142.43,
+    "end": 163.63,
+    "conf": 0.9
+   },
+   {
+    "kind": "ar",
+    "row": 10,
+    "text": "فٌ قٌ كٌ لٌ مٌ نٌ وٌ هٌ يٌ",
+    "start": 163.63,
+    "end": 181.99,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 11,
+    "text": "ثَوْبًا ثَوْبٍ ثَوْبٌ فَوْتًا فَوْتٍ فَوْتٌ",
+    "start": 181.99,
+    "end": 196.94,
+    "conf": 0.83
+   },
+   {
+    "kind": "uz",
+    "text": "LAYثAN FOWJIN LOHUN",
+    "start": 196.94,
+    "end": 204.04,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 12,
+    "text": "لَيْثًا فَوْجٍ لَوْحٌ فَرْقًا طَوْدٍ عَوْذٌ",
+    "start": 204.04,
+    "end": 213.46,
+    "conf": 0.6
+   },
+   {
+    "kind": "ar",
+    "row": 13,
+    "text": "دَوْرًا فَوْزٍ قَوْسٌ عَرْشًا عَرْضٍ حَوْضٌ",
+    "start": 213.46,
+    "end": 230.23,
+    "conf": 0.91
+   },
+   {
+    "kind": "ar",
+    "row": 14,
+    "text": "سَوْطًا غَيْظٍ شَرْعٌ فَرْغًا خَوْفٍ شَوْقٌ",
+    "start": 230.23,
+    "end": 245.88,
+    "conf": 0.95
+   },
+   {
+    "kind": "ar",
+    "row": 15,
+    "text": "دَرْكًا حَوْلٌ نَوْمٌ لَوْنًا دَلْوٍ شَرْهٌ",
+    "start": 245.88,
+    "end": 262.18,
+    "conf": 1.0
+   }
+  ],
+  "ms-033": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ـًّ ـٍّ ـٌّ",
+    "start": 28.58,
+    "end": 29.98,
+    "conf": 0.57
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "رَبًّا – رَبْبَنْ . رَبٍّ – رَبْبِنْ . رَبٌّ – رَبْبُنْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "حَبًّا بَرًّا جَرًّا مَسًّا كَفًّا مَنًّا",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "TASHDIT",
+    "start": 29.98,
+    "end": 29.99,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "سِتٍّ سِرٍّ حِلٍّ حِسٍّ عِزٍّ بِرٍّ",
+    "start": 29.99,
+    "end": 43.44,
+    "conf": 0.98
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "دُرٌّ ذُلٌّ اُمٌّ خُفٌّ بُرٌّ كُلٌّ",
+    "start": 43.44,
+    "end": 57.85,
+    "conf": 0.98
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "مُبْيَضًّا مُسْوَدٍّ مُصْفَرٌّ مُحْمَرًّا مُحْضَرٍّ",
+    "start": 57.85,
+    "end": 72.0,
+    "conf": 0.9
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "مُهْتَزًّا مُحْتَجٍّ مُنْسَدٌّ مُضْطَرٍّ مُخْتَصٌّ",
+    "start": 72.0,
+    "end": 86.35,
+    "conf": 0.95
+   },
+   {
+    "kind": "ar",
+    "row": 7,
+    "text": "مُسْتَرِدًّا مُسْتَحِبٍّ مُسْتَحِلٌّ مُسْتَدِلًّا مُسْتَعِدٍّ",
+    "start": 86.35,
+    "end": 100.78,
+    "conf": 1.0
+   }
+  ],
+  "ms-034": [
+   {
+    "kind": "uz",
+    "text": "Alif ve Hamza",
+    "start": 0.0,
+    "end": 1.88,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ا أ ـا ـأ ئ ؤ ـئ ـئـ ء",
+    "start": 1.88,
+    "end": 3.34,
+    "conf": 0.71
+   },
+   {
+    "kind": "uz",
+    "text": "Hamza toqqis qil korunışta mawujud ular Quyda gilar. Indi ularini misallar yardamda korub ciqhamis.",
+    "start": 3.34,
+    "end": 10.57,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَمَرَ اَخَذَ قَرَاَ يَقْرَاُ",
+    "start": 10.57,
+    "end": 14.28,
+    "conf": 0.6
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "أَمَرَ أَخَذَ قَرَأَ يَقْرَأُ",
+    "start": 14.28,
+    "end": 20.25,
+    "conf": 0.65
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "يَاْمُرُ يَاْخُذُ مَاْمُورْ مَاْخُوذْ",
+    "start": 20.25,
+    "end": 25.87,
+    "conf": 0.63
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "يَأْمُرُ يَأْخُذُ مَأْمُورْ مَأْخُوذْ",
+    "start": 25.87,
+    "end": 31.34,
+    "conf": 0.61
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "قُرِئَ قَارِئْ مُبْتَدِئْ مُسْتَهْزِئْ",
+    "start": 31.34,
+    "end": 43.03,
+    "conf": 0.96
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "يُؤْمِنُ مُؤْمِنْ مُؤَذِّنْ مُؤَلِّفْ لُؤْلُؤْ",
+    "start": 43.03,
+    "end": 55.37,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 7,
+    "text": "قٰائِلْ قٰائِمْ سٰائِلْ مٰائِلْ رَئِيسْ",
+    "start": 55.37,
+    "end": 68.42,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 8,
+    "text": "بِئْسَ بِئْرُ سَئَلَ يَسْئَلُ مَسْئُولْ",
+    "start": 68.42,
+    "end": 81.18,
+    "conf": 0.98
+   },
+   {
+    "kind": "uz",
+    "text": "Shaaah Saaaah Jaa 'a Yasha",
+    "start": 81.18,
+    "end": 92.14,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "'a",
+    "start": 92.14,
+    "end": 93.83,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Masaa 'a Shia 'a Ji 'a Yajii 'u",
+    "start": 93.83,
+    "end": 105.76,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Yusii 'u Musii 'u",
+    "start": 105.76,
+    "end": 111.8,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 9,
+    "text": "شٰآءَ سٰآءَ جٰآءَ يَشٰآءُ مَسٰاءُ",
+    "start": 111.8,
+    "end": 129.98,
+    "conf": 0.92
+   },
+   {
+    "kind": "ar",
+    "row": 10,
+    "text": "شِيٓءَ جِيٓءَ يَجِيٓءُ يُسِيٓءُ مُسِيٓءُ",
+    "start": 129.98,
+    "end": 147.57,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 11,
+    "text": "شَيْءُ فَيْءُ مِلْءُ بُرْءُ جُزْءُ قِرٰآءَةٌ",
+    "start": 147.57,
+    "end": 164.25,
+    "conf": 0.98
+   },
+   {
+    "kind": "ar",
+    "row": 12,
+    "text": "سُوٓءُ يَسُوٓءُ وَضُوٓءُ قُرُوٓءُ مُرُوٓءَةٌ",
+    "start": 164.25,
+    "end": 184.35,
+    "conf": 0.63
+   },
+   {
+    "kind": "ar",
+    "row": 13,
+    "text": "اَلْمَرْءُ اِمْرَأً اِمْرِئٍ اِمْرُؤٌ",
+    "start": 186.23,
+    "end": 194.65,
+    "conf": 0.6
+   },
+   {
+    "kind": "uz",
+    "text": "امرئ",
+    "start": 194.65,
+    "end": 197.85,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 14,
+    "text": "اَلْجُزْءُ جُزْأَهٰا جُزْئِهٰا جُزْؤُهٰا",
+    "start": 197.85,
+    "end": 208.42,
+    "conf": 0.93
+   }
+  ],
+  "ms-035": [
+   {
+    "kind": "uz",
+    "text": "Ta marbutta. Ta marbutta tini asasa.",
+    "start": 0.0,
+    "end": 3.23,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "ة ـة – ت",
+    "start": 3.23,
+    "end": 3.66,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "un dashi bolib u muannas. Ayal cinsige dalalat qiluči sozlar ahirida kollanilada. Quyida unge misallar kildaramis.",
+    "start": 3.66,
+    "end": 13.69,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "عَزِيزَةٌ فَرِيدَةٌ حَمِيدَةٌ سَعِيدَةٌ شَهِيدَةٌ",
+    "start": 16.19,
+    "end": 28.0,
+    "conf": 0.89
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "جَمِيلَةٌ حَلِيمَةٌ سَلِيمَةٌ شَرِيفَةٌ نَعِيمَةٌ",
+    "start": 28.0,
+    "end": 42.84,
+    "conf": 0.57
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "مَرَّةٌ – مَرّٰاتٌ . كَرَّةٌ – كَرّٰاتٌ . حُرَّةٌ – حُرّٰاتٌ",
+    "start": 42.84,
+    "end": 59.52,
+    "conf": 0.6
+   }
+  ],
+  "ms-036": [
+   {
+    "kind": "uz",
+    "text": "Yazılmasa xam uqiladigyan xariflar.",
+    "start": 0.0,
+    "end": 2.55,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اَلِفِ مُقَدَّرَه",
+    "start": 2.55,
+    "end": 4.29,
+    "conf": 0.96
+   },
+   {
+    "kind": "uz",
+    "text": "Artdırilgen alif. Üstuda fatxalomat bilan tike yazilgen kiçik alif xarifi hudda alif kabir çözib uqiladi. Quyuda misallar bilan tanışib çıxamiz.",
+    "start": 4.29,
+    "end": 16.53,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَللّٰهُ – اِلٰاهُ . رَحْمٰنُ قُرْاٰنُ هٰذٰا",
+    "start": 18.61,
+    "end": 26.34,
+    "conf": 0.78
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "ذٰلِكَ هٰؤُلٰاءِ لٰكِنْ اٰمَنُ اٰدَمُ",
+    "start": 26.34,
+    "end": 42.5,
+    "conf": 0.62
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اٰخَرُ اٰمَنّٰا اِبْرٰاهِيمْ اِسْمٰاعِيلْ اِسْحٰقْ",
+    "start": 42.5,
+    "end": 57.98,
+    "conf": 0.79
+   }
+  ],
+  "ms-037": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "يٰاىِ مُقَدَّرَه",
+    "start": 0.0,
+    "end": 1.67,
+    "conf": 0.92
+   },
+   {
+    "kind": "uz",
+    "text": "artdırilgan ya. Soz ahirda kilgan kəsirali ha -dan aldingi xarif xam kəsirali bolsa, ha -dan kin bir ya xarifı qoşıb çözilib oquladı. Bu belgi Usman",
+    "start": 1.67,
+    "end": 13.72,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "mushafıda quyudakce kornishda kilgan.",
+    "start": 13.72,
+    "end": 17.07,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "بِهِ – بِهِى . بِاَمْرِهِ بِحُكْمِهِ بِقُدْرَتِهِ هٰذِهِ",
+    "start": 17.07,
+    "end": 29.88,
+    "conf": 0.88
+   }
+  ],
+  "ms-038": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "وٰاوِ مُقَدَّرَه",
+    "start": 0.0,
+    "end": 1.52,
+    "conf": 0.96
+   },
+   {
+    "kind": "uz",
+    "text": "ОРТТРИЛГЕН ВАВ СОЗ АХИРДА КЕЛГЕН ЗАММАЛИ ХА ХАРФДАН АЛДИНГЕ ХАРФХАМ ЗАММАЛИ ЯКИ ФАТХАЛИП ОЛСА ХА ХАРФДАН СОЙН БР",
+    "start": 1.52,
+    "end": 13.36,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ВАВ КОШЮП ЧОЗБОКЛАДА КУЙДА ОНГЕ МСАЛЛАР КЕЛТРАМИЗ",
+    "start": 13.36,
+    "end": 17.5,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "لَهُ – لَهُو . اَمْرُهُ حُكْمُهُ قُدْرَتُهُ مٰالُهُ",
+    "start": 17.5,
+    "end": 31.9,
+    "conf": 0.87
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "دٰاوُدْ طٰاوُسْ رُؤُسْ يَقْرَؤُنَ",
+    "start": 31.9,
+    "end": 32.34,
+    "conf": 0.3,
+    "estimated": true
+   }
+  ],
+  "ms-039": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "يٰاءِ اَلِفِيَّه",
+    "start": 0.0,
+    "end": 1.43,
+    "conf": 0.86
+   },
+   {
+    "kind": "uz",
+    "text": "Sos ahirda fatqadankin nuktalarsız gelgan ya -xarfi alfi maksura dip atalada. O, çözıq A tarzda uqalada. Quyda bunga misallar keldirilgan.",
+    "start": 1.43,
+    "end": 13.79,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "A 'la, Mousa,",
+    "start": 30.01,
+    "end": 35.61,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اِلٰى عَلٰى لَدٰى مَتٰى اَنّٰى حَتّٰى",
+    "start": 35.61,
+    "end": 47.86,
+    "conf": 0.6
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "شَتّٰى تَعٰالٰى اَعْلٰى مُوسٰى عِيسٰى",
+    "start": 47.86,
+    "end": 48.91,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "Shunindik qoydagi sozlar ortasta keelgan",
+    "start": 48.91,
+    "end": 51.94,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "يَحْيٰى مُرْتَضٰى يَتَزَكّٰى فَتَرْضٰى",
+    "start": 51.94,
+    "end": 54.74,
+    "conf": 0.57
+   },
+   {
+    "kind": "uz",
+    "text": "talafuz qılınada.",
+    "start": 54.74,
+    "end": 56.02,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "سَوّٰيهٰا دَسّٰيهٰا زَكّٰيهٰا فَسَوّٰيهٰا عُقْبٰيهٰا",
+    "start": 56.02,
+    "end": 73.74,
+    "conf": 0.6
+   }
+  ],
+  "ms-040": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "وٰاوِ اَلِفِيَّه",
+    "start": 0.0,
+    "end": 1.99,
+    "conf": 0.91
+   },
+   {
+    "kind": "uz",
+    "text": "Fatqadan ki in kelgan vav, un dashi kham, chozik aqilip uqilada. Quyida musallarini korib chikhamis.",
+    "start": 1.99,
+    "end": 9.61,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "صَلٰوةٌ زَكٰوةٌ ذَكٰوةٌ حَيٰوةٌ غَدٰوةٌ رِبٰوا",
+    "start": 9.61,
+    "end": 24.24,
+    "conf": 0.9
+   }
+  ],
+  "ms-041": [
+   {
+    "kind": "uz",
+    "text": "Yazılsakam uqilmeydigyan xarflar. Quydaqi sözlarinin başıdagi əlif, Vov blan yazılgen bolsa da, Vov matqilip yani çözib uqilmeydi, balki addi zem makabu",
+    "start": 0.0,
+    "end": 11.98,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "uqiladi.",
+    "start": 11.98,
+    "end": 12.4,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اُولُو اُولِى اُولٰاتِ اُولٰاءِ اُولٰئِكَ اَلْاُولٰى",
+    "start": 12.4,
+    "end": 24.37,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "Shunindek sözlar ahirdaqi kəlimelarinin cem, Qublik alamati bolgan",
+    "start": 24.37,
+    "end": 29.52,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اٰمَنُوا اٰمِنُوا قٰالُوا اِعْلَمُوا اِعْمَلُوا",
+    "start": 29.52,
+    "end": 34.04,
+    "conf": 0.53
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "بِالْغَيْبِ . وَبِالْاٰخِرَةِ . كَالْفَرٰاشِ . وَالْعَصْرِ . وَانْحَرْ",
+    "start": 34.04,
+    "end": 47.55,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "Quydaagi misallar kabhi sozlardah ham orta dagi alif uqilmeyda.",
+    "start": 47.55,
+    "end": 53.33,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "wa Jalākhira kaalfarash wal 'asr wal 'har",
+    "start": 56.89,
+    "end": 66.38,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "وَالْمُشْرِكِينَ . رَبِّ الْعٰالَمِينَ . صِرٰاطَ الَّذِينَ",
+    "start": 66.38,
+    "end": 78.3,
+    "conf": 0.87
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "غَيْرِ الْمَغْضُوبِ . هُمُ الْمُفْلِحُونَ . لَيْلَةُ الْقَدْرِ",
+    "start": 78.3,
+    "end": 87.86,
+    "conf": 0.75
+   },
+   {
+    "kind": "uz",
+    "text": "kāalafrāsh waal 'a srāt al -lazīn ghayri al -maghdub. Siylatul Qadr",
+    "start": 87.86,
+    "end": 89.98,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "حَذَرَ الْمَوْتِ . وَاِذِ اسْتَسْقٰى . اَنْفُسَكُمُ اسْتَكْبَرْتُمْ",
+    "start": 89.98,
+    "end": 101.94,
+    "conf": 0.94
+   }
+  ],
+  "ms-042": [
+   {
+    "kind": "uz",
+    "text": "IDGHAM SHAMSIYA Quyidagi misallar ka bu sozlar da xam ortadagi lam uqilmeyda",
+    "start": 0.0,
+    "end": 6.61,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "al -dararu, al",
+    "start": 30.13,
+    "end": 34.14,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اَلتَّبَعُ . اَلثَّمَرُ . اَلدَّخَلُ . اَلذَّهَبُ . اَلرَّصَدُ",
+    "start": 34.14,
+    "end": 41.27,
+    "conf": 0.52
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَلزَّبَدُ . اَلسَّفَرُ . اَلشَّجَرُ . اَلصَّفَرُ . اَلضَّرَرُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "al",
+    "start": 41.27,
+    "end": 42.64,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "اَلطَّلَبُ . اَلظَّفَرُ . اَللَّهَبُ . اَلنَّسَبُ",
+    "start": 42.64,
+    "end": 46.61,
+    "conf": 0.62
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "هُوَ التَّبَعُ . هُوَ الثَّمَرُ . هُوَ الدَّخَلُ . هُوَ الذَّهَبُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "Quy dagi misallar ki abu sozlar daxam, orta dagi alif vallam uqilmeyda. هو التبعو هو السمرو",
+    "start": 46.61,
+    "end": 57.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "هو الدخلو هو الذهبو",
+    "start": 57.92,
+    "end": 63.88,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "هُوَ الرَّصَدُ . هُوَ الزَّبَدُ . هُوَ السَّفَرُ . هُوَ الشَّجَرُ",
+    "start": 63.88,
+    "end": 76.4,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "هُوَ الصَّفَرُ . هُوَ الضَّرَرُ . هُوَ الطَّلَبُ",
+    "start": 76.4,
+    "end": 85.94,
+    "conf": 0.76
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "هُوَ الظَّفَرُ . هُوَ اللَّهَبُ . هُوَ النَّسَبُ",
+    "start": 85.94,
+    "end": 94.84,
+    "conf": 0.79
+   }
+  ],
+  "ms-043": [
+   {
+    "kind": "uz",
+    "text": "Ishar, Qamariya. Quyidagi misallar kabi sözlar qošip oqilganda, aval keleotgen söz, mat xariflari blan tukilgan bolsa xam, kengi söznin baş xarifu blan yapıq boğun xasil",
+    "start": 0.0,
+    "end": 11.9,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "qilganligi uçun qisqa onli kabi oqiladi.",
+    "start": 11.9,
+    "end": 15.17,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Bundai xallarda ikta xarif oqilmeyi tuship qalada.",
+    "start": 15.17,
+    "end": 17.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "هٰذَا الْبَلَدُ . مَا الْقٰارِعَةُ . مَا الْحُطَمَةُ . هٰذَا الَّذِى",
+    "start": 17.92,
+    "end": 22.44,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "مَنْ ذَا الَّذِى . تَحْتِهَا الْاَنْهٰارُ . فَقُلْنَا اضْرِبْ",
+    "start": 22.44,
+    "end": 26.27,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "بِئْسَ الْاِسْمُ . اِهْدِنَا الصِّرٰاطَ . يٰآاَيُّهَا النّٰاسُ",
+    "start": 26.27,
+    "end": 30.0,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "هذا الذي من ذا الذي تحتها الأنهار",
+    "start": 30.0,
+    "end": 41.59,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "فقلنا انضرب بئس الاسم",
+    "start": 41.59,
+    "end": 49.97,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "اهدنا الصراط يا أيها الناس",
+    "start": 49.97,
+    "end": 59.76,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "اِلَى النّٰاسِ . عَلَى النّٰاسِ . فِى الْاَرْضِ . فِى الصُّدُورِ",
+    "start": 59.76,
+    "end": 74.06,
+    "conf": 0.63
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "قٰالُوا اتَّخَذَ . قٰالُوا ادْعُ . لَقُوا الَّذِينَ . اُوتُوا الْكِتٰابَ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "قالوا اتخذ قالوا ادعوا",
+    "start": 74.06,
+    "end": 81.35,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "لقوا الذين أوتوا الكتاب",
+    "start": 81.35,
+    "end": 89.59,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "وَاَقِيمُوا الصَّلٰوةَ . وَاٰتُوا الزَّكٰوةَ . وَعَمِلُوا الصّٰالِحٰاتِ",
+    "start": 89.59,
+    "end": 103.06,
+    "conf": 0.64
+   }
+  ],
+  "ms-044": [
+   {
+    "kind": "uz",
+    "text": "Vasil",
+    "start": 0.0,
+    "end": 1.27,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Koshubokush",
+    "start": 1.27,
+    "end": 3.15,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "وَصْلْ – قوشو",
+    "start": 3.15,
+    "end": 5.48,
+    "conf": 0.6
+   },
+   {
+    "kind": "uz",
+    "text": "ni birga koshubokush dar. Vasil Ali, alif üstuda xamza bilgis bolmayda. 2 söz birga koshubokul ganda, xar daim orta lardagi bir, 2 ya ki, 3 xarf okulmay chupqalada.",
+    "start": 5.48,
+    "end": 17.15,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Bunday vaxte 2 söz niy ortasta keliyatgan bir alif, hec bir bilgisiz xalda, fatqa zama ya ki, kasrasiz tura da. Quydagi misalarda, 3 söz vasil qilingan.",
+    "start": 17.15,
+    "end": 29.83,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اِهْدِنَا الصِّرٰاطَ الْمُسْتَقِيمَ . وَهٰذَا الْبَلَدِ الْاَمِينِ",
+    "start": 29.83,
+    "end": 42.33,
+    "conf": 0.69
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "نٰارُ اللّٰهِ الْمُوقَدَةُ . كَمَثَلِ الَّذِى اسْتَوْقَدَ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "نار الله الموقدة",
+    "start": 42.33,
+    "end": 48.59,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "كمثل الذي استوقد",
+    "start": 49.47,
+    "end": 54.79,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "فَاتَّقُوا النّٰارَ الَّتِى . هُوَ التَّوّٰابُ الرَّحِيمُ",
+    "start": 56.41,
+    "end": 69.43,
+    "conf": 0.56
+   },
+   {
+    "kind": "uz",
+    "text": "ذو الفضل العظيم",
+    "start": 69.43,
+    "end": 74.44,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "ذُو الْفَضْلِ الْعَظِيمِ . اَنْتَ الْعَزِيزُ الْحَكِيمُ",
+    "start": 74.44,
+    "end": 77.98,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "أنت العزيز الحكيم PLEASE PLEASE PLEASE PLEASE",
+    "start": 77.98,
+    "end": 83.6,
+    "conf": 1.0
+   }
+  ],
+  "ms-045": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "وَقْفْ – طنش",
+    "start": 0.0,
+    "end": 1.96,
+    "conf": 0.74
+   },
+   {
+    "kind": "uz",
+    "text": "Vaqf sozı toqtash manasada kilib, Qur 'an karimda uniyin belgilari kilgan jayda braz toqtashge aytilada. Toqtash alamata aldada gie sozniin halatiga qarab ya sikun,",
+    "start": 1.96,
+    "end": 13.45,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ya alif, ya khud sikunli hablan vaqf qilnada. Quyida ularege misallar berilgan.",
+    "start": 13.45,
+    "end": 20.77,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "نَسْتَعِينُ . يُؤْمِنُونَ . يَعْلَمُونَ",
+    "start": 20.77,
+    "end": 31.43,
+    "conf": 0.91
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "نَسْتَعِينْ . يُؤْمِنُونْ . يَعْلَمُونْ",
+    "start": 31.43,
+    "end": 43.62,
+    "conf": 0.95
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "يُسْرًا . اَبَدًا . تَوّٰابًا . غِشٰاوَةٌ . حٰامِيَةٌ . مُمَدَّدَةٌ",
+    "start": 43.62,
+    "end": 62.32,
+    "conf": 0.8
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "يُسْرٰا . اَبَدٰا . تَوّٰابٰا . غِشٰاوَهْ . حٰامِيَهْ . مُمَدَّدَهْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   }
+  ],
+  "ms-046": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "مَدُّ – صوزو",
+    "start": 0.0,
+    "end": 0.92,
+    "conf": 0.62
+   },
+   {
+    "kind": "uz",
+    "text": "uqış qaydalara. Maddeb unli tavşlarini iki xarakat mqtarda ya ki, ondan kubraq çözüb uqışiga aytilishini va madxariflar uçda. Alif, vao,",
+    "start": 0.92,
+    "end": 12.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "yalar ekanini yukarda takidlab utgan edik. Yindi madxariflarinin çözüb uqilishiga sabab boladigyan belgilar haqda bilbalamiz. Madga",
+    "start": 12.71,
+    "end": 22.52,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "سٰآءَ . شٰآءَ . جٰآءَ . اُولٰٓئِكَ . هٰٓؤُلٰآءِ . سَوٰآءٌ",
+    "start": 22.52,
+    "end": 26.49,
+    "conf": 0.5
+   },
+   {
+    "kind": "uz",
+    "text": "Skunnin ozu iki xil boladi. Birincisi, lazım sikun. Xarf üstuda əvvəldən bar bolub, daima turadigən sikundur. Misallar.",
+    "start": 26.49,
+    "end": 36.78,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "سٰآئِلٌ . يٰٓاَيُّهَا . اِسْرٰٓائِيلَ . جَبْرٰٓائِيلُ . مِيكٰٓائِيلُ",
+    "start": 36.78,
+    "end": 50.09,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "Yukarıdagi sözlarda təşdid içi dəgi birinci ha, birinci lam və birinci sinlərin sikunu lazım sikundur. 2.",
+    "start": 50.09,
+    "end": 60.13,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Aruz sikun Vaqf qilish sabapli payda boladigan sikundir. Agar söz ozdan ki ingi jumlaga ulab uqilsa, unda oz harakatiga muhafiq uqla",
+    "start": 60.13,
+    "end": 70.46,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "سِيٓءَ . جِيٓءَ . سِيٓئَتْ . سُوٓءَ . اَبُوٓءَ",
+    "start": 70.46,
+    "end": 73.24,
+    "conf": 0.5
+   },
+   {
+    "kind": "uz",
+    "text": "-alamin",
+    "start": 73.24,
+    "end": 75.77,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Al -rahim Al -nas Yukaridagi sözlar ahiridagi nun, mim və sinlərнің yuskını",
+    "start": 75.77,
+    "end": 87.54,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "orz kındır.",
+    "start": 87.54,
+    "end": 89.1,
+    "conf": 1.0
+   }
+  ],
+  "ms-047": [
+   {
+    "kind": "uz",
+    "text": "Tabi mat. Mat, kharafı songidan sabab mat kelimasa tabi mat boladi wa bir alif miktarca çozu boquladi. Tabi mat ke misallar.",
+    "start": 0.0,
+    "end": 10.39,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Inna, ra,",
+    "start": 13.37,
+    "end": 17.63,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ta,",
+    "start": 17.63,
+    "end": 20.13,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "bu,",
+    "start": 20.35,
+    "end": 22.99,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "nu,",
+    "start": 22.99,
+    "end": 26.67,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "hu.",
+    "start": 26.67,
+    "end": 28.51,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "伊غ ۷ۃ ذي قِيلَ طيني فیها ما",
+    "start": 28.51,
+    "end": 41.45,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "اعلمي",
+    "start": 42.29,
+    "end": 45.55,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "اشكرا",
+    "start": 45.55,
+    "end": 47.73,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "انصرا",
+    "start": 48.55,
+    "end": 52.55,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "اعلمى",
+    "start": 52.55,
+    "end": 54.69,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ushkuri",
+    "start": 54.69,
+    "end": 57.12,
+    "conf": 1.0
+   }
+  ],
+  "ms-048": [
+   {
+    "kind": "uz",
+    "text": "Muttasil mat. Mat xarifı sungidan sabab mat xamza bolub, ikis xam bir kalimada kelsa, muttasil mat bolada. Muttasil mat tort alif mxtarca chozulada.",
+    "start": 0.0,
+    "end": 12.03,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Muttasil mat ge musallar.",
+    "start": 12.03,
+    "end": 15.21,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ja -a,",
+    "start": 15.87,
+    "end": 19.75,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "su -a,",
+    "start": 19.75,
+    "end": 23.09,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ji -a,",
+    "start": 23.09,
+    "end": 26.31,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "alfa -i -za.",
+    "start": 26.31,
+    "end": 30.97,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "۱۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲ damn sayא",
+    "start": 51.49,
+    "end": 57.07,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "MSA sea Qulu o Qulu o",
+    "start": 62.01,
+    "end": 70.74,
+    "conf": 1.0
+   }
+  ],
+  "ms-049": [
+   {
+    "kind": "uz",
+    "text": "MUNFASIL MAD Agar MAD kharafartadan sabab MAD khamza bolub, başqa sözda kilse, MUNFASIL MAD bolada. MUNFASIL MAD na bir alifdan tort alifkače çözış",
+    "start": 0.0,
+    "end": 11.82,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "caiz. MUNFASIL MAD kem saallar.",
+    "start": 11.82,
+    "end": 14.81,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Inna ilayhi",
+    "start": 16.51,
+    "end": 20.25,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Inna a'tadna",
+    "start": 22.33,
+    "end": 25.43,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Maza a 'rada wa inna in bima unzila",
+    "start": 26.33,
+    "end": 38.8,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ya ayyuhaa inna arsalna",
+    "start": 38.8,
+    "end": 48.9,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "innama amwalukum.",
+    "start": 48.9,
+    "end": 55.04,
+    "conf": 1.0
+   }
+  ],
+  "ms-050": [
+   {
+    "kind": "uz",
+    "text": "ЛАЗММАТ Әгер мад харфы сонгиды келген сабаб, мад сукону лазым болса, лазым мад болады. Лазым мад, торт әлиф мықтарча чозылыши шарт. Лазым мад",
+    "start": 0.0,
+    "end": 11.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ке мысалдар.",
+    "start": 11.92,
+    "end": 13.39,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Әлиф ләммим сады Әлиф ләммим сады Әлиф ләммим сады Әлиф ләммим сады Al",
+    "start": 17.39,
+    "end": 30.06,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "-Amiim",
+    "start": 30.06,
+    "end": 34.07,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Walallallin",
+    "start": 38.55,
+    "end": 40.89,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Qaf",
+    "start": 44.11,
+    "end": 47.27,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Saad",
+    "start": 47.61,
+    "end": 50.43,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Yasin",
+    "start": 52.31,
+    "end": 54.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Alif Laam Meem",
+    "start": 57.89,
+    "end": 64.59,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Noon Alif Laam Ra",
+    "start": 67.85,
+    "end": 75.66,
+    "conf": 1.0
+   }
+  ],
+  "ms-051": [
+   {
+    "kind": "uz",
+    "text": "Arzmat. Agar mad kharafı songida kilgan sabab mad arz kun bolsa, arzmat bolada. Arizmat ikki aliften tord alifkaçya çozu boqulada. Arizmat ke misallar.",
+    "start": 0.0,
+    "end": 12.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Yash 'uroon,",
+    "start": 12.71,
+    "end": 15.37,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ya 'lamoon,",
+    "start": 16.03,
+    "end": 19.65,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Tek -siboon,",
+    "start": 20.19,
+    "end": 23.85,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Walil mu'minin,",
+    "start": 23.85,
+    "end": 27.37,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ملع المحسنين",
+    "start": 28.35,
+    "end": 32.19,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يشتهون",
+    "start": 33.43,
+    "end": 36.17,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "وتقضعون",
+    "start": 37.23,
+    "end": 40.73,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "مفسدين",
+    "start": 40.73,
+    "end": 42.52,
+    "conf": 1.0
+   }
+  ],
+  "ms-052": [
+   {
+    "kind": "uz",
+    "text": "LIN LAZIMMAT LIN YUMŞAX MANASINI BILDIRADI LIN XARIFLARI 2D SÜKÜNLİ VAV VA SÜKÜNLİ YA XARIFLARI LIN XARIFI SÜKÜNLİ LAZIMGƏ",
+    "start": 0.0,
+    "end": 11.8,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "YOLQQANIDA LIN LAZIMMAT BOLADY LIN LAZIMMAT TORT ALIF MĞTARCYI CHOZUB OQILADY MISALLAR",
+    "start": 11.8,
+    "end": 19.83,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "KÄF HƏYƏ AIN SAD",
+    "start": 21.83,
+    "end": 28.87,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Hamim Aynsinqaf",
+    "start": 35.47,
+    "end": 39.28,
+    "conf": 1.0
+   }
+  ],
+  "ms-053": [
+   {
+    "kind": "uz",
+    "text": "Lin arizmat. Lin xarifis kunli arizge yoluqanda lin arizmat bolada. Lin arizmatna ikki aliften tord alifkecha chozish mumkun. Musallar.",
+    "start": 0.0,
+    "end": 12.49,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Wassayif",
+    "start": 13.13,
+    "end": 15.87,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Amrain",
+    "start": 16.99,
+    "end": 18.73,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Assu",
+    "start": 21.31,
+    "end": 23.75,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Shauq",
+    "start": 25.93,
+    "end": 28.47,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "қوص",
+    "start": 28.47,
+    "end": 31.65,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғایض",
+    "start": 33.13,
+    "end": 36.57,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "қوف",
+    "start": 36.57,
+    "end": 38.42,
+    "conf": 1.0
+   }
+  ],
+  "ms-054": [
+   {
+    "kind": "uz",
+    "text": "Исхар, скунли нун, яки танвейн қуйдаги алтитақ арфнин бірге йолыққаныда нунны білдіріп оқыш. Мысалылар.",
+    "start": 0.0,
+    "end": 10.13,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Lobeika Ni ha juguka Ukrautik ila bukmun umyun wa minhum",
+    "start": 29.21,
+    "end": 40.78,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "walahum azabun alim haqqan alal muttaqin.",
+    "start": 40.78,
+    "end": 49.34,
+    "conf": 1.0
+   }
+  ],
+  "ms-055": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اِقْلٰابْ",
+    "start": 0.0,
+    "end": 0.85,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Skunli nun yaki tanwin bax harfiqi yolqqanida nunni mimga almaştirib dmaqı bulan iki xarakat maxtarca uşlab duruş.",
+    "start": 0.85,
+    "end": 11.31,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "مِنْ بَعْدِ – مِمْ بَعْدِ . سَمِيعٌ بَصِيرٌ – سَمِيعُمْ بَصِيرٌ",
+    "start": 11.31,
+    "end": 25.24,
+    "conf": 0.54
+   },
+   {
+    "kind": "uz",
+    "text": "bil ma 'ruf.",
+    "start": 25.24,
+    "end": 28.45,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "غرفة بيده كثيرة بإذن الله",
+    "start": 29.45,
+    "end": 39.77,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "أمدا بعيدا من بعض",
+    "start": 41.49,
+    "end": 47.96,
+    "conf": 1.0
+   }
+  ],
+  "ms-056": [
+   {
+    "kind": "uz",
+    "text": "ғұннали",
+    "start": 0.0,
+    "end": 0.82,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اِدْغٰامْ",
+    "start": 0.82,
+    "end": 1.59,
+    "conf": 0.91
+   },
+   {
+    "kind": "uz",
+    "text": "ғұннабу дымақ, yani, бұрынбошлығдан чықадиган аваздар. ғұннали харфлар тортта улар, куиләгелар.",
+    "start": 1.59,
+    "end": 10.01,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Үләу,",
+    "start": 10.01,
+    "end": 11.51,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "нун,",
+    "start": 11.51,
+    "end": 12.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "мим,",
+    "start": 12.71,
+    "end": 14.87,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "я. Скунли нун, яки, танвин ғұннали харфларны бірге, еолыққанды нунны, ұша харфның ичеге киргызып, дымағы білен, икі харакат мақтарчы оқыш ғұннали",
+    "start": 14.87,
+    "end": 26.66,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "идиғам қса біленады. Misallar.",
+    "start": 26.66,
+    "end": 29.22,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "مِنْ مَسَدٍ – مِمْ مَسَدٍ . لَنْ نُؤْمِنَ – لَنُّؤْمِنَ",
+    "start": 29.22,
+    "end": 35.73,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "مِنْ وَلِيٍّ – مِوْوَلِيٍّ . وَمَنْ يَعْمَلْ – وَمَيْ يَعْمَلْ",
+    "start": 35.73,
+    "end": 42.6,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "هُدًى مِنْ – هُدَمْ مِنْ . شَيْئًا نُكْرًا – شَيْئَنُّكْرًا",
+    "start": 42.6,
+    "end": 49.64,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "اِلٰهٌ وٰاحِدٌ – اِلٰهُوْ وٰاحِدٌ . خَيْرًا يَرَهُ – خَيْرَيْ يَرَهُ",
+    "start": 49.64,
+    "end": 58.85,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "صبرا وثبت",
+    "start": 60.83,
+    "end": 63.62,
+    "conf": 1.0
+   }
+  ],
+  "ms-057": [
+   {
+    "kind": "uz",
+    "text": "ғұннасыз итіғам Үскүңли нұн яки тәнвіні ра яки лам қарфлардан бірге йол қаныда нұнну оша қарфның ечіге кирғызып ғұннасыз оқыш",
+    "start": 0.0,
+    "end": 10.94,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ғұннасыз итіғамдар Мысалдар",
+    "start": 10.94,
+    "end": 13.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "وَمَنْ لَمْ – وَمَلْ لَمْ . مِنْ رَبِّهِمْ – مِرْ رَبِّهِمْ",
+    "start": 13.92,
+    "end": 19.91,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "هُدًى لِلْمُتَّقِينَ – هُدَلْ لِلْمُتَّقِينَ . غَفُورٌ رَحِيمٌ – غَفُورُرْ رَحِيمٌ",
+    "start": 19.91,
+    "end": 30.71,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "همزت اللمزه ما لن نبدأ",
+    "start": 30.71,
+    "end": 37.58,
+    "conf": 1.0
+   }
+  ],
+  "ms-058": [
+   {
+    "kind": "uz",
+    "text": "Ихфа. Скунли нун яки, танвин хуйдаги 15 -та Ихфа харфлардан бирге йолканда нунни яшырыб, дымағ билан 2 харакат мүхтарча ғуна қылып",
+    "start": 0.0,
+    "end": 11.92,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "оқылада.",
+    "start": 11.92,
+    "end": 12.93,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "wa ve fa civ misal oughtlar Musibatu",
+    "start": 29.95,
+    "end": 40.26,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "qaloo",
+    "start": 40.26,
+    "end": 43.13,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "min douni wa ansulunak",
+    "start": 43.13,
+    "end": 50.41,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "rahmetun famen famen",
+    "start": 50.41,
+    "end": 56.79,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "kh purch down",
+    "start": 56.79,
+    "end": 59.67,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "حلالا طيبا",
+    "start": 60.53,
+    "end": 64.89,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "منفقين من كتاب فمن جاء",
+    "start": 67.19,
+    "end": 76.84,
+    "conf": 1.0
+   }
+  ],
+  "ms-059": [
+   {
+    "kind": "uz",
+    "text": "Tachvimlii ra. Ra xarifu 6 -da xalatda tachvim, yani yoghan qilib uqiladi. Bular qiidagilar.",
+    "start": 0.0,
+    "end": 9.25,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ra xarifu zammali ya ki fathali bolsa.",
+    "start": 9.25,
+    "end": 13.67,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Rahim, birabbikum.",
+    "start": 15.73,
+    "end": 18.59,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ra xarifu sikunli bolib, undan avvalgi xarif zammali ya ki fathali bolsa.",
+    "start": 18.59,
+    "end": 25.17,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "وَلْأَرْضُ",
+    "start": 27.83,
+    "end": 28.87,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "مَرْيَم Ra kharaf sikunli bolib, undan ki ingi kharaf, istila kharaflerden bolsa.",
+    "start": 28.87,
+    "end": 36.99,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "فِرْقَ",
+    "start": 36.99,
+    "end": 38.75,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "قِرْطَاس Ra kharaf sikunli bolib, undan avvalgi kharaf kəsrali bolsa, kəsrasi arzi ya ki, başqa sözda bolsa. Iroji 'hu",
+    "start": 39.71,
+    "end": 53.03,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Amiru tabu Skun bilan tukhtalgan raadan awalgi kharf Istila kharf lardan bolib O khams kuli bolsa Aynal qidr",
+    "start": 53.03,
+    "end": 66.28,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Skun bilan tukhtalgan raadan awalgi kharf Khams kuli bolib Ondan awalgi kharf Zammali ya ki Fadhali bolsa Walfajr",
+    "start": 66.28,
+    "end": 77.82,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "بالكفر",
+    "start": 77.82,
+    "end": 80.5,
+    "conf": 1.0
+   }
+  ],
+  "ms-060": [
+   {
+    "kind": "uz",
+    "text": "Tarkiqli ra. Ra xarifi turdda xolatda tarqiq, yani ingička qilib oqulada. Bular kuyidagilar.",
+    "start": 0.0,
+    "end": 8.49,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Birincisi, ra xarifi kəsrali bolsa.",
+    "start": 8.49,
+    "end": 13.31,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "İkinciisi, ra xarifi skuli bolib, uzdan avvalgi xarif kəsrali bolsa. Фағуфир 3. Скунбылан тоқталген",
+    "start": 15.53,
+    "end": 27.6,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Ра харфыдан аввәлгі харф, лин харфы болса 4.",
+    "start": 27.6,
+    "end": 34.05,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Скунбылан тоқталген Ра дан алдингі харф, скунли болып, ондан аввәлгі харф, кәсралли болса 4. Хичари PANASY",
+    "start": 35.45,
+    "end": 46.4,
+    "conf": 1.0
+   }
+  ],
+  "ms-061": [
+   {
+    "kind": "uz",
+    "text": "Allah ləvzi Allah ləvzinin lamıda ikta qayda bar Təvhim və tərqiq Allah ləvzinin lamı qaçanki Uş bu sözdan",
+    "start": 0.0,
+    "end": 11.58,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "aldingi xərf Fatxayaki zəmməli bolsa Təvhim, yəni yogan qılıb o qilada Misallar",
+    "start": 11.58,
+    "end": 19.86,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "عَبْدُ اللّٰهِ – عَبْدُ وَلّٰاهِ . عُبَيْدُ اللّٰهِ – عُبَيْدُ وَلّٰاهِ",
+    "start": 19.86,
+    "end": 21.68,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "إِنَّ اللَّهَ",
+    "start": 21.68,
+    "end": 24.42,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "فَضْلُ اللّٰهِ . فَيْضُ اللّٰهِ . خَيْرُ اللّٰهِ . نَصْرُ اللّٰهِ",
+    "start": 24.42,
+    "end": 36.18,
+    "conf": 0.81
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "رَحْمَةُ اللّٰهِ . زِينَةُ اللّٰهِ . نِعْمَةُ اللّٰهِ . عِزَّةُ اللّٰهِ",
+    "start": 36.18,
+    "end": 50.12,
+    "conf": 0.91
+   },
+   {
+    "kind": "uz",
+    "text": "lafzıdan əvvəlgi xarif kəsirəli bulsa, lam tarqiq, yəni ingiçikə qılıb oxuladı. Misallar Billə",
+    "start": 50.12,
+    "end": 61.22,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "لُطْفُ اللّٰهِ . عِنٰايَةُ اللّٰهِ . هِدٰايَةُ اللّٰهِ . عَطِيَّةُ اللّٰهِ",
+    "start": 61.22,
+    "end": 62.35,
+    "conf": 0.3,
+    "estimated": true
+   },
+   {
+    "kind": "uz",
+    "text": "Lillah",
+    "start": 62.35,
+    "end": 64.62,
+    "conf": 1.0
+   }
+  ],
+  "ms-062": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "مُقَطَّعٰاتِ قُرْاٰنِيَّه",
+    "start": 0.0,
+    "end": 2.12,
+    "conf": 0.88
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "الٓمٓ – اَلِفْ لٰامْ مِيمْ . الٓمٓصٓ – اَلِفْ لٰامْ مِيمْ صٰادْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "الٓرٰ – اَلِفْ لٰامْ رٰا . الٓمٓرٰ – اَلِفْ لٰامْ مِيمْ رٰا",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "كٓهٰيٰعٓصٓ – كٰافْ هٰا يٰا عَيْنْ صٰادْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "طٰهٰ – طٰا هٰا . طٰسٓمٓ – طٰا سِينْ مِيمْ . طٰسٓ – طٰا سِينْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 5,
+    "text": "يٰسٓ – يٰا سِينْ . صٓ – صٰادْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 6,
+    "text": "حٰمٓ – حٰا مِيمْ . حٰمٓ عٓسٓقٓ – حٰا مِيمْ عَيْنْ سِينْ قٰافْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 7,
+    "text": "قٓ – قٰافْ . نٓ – نُونْ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "Qur 'ani kərimdə bazı surələr Allahıda xarflər bilən başlanədə. Misallər",
+    "start": 2.12,
+    "end": 7.78,
+    "conf": 1.0
+   }
+  ],
+  "ms-063": [
+   {
+    "kind": "uz",
+    "text": "SAKTA İki kalima rasta nafas almastan bir az tohtab otisna SAKTA deyil adi. Qur 'an -i kerimnin turta surasda KAHF, YASN, Qiyamat,",
+    "start": 0.0,
+    "end": 11.59,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Mutafifim suralarda SAKTA qilish vacibdir.",
+    "start": 11.59,
+    "end": 15.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "KAHF surasdagi SAKTA ayata.",
+    "start": 15.71,
+    "end": 19.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ولم يجعل له عوجا قيما لينذر بأسا",
+    "start": 29.01,
+    "end": 40.3,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "شديدا من لدنه ويبشر المؤمنين الذين",
+    "start": 40.3,
+    "end": 50.26,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "يعملون الصالحات",
+    "start": 50.26,
+    "end": 54.71,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Yosun surasidagi sakta ayatda.",
+    "start": 60.57,
+    "end": 63.97,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Qiyamat surasidagi sakti ayatda.",
+    "start": 83.91,
+    "end": 88.63,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Mutafifun surasidagi sakti ayatda.",
+    "start": 92.41,
+    "end": 97.53,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Yukarıdagi sakti ayatlarini ustaz yardamda urgenişini tafsiyye qılamız.",
+    "start": 106.37,
+    "end": 112.08,
+    "conf": 1.0
+   }
+  ],
+  "ms-064": [
+   {
+    "kind": "uz",
+    "text": "Istiaza Istiaza, Qur 'an -ı kərimini, qiraat qilişini, quyidəgi cümlə bilən başləşdir. Ə",
+    "start": 0.0,
+    "end": 7.34,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اَعُوذُ بِاللّٰهِ مِنَ الشَّيْطٰانِ الرَّجِيمِ",
+    "start": 7.34,
+    "end": 14.03,
+    "conf": 0.81
+   },
+   {
+    "kind": "uz",
+    "text": "Istiaza ni mənası pənax soraş və ilticab olub yuqardəgi cümləni mənası şeytanin yamanliklərdən Allah qə sığınəmən digənidir.",
+    "start": 14.03,
+    "end": 24.56,
+    "conf": 1.0
+   }
+  ],
+  "ms-065": [
+   {
+    "kind": "uz",
+    "text": "Basmala, Basmala Qur 'an -ı Kerimdagi xarbir surana, Tavva surastan tashqara, Quydagi cümlə bilan başlashdir.",
+    "start": 0.0,
+    "end": 8.41,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ",
+    "start": 13.21,
+    "end": 14.74,
+    "conf": 0.93
+   },
+   {
+    "kind": "uz",
+    "text": "Yani, bu cümlə asli Nəmil surasinin 30 -cı ayatı dagi cümlə bolub, Qiraatda xarbir suranı ubilan başlash sünnəttir.",
+    "start": 14.74,
+    "end": 23.96,
+    "conf": 1.0
+   }
+  ],
+  "ms-066": [
+   {
+    "kind": "uz",
+    "text": "хамза хақыда хамза халқумның ең юқар таманы, yani, көкірәкі яқын жайдан талафуз қылына деген таушдыр. О тауш пайларды пайда болган jarансыз",
+    "start": 0.0,
+    "end": 11.64,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "шауқынли портловчо ондашдыр. Партлап чыққан хава ағыз пошлығыге отгэнда еңгел тамақ қыршыяки, юталге оқшап кетаде. Узбек тілді бұндай тавыш йоқ. Бірақ,",
+    "start": 11.64,
+    "end": 23.65,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "айрым араб тілдан узлашкен созларнин талапузыда оны сезеш мүмкун.",
+    "start": 23.65,
+    "end": 28.06,
+    "conf": 1.0
+   }
+  ],
+  "ms-067": [
+   {
+    "kind": "uz",
+    "text": "KALIMATI IYMAN KALIMATI IYMAN",
+    "start": 0.0,
+    "end": 5.2,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "كَلِمَةُ طَيِّبَةٌ",
+    "start": 5.2,
+    "end": 7.52,
+    "conf": 0.81
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "لٰٓا اِلٰهَ اِلَّا اللّٰهُ مُحَمَّدٌ رَسُولُ اللّٰهِ",
+    "start": 7.52,
+    "end": 16.64,
+    "conf": 0.9
+   }
+  ],
+  "ms-068": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "كَلِمَةُ الشَّهٰادَةِ",
+    "start": 0.0,
+    "end": 2.1,
+    "conf": 0.67
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَشْهَدُ اَنْ لٰٓا اِلٰهَ اِلَّا اللّٰهُ",
+    "start": 2.1,
+    "end": 6.46,
+    "conf": 0.54
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "وَاَشْهَدُ اَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "إلا الله وأشهد أن محمدا عبده ورسوله",
+    "start": 6.46,
+    "end": 14.44,
+    "conf": 1.0
+   }
+  ],
+  "ms-069": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "كَلِمَةُ التَّوْحِيدِ",
+    "start": 0.0,
+    "end": 2.3,
+    "conf": 0.69
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَشْهَدُ اَنْ لٰٓا اِلٰهَ اِلَّا اللّٰهُ وَحْدَهُ لٰا شَرِيكَ لَهُ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "أشهد أن لا إله إلا الله وحده لا شريك",
+    "start": 2.3,
+    "end": 11.96,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِى وَيُمِيتُ",
+    "start": 11.96,
+    "end": 20.32,
+    "conf": 0.53
+   },
+   {
+    "kind": "uz",
+    "text": "وهو حي لا يموت بيده الخير وهو على كل شيء",
+    "start": 20.32,
+    "end": 31.58,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "قدير",
+    "start": 31.58,
+    "end": 33.7,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "وَهُوَ حَىٌّ لٰا يَمُوتُ بِيَدِهِ الْخَيْرُ وَهُوَ عَلٰى كُلِّ شَىْءٍ قَدِيرٌ",
+    "start": 33.7,
+    "end": 34.3,
+    "conf": 0.3,
+    "estimated": true
+   }
+  ],
+  "ms-070": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "اِيمٰانٌ مُفَصَّلٌ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اٰمَنْتُ بِاللّٰهِ وَمَلٰٓائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "ايمان مفصل",
+    "start": 0.0,
+    "end": 2.91,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "آمنت بالله وملائكته وكتبه ورسله",
+    "start": 2.91,
+    "end": 11.98,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "وَالْيَوْمِ الْاٰخِرِ وَالْقَدَرِ خَيْرِهِ وَشَرِّهِ مِنَ اللّٰهِ تَعٰالٰى",
+    "start": 11.98,
+    "end": 22.36,
+    "conf": 0.71
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "وَالْبَعْثِ بَعْدَ الْمَوْتِ",
+    "start": 22.36,
+    "end": 26.24,
+    "conf": 0.74
+   }
+  ],
+  "ms-071": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "كَلِمَةُ الْاِسْتِغْفٰارِ",
+    "start": 0.0,
+    "end": 3.26,
+    "conf": 0.71
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "اَسْتَغْفِرُ اللّٰهَ . اَسْتَغْفِرُ اللّٰهَ . اَسْتَغْفِرُ اللّٰهَ تَعٰالٰى",
+    "start": 3.26,
+    "end": 17.42,
+    "conf": 0.71
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "مِنْ كُلِّ ذَنْبٍ اَذْنَبْتُهُ عَمْدًا اَوْ خَطَأً سِرًّا وَعَلٰانِيَةً",
+    "start": null,
+    "end": null,
+    "conf": 0.0
+   },
+   {
+    "kind": "uz",
+    "text": "من كل ذنب أذنبته عمدا أو خطأا سرا أو علانية",
+    "start": 17.42,
+    "end": 29.29,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "وَاَتُوبُ اِلَيْهِ مِنَ الذَّنْبِ الَّذِى اَعْلَمُ",
+    "start": 29.29,
+    "end": 35.82,
+    "conf": 0.64
+   },
+   {
+    "kind": "ar",
+    "row": 4,
+    "text": "وَمِنَ الذَّنْبِ الَّذِى لٰٓا اَعْلَمُ اِنَّكَ اَنْتَ عَلّٰامُ الْغُيُوبِ",
+    "start": 35.82,
+    "end": 48.74,
+    "conf": 0.51
+   }
+  ],
+  "ms-072": [
+   {
+    "kind": "ar",
+    "row": 0,
+    "text": "كَلِمَةُ التَّمْجِيدِ",
+    "start": 0.0,
+    "end": 2.14,
+    "conf": 0.69
+   },
+   {
+    "kind": "ar",
+    "row": 1,
+    "text": "سُبْحٰانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلٰٓا اِلٰهَ اِلَّا اللّٰهُ وَاللّٰهُ اَكْبَرُ",
+    "start": 2.14,
+    "end": 17.6,
+    "conf": 0.58
+   },
+   {
+    "kind": "uz",
+    "text": "لا حول",
+    "start": 17.6,
+    "end": 20.34,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 2,
+    "text": "لٰا حَوْلَ وَلٰا قُوَّةَ اِلَّا بِاللّٰهِ الْعَلِىِّ الْعَظِيمِ",
+    "start": 20.34,
+    "end": 27.26,
+    "conf": 0.53
+   },
+   {
+    "kind": "uz",
+    "text": "ما شاء الله كان",
+    "start": 27.26,
+    "end": 32.78,
+    "conf": 1.0
+   },
+   {
+    "kind": "ar",
+    "row": 3,
+    "text": "مٰا شٰآءَ اللّٰهُ كٰانَ وَمٰا لَمْ يَشَأْ لَمْ يَكُنْ",
+    "start": 32.78,
+    "end": 37.65,
+    "conf": 0.53
+   },
+   {
+    "kind": "uz",
+    "text": "الإيمان إقرار باللسان وتصديق بالقلب بما جاء به من",
+    "start": 37.65,
+    "end": 49.54,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "عند الله",
+    "start": 49.54,
+    "end": 52.79,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "من عند الله محمد رسول الله صلى الله عليه",
+    "start": 52.79,
+    "end": 64.72,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "وسلم",
+    "start": 64.72,
+    "end": 66.18,
+    "conf": 1.0
+   }
+  ],
+  "ms-073": [
+   {
+    "kind": "uz",
+    "text": "Sözbaşı Bütün barlıq Yer -Oasman kainat egiasi bolgan zat Allah ta 'alaga uzunin ululugi qadar Xamdu sanalarımız",
+    "start": 0.0,
+    "end": 10.76,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Alamlarga rahmat qilip yubarilgan Paiğambarimiz Muhammad Mustafa sallallahu aleyhi və sallamga Duru du salavatlarımız bolsin Immatimnin en yaxshisi",
+    "start": 10.76,
+    "end": 22.0,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Hayrlisi Quran okşini organib Sonura Başqalarga orga toqcidir Canacan yurtimizda qadimda xam, xazirgi kullarimizda xam, anasunday uluq",
+    "start": 22.0,
+    "end": 33.58,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "ustazlarimiz bar. Shunin uchun xam, bu zamindan xariyili onlap, yüzlap, qarilar,",
+    "start": 33.58,
+    "end": 40.33,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Quran bilimdanlar yetishib çiqmaqda. Quranlı uqish büyük fazilet, tügemma saadatdır. Shun deyikin, xarbirimiz ilahi dasturnu beynuxsan uqish və uqish",
+    "start": 40.33,
+    "end": 52.16,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "baqtiga irishish yolu da xarakat qilmaqimiz lazim boladi. Qol ingizda ki ušbu risala anasho saadatli manzilgi yitiklochi kharihda dar. Bu kitab",
+    "start": 52.16,
+    "end": 63.96,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "azalden yurtumizda mashquur bolib gilgan. Sababe organochi uchun saadda wa asanligi dar. Bu uku qolla masajudakob nashir bolgan. Biraq ular nii kharbrada ozgi khas",
+    "start": 63.96,
+    "end": 75.94,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "juzi yangiliklar bar. Kitab nii ušbu nashir khambra sada lashkan usulubta čap itil maqda. Maksad ukuji ga asan bolsan. Shunindegi qollama songiga",
+    "start": 75.94,
+    "end": 87.56,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "eynmuxum dualar və kəlimelar xam ila vaqilina da.",
+    "start": 87.56,
+    "end": 91.13,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "Oylaymiz ki, mubarək Quran -ı kərimini uqşuna niyat qilgan muxtaram uqucularimiz uçun bu xam faydali bolada. Allah taala bu acizanı işlarimizin uzu xayirli",
+    "start": 91.13,
+    "end": 103.58,
+    "conf": 1.0
+   },
+   {
+    "kind": "uz",
+    "text": "qılsın. Qollanma muallifi Ahmed Xadi Maxsudi xazaratlarina rəhmatiga olsun.",
+    "start": 103.58,
+    "end": 109.9,
+    "conf": 1.0
+   }
+  ]
+ }
+}

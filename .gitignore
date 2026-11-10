@@ -43,3 +43,4 @@ graphify-out/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/
 
 # Muallimi soniy lesson audio: hosted on R2, never in git
 data/tajweed/downloads/
+data/tajweed/quranayat_muallimi.zip
