@@ -249,3 +249,24 @@ The original T2–T4 (quizzes, diagram + Learn tab, Reader colours) fold into P1
 **Surfaces.**
 - **Mini App:** the lines sit under the player. The line being read is highlighted and kept in view, and tapping a line plays from there.
 - **Bot:** 📄 Matn sends the whole text, with the Arabic rows as printed and the Uzbek lines in italics.
+
+## 16. P3: quizzes and reading drills (built 2026-11-10)
+
+**Where.** Every lesson, in both tracks and both surfaces, ends with **📖 Oʻqish mashqi** (reading practice). Lessons that teach an annotated rule also get **✍️ Mashq** (a quiz): 14 audio lessons and 14 rules lessons.
+
+**Content.** `src/domain/tajweed_practice.py` builds a session deterministically from (lesson, seed). Items come from short ayahs, al-Fatiha and Juz ʿAmma first.
+- **Quiz:** 5 questions, rotating through four kinds:
+  - name the marked rule;
+  - find the ayah that has it;
+  - listen (in the user's reciter) and name it;
+  - count the marked spans.
+
+  Wrong options are never also annotated on the marked letters, and tests check every answer for every lesson.
+- **Reading drill:** 5 words chosen for the lesson's point: its letter (lessons 2–29), the madd letters, shadda, tanwin or hamza (30–40), or the rule. The user reads aloud, listens to the ayah, then marks it right or wrong.
+
+**Scoring.**
+- A finished session stores `tajweed_practice` (sessions, best %) and logs a `tajweed` streak day.
+- The bot is stateless: the seed and score ride in the callback data.
+- The Mini App uses `GET /api/v1/tajweed/practice/{lesson}?seed=` and `POST /api/v1/tajweed/practice`.
+
+**Audio lessons and quizzes.** Audio lessons map to rule ids in `AUDIO_RULES`. The letter, harakat, izhor, ro and Alloh lessons have no rule annotations, so they get drills only.
