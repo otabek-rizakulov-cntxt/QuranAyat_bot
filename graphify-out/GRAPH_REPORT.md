@@ -1,52 +1,52 @@
 # Graph Report - QuranAyat_bot  (2026-11-10)
 
 ## Corpus Check
-- 309 files · ~295,229 words
+- 312 files · ~296,189 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 10 file(s) not represented in the graph (top: (none) 7, .example 1, .ini 1)
+- Unclassified: 11 file(s) not represented in the graph (top: (none) 7, .ipynb 2, .example 1)
 
 ## Summary
-- 5588 nodes · 13500 edges · 296 communities (172 shown, 124 thin omitted)
+- 5609 nodes · 13552 edges · 337 communities (183 shown, 154 thin omitted)
 - Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 1229 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c0f1984e`
+- Built from commit: `bbfeab0f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - build_plan
 - link_token.py
-- Quran
+- .exists
 - deliver_push
 - Wizard
 - lifespan.py
 - export.py
-- streak.py
+- command
 - to_whatsapp
-- dispatch.py
+- api/plans.py
 - Ref
 - InMemoryScheduleStore
 - Wizard
 - streak_image.py
-- Choice
+- Ctx
 - UserSettings
 - Context
-- bot/media.py
+- test_media_cache_keys.py
 - parse_reference
 - RedisSingleton
-- t
+- channels/__init__.py
 - WhatsAppChannel
-- group.py
+- features/__init__.py
 - Hifz Progress Cmd Tests
-- services/plans.py
+- group.py
 - Refactor — Implementation Plan
 - TelegramChannel
 - test_hifz_streak.py
 - Hifz Platform - Plan & Progress
 - Acceptance Tests
-- html
+- features/check.py
 - Docker Compose.stress
 - _png
 - test_recall_check.py
@@ -55,12 +55,12 @@
 - _ctx
 - Recitation Checker Investigation
 - round_percent
-- test_dispatch_order.py
+- tajweed_lessons.py
 - test_uz_audio_feature.py
 - TranslationRegistry
 - PostgresPlanStore
 - to_markup
-- handle_update
+- build_question
 - Streaks
 - asyncio
 - Four multilingual dimensions (UI, translation, tafsir, audio)
@@ -68,47 +68,47 @@
 - Schema
 - Services
 - test_tajweed_lessons.py
-- features/check.py
+- services/check.py
 - api/progress.py
 - fixture
-- InMemoryGroupStore
-- deliver_quran
+- GroupStore
+- dispatch.py
 - whatsapp_setup.py
 - os
 - store/__init__.py
 - surah_progress
-- reciter_group
+- InMemoryGroupStore
 - .test_full_flow_queues_the_first_send
 - Mini App Plan
-- local_date
 - .page_range
+- reader.py
 - IdentityStore
 - summarize
 - InMemoryStore
-- features/daily.py
+- .reply
 - PostgresScheduleStore
-- parse_ayah_range
+- surah_progress
 - Hifz Seam Tests
 - session.py
-- parse_offset
+- next_due_utc
 - InMemoryTajweedStore
 - SendCtx
 - quran_page_progress
-- bundle_translations.py
+- sys
 - Recitation Checker Investigation: RECITATION_CHECKER_INVESTIGATIONmd
-- json
+- re
 - ._send_media
 - Groups: PostgresGroupStore
 - InMemorySessionStore
 - Scheduler Tests
-- routes/whatsapp.py
+- PostgresPlanStore
 - PostgresProfileStore
-- tajweed_lessons.py
+- streak_summary
 - main.py
 - test_api_auth.py
 - Store Contract Tests
 - Multi Platform Plan: MultiPlatform Implementation Plan
-- test_inline_reciter_search.py
+- handle_update
 - _hifz
 - PlanDaySpec
 - test_whatsapp_router.py
@@ -117,7 +117,7 @@
 - Scheduler Tests: TestTransientFailuresAreRetried
 - _message
 - GraphClient
-- File
+- test_inline_reciter_search.py
 - _at
 - api/uz_audio.py
 - recall_check.py
@@ -134,35 +134,35 @@
 - Koyeb Capacity Report
 - Blue Green Ci
 - Blue Green Ci: name
-- scheduler/__init__.py
+- whatsapp_format.py
 - InMemoryProfileStore
 - PostgresIdentityStore
 - test_store_selection.py
 - compute_streak
-- Hifz platform frozen string manifest
+- corpus
 - _align
 - build_grid
 - PostgresHifzStore
 - Blue Green Ci: jobs
 - Blue Green Ci: with
-- Portion
+- test_handle_update.py
 - Store
-- time
-- weekly_board
+- TestPickerFlow
+- send_repeated_audio
 - TestPlans
 - Channel
-- TestPickerFlow
+- PostgresStore
 - reciter_keyboard
-- .get_next_ayah
+- fetch_and_stitch
 - Tajweed (tajvid) section: plan
-- re
+- split
 - MINI_APP_PLAN.md
-- sys
+- _ctx
 - TestRestartDeliversExactlyOnce
 - parse_ayah
 - test_hifz_leaderboard.py
 - MINI_APP_PLAN.md
-- keyboards/menu.py
+- t
 - TestLeaderboard
 - send_page
 - Hifz Seam Tests: TestConflictFreeByConstruction
@@ -176,27 +176,27 @@
 - graphify-autopush.sh
 - test_settings.py
 - Dependency rule (app -> bot -> services -> domain)
-- uz_translit.py
+- .get_next_ayah
 - health
 - Blue Green Ci: postgres
 - Blue Green Ci: test
 - Blue Green Ci: preflight
-- make_whatsapp_avatar.py
+- Portion
 - PostgresProfileStore
 - Hifz Seam Tests: TestPrefixNamespace
 - Hifz Seam Tests: TestDispatchCallback
-- Profile settings reset fix (fix/settings-persistence)
-- features/__init__.py
+- weekly_board
+- GroupPlanDayRow
 - Blue Green Ci: smokegreen
-- test_miniapp_links.py
-- FakeChannel
-- test_webhook.py
+- TestSenderIds
+- uz_audio_delivery.py
+- routes/whatsapp.py
 - test_uz_audio_timings.py
 - features/tajweed.py
-- ayah_for
+- scheduler/__init__.py
 - BismillahBot README
 - test_keyboard_snapshots.py
-- week_window
+- Store
 - Graph
 - Blue Green Ci: deploygreen
 - Blue Green Ci: promote
@@ -205,51 +205,92 @@
 - Hifz Seam Tests: test_longest_prefix_wins
 - percentile_band
 - SendCtx
-- .test_concatenates_the_ayahs_in_order
-- .search_performers
+- Caching strategy (Redis user state, file_id, wizard draft)
+- File
 - TestIdentity
 - Claude
-- WhatsAppChannel
+- TestTheRest
 - Hifz Seam Tests: TestDispatchCommand
-- _callback
+- httpx
 - .wa_user
 - handle_message
 - ignore_not_modified
 - Graph
-- week_bounds
-- test_whatsapp_config.py
-- exchange
+- test_the_basmala_heading_is_not_part_of_the_question
+- ScheduledSend
+- GroupMemberLink
 - WhatsAppChannel
 - TestSessions
-- milestone_for
+- test_pick_ayah_accepts_anything_with_as_tuple
 - export_web_content.py
-- WhatsAppError
+- _Ratio
 - level_for
 - BismillahBot — Multilingual Support Plan
 - Telegram
-- reset_for_tests
+- pick_ayahs
 - test_hifz_seam.py
-- parse_quran_tafsir
+- test_the_answer_is_not_findable_by_sorting_on_length
 - TestSettings
-- UserSettingsRow
-- PostgresDailyStore
-- t
+- test_sweep_produces_a_well_formed_question_everywhere
+- InMemoryPlanStore
+- bot/whatsapp.py
 - probe
 - for_platform
-- graph
-- TestRunScheduler
-- .has_page_audio
-- sessions
-- TestDailyPost
-- test_reciter_picker.py
-- test_telegram_reader_shows_the_row_to_an_uzbek_user
+- test_options_are_distinct_even_ignoring_vowelling
+- test_scheduler.py
+- test_prompt_is_never_offered_back_as_an_option
+- .get_surah_length
+- quran_progress
+- test_correct_option_really_follows_the_prompt
+- test_both_question_modes_show_up_in_the_sweep
+- test_next_ayah_mode_answers_with_the_whole_short_ayah
+- test_long_ayah_prompt_and_options_stay_button_sized
 - Separate quranayat-miniapp Next.js repo; API in this repo
+- test_next_ayah_prompt_is_truncated_and_says_so
+- test_every_option_carries_the_same_word_count
+- test_same_inputs_give_the_same_question
+- test_a_different_date_gives_a_different_question
 - test_store_contract.py
 - SendCtx
-- TestRegistration
+- test_dates_and_iso_strings_are_interchangeable
+- test_the_global_random_module_is_never_touched
+- test_the_answer_does_not_always_land_in_the_same_slot
+- test_the_first_and_last_ayah_of_the_quran
+- test_muqattaat_get_muqattaat_shaped_distractors
+- test_no_option_carries_a_reference_suffix_or_a_bom
+- test_options_need_no_html_escaping_beyond_the_callers
+- test_pick_then_build_is_the_whole_check_flow
+- test_preload_corpus_returns_the_same_cached_object
+- sweep_refs
+- test_correct_option_is_never_a_length_outlier
+- test_correct_option_is_never_the_extreme_by_a_wide_ratio
+- ask
+- .test_concatenates_the_ayahs_in_order
+- test_hifz_progress.py
+- FakeChannel
+- cache_key
+- milestone_for
+- 6. Phased task breakdown
+- Profile settings reset fix (fix/settings-persistence)
 - domain/tajweed.py
+- run_app.py
+- test_miniapp_links.py
+- _callback
+- 8. Phased task breakdown
+- _search_reciters
+- features/leaderboard.py
+- send_page_audio
+- WhatsAppError
+- SurahProgress
+- 11. Infrastructure, capacity and cost on paid Koyeb
+- user_settings.py
+- test_hifz_cross_platform.py
+- Identity table (platform, external_id → user_id)
 - test_export_web_content.py
-- WhatsApp
+- graph
+- test_short_surahs_still_get_four_distinct_options
+- reset_for_tests
+- TestRegistration
 
 ## God Nodes (most connected - your core abstractions)
 1. `get_store()` - 178 edges
@@ -264,16 +305,16 @@
 10. `File` - 64 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `5. Caching strategy` --references--> `MemoryStore`  [INFERRED]
-  docs/BUSINESS_LOGIC.md → src/infra/redis_client.py
-- `3. Target architecture` --references--> `TranslationRegistry`  [INFERRED]
-  docs/MULTILINGUAL_PLAN.md → src/domain/quran.py
 - `3. Architecture` --references--> `Ctx`  [INFERRED]
   docs/MINI_APP_PLAN.md → src/bot/context.py
+- `5. Caching strategy` --references--> `MemoryStore`  [INFERRED]
+  docs/BUSINESS_LOGIC.md → src/infra/redis_client.py
 - `Phase 3 — Hifz parity` --references--> `build_plan()`  [INFERRED]
   docs/MINI_APP_PLAN.md → src/domain/plan_builder.py
-- `2. Current-state audit (what is hardcoded English)` --references--> `build_data()`  [INFERRED]
-  docs/MULTILINGUAL_PLAN.md → src/app/lifespan.py
+- `Prioritized backlog` --references--> `parse_ayah()`  [INFERRED]
+  docs/BUSINESS_LOGIC.md → src/domain/parsing.py
+- `Translation-only catalogue entries` --references--> `normalize_lang()`  [INFERRED]
+  docs/BUSINESS_LOGIC.md → src/locales/languages.py
 
 ## Import Cycles
 - None detected.
@@ -287,191 +328,191 @@
 - **Thin adapters over a single Python business-logic layer (bot, Mini App API, WhatsApp channel)** — docs_mini_app_plan_service_layer, docs_mini_app_plan_api_v1_surface, docs_multi_platform_plan_channel_interface, docs_business_logic_repository_store [INFERRED 0.85]
 - **Locale integrity enforcement across 48 locales** — scripts_check_locales, docs_hifz_strings_hard_rules, docs_hifz_platform_group_locales, docs_translation_review_review_criteria [INFERRED 0.85]
 
-## Communities (296 total, 124 thin omitted)
+## Communities (337 total, 154 thin omitted)
 
 ### Community 0 - "build_plan"
 Cohesion: 0.05
-Nodes (17): advancing(), auto_pace(), build_plan(), juz_ref(), surah_ref(), to_day_specs(), assert_well_formed(), spans() (+9 more)
+Nodes (21): session(), _advance(), advancing(), build_plan(), next_scheduled_date(), _validated_days(), juz_ref(), surah_ref() (+13 more)
 
 ### Community 1 - "link_token.py"
-Cohesion: 0.19
-Nodes (8): _b64(), InvalidLinkToken, issue(), _key(), redeem(), _secret(), _unb64(), TestToken
+Cohesion: 0.11
+Nodes (11): _b64(), InvalidLinkToken, issue(), _key(), redeem(), _secret(), configured(), exchange() (+3 more)
 
-### Community 2 - "Quran"
-Cohesion: 0.05
-Nodes (20): random_ayah(), read_text(), _consolidations(), Quran, _span_length(), ayah_count(), TestSurahSpans, TestAyahCount (+12 more)
+### Community 2 - ".exists"
+Cohesion: 0.07
+Nodes (12): ayah_for(), _validated(), test_every_entry_is_a_real_ayah(), test_nothing_repeats_within_one_cycle(), test_same_date_same_ayah(), TestEveryParsedRefIsReal, TestExists, TestRandom (+4 more)
 
 ### Community 3 - "deliver_push"
 Cohesion: 0.19
 Nodes (10): deliver_push(), _log(), ctx_for(), say_hi(), test_every_push_is_logged_for_cost_tracking(), TestConsent, TestFreeMode, TestTelegram (+2 more)
 
 ### Community 4 - "Wizard"
-Cohesion: 0.06
-Nodes (9): Wizard, test_draft_is_written_with_that_ttl(), TestAccumulation, TestCancel, TestCoexistsWithTheReciterFlow, TestCorruptState, TestLifecycle, TestOneDraftPerUser (+1 more)
+Cohesion: 0.05
+Nodes (24): Wizard, _callback(), fake_bot(), _message(), _sent_a_verse(), test_a_command_beats_a_pending_reciter_search(), test_a_command_escapes_a_wizard_without_ending_it(), test_a_pending_reciter_search_beats_a_wizard() (+16 more)
 
 ### Community 5 - "lifespan.py"
-Cohesion: 0.05
-Nodes (26): create_app(), _commands_for(), initialize(), lifespan(), _set_bot_commands(), get_default_query_results(), inline_photo_results(), range_audio_url() (+18 more)
+Cohesion: 0.06
+Nodes (21): _commands_for(), initialize(), _set_bot_commands(), app_button(), app_link(), app_row(), app_url(), set_menu_button() (+13 more)
 
 ### Community 6 - "export.py"
-Cohesion: 0.14
-Nodes (12): decode_16k(), mp3_path(), Mp3Info, probe(), to_float(), build_surah(), frames_of(), chunk_bounds() (+4 more)
+Cohesion: 0.09
+Nodes (21): decode_16k(), fetch(), main(), sources(), transcribe(), decode_16k(), mp3_path(), Mp3Info (+13 more)
 
-### Community 7 - "streak.py"
-Cohesion: 0.18
-Nodes (8): _caption(), _keyboard(), on_streak(), _send_graph(), streak(), cache_key(), StreakSummary, TestCacheKey
+### Community 7 - "command"
+Cohesion: 0.11
+Nodes (18): command, Routing rules (in `serve`), 5. API surface (`/api/v1`), Phase 2 — WhatsApp MVP (reader + daily ayat), _is_telegram_id(), link(), unlink(), _caption() (+10 more)
 
 ### Community 8 - "to_whatsapp"
-Cohesion: 0.08
-Nodes (8): _Converter, _render(), split(), to_whatsapp(), _wrap(), TestSplit, TestTags, TestWhatTheBotSends
+Cohesion: 0.17
+Nodes (3): to_whatsapp(), TestTags, TestWhatTheBotSends
 
-### Community 9 - "dispatch.py"
-Cohesion: 0.09
-Nodes (14): handle_incoming(), _incoming(), _on_callback(), _on_text(), _search_reciters(), answer_inline_query(), resolve_settings(), _now() (+6 more)
+### Community 9 - "api/plans.py"
+Cohesion: 0.10
+Nodes (24): parse_ref_or_422(), active(), _build(), complete(), create(), DrillOut, lifecycle(), _plan_out() (+16 more)
 
 ### Community 10 - "Ref"
-Cohesion: 0.06
-Nodes (19): _clip(), _covered(), _focus_surah(), _intersect(), _page_share(), _pages_of(), _recency_key(), _surah_of() (+11 more)
+Cohesion: 0.05
+Nodes (26): _ref_from_draft(), _send_drill(), _translation_text(), _portion_label(), _preview_text(), _clip(), _covered(), _focus_surah() (+18 more)
 
 ### Community 12 - "Wizard"
-Cohesion: 0.08
-Nodes (13): get_store(), _lock(), _CallbackQuery, _ctx(), _Message, _run_wizard(), _Settings, _tap() (+5 more)
+Cohesion: 0.09
+Nodes (11): _CallbackQuery, _ctx(), _Message, _run_wizard(), _Settings, _tap(), TestDrill, TestEnqueueChain (+3 more)
 
 ### Community 13 - "streak_image.py"
-Cohesion: 0.15
-Nodes (7): render(), draw_contribution_graph(), render_streak_graph(), _semaphore(), open_png(), TestRendering, TestRenderStreakGraph
+Cohesion: 0.14
+Nodes (6): draw_contribution_graph(), render_streak_graph(), _semaphore(), open_png(), TestRendering, TestRenderStreakGraph
 
-### Community 14 - "Choice"
+### Community 14 - "Ctx"
 Cohesion: 0.06
-Nodes (48): Ctx, _begin_setup(), _is_group_admin(), _join_board(), on_group_tap(), _save_group_plan(), setup_step(), _step_post_time() (+40 more)
+Nodes (53): Ctx, _score(), _begin_setup(), _chat_id(), _create_topic(), handle_start_payload(), _is_group_admin(), _join_board() (+45 more)
 
 ### Community 15 - "UserSettings"
 Cohesion: 0.11
 Nodes (9): patch_settings(), UserSettings, _seed_legacy_lang(), TestDefaults, TestIndependence, TestInlineCaller, TestKeyedByUserId, TestLegacyMigration (+1 more)
 
 ### Community 16 - "Context"
-Cohesion: 0.13
-Nodes (15): _added_update(), _bot(), _ctx(), _member(), _run_setup_to_plan(), _Settings, TestAdded, TestBoard (+7 more)
+Cohesion: 0.16
+Nodes (13): _bot(), _ctx(), _member(), _run_setup_to_plan(), _Settings, TestBoard, tap(), TestBoardJoin (+5 more)
 
-### Community 17 - "bot/media.py"
-Cohesion: 0.07
-Nodes (14): fetch_and_stitch(), _fit_for_telegram(), _semaphore(), stitch_images(), TestCodes, test_a_week_on_whatsapp_matches_a_week_on_telegram(), _week(), _bot() (+6 more)
+### Community 17 - "test_media_cache_keys.py"
+Cohesion: 0.15
+Nodes (8): _bot(), _next_id(), send_audio(), send_photo(), no_cdn(), _source(), test_a_miss_caches_under_the_key_and_a_hit_replays_it(), test_a_rejected_cached_id_is_rebuilt_and_recached()
 
 ### Community 18 - "parse_reference"
 Cohesion: 0.06
-Nodes (12): _clean(), format_ref(), page_ref(), parse_range(), parse_reference(), plan_target(), TestAcrossSurahs, TestFormatting (+4 more)
+Nodes (12): clamp_to_quran(), _clean(), parse_range(), parse_reference(), TestSurahSpans, TestAcrossSurahs, TestContainsAndClamp, TestFormatting (+4 more)
 
 ### Community 19 - "RedisSingleton"
-Cohesion: 0.06
-Nodes (21): 6. Issues fixed in this refactor, _is_telegram_id(), link(), _code_key(), issue(), redeem(), too_many_tries(), _tries_key() (+13 more)
-
-### Community 20 - "t"
 Cohesion: 0.08
-Nodes (22): memorize(), session(), _ref_from_draft(), _ref_to_draft(), _send_drill(), _start_drill(), _cancel_row(), _custom_days_keyboard() (+14 more)
+Nodes (16): 6. Issues fixed in this refactor, _code_key(), issue(), redeem(), too_many_tries(), _tries_key(), forget(), _key() (+8 more)
+
+### Community 20 - "channels/__init__.py"
+Cohesion: 0.08
+Nodes (14): forgot_command(), on_progress_tap(), progress_command(), progress_view(), _show(), _surah_line(), sajda(), button_rows() (+6 more)
 
 ### Community 21 - "WhatsAppChannel"
-Cohesion: 0.15
-Nodes (4): _bytes_and_name(), _resolve(), _split_choices(), TestMedia
+Cohesion: 0.12
+Nodes (7): _bytes_and_name(), _clip(), _resolve(), _split_choices(), WhatsAppChannel, interactive(), TestMedia
 
-### Community 22 - "group.py"
-Cohesion: 0.06
-Nodes (30): patch_profile(), bot_username(), _chat_id(), _create_topic(), _days_keyboard(), _deep_link(), _enqueue_next_board(), _enqueue_next_group() (+22 more)
+### Community 22 - "features/__init__.py"
+Cohesion: 0.07
+Nodes (25): Phase 3 — One router for everything — *done*, _on_callback(), _on_text(), help_(), start(), _welcome(), on_menu(), show_main_menu() (+17 more)
 
 ### Community 23 - "Hifz Progress Cmd Tests"
-Cohesion: 0.14
-Nodes (12): _CallbackQuery, _ctx(), _edited(), _intervals(), _mark(), _Message, _progress(), _sent() (+4 more)
+Cohesion: 0.13
+Nodes (13): _CallbackQuery, _ctx(), _edited(), _intervals(), _isolate_registries(), _mark(), _Message, _progress() (+5 more)
 
-### Community 24 - "services/plans.py"
-Cohesion: 0.06
-Nodes (40): active(), _build(), complete(), create(), DrillOut, lifecycle(), _plan_out(), PlanCreateIn (+32 more)
+### Community 24 - "group.py"
+Cohesion: 0.05
+Nodes (34): 1. Why, bot_username(), _deep_link(), _enqueue_next_board(), _enqueue_next_group(), group_board_entries(), on_my_chat_member(), post_board() (+26 more)
 
 ### Community 25 - "Refactor — Implementation Plan"
 Cohesion: 0.08
-Nodes (25): graphify knowledge graph (graphify-out/), CLAUDE.md graphify lookup rules, 10. Found along the way (out of scope — behaviour changes), 2. Goals and non-goals, 3. Principles applied, 6. Ordering, risk, size, 7. Safety net, 8. Expected result (+17 more)
+Nodes (25): graphify knowledge graph (graphify-out/), CLAUDE.md graphify lookup rules, 10. Found along the way (out of scope — behaviour changes), 11.2 Timezone picker by country — `feat/timezone-by-country`, 11. User-reported problems, 2. Goals and non-goals, 3. Principles applied, 6. Ordering, risk, size (+17 more)
 
 ### Community 26 - "TelegramChannel"
 Cohesion: 0.08
 Nodes (10): TelegramChannel, bot(), cache(), test_whatsapp_dressing_is_dropped(), TestAnswerAndTyping, TestChoice, TestEditChoices, TestEditText (+2 more)
 
 ### Community 27 - "test_hifz_streak.py"
-Cohesion: 0.14
-Nodes (11): _caption(), _ctx(), _earn(), _photo_message(), _Settings, _streak(), TestCallback, TestGraphCache (+3 more)
+Cohesion: 0.24
+Nodes (5): _caption(), _earn(), _streak(), TestMilestones, TestStreakCard
 
 ### Community 28 - "Hifz Platform - Plan & Progress"
-Cohesion: 0.09
-Nodes (20): Hifz Platform - Plan & Progress, Phase 1 acceptance criteria (tests/test_acceptance.py), Hifz change log, claim_due claimed_at clock bug, Hifz data model (user_profile, hifz_interval, plan, plan_day, session_log, scheduled_send, group_*), Phase 2 group cluster (J1-J6, forum topics), Workstream I: i18n & commands for 48 locales, Workstream C: interval merge-on-insert + derived percentages (+12 more)
+Cohesion: 0.07
+Nodes (28): Hifz Platform - Plan & Progress, Phase 1 acceptance criteria (tests/test_acceptance.py), Hifz change log, claim_due claimed_at clock bug, Hifz data model (user_profile, hifz_interval, plan, plan_day, session_log, scheduled_send, group_*), Phase 2 group cluster (J1-J6, forum topics), Workstream I: i18n & commands for 48 locales, Workstream C: interval merge-on-insert + derived percentages (+20 more)
 
 ### Community 29 - "Acceptance Tests"
 Cohesion: 0.09
 Nodes (15): _CallbackQuery, _cmd(), _ctx(), _isolate_registries(), _Message, _run_wizard(), _save_plan(), _Settings (+7 more)
 
-### Community 30 - "html"
-Cohesion: 0.18
-Nodes (8): surah_name(), _translation_text(), forgot_command(), on_progress_tap(), progress_command(), progress_view(), _show(), _surah_line()
+### Community 30 - "features/check.py"
+Cohesion: 0.20
+Nodes (6): _answer_data(), _ask(), check(), on_check(), _options_keyboard(), _question_text()
 
 ### Community 31 - "Docker Compose.stress"
 Cohesion: 0.06
 Nodes (33): build, container_name, cpus, depends_on, env_file, environment, mem_limit, mem_swappiness (+25 more)
 
 ### Community 33 - "test_recall_check.py"
-Cohesion: 0.03
-Nodes (28): swept(), test_a_different_date_gives_a_different_question(), test_both_question_modes_show_up_in_the_sweep(), test_correct_option_is_never_a_length_outlier(), test_correct_option_is_never_the_extreme_by_a_wide_ratio(), test_correct_option_really_follows_the_prompt(), test_dates_and_iso_strings_are_interchangeable(), test_every_option_carries_the_same_word_count() (+20 more)
+Cohesion: 0.18
+Nodes (3): test_pick_ayah_is_deterministic_per_user_and_date(), test_pick_ayah_on_an_inverted_or_empty_span(), test_unknown_ayahs_are_rejected()
 
 ### Community 34 - "stats.py"
-Cohesion: 0.35
-Nodes (8): BoardEntry, BoardMe, DayCount, leaderboard(), LeaderboardOut, MilestoneOut, streak(), StreakOut
+Cohesion: 0.18
+Nodes (10): BoardEntry, BoardMe, DayCount, leaderboard(), LeaderboardOut, MilestoneOut, streak(), StreakOut (+2 more)
 
 ### Community 35 - "infra/uz_audio.py"
-Cohesion: 0.15
-Nodes (11): byte_range(), part_key(), entry(), estimated(), Part, parts(), seconds(), size() (+3 more)
+Cohesion: 0.11
+Nodes (13): byte_range(), entry(), estimated(), Part, parts(), reset_for_tests(), seconds(), size() (+5 more)
 
 ### Community 36 - "_ctx"
 Cohesion: 0.08
 Nodes (17): _buttons(), _callback_data(), _CallbackQuery, _ctx(), _edited(), _isolate_registries(), _Message, _profile_row() (+9 more)
 
 ### Community 37 - "Recitation Checker Investigation"
-Cohesion: 0.07
-Nodes (29): 0.1 Decision (2026-10-27), 0. Bottom line up front, 10. Phased roadmap, 11.1 Relevant Koyeb prices, 11.2 Assumptions, 11.3 Capacity by scenario, 11.4 Monthly cost, 11.5 Cost guards (+21 more)
+Cohesion: 0.09
+Nodes (23): 0.1 Decision (2026-10-27), 0. Bottom line up front, 10. Phased roadmap, 1. Terminology (so the report language is right), 2. What "correct" can mean — error taxonomy, 3.1 Commercial, 3.2 Open models and data, 3.3 Reference *text* per riwāyah (+15 more)
 
 ### Community 38 - "round_percent"
-Cohesion: 0.08
-Nodes (5): format_percent(), PageProgress, _Ratio, round_percent(), TestRounding
+Cohesion: 0.13
+Nodes (4): format_percent(), PageProgress, round_percent(), TestRounding
 
-### Community 39 - "test_dispatch_order.py"
-Cohesion: 0.24
-Nodes (15): _callback(), fake_bot(), _message(), _sent_a_verse(), test_a_command_beats_a_pending_reciter_search(), test_a_command_escapes_a_wizard_without_ending_it(), test_a_pending_reciter_search_beats_a_wizard(), test_a_wizard_beats_the_reference_parser() (+7 more)
+### Community 39 - "tajweed_lessons.py"
+Cohesion: 0.12
+Nodes (22): _listen(), _unit(), _unit_track(), examples(), audio_lesson(), audio_lessons(), audio_text(), audio_units() (+14 more)
 
 ### Community 40 - "test_uz_audio_feature.py"
-Cohesion: 0.10
-Nodes (19): _baqarah(), _data(), _fatiha(), fetched(), _patch_client(), client(), table(), test_api_send_runs_the_bot_feature() (+11 more)
+Cohesion: 0.09
+Nodes (20): _baqarah(), _data(), _fatiha(), fetched(), _patch_client(), client(), table(), test_api_send_runs_the_bot_feature() (+12 more)
 
 ### Community 41 - "TranslationRegistry"
 Cohesion: 0.08
-Nodes (9): 12. Testing, parse_quran(), TranslationRegistry, TestCorpusIntegrity, _nfc(), test_the_basmala_heading_is_not_part_of_the_question(), TestAvailable, TestCaching (+1 more)
+Nodes (8): 10. File-by-file change list, 3. Target architecture, TranslationRegistry, TestCorpusIntegrity, TestAvailable, TestCaching, TestFallback, TestTransliteration
 
 ### Community 42 - "PostgresPlanStore"
-Cohesion: 0.06
-Nodes (4): PlanDayRow, PlanRow, PlanStore, PostgresPlanStore
+Cohesion: 0.09
+Nodes (3): PlanDayRow, PlanRow, PlanStore
 
 ### Community 43 - "to_markup"
-Cohesion: 0.19
-Nodes (5): verse_keyboard(), to_markup(), TestToMarkup, _button(), TestVerseKeyboard
+Cohesion: 0.12
+Nodes (12): page_keyboard(), verse_keyboard(), to_button(), to_markup(), TestToMarkup, test_cards_and_drill_link_to_their_screens(), test_inline_messages_never_get_a_web_app_button(), test_off_by_default() (+4 more)
 
-### Community 44 - "handle_update"
-Cohesion: 0.20
-Nodes (7): reference(), _inline_query(), _of_type(), _results(), TestInlineArabicImage, TestRangeAudio, TestRangeText
+### Community 44 - "build_question"
+Cohesion: 0.25
+Nodes (6): build_question(), _answer_data(), _sessions(), _tap(), TestScoring, TestStaleButtons
 
 ### Community 45 - "Streaks"
-Cohesion: 0.13
-Nodes (4): record_session(), TestFiveAndSixTheBoard, TestThreeTheStreak, TestRecordSession
+Cohesion: 0.09
+Nodes (9): get_store(), _lock(), record_session(), TestFiveAndSixTheBoard, TestThreeTheStreak, _added_update(), TestAdded, TestDailyPost (+1 more)
 
 ### Community 47 - "Four multilingual dimensions (UI, translation, tafsir, audio)"
-Cohesion: 0.13
-Nodes (14): Four multilingual dimensions (UI, translation, tafsir, audio), Per-user language preference (lang:{chat_id}, detect from language_code, /language), locales/ tables + t(key, lang) with English fallback, Multilingual phased roadmap (UI i18n -> translations -> polish -> content depth), Quran.from_file(path) refactor, setMyCommands per language, TafsirRegistry with fallback to en, tanzil.net translation catalogue (+6 more)
+Cohesion: 0.11
+Nodes (18): Four multilingual dimensions (UI, translation, tafsir, audio), Per-user language preference (lang:{chat_id}, detect from language_code, /language), locales/ tables + t(key, lang) with English fallback, Multilingual phased roadmap (UI i18n -> translations -> polish -> content depth), Quran.from_file(path) refactor, setMyCommands per language, TafsirRegistry with fallback to en, tanzil.net translation catalogue (+10 more)
 
 ### Community 48 - "Phase 1 — Take `main.py` apart (pure moves) — *done*"
-Cohesion: 0.08
-Nodes (17): 1. Why, 5. Phases, Phase 0 — Guardrails (no code moves) — *done*, Phase 1 — Take `main.py` apart (pure moves) — *done*, Phase 4 — Split infrastructure god-objects — *done*, Phase 5 — Fix the layering — *done*, Phase 6 — Repository hygiene — *done*, _post_portion() (+9 more)
+Cohesion: 0.11
+Nodes (6): reciter_set_confirmation(), reciter_catalog(), reciter_kind(), TestCatalogKinds, TestCatalogOrder, TestKindWarnings
 
 ### Community 49 - "Schema"
 Cohesion: 0.10
@@ -482,96 +523,92 @@ Cohesion: 0.15
 Nodes (20): client(), _jwt_secret(), _login(), test_bare_check_falls_back_to_juz_30(), test_cannot_complete_someone_elses_portion(), test_catalogs(), test_drill_in_app_and_chat_logs_one_session(), test_lifecycle_and_today() (+12 more)
 
 ### Community 51 - "test_tajweed_lessons.py"
-Cohesion: 0.19
-Nodes (13): on_tajweed(), tajvid(), test_without_the_audio_base_url_there_is_nothing_yet(), _buttons(), _ctx(), reviewers(), test_bad_callbacks_are_only_acknowledged(), test_editing_a_lesson_sends_it_back_to_draft() (+5 more)
+Cohesion: 0.11
+Nodes (19): tajvid(), _case(), to_cyrillic(), to_latin(), _word_to_cyr(), test_cyrillic_titles_round_trip(), _buttons(), _ctx() (+11 more)
 
-### Community 52 - "features/check.py"
-Cohesion: 0.09
-Nodes (15): _answer_data(), _ask(), check(), on_check(), _options_keyboard(), _parse_answer(), _question_text(), _score() (+7 more)
+### Community 52 - "services/check.py"
+Cohesion: 0.22
+Nodes (3): RecallQuestion, Score, score()
 
 ### Community 53 - "api/progress.py"
-Cohesion: 0.08
-Nodes (33): require_user(), answer(), AnswerIn, AnswerOut, make_token(), question(), QuestionOut, read_token() (+25 more)
+Cohesion: 0.07
+Nodes (35): Phase 5 — Fix the layering — *done*, answer(), AnswerIn, AnswerOut, make_token(), question(), QuestionOut, read_token() (+27 more)
 
 ### Community 54 - "fixture"
-Cohesion: 0.06
-Nodes (34): _clean_state_store(), build_data(), make_index(), data(), _jwt_secret(), data(), data(), data() (+26 more)
+Cohesion: 0.07
+Nodes (30): _clean_state_store(), build_data(), make_index(), data(), data(), data(), data(), _isolate_registries() (+22 more)
 
-### Community 55 - "InMemoryGroupStore"
-Cohesion: 0.06
-Nodes (6): GroupConfig, GroupMemberLink, GroupPlanDayRow, GroupPlanRow, GroupStore, InMemoryGroupStore
+### Community 55 - "GroupStore"
+Cohesion: 0.12
+Nodes (3): GroupConfig, GroupPlanRow, GroupStore
 
-### Community 56 - "deliver_quran"
-Cohesion: 0.08
-Nodes (16): inline_audio_result(), combined_audio_key(), deliver_combined_audio(), stitch(), deliver_quran(), deliver_repeated_audio(), stitch(), ref_key() (+8 more)
+### Community 56 - "dispatch.py"
+Cohesion: 0.05
+Nodes (23): answer_inline_query(), inline_audio_result(), inline_photo_results(), reciter_page_of(), combined_audio_key(), deliver_combined_audio(), stitch(), deliver_quran() (+15 more)
 
 ### Community 57 - "whatsapp_setup.py"
-Cohesion: 0.15
-Nodes (12): automation(), _bot_api(), Graph, main(), profile(), _show(), status(), telegram() (+4 more)
+Cohesion: 0.10
+Nodes (16): main(), score(), automation(), Graph, main(), profile(), _show(), status() (+8 more)
 
 ### Community 58 - "os"
 Cohesion: 0.11
 Nodes (18): export(), languages(), main(), resolved_table(), _write(), build(), main_(), _absolute_imports() (+10 more)
 
 ### Community 59 - "store/__init__.py"
-Cohesion: 0.14
-Nodes (6): Milestone, offset_of(), StreakCounts, MemoryState, user_offset(), state()
+Cohesion: 0.06
+Nodes (14): Incoming, Milestone, offset_of(), DailyStore, DailySubRow, InMemoryDailyStore, LeaderboardEntry, MemoryState (+6 more)
 
 ### Community 60 - "surah_progress"
-Cohesion: 0.11
-Nodes (7): juz_progress(), JuzProgress, quran_progress(), _spans(), started_juzs(), TestJuzProgress, TestQuranProgress
-
-### Community 61 - "reciter_group"
-Cohesion: 0.39
-Nodes (3): reciter_page_of(), reciter_group(), TestCurrentReciter
+Cohesion: 0.18
+Nodes (4): juz_progress(), JuzProgress, started_juzs(), TestJuzProgress
 
 ### Community 62 - ".test_full_flow_queues_the_first_send"
 Cohesion: 0.22
 Nodes (8): _buttons(), _message(), _send_ctx(), _tap(), TestTelegramDelivery, TestTelegramSetup, _texts(), tg_bot()
 
 ### Community 63 - "Mini App Plan"
-Cohesion: 0.08
-Nodes (25): 10. Risks, 11. Decisions (resolved 2026-10-20), 12. Change log, 1. Scope, 2. Decisions (confirmed 2026-10-20), 3. Architecture, 4.1 Flow, 4.2 Rules (+17 more)
-
-### Community 64 - "local_date"
 Cohesion: 0.14
-Nodes (8): _as_utc(), local_date(), local_now(), local_time(), next_due_utc(), TestLocalDate, TestNextDueUtc, _utc()
+Nodes (14): 10. Risks, 11. Decisions (resolved 2026-10-20), 12. Change log, 1. Scope, 2. Decisions (confirmed 2026-10-20), 3. Architecture, 6. Frontend structure (`quranayat-miniapp`), 7. Bot ↔ Mini App integration (+6 more)
 
-### Community 65 - ".page_range"
-Cohesion: 0.10
-Nodes (9): juz(), page(), reader_position(), deliver_page(), source(), stitch(), page_caption(), test_page_boundaries_match_the_bot() (+1 more)
+### Community 64 - ".page_range"
+Cohesion: 0.13
+Nodes (4): source(), stitch(), test_page_boundaries_match_the_bot(), TestDivisionsTileTheQuran
+
+### Community 65 - "reader.py"
+Cohesion: 0.09
+Nodes (19): on_uz_audio(), juz(), page(), page_audio(), turn_page(), random_ayah(), read_text(), reader_position() (+11 more)
 
 ### Community 67 - "summarize"
-Cohesion: 0.05
-Nodes (13): Progress, ProgressSummary, started_surahs(), summarize(), surah_progress(), SurahProgress, load_summary(), _at() (+5 more)
+Cohesion: 0.12
+Nodes (3): Progress, summarize(), TestSummarize
 
 ### Community 68 - "InMemoryStore"
-Cohesion: 0.08
-Nodes (8): InMemoryDailyStore, InMemoryStore, InMemoryPlanStore, store(), store(), store(), store(), store()
+Cohesion: 0.17
+Nodes (6): InMemoryStore, store(), store(), store(), store(), store()
 
-### Community 69 - "features/daily.py"
-Cohesion: 0.12
-Nodes (18): _ask_time(), daily(), _enable(), _hhmm(), _offset(), on_tap(), _parse_time(), session() (+10 more)
+### Community 69 - ".reply"
+Cohesion: 0.15
+Nodes (12): _ask_time(), daily(), _enable(), _hhmm(), _offset(), on_tap(), _parse_time(), _send_today() (+4 more)
 
-### Community 70 - "PostgresScheduleStore"
-Cohesion: 0.10
-Nodes (3): PostgresStore, PostgresScheduleStore, PostgresSessionStore
+### Community 71 - "surah_progress"
+Cohesion: 0.13
+Nodes (5): _spans(), started_surahs(), surah_progress(), TestInputHandling, TestSurahProgress
 
 ### Community 72 - "Hifz Seam Tests"
 Cohesion: 0.16
 Nodes (3): _ctx(), TestCtx, TestDispatchWizard
 
 ### Community 73 - "session.py"
-Cohesion: 0.15
-Nodes (20): init_data_max_age(), jwt_secret(), auth_link(), auth_telegram(), AuthOut, LinkAuthIn, me(), _me() (+12 more)
+Cohesion: 0.06
+Nodes (39): init_data_max_age(), jwt_secret(), require_user(), _unauthorized(), get_position(), _lang(), LanguageOut, languages() (+31 more)
 
-### Community 74 - "parse_offset"
-Cohesion: 0.10
-Nodes (5): format_offset(), parse_offset(), TestFormatOffset, TestParseOffset, TestPicker
+### Community 74 - "next_due_utc"
+Cohesion: 0.06
+Nodes (12): _as_utc(), format_offset(), local_now(), local_time(), next_due_utc(), parse_offset(), TestFormatOffset, TestLocalDate (+4 more)
 
 ### Community 75 - "InMemoryTajweedStore"
-Cohesion: 0.09
-Nodes (4): ApprovalRow, InMemoryTajweedStore, PostgresTajweedStore, TajweedStore
+Cohesion: 0.11
+Nodes (3): ApprovalRow, PostgresTajweedStore, TajweedStore
 
 ### Community 76 - "SendCtx"
 Cohesion: 0.13
@@ -579,111 +616,111 @@ Nodes (12): catch_up(), run_scheduler(), _wait(), _deliver(), _is_stale(), _lock
 
 ### Community 77 - "quran_page_progress"
 Cohesion: 0.11
-Nodes (4): juz_page_progress(), quran_page_progress(), TestPageProgress, _whole_quran_spans()
+Nodes (3): juz_page_progress(), TestPageProgress, _whole_quran_spans()
 
-### Community 78 - "bundle_translations.py"
-Cohesion: 0.22
-Nodes (7): bundle_one(), fetch_edition(), main(), to_lines(), transliterate_uz(), write_attributions(), write_file()
+### Community 78 - "sys"
+Cohesion: 0.09
+Nodes (16): bundle_one(), fetch_edition(), main(), to_lines(), transliterate_uz(), write_attributions(), write_file(), square() (+8 more)
 
 ### Community 79 - "Recitation Checker Investigation: RECITATION_CHECKER_INVESTIGATIONmd"
-Cohesion: 0.12
-Nodes (18): Audio catalog kinds, Translation-only catalogue entries (UI_LANGUAGES vs LANGUAGES), Phase 4 — Recitation checker UI, Mini App phased task breakdown (Phases 0-5), Word alignment (Needleman-Wunsch) with confidence gating, Riwayah divergence table (closed-set check at farsh points), Error taxonomy L1-L5 (word, harakah, tajwid, riwayah mismatch, waqf), Evaluation plan (false-alarm gate < 2% per ayah) (+10 more)
+Cohesion: 0.11
+Nodes (20): Audio catalog kinds, Repeat (memorization), Translation-only catalogue entries (UI_LANGUAGES vs LANGUAGES), Mini App feature parity map, Phase 4 — Recitation checker UI, Mini App phased task breakdown (Phases 0-5), Word alignment (Needleman-Wunsch) with confidence gating, Riwayah divergence table (closed-set check at farsh points) (+12 more)
 
-### Community 80 - "json"
-Cohesion: 0.13
-Nodes (11): _load(), test_every_ui_language_is_exported_resolved_like_t(), test_languages_catalogue_carries_rtl(), _as_dict(), _ctx(), _Settings, _static_cases(), test_hifz_keyboards_match_their_snapshots() (+3 more)
+### Community 80 - "re"
+Cohesion: 0.16
+Nodes (12): duration(), _id3_size(), main(), _modules(), test_nothing_builds_telegram_markup_by_hand_outside_those_modules(), test_only_group_code_reads_the_telegram_client(), test_only_telegram_only_modules_import_telegram(), _ids_with_text() (+4 more)
 
 ### Community 81 - "._send_media"
 Cohesion: 0.15
 Nodes (4): _build(), _send(), send_cached(), build()
 
 ### Community 83 - "InMemorySessionStore"
-Cohesion: 0.09
-Nodes (5): InMemorySessionStore, LeaderboardEntry, SessionRow, SessionStore, WeeklyBoard
+Cohesion: 0.10
+Nodes (3): InMemorySessionStore, SessionRow, SessionStore
 
 ### Community 84 - "Scheduler Tests"
 Cohesion: 0.17
 Nodes (4): _claimed_at(), _record(), TestCatchUp, TestTick
 
-### Community 85 - "routes/whatsapp.py"
-Cohesion: 0.12
-Nodes (10): _process_update(), telegram_webhook(), _first_delivery(), messages_of(), _process(), receive(), signature(), verify() (+2 more)
-
-### Community 87 - "tajweed_lessons.py"
-Cohesion: 0.18
-Nodes (18): _listen(), _unit(), _unit_track(), audio_lesson(), audio_lessons(), audio_units(), audio_url(), AudioLesson (+10 more)
+### Community 87 - "streak_summary"
+Cohesion: 0.25
+Nodes (4): refresh_streaks(), streak_summary(), user_today(), TestRefreshAndSummary
 
 ### Community 88 - "main.py"
-Cohesion: 0.11
-Nodes (3): privacy(), setup_logging(), test_http_client_request_urls_are_never_logged()
+Cohesion: 0.07
+Nodes (6): privacy(), webhook_secret(), setup_logging(), test_http_client_request_urls_are_never_logged(), test_the_secret_does_not_reveal_the_token(), test_webhook_acks_before_initialization()
 
 ### Community 89 - "test_api_auth.py"
-Cohesion: 0.17
-Nodes (20): _init_data_secret(), InvalidInitData, sign_init_data(), validate_init_data(), _auth(), _fields(), test_added_field_is_rejected(), test_auth_drops_malformed_start_param() (+12 more)
+Cohesion: 0.10
+Nodes (33): _b64url(), _b64url_decode(), decode_token(), _init_data_secret(), InvalidInitData, InvalidToken, issue_token(), _sign() (+25 more)
 
 ### Community 91 - "Multi Platform Plan: MultiPlatform Implementation Plan"
-Cohesion: 0.08
-Nodes (24): 10. Other platforms — shortlist for Phase 6, 11. Open decisions (needed before Phase 1), 12. Change log, 1. Scope, 2. Decisions (proposed — confirm before Phase 1), 3. Architecture, 4. WhatsApp constraints that shape the design, 5. Data model changes (`src/common/schema.sql`) (+16 more)
+Cohesion: 0.12
+Nodes (17): 10. Other platforms — shortlist for Phase 6, 11. Open decisions (needed before Phase 1), 12. Change log, 1. Scope, 2. Decisions (proposed — confirm before Phase 1), 3. Architecture, 4. WhatsApp constraints that shape the design, 5. Data model changes (`src/common/schema.sql`) (+9 more)
 
-### Community 92 - "test_inline_reciter_search.py"
-Cohesion: 0.10
-Nodes (36): handle_update(), _callback(), fake_bot(), _message(), test_about_uses_html(), test_group_chats_are_ignored(), test_index_sends_surah_index(), test_inline_query_valid_ayah_returns_all_four_views() (+28 more)
+### Community 92 - "handle_update"
+Cohesion: 0.20
+Nodes (9): handle_update(), fake_bot(), _inline_query(), _of_type(), _results(), TestInlineArabicImage, TestRangeAudio, TestRangeText (+1 more)
 
 ### Community 93 - "_hifz"
 Cohesion: 0.07
-Nodes (10): _assert_invariant(), _ayahs(), _hifz(), _spans(), test_a_random_walk_never_leaks_across_users(), test_any_sequence_of_marks_and_removals_keeps_the_invariant(), test_intervals_from_many_surahs_come_back_in_mushaf_order(), TestAddInterval (+2 more)
+Nodes (11): HifzInterval, _assert_invariant(), _ayahs(), _hifz(), _spans(), test_a_random_walk_never_leaks_across_users(), test_any_sequence_of_marks_and_removals_keeps_the_invariant(), test_intervals_from_many_surahs_come_back_in_mushaf_order() (+3 more)
 
 ### Community 95 - "test_whatsapp_router.py"
 Cohesion: 0.19
 Nodes (8): bodies(), fixture_message(), known_user(), rows(), tap(), TestBoundaries, TestMenu, TestStarters
 
 ### Community 97 - "test_hifz_check.py"
-Cohesion: 0.08
-Nodes (18): refresh_streaks(), streak_summary(), user_today(), _answer_data(), _AnyDay, _ask(), _asked(), _buttons() (+10 more)
+Cohesion: 0.14
+Nodes (10): _parse_answer(), _AnyDay, _ask(), _asked(), _buttons(), _callback_query(), _ctx(), _Settings (+2 more)
 
 ### Community 99 - "_message"
 Cohesion: 0.11
 Nodes (9): data(), fake_bot(), _message(), _no_network(), TestCommandArguments, TestJuzCommand, TestPageCommand, TestSajdaCommand (+1 more)
 
-### Community 101 - "File"
+### Community 100 - "GraphClient"
 Cohesion: 0.10
-Nodes (5): File, TestAudioFilename, TestImageFilename, TestLegacyLanguageKey, TestStateStore
+Nodes (3): GraphClient, test_without_consent_whatsapp_gets_no_reminders(), WhatsApp
+
+### Community 101 - "test_inline_reciter_search.py"
+Cohesion: 0.17
+Nodes (16): _audio_result(), _inline_callback(), _inline_query(), test_ayah_audio_dropped_for_unknown_reciter(), test_ayah_audio_dropped_without_public_base_url(), test_ayah_audio_uses_callers_reciter(), test_ayah_query_is_personal_and_briefly_cached(), test_ayah_query_returns_translation_tafsir_audio_and_image() (+8 more)
 
 ### Community 103 - "api/uz_audio.py"
-Cohesion: 0.29
-Nodes (6): send(), SendIn, SendOut, available(), send_to_user(), valid_clip()
+Cohesion: 0.27
+Nodes (6): send(), SendIn, SendOut, parse(), available(), valid_clip()
 
 ### Community 104 - "recall_check.py"
-Cohesion: 0.06
-Nodes (28): _assemble(), _at_offset(), _ayah_text(), _basmala_prefix(), build_question(), _clean(), _continuation_question(), corpus() (+20 more)
+Cohesion: 0.11
+Nodes (15): _assemble(), _continuation_question(), display_length(), _distinct(), _everything(), _gather(), is_similar_length(), _key() (+7 more)
 
 ### Community 105 - "button_action"
-Cohesion: 0.07
-Nodes (12): main(), button_action(), keyboard_rows(), missing_keys(), missing_locales(), welcome_text(), _placeholders(), TestButtonAction (+4 more)
+Cohesion: 0.05
+Nodes (17): main(), placeholders(), button_action(), command_lines(), keyboard_rows(), _load_locales(), missing_keys(), missing_locales() (+9 more)
 
 ### Community 106 - "test_tajweed_audio.py"
-Cohesion: 0.15
-Nodes (15): _buttons(), client(), _ctx(), env(), _labels(), _login(), test_api_refuses_unknown_and_draft_lessons(), test_api_state_and_done() (+7 more)
+Cohesion: 0.13
+Nodes (18): on_tajweed(), _buttons(), client(), _ctx(), env(), _labels(), _login(), sessions() (+10 more)
 
 ### Community 107 - "debug.py"
-Cohesion: 0.27
-Nodes (16): quiet_mask(), cmd_clip(), cmd_nudge(), cmd_purge(), cmd_report(), cmd_set(), cmd_show(), cmd_smoke() (+8 more)
+Cohesion: 0.31
+Nodes (16): read_json(), cmd_clip(), cmd_nudge(), cmd_purge(), cmd_report(), cmd_set(), cmd_show(), cmd_smoke() (+8 more)
 
 ### Community 109 - "asyncio"
-Cohesion: 0.10
-Nodes (14): batch(), message_update(), random_text(), _container_alive(), _docker_stats(), _fire_one(), main(), _mem_to_mb() (+6 more)
+Cohesion: 0.15
+Nodes (12): batch(), message_update(), random_text(), _container_alive(), _docker_stats(), _fire_one(), main(), _mem_to_mb() (+4 more)
 
 ### Community 110 - "BismillahBot — Business Logic"
-Cohesion: 0.11
-Nodes (17): 1. Overview, 2. Architecture, 3. Request lifecycle, 5. Caching strategy, 7. Known limitations / tech debt, 8. Future roadmap, 9. The hifz platform, BismillahBot — Business Logic (+9 more)
+Cohesion: 0.14
+Nodes (14): 1. Overview, 2. Architecture, 3. Request lifecycle, 5. Caching strategy, 8. Future roadmap, 9. The hifz platform, BismillahBot — Business Logic, Local time (+6 more)
 
 ### Community 111 - "handlers/settings.py"
 Cohesion: 0.09
-Nodes (16): 7. The keyboard & command localization challenge, Telegram command menu, Phase 2 — DRY the duplicated patterns — *done*, language(), set_translation_language(), set_ui_language(), show_languages(), translation() (+8 more)
+Nodes (18): 7. The keyboard & command localization challenge, Telegram command menu, Phase 2 — DRY the duplicated patterns — *done*, set_translation_language(), set_ui_language(), show_languages(), translation(), _ui_picker() (+10 more)
 
 ### Community 113 - "offset_keyboard"
-Cohesion: 0.28
-Nodes (8): offset_keyboard(), offset_options(), _grid(), test_a_label_prefix_changes_only_the_label(), test_cancel_data_adds_a_localized_cancel_row(), test_every_offset_is_offered_in_order_under_the_callers_prefix(), test_no_cancel_row_unless_asked(), test_rows_are_columns_wide()
+Cohesion: 0.18
+Nodes (13): offset_keyboard(), _as_dict(), _ctx(), _Settings, _static_cases(), test_hifz_keyboards_match_their_snapshots(), _view_cases(), _grid() (+5 more)
 
 ### Community 114 - "post"
 Cohesion: 0.11
@@ -701,33 +738,33 @@ Nodes (13): concurrency, cancel-in-progress, group, env, PYTHON_DEFAULT, name, o
 Cohesion: 0.23
 Nodes (14): steps, steps, steps, steps, steps, steps, steps, env (+6 more)
 
-### Community 118 - "scheduler/__init__.py"
-Cohesion: 0.09
-Nodes (7): enqueue(), idempotency_key(), schedule_daily(), register_send_handler(), registered_kinds(), _same_origin(), ScheduledSend
+### Community 118 - "whatsapp_format.py"
+Cohesion: 0.20
+Nodes (3): _Converter, _render(), _wrap()
 
 ### Community 121 - "test_store_selection.py"
-Cohesion: 0.13
-Nodes (8): database_url(), fast_retries(), fresh_redis(), _Reachable, strict(), TestStrictByDefault, from_url(), _Unreachable
+Cohesion: 0.16
+Nodes (5): fresh_redis(), _Reachable, TestStrictByDefault, from_url(), _Unreachable
 
 ### Community 122 - "compute_streak"
-Cohesion: 0.24
+Cohesion: 0.21
 Nodes (3): compute_streak(), days_back(), TestComputeStreak
 
-### Community 123 - "Hifz platform frozen string manifest"
-Cohesion: 0.22
-Nodes (8): Hifz platform frozen string manifest, src/locales/en.py source of truth, Key conventions (btn_*, cmd_*), Wave process (feature agents, translation agents, reviewers), Native-speaker review - hifz platform strings, Locale review tracking table (47 locales), Review process steps, Review criteria (meaning, register, grammatical number, RTL, button length)
+### Community 123 - "corpus"
+Cohesion: 0.18
+Nodes (6): _ayah_text(), _basmala_prefix(), _clean(), corpus(), _option_from(), _words()
 
 ### Community 124 - "_align"
-Cohesion: 0.10
-Nodes (18): align(), _align(), containment(), load_pins(), main(), onset_cut(), quiet_runs(), skeleton() (+10 more)
+Cohesion: 0.12
+Nodes (14): align(), _align(), containment(), load_pins(), main(), onset_cut(), quiet_mask(), quiet_runs() (+6 more)
 
 ### Community 125 - "build_grid"
 Cohesion: 0.18
 Nodes (4): build_grid(), _counts(), Grid, TestGrid
 
 ### Community 126 - "PostgresHifzStore"
-Cohesion: 0.06
-Nodes (11): _covers(), HifzInterval, HifzStore, InMemoryHifzStore, _merge_span(), _normalize(), _overlaps(), PostgresHifzStore (+3 more)
+Cohesion: 0.07
+Nodes (9): _covers(), InMemoryHifzStore, _merge_span(), _normalize(), _overlaps(), PostgresHifzStore, _split_span(), _touches() (+1 more)
 
 ### Community 127 - "Blue Green Ci: jobs"
 Cohesion: 0.15
@@ -737,81 +774,85 @@ Nodes (13): name, needs, runs-on, jobs, build, lint, rollback, name (+5 more)
 Cohesion: 0.15
 Nodes (13): with, cache, cache-dependency-path, cache-from, cache-to, context, if-no-files-found, load (+5 more)
 
-### Community 131 - "time"
-Cohesion: 0.18
-Nodes (12): _b64url(), _b64url_decode(), decode_token(), InvalidToken, issue_token(), _sign(), _unauthorized(), test_expired_token_is_rejected() (+4 more)
+### Community 129 - "test_handle_update.py"
+Cohesion: 0.17
+Nodes (17): _callback(), fake_bot(), _message(), test_about_uses_html(), test_group_chats_are_ignored(), test_index_sends_surah_index(), test_inline_query_valid_ayah_returns_all_four_views(), test_language_shows_inline_keyboard() (+9 more)
 
-### Community 132 - "weekly_board"
-Cohesion: 0.28
-Nodes (3): weekly_board(), make_user(), TestWeeklyBoard
-
-### Community 135 - "TestPickerFlow"
+### Community 131 - "TestPickerFlow"
 Cohesion: 0.16
 Nodes (5): _callback(), _message(), _tab_row(), TestAudioNeverFollowsLanguage, TestPickerFlow
+
+### Community 132 - "send_repeated_audio"
+Cohesion: 0.26
+Nodes (3): send_repeated_audio(), _stub_audio(), TestRepeatForMemorization
+
+### Community 135 - "PostgresStore"
+Cohesion: 0.12
+Nodes (3): PostgresDailyStore, PostgresStore, PostgresSessionStore
 
 ### Community 136 - "reciter_keyboard"
 Cohesion: 0.15
 Nodes (7): reciter_keyboard(), reciter_label(), reciter_page_count(), _pager_row(), _reciter_buttons(), TestLabels, TestPagination
 
-### Community 137 - ".get_next_ayah"
-Cohesion: 0.18
-Nodes (6): 4. Navigation model, Page images and page audio, Structural divisions (page / juz / sajda), Translation-only catalogue entries, assert_covers_target_once(), TestNavigation
+### Community 137 - "fetch_and_stitch"
+Cohesion: 0.29
+Nodes (4): fetch_and_stitch(), _fit_for_telegram(), _semaphore(), stitch_images()
 
 ### Community 138 - "Tajweed (tajvid) section: plan"
 Cohesion: 0.12
 Nodes (15): 10. Phases, 11. Testing, 12. Attribution, 13. Open questions, 14. Revision 2026-11-10: the audio track, progress, phases P1–P5, 1. Decisions (2026-11-09), 2. Data: where the rules come from, 3. Curriculum (v1, ~24 lessons) (+7 more)
 
-### Community 139 - "re"
-Cohesion: 0.21
-Nodes (8): placeholders(), duration(), _id3_size(), main(), _modules(), test_nothing_builds_telegram_markup_by_hand_outside_those_modules(), test_only_group_code_reads_the_telegram_client(), test_only_telegram_only_modules_import_telegram()
-
 ### Community 140 - "MINI_APP_PLAN.md"
-Cohesion: 0.13
-Nodes (13): Central callback prefix allocation (hifz.PREFIXES), Future roadmap and prioritized backlog, The hifz platform (memorization companion), Streak day ticks on completed session, Bot ↔ Mini App integration (menu button, startapp, /app), Identity table (platform, external_id → user_id), Normalized Incoming event, Neutral message model rendering (HTML / WhatsApp markup) (+5 more)
+Cohesion: 0.16
+Nodes (9): Central callback prefix allocation (hifz.PREFIXES), Future roadmap and prioritized backlog, The hifz platform (memorization companion), Pure plan builder (build_plan), Streak day ticks on completed session, Bot ↔ Mini App integration (menu button, startapp, /app), Neutral message model rendering (HTML / WhatsApp markup), recitation_job table and user_profile.riwayah (+1 more)
 
-### Community 141 - "sys"
-Cohesion: 0.26
-Nodes (8): main(), score(), _env(), _lessons(), _local(), main(), upload(), verify()
+### Community 141 - "_ctx"
+Cohesion: 0.24
+Nodes (5): _ctx(), _photo_message(), _Settings, TestCallback, TestWhatTicksADay
+
+### Community 143 - "parse_ayah"
+Cohesion: 0.16
+Nodes (4): parse_ayah(), parse_ayah_range(), TestParseAyah, TestParseAyahRange
 
 ### Community 144 - "test_hifz_leaderboard.py"
 Cohesion: 0.12
 Nodes (10): _CallbackQuery, _ctx(), _earn(), _isolate_registries(), _join(), _Message, _sent(), _Settings (+2 more)
 
 ### Community 145 - "MINI_APP_PLAN.md"
-Cohesion: 0.18
-Nodes (12): Pure plan builder (build_plan), /api/v1 REST surface, initData HMAC validation → short-lived JWT, OpenAPI → TypeScript client pipeline, Recall check integrity (signed question_token), Mini App risks, Other platforms shortlist (Messenger, Viber, Discord, PWA, Signal), Multi-platform phased breakdown (Phases 0-6) (+4 more)
+Cohesion: 0.19
+Nodes (11): /api/v1 REST surface, initData HMAC validation → short-lived JWT, OpenAPI → TypeScript client pipeline, Recall check integrity (signed question_token), Mini App risks, Other platforms shortlist (Messenger, Viber, Discord, PWA, Signal), Multi-platform phased breakdown (Phases 0-6), Multi-platform risks (+3 more)
 
-### Community 146 - "keyboards/menu.py"
-Cohesion: 0.15
-Nodes (15): command, Routing rules (in `serve`), about(), app(), help_(), index(), start(), _welcome() (+7 more)
+### Community 146 - "t"
+Cohesion: 0.06
+Nodes (31): 4.1 Overlap with `MULTI_PLATFORM_PLAN.md`, 4. Target layout and layering, _days_keyboard(), _lang_keyboard(), _pace_keyboard(), _cancel_row(), _custom_days_keyboard(), _days_keyboard() (+23 more)
 
 ### Community 148 - "send_page"
-Cohesion: 0.14
-Nodes (10): send_page(), send_repeated_audio(), _buffer(), _stub_audio(), _stub_stitch(), stub(), TestPageCard, capture() (+2 more)
+Cohesion: 0.21
+Nodes (9): send_page(), _buffer(), fake_bot(), _stub_stitch(), stub(), TestPageCard, capture(), counting() (+1 more)
 
 ### Community 152 - "_FakePool"
-Cohesion: 0.23
-Nodes (4): _failing_create_pool(), create_pool(), _FakePool, TestUnreachableDatabase
+Cohesion: 0.15
+Nodes (7): database_url(), _failing_create_pool(), create_pool(), _FakePool, fast_retries(), strict(), TestUnreachableDatabase
 
 ### Community 153 - "MemoryStore"
-Cohesion: 0.15
-Nodes (5): 11.1 Profile settings reset after a while — `fix/settings-persistence`, 11.2 Timezone picker by country — `feat/timezone-by-country`, 11. User-reported problems, DatabaseUnavailable, MemoryStore
+Cohesion: 0.17
+Nodes (3): 11.1 Profile settings reset after a while — `fix/settings-persistence`, DatabaseUnavailable, MemoryStore
 
 ### Community 154 - "Blue Green Ci: env"
 Cohesion: 0.40
 Nodes (10): env, ACTIVE, BLUE_SERVICE, GREEN_SERVICE, KOYEB_API_TOKEN, KOYEB_APP, PRODUCTION_DOMAIN, TARGET (+2 more)
 
 ### Community 155 - "test_channels_whatsapp.py"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (6): taps(), TestChoices, TestDressing, TestNumberedMenuLifetime, TestText, TestTransport
 
 ### Community 159 - "Dependency rule (app -> bot -> services -> domain)"
-Cohesion: 0.22
-Nodes (8): tests/test_layering.py ratchet (KNOWN violations), Overlap with MULTI_PLATFORM_PLAN channel seam, Decisions and open questions (§9), Phase 0 — Guardrails (ruff, layering test, logging), Phase 5 — Fix the layering, Target layout (app/ bot/ services/ domain/ infra/), Timezone picker by country (feat/timezone-by-country), Memorizing (hifz): /memorize, /check, /progress, /streak, /leaderboard, /profile
+Cohesion: 0.18
+Nodes (10): tests/test_layering.py ratchet (KNOWN violations), Overlap with MULTI_PLATFORM_PLAN channel seam, Shared UTC offset picker (time_pickers.offset_keyboard), Decisions and open questions (§9), Found along the way (out-of-scope behaviour changes), Phase 0 — Guardrails (ruff, layering test, logging), Phase 5 — Fix the layering, Target layout (app/ bot/ services/ domain/ infra/) (+2 more)
 
-### Community 160 - "uz_translit.py"
-Cohesion: 0.21
-Nodes (7): _case(), to_cyrillic(), to_latin(), _word_to_cyr(), test_cyrillic_titles_round_trip(), test_cyrillic_is_real_cyrillic_and_round_trips(), test_transliteration_cases()
+### Community 160 - ".get_next_ayah"
+Cohesion: 0.18
+Nodes (6): 4. Navigation model, Page images and page audio, Structural divisions (page / juz / sajda), Translation-only catalogue entries, _neighbours(), TestNavigation
 
 ### Community 161 - "health"
 Cohesion: 0.24
@@ -829,41 +870,37 @@ Nodes (9): TEST_DATABASE_URL, test, python-version, fail-fast, matrix, env, name
 Cohesion: 0.22
 Nodes (9): preflight, active, deploy_enabled, target, if, name, needs, outputs (+1 more)
 
-### Community 169 - "Profile settings reset fix (fix/settings-persistence)"
+### Community 165 - "Portion"
 Cohesion: 0.18
-Nodes (14): Documentation index (docs/README.md), ALLOW_MEMORY_STORE flag / DatabaseUnavailable / CacheUnavailable, GET / health with store and cache status (503), Silent in-memory store fallback, Phase 6 — Repository hygiene, Profile settings reset fix (fix/settings-persistence), Typed frozen Settings (config/settings.py), Blue-Green CI pipeline (blue-green-ci.yml) (+6 more)
+Nodes (5): Portion, match_portion(), portion_for(), portions_of(), TestPortionShape
 
-### Community 170 - "features/__init__.py"
-Cohesion: 0.07
-Nodes (23): Phase 3 — One router for everything — *done*, _board_message(), leaderboard(), on_leaderboard(), turn_page(), callback(), decorate(), _cancel() (+15 more)
+### Community 169 - "weekly_board"
+Cohesion: 0.28
+Nodes (3): weekly_board(), make_user(), TestWeeklyBoard
 
 ### Community 171 - "Blue Green Ci: smokegreen"
 Cohesion: 0.25
 Nodes (8): BLUE_HEALTH_URL, GREEN_HEALTH_URL, smoke-green, env, if, name, needs, runs-on
 
-### Community 172 - "test_miniapp_links.py"
-Cohesion: 0.16
-Nodes (11): page_keyboard(), _app_command(), app_on(), data(), test_app_command(), test_app_command_without_url(), test_cards_and_drill_link_to_their_screens(), test_inline_messages_never_get_a_web_app_button() (+3 more)
+### Community 173 - "uz_audio_delivery.py"
+Cohesion: 0.13
+Nodes (13): ayah_key(), _caption(), _clip_choices(), part_key(), _reference(), send_clip(), build(), send_surah() (+5 more)
 
-### Community 173 - "FakeChannel"
-Cohesion: 0.12
-Nodes (12): build(), send_surah(), build(), surah_key(), fetch(), url(), FakeChannel, test_big_surah_goes_in_parts() (+4 more)
-
-### Community 174 - "test_webhook.py"
-Cohesion: 0.22
-Nodes (4): webhook_secret(), test_startup_registers_the_webhook_without_the_token(), test_the_secret_does_not_reveal_the_token(), test_webhook_acks_before_initialization()
+### Community 174 - "routes/whatsapp.py"
+Cohesion: 0.07
+Nodes (19): 5. Phases, Phase 0 — Guardrails (no code moves) — *done*, Phase 1 — Take `main.py` apart (pure moves) — *done*, Phase 4 — Split infrastructure god-objects — *done*, Phase 6 — Repository hygiene — *done*, create_app(), lifespan(), _process_update() (+11 more)
 
 ### Community 175 - "test_uz_audio_timings.py"
-Cohesion: 0.13
-Nodes (9): Fixing a wrong timing, Format and the download formula, Pipeline, Setup (once), Transcribing on Colab (preferred), Uzbek translation audio — timing tool, reset_for_tests(), real_table() (+1 more)
+Cohesion: 0.22
+Nodes (7): Fixing a wrong timing, Format and the download formula, Pipeline, Setup (once), Transcribing on Colab (preferred), Uzbek translation audio — timing tool, test_baqarah_matches_the_cuts_approved_by_ear()
 
 ### Community 176 - "features/tajweed.py"
-Cohesion: 0.11
-Nodes (21): state(), _done_row(), _duration(), _lesson(), _mark_done(), _nav_row(), _play(), _review() (+13 more)
+Cohesion: 0.12
+Nodes (18): _duration(), _lesson(), _mark_done(), _play(), _review(), _rules_text(), _rules_visible(), _say() (+10 more)
 
-### Community 177 - "ayah_for"
-Cohesion: 0.22
-Nodes (4): ayah_for(), test_every_entry_is_a_real_ayah(), test_nothing_repeats_within_one_cycle(), test_same_date_same_ayah()
+### Community 177 - "scheduler/__init__.py"
+Cohesion: 0.17
+Nodes (6): _send_plain_message(), register_send_handler(), registered_kinds(), _same_origin(), send_handler(), decorate()
 
 ### Community 178 - "BismillahBot README"
 Cohesion: 0.13
@@ -872,10 +909,6 @@ Nodes (13): Translation Attributions, alquran.cloud API, en.ahmedraza (Ahmed Raz
 ### Community 179 - "test_keyboard_snapshots.py"
 Cohesion: 0.23
 Nodes (5): _as_dict(), _keyboards(), _render(), _search_markup(), test_keyboards_match_their_snapshots()
-
-### Community 180 - "week_window"
-Cohesion: 0.25
-Nodes (3): user_week_window(), week_window(), TestWeekWindow
 
 ### Community 182 - "Blue Green Ci: deploygreen"
 Cohesion: 0.33
@@ -890,20 +923,24 @@ Cohesion: 0.18
 Nodes (3): lang_hint(), TestKeywords, TestUsernames
 
 ### Community 188 - "SendCtx"
-Cohesion: 0.10
-Nodes (14): Phase 1 — Channel seam (this repo, no user-visible change), 4.1 Overlap with `MULTI_PLATFORM_PLAN.md`, 4. Target layout and layering, push_daily(), _template_text(), _consented(), push_plan_day(), _send_plain_message() (+6 more)
+Cohesion: 0.15
+Nodes (7): push_daily(), session(), _consented(), push_plan_day(), Template, template_lang(), SendCtx
 
-### Community 189 - ".test_concatenates_the_ayahs_in_order"
-Cohesion: 0.20
-Nodes (4): content(), fake_download(), TestStitching, __init__()
+### Community 189 - "Caching strategy (Redis user state, file_id, wizard draft)"
+Cohesion: 0.33
+Nodes (3): Inline query answering (all four representations, ranges), Navigation model ((surah, ayah, type) per chat_id), Verse card (inline keyboard, edit in place)
 
-### Community 193 - "WhatsAppChannel"
-Cohesion: 0.13
-Nodes (4): _clip(), WhatsAppChannel, interactive(), TestTheRest
+### Community 190 - "File"
+Cohesion: 0.06
+Nodes (10): page_audio_url(), page_image_url(), File, _key(), take(), TestSearch, TestAudioFilename, TestImageFilename (+2 more)
+
+### Community 196 - "httpx"
+Cohesion: 0.19
+Nodes (4): stitch(), download_combined_audio(), download_stitched_audio(), TestStitchedAudioAcrossSurahs
 
 ### Community 197 - ".wa_user"
-Cohesion: 0.36
-Nodes (4): apps(), Apps, _code(), TestLinking
+Cohesion: 0.22
+Nodes (5): apps(), Apps, _code(), TestCodes, TestLinking
 
 ### Community 198 - "handle_message"
 Cohesion: 0.16
@@ -913,89 +950,137 @@ Nodes (8): _allowed_command(), as_command(), handle_message(), _tap(), TestFirst
 Cohesion: 0.31
 Nodes (4): ignore_not_modified(), test_any_other_bad_request_propagates(), test_not_modified_is_swallowed(), test_other_errors_propagate()
 
-### Community 205 - "test_whatsapp_config.py"
-Cohesion: 0.31
-Nodes (5): env(), test_any_missing_value_keeps_it_off(), test_off_by_default(), test_on_when_fully_configured(), test_the_flag_must_be_truthy()
-
-### Community 206 - "exchange"
-Cohesion: 0.22
-Nodes (3): exchange(), test_whatsapp_app_sends_a_working_sign_in_link(), TestExchange
+### Community 205 - "ScheduledSend"
+Cohesion: 0.26
+Nodes (4): enqueue(), idempotency_key(), schedule_daily(), ScheduledSend
 
 ### Community 207 - "WhatsAppChannel"
 Cohesion: 0.12
 Nodes (7): ctx(), cache(), channel(), graph(), Graph, test_a_bsuid_is_addressed_as_recipient(), TestVoiceNotes
 
-### Community 209 - "milestone_for"
-Cohesion: 0.33
-Nodes (3): milestone_for(), _milestone_key(), TestMilestones
-
 ### Community 210 - "export_web_content.py"
-Cohesion: 0.20
-Nodes (8): build_meta(), export(), main(), _spans(), split_basmalah(), tajweed_doc(), uz_audio_doc(), _write()
-
-### Community 211 - "WhatsAppError"
-Cohesion: 0.29
-Nodes (3): _error(), WhatsAppError, WindowClosed
+Cohesion: 0.12
+Nodes (9): build_meta(), export(), main(), _spans(), split_basmalah(), tajweed_doc(), uz_audio_doc(), _write() (+1 more)
 
 ### Community 213 - "BismillahBot — Multilingual Support Plan"
-Cohesion: 0.14
-Nodes (14): 10. File-by-file change list, 11. Memory & performance (free-tier reality), 13. Risks & open questions, 14. Recommended first step, 1. Goal & scope, 2. Current-state audit (what is hardcoded English), 3. Target architecture, 4. User language preference (+6 more)
+Cohesion: 0.09
+Nodes (19): 7. Known limitations / tech debt, 11. Memory & performance (free-tier reality), 12. Testing, 13. Risks & open questions, 14. Recommended first step, 1. Goal & scope, 2. Current-state audit (what is hardcoded English), 4. User language preference (+11 more)
+
+### Community 215 - "pick_ayahs"
+Cohesion: 0.17
+Nodes (6): _at_offset(), _date_key(), pick_ayah(), pick_ayahs(), _span_length(), _span_tuple()
 
 ### Community 216 - "test_hifz_seam.py"
 Cohesion: 0.20
 Nodes (3): _isolate_registries(), _Settings, TestSchemaApplication
 
-### Community 270 - "PostgresDailyStore"
-Cohesion: 0.16
-Nodes (3): DailyStore, DailySubRow, PostgresDailyStore
+### Community 271 - "bot/whatsapp.py"
+Cohesion: 0.10
+Nodes (11): 4.1 Flow, 4.2 Rules, 4.3 Transport, 4. Authentication, handle_incoming(), _incoming(), resolve_settings(), _now() (+3 more)
 
-### Community 271 - "t"
-Cohesion: 0.04
-Nodes (32): 5. API surface (`/api/v1`), on_uz_audio(), parse(), page_audio(), sajda(), reciter(), sajda_keyboard(), uz_audio_row() (+24 more)
-
-### Community 282 - "test_reciter_picker.py"
-Cohesion: 0.12
-Nodes (13): get_position(), _lang(), LanguageOut, languages(), LanguagesOut, put_position(), ReaderPosition, Reciter (+5 more)
+### Community 276 - "test_scheduler.py"
+Cohesion: 0.17
+Nodes (3): _isolate_handlers(), state(), TestRunScheduler
 
 ### Community 289 - "Separate quranayat-miniapp Next.js repo; API in this repo"
-Cohesion: 0.12
-Nodes (15): Inline query answering (all four representations, ranges), Navigation model ((surah, ayah, type) per chat_id), Page audio with stitched fallback, Page image stitching (lib/page_image.py), Repeat (memorization), Structural divisions (page / juz / sajda from quran-data.xml), Verse card (inline keyboard, edit in place), Uthmani text in Amiri Quran / KFGQPC font (+7 more)
+Cohesion: 0.22
+Nodes (10): Page audio with stitched fallback, Page image stitching (lib/page_image.py), Structural divisions (page / juz / sajda from quran-data.xml), Uthmani text in Amiri Quran / KFGQPC font, Client-side playlist audio (no server stitching), Locale export to JSON (web_ keys, next-intl), Static immutable Quran JSON served from frontend CDN, Daily ayat cost model on WhatsApp (+2 more)
 
 ### Community 294 - "test_store_contract.py"
-Cohesion: 0.08
-Nodes (5): TestDaily, TestReaderPosition, TestSenderIds, TestTajweedApprovals, TestTajweedProgress
+Cohesion: 0.11
+Nodes (4): TestDaily, TestReaderPosition, TestTajweedApprovals, TestTajweedProgress
 
 ### Community 295 - "SendCtx"
 Cohesion: 0.51
 Nodes (4): _due_rows(), TestWhatsApp, wa_tap(), wa_text()
 
+### Community 309 - "ask"
+Cohesion: 0.22
+Nodes (4): preload_corpus(), ask(), default_span(), rebuild()
+
+### Community 310 - ".test_concatenates_the_ayahs_in_order"
+Cohesion: 0.20
+Nodes (4): content(), fake_download(), TestStitching, __init__()
+
+### Community 312 - "FakeChannel"
+Cohesion: 0.20
+Nodes (6): FakeChannel, test_big_surah_goes_in_parts(), test_small_surah_goes_by_url(), test_source_failure_is_reported_not_raised(), test_tap_sends_and_acknowledges(), test_verified_surah_has_no_estimate_note()
+
+### Community 313 - "cache_key"
+Cohesion: 0.28
+Nodes (3): cache_key(), TestGraphCache, TestCacheKey
+
+### Community 314 - "milestone_for"
+Cohesion: 0.33
+Nodes (3): milestone_for(), _milestone_key(), TestMilestones
+
+### Community 315 - "6. Phased task breakdown"
+Cohesion: 0.25
+Nodes (8): 6. Phased task breakdown, Phase 0 — Prerequisites (no code), Phase 1 — Channel seam (this repo, no user-visible change), Phase 3 — Hifz on WhatsApp, Phase 4 — Recitation checker on WhatsApp, Phase 5 — Web access outside Telegram, Phase 6 — Later, bot()
+
+### Community 316 - "Profile settings reset fix (fix/settings-persistence)"
+Cohesion: 0.29
+Nodes (8): ALLOW_MEMORY_STORE flag / DatabaseUnavailable / CacheUnavailable, lib/utils.File god class, Silent in-memory store fallback, Phase 4 — Split infrastructure god-objects, Profile settings reset fix (fix/settings-persistence), Typed frozen Settings (config/settings.py), conftest.py test environment (src on path, CWD pin, no Redis/network), Environment configuration (webhook, CDN base URLs, Redis)
+
 ### Community 317 - "domain/tajweed.py"
-Cohesion: 0.19
-Nodes (6): examples(), _load(), marked_html(), Rule, spans(), text()
+Cohesion: 0.23
+Nodes (5): _load(), marked_html(), Rule, spans(), text()
+
+### Community 319 - "test_miniapp_links.py"
+Cohesion: 0.32
+Nodes (6): _app_command(), app_on(), test_app_command(), test_app_command_without_url(), test_menu_button(), test_menu_button_off_without_url()
+
+### Community 321 - "8. Phased task breakdown"
+Cohesion: 0.29
+Nodes (7): 8. Phased task breakdown, Phase 0 — Foundations, Phase 1 — Service-layer extraction (this repo, no UI change), Phase 2 — Reader parity (read-only, low risk, ships first), Phase 3 — Hifz parity, Phase 4 — Recitation checker UI (depends on the investigation's Phase A), Phase 5 — Later
+
+### Community 322 - "_search_reciters"
+Cohesion: 0.29
+Nodes (4): _search_reciters(), start_search(), reciter_search_keyboard(), expect()
+
+### Community 323 - "features/leaderboard.py"
+Cohesion: 0.38
+Nodes (3): _board_message(), leaderboard(), on_leaderboard()
+
+### Community 325 - "WhatsAppError"
+Cohesion: 0.29
+Nodes (3): _error(), WhatsAppError, WindowClosed
+
+### Community 328 - "11. Infrastructure, capacity and cost on paid Koyeb"
+Cohesion: 0.33
+Nodes (6): 11.1 Relevant Koyeb prices, 11.2 Assumptions, 11.3 Capacity by scenario, 11.4 Monthly cost, 11.5 Cost guards, 11. Infrastructure, capacity and cost on paid Koyeb
+
+### Community 329 - "user_settings.py"
+Cohesion: 0.33
+Nodes (3): UserSettingsRow, _legacy_lang_key(), SettingsRow
+
+### Community 331 - "Identity table (platform, external_id → user_id)"
+Cohesion: 0.50
+Nodes (5): Identity table (platform, external_id → user_id), Normalized Incoming event, WhatsApp opt-in / STOP opt-out flow, WhatsApp constraints (24-h window, templates, pricing, opt-in), Window-aware scheduler (session message vs template)
 
 ### Community 332 - "test_export_web_content.py"
-Cohesion: 0.21
-Nodes (7): _count(), _load(), test_arabic_has_every_ayah(), test_basmalah_is_lifted_into_a_flag(), test_every_translation_has_every_ayah(), test_meta_surahs_and_sajdas(), test_tafsir_has_every_ayah()
+Cohesion: 0.14
+Nodes (10): _load(), test_every_ui_language_is_exported_resolved_like_t(), test_languages_catalogue_carries_rtl(), _count(), _load(), test_arabic_has_every_ayah(), test_basmalah_is_lifted_into_a_flag(), test_every_translation_has_every_ayah() (+2 more)
 
 ## Knowledge Gaps
-- **51 isolated node(s):** `Synthetic traffic mix (scripts/stress/gen_updates.py)`, `Fidelity limits (no Telegram RTT, local Postgres for Neon, no cold start)`, `Neon managed Postgres`, `Capacity results 5-1000 concurrent (no errors, 70-91 MB)`, `src/locales/en.py source of truth` (+46 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1875 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **124 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **51 isolated node(s):** `Synthetic traffic mix (scripts/stress/gen_updates.py)`, `Fidelity limits (no Telegram RTT, local Postgres for Neon, no cold start)`, `Neon managed Postgres`, `Capacity results 5-1000 concurrent (no errors, 70-91 MB)`, `Central callback prefix allocation (hifz.PREFIXES)` (+46 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1882 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **154 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `get_store()` connect `Wizard` to `Store`, `weekly_board`, `lifespan.py`, `dispatch.py`, `streak_image.py`, `t`, `Context`, `bot/media.py`, `UserSettings`, `RedisSingleton`, `test_hifz_leaderboard.py`, `group.py`, `Hifz Progress Cmd Tests`, `services/plans.py`, `MemoryStore`, `TestDailyPost`, `test_hifz_streak.py`, `Acceptance Tests`, `stats.py`, `_ctx`, `SendCtx`, `Streaks`, `features/tajweed.py`, `Services`, `api/progress.py`, `deliver_quran`, `lang_hint`, `store/__init__.py`, `.test_full_flow_queues_the_first_send`, `summarize`, `InMemoryStore`, `.wa_user`, `handle_message`, `PostgresScheduleStore`, `session.py`, `SendCtx`, `WhatsApp`, `json`, `test_inline_reciter_search.py`, `_hifz`, `test_whatsapp_router.py`, `test_hifz_check.py`, `test_tajweed_audio.py`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+- **Why does `get_store()` connect `Streaks` to `lifespan.py`, `PostgresStore`, `api/plans.py`, `Wizard`, `streak_image.py`, `bot/whatsapp.py`, `Context`, `UserSettings`, `test_hifz_leaderboard.py`, `RedisSingleton`, `features/__init__.py`, `Hifz Progress Cmd Tests`, `MemoryStore`, `test_hifz_streak.py`, `Acceptance Tests`, `stats.py`, `_ctx`, `SendCtx`, `weekly_board`, `build_question`, `Services`, `Store`, `api/progress.py`, `test_hifz_progress.py`, `dispatch.py`, `lang_hint`, `store/__init__.py`, `.test_full_flow_queues_the_first_send`, `summarize`, `InMemoryStore`, `.wa_user`, `handle_message`, `surah_progress`, `SurahProgress`, `session.py`, `user_settings.py`, `test_hifz_cross_platform.py`, `SendCtx`, `streak_summary`, `handle_update`, `_hifz`, `test_whatsapp_router.py`, `test_hifz_check.py`, `GraphClient`, `test_tajweed_audio.py`, `offset_keyboard`?**
+  _High betweenness centrality (0.102) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `get_store()` (e.g. with `11.1 Profile settings reset after a while — `fix/settings-persistence`` and `.apply_schema()`) actually correct?**
   _`get_store()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Synthetic traffic mix (scripts/stress/gen_updates.py)`, `Fidelity limits (no Telegram RTT, local Postgres for Neon, no cold start)`, `Neon managed Postgres` to the rest of the system?**
   _51 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `build_plan` be split into smaller, more focused modules?**
-  _Cohesion score 0.053194333066025126 - nodes in this community are weakly interconnected._
-- **Why does `Quran` connect `Quran` to `build_plan`, `lifespan.py`, `dispatch.py`, `Ref`, `parse_quran_tafsir`, `.get_next_ayah`, `Choice`, `t`, `bot/media.py`, `parse_reference`, `t`, `group.py`, `Hifz Progress Cmd Tests`, `services/plans.py`, `test_reciter_picker.py`, `html`, `TranslationRegistry`, `features/__init__.py`, `to_markup`, `test_miniapp_links.py`, `FakeChannel`, `asyncio`, `Phase 1 — Take `main.py` apart (pure moves) — *done*`, `ayah_for`, `features/check.py`, `api/progress.py`, `fixture`, `surah_progress`, `.page_range`, `summarize`, `test_export_web_content.py`, `quran_page_progress`, `_message`, `api/uz_audio.py`, `recall_check.py`, `BismillahBot — Business Logic`?**
+  _Cohesion score 0.04606060606060606 - nodes in this community are weakly interconnected._
+- **Why does `Quran` connect `Ref` to `build_plan`, `.exists`, `lifespan.py`, `api/plans.py`, `t`, `parse_reference`, `channels/__init__.py`, `.get_surah_length`, `Hifz Progress Cmd Tests`, `group.py`, `quran_progress`, `features/check.py`, `.get_next_ayah`, `infra/uz_audio.py`, `TranslationRegistry`, `to_markup`, `build_question`, `uz_audio_delivery.py`, `asyncio`, `routes/whatsapp.py`, `sweep_refs`, `api/progress.py`, `fixture`, `ask`, `dispatch.py`, `whatsapp_setup.py`, `surah_progress`, `.page_range`, `reader.py`, `summarize`, `surah_progress`, `session.py`, `test_export_web_content.py`, `quran_page_progress`, `test_short_surahs_still_get_four_distinct_options`, `export_web_content.py`, `BismillahBot — Multilingual Support Plan`, `pick_ayahs`, `test_hifz_check.py`, `_message`, `api/uz_audio.py`, `recall_check.py`, `BismillahBot — Business Logic`, `corpus`?**
   _High betweenness centrality (0.072) - this node is a cross-community bridge._
 - **Are the 44 inferred relationships involving `Ctx` (e.g. with `3. Architecture` and `4.1 Overlap with `MULTI_PLATFORM_PLAN.md``) actually correct?**
   _`Ctx` has 44 INFERRED edges - model-reasoned connections that need verification._
-- **Should `Quran` be split into smaller, more focused modules?**
-  _Cohesion score 0.05076679005817028 - nodes in this community are weakly interconnected._
+- **Should `link_token.py` be split into smaller, more focused modules?**
+  _Cohesion score 0.1092436974789916 - nodes in this community are weakly interconnected._

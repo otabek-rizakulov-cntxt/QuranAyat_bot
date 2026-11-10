@@ -1801,9 +1801,9 @@
     "semantic_hash": ""
   },
   "src/domain/tajweed_lessons.py": {
-    "mtime": 1794301588.3791494,
-    "seen": 1794301927.773463,
-    "ast_hash": "2355397a4f4ce2c441e9b48eaf899097",
+    "mtime": 1794303433.1794372,
+    "seen": 1794303467.961928,
+    "ast_hash": "88013bb9a1594b7f3e3c2a9098b77288",
     "semantic_hash": ""
   },
   "src/domain/uz_translit.py": {
@@ -1852,6 +1852,24 @@
     "mtime": 1794301849.565091,
     "seen": 1794301927.773664,
     "ast_hash": "f95f4496160b4e91a143ad6ca847cadc",
+    "semantic_hash": ""
+  },
+  "scripts/tajweed/__init__.py": {
+    "mtime": 1794303290.5267174,
+    "seen": 1794303318.2511702,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "scripts/tajweed/transcribe_muallimi.py": {
+    "mtime": 1794303290.763727,
+    "seen": 1794303318.251175,
+    "ast_hash": "9bb8278bb51e4ff794e9d81606a60f5c",
+    "semantic_hash": ""
+  },
+  "tests/test_tajweed_text.py": {
+    "mtime": 1794303711.5637577,
+    "seen": 1794303864.953407,
+    "ast_hash": "6847848730d9193459409445d7fc9d7e",
     "semantic_hash": ""
   }
 }
