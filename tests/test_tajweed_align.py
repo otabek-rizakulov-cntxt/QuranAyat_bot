@@ -4,6 +4,8 @@ The real transcripts come from Colab; this fixture imitates one: Uzbek talk, the
 the rows read aloud as Whisper spells them, with pauses between.
 """
 
+import re
+
 import pytest
 
 from scripts.tajweed import align_text as at
@@ -133,3 +135,24 @@ def test_rows_whisper_skipped_get_the_untranscribed_speech():
     assert 17.95 <= rows[-1]["end"] <= 20.0  # in the silence after it
     assert [x["kind"] for x in lines] == ["uz", "ar", "ar", "ar", "uz"]  # back in time order
     assert lines[0]["end"] <= 2.6  # the intro isn't stretched over the long gap
+
+
+def test_cleaned_uzbek_replaces_whisper_and_empty_drops_the_line():
+    lines = [
+        {"kind": "uz", "text": "Mimkharifah.", "start": 0.0, "end": 2.0, "conf": 1.0},
+        {"kind": "ar", "row": 0, "text": "مَ", "start": 2.0, "end": 3.0, "conf": 0.9},
+        {"kind": "uz", "text": "Bi", "start": 3.0, "end": 3.5, "conf": 1.0},
+        {"kind": "uz", "text": "untouched", "start": 3.5, "end": 4.0, "conf": 1.0},
+    ]
+    out = at.apply_clean(lines, {"Mimkharifah.": "Mim harfi.", "Bi": ""})
+    assert [x["text"] for x in out] == ["Mim harfi.", "مَ", "untouched"]
+    assert out[1]["end"] == 3.5  # the dropped line's time joins the row before it
+
+
+def test_the_clean_file_has_no_leftover_latin_garble():
+    import json
+
+    data = json.load(open(at.CLEAN_PATH, encoding="utf-8"))
+    for lesson, lines in data["lessons"].items():
+        for raw, clean in lines.items():
+            assert not re.search(r"[Ѐ-ӿ؀-ۿ]", clean), (lesson, clean)

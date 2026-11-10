@@ -39,6 +39,7 @@ from domain.uz_translit import to_latin  # noqa: E402
 CACHE = os.path.expanduser(os.environ.get("TAJWEED_CACHE", "~/.cache/quranayat/muallimi"))
 TIMINGS_PATH = os.path.join(REPO, "data", "tajweed", "muallimi_timings.json")
 OVERRIDES_PATH = os.path.join(REPO, "data", "tajweed", "muallimi_overrides.json")
+CLEAN_PATH = os.path.join(REPO, "data", "tajweed", "muallimi_uz_clean.json")
 HOP_S = 0.02  # one energy value per 20 ms
 VERSION = 1
 
@@ -470,6 +471,25 @@ def _snap(lines: list, energy, pins: dict) -> list:
     return lines
 
 
+def apply_clean(lines: list, clean: dict) -> list:
+    """Swap Whisper's Uzbek for the hand-cleaned text (data/tajweed/muallimi_uz_clean.json).
+
+    Keyed by the raw line, so a re-alignment that yields the same words keeps the
+    fix; a raw line with no entry stays as it is (for a later cleaning pass). An
+    empty value drops the line, and the line before it keeps its time."""
+    out = []
+    for x in lines:
+        if x["kind"] == "uz" and x["text"] in clean:
+            text = clean[x["text"]]
+            if not text:
+                if out and out[-1]["start"] is not None and x["end"] is not None:
+                    out[-1]["end"] = max(out[-1]["end"], x["end"])
+                continue
+            x = dict(x, text=text)
+        out.append(x)
+    return out
+
+
 # --- files -------------------------------------------------------------------------
 
 
@@ -499,7 +519,8 @@ def align_lesson(n: int, overrides: dict) -> Optional[list]:
     lesson_id = "ms-%03d" % n
     rows = [x.text for x in tajweed_lessons.audio_text(lesson_id) if x.kind == "ar"]
     pins = {int(k): v for k, v in overrides.get(lesson_id, {}).items()}
-    return align(rows, words_of(transcript), energy, pins)
+    clean = _read(CLEAN_PATH, {}).get("lessons", {}).get(lesson_id, {})
+    return apply_clean(align(rows, words_of(transcript), energy, pins), clean)
 
 
 def report(table: dict, limit: int = 40) -> None:

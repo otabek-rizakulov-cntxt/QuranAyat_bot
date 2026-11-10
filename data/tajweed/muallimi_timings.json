@@ -4,7 +4,7 @@
   "ms-001": [
    {
     "kind": "uz",
-    "text": "Arab, alif ba, sa,",
+    "text": "Arab alifbosi.",
     "start": 0.0,
     "end": 3.23,
     "conf": 1.0
@@ -69,14 +69,14 @@
   "ms-002": [
    {
     "kind": "uz",
-    "text": "АЛИФ ҚАРФА АРАБ АЛИФ БАСЫДАГИ БАРЧА ҚАРФЛАР ОНДАШ ҚАРФЛАРДИР УЛАРДАН КИН КИЛУЧЮ ОНЛИТАВЩ ҚИСКА ОНЛИЛАРНИ ХАРАКЦЛАР ИФАДАЛАЙДА БУЛАР",
+    "text": "Alif harfi. Arab alifbosidagi barcha harflar undosh harflardir. Ulardan keyin keluvchi unli tovushlarni, qisqa unlilarni harakatlar ifodalaydi. Bular",
     "start": 0.0,
     "end": 11.74,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "КУЙДАГИЛАР",
+    "text": "quyidagilar:",
     "start": 11.74,
     "end": 12.96,
     "conf": 1.0
@@ -91,14 +91,14 @@
    },
    {
     "kind": "uz",
-    "text": "АЛИФ ҚАРФА ҚУБУ ХАРАКЦЛАР БЛАН БЕРГИ КИЛИП ə, i, u tavuşlarını ifadələyda. Arab tələdə yapıq boğunlu ya ki, tuxtəşni ifadələş",
+    "text": "Alif harfi quyidagi harakatlar bilan birga kelib, a, i, u tovushlarini ifodalaydi. Arab tilida yopiq boʻgʻinni yoki toʻxtashni ifodalash",
     "start": 17.52,
     "end": 29.38,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "üçün maxsus belgə. Squndan faydələniləda.",
+    "text": "uchun maxsus belgi, sukundan foydalaniladi.",
     "start": 29.38,
     "end": 33.56,
     "conf": 1.0
@@ -107,7 +107,7 @@
   "ms-003": [
    {
     "kind": "uz",
-    "text": "Ра қарфы.",
+    "text": "Ro harfi.",
     "start": 0.0,
     "end": 1.11,
     "conf": 1.0
@@ -122,7 +122,7 @@
    },
    {
     "kind": "uz",
-    "text": "Ра қарфы узбектілі дэгі Р таушіны ифа дейтады. Фақат У, уздан кейін қайыс харекет кейлішігі қарап, ингечке рақ, яки, йоган рақ талафуз қылынады.",
+    "text": "Ro harfi oʻzbek tilidagi «r» tovushini ifodalaydi. Faqat undan keyin qaysi harakat kelishiga qarab ingichkaroq yoki yoʻgʻonroq talaffuz qilinadi.",
     "start": 5.73,
     "end": 18.71,
     "conf": 1.0
@@ -139,14 +139,14 @@
   "ms-004": [
    {
     "kind": "uz",
-    "text": "ЗАХАРФА",
+    "text": "Za harfi.",
     "start": 0.0,
     "end": 1.53,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "ЗАХАРФА УЗБЕКТИЛІДАГИ ЗЫ ТАУШИБЛАН БАРХАЛ",
+    "text": "Za harfi oʻzbek tilidagi «z» tovushi bilan bir xil.",
     "start": 1.53,
     "end": 5.21,
     "conf": 1.0
@@ -174,22 +174,15 @@
     "row": 2,
     "text": "اَزْرُ اِزْرُ اُزْرُ اُرْزُ",
     "start": 19.28,
-    "end": 30.0,
+    "end": 30.86,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "Zuhu.",
-    "start": 30.0,
-    "end": 30.86,
-    "conf": 1.0
    }
   ],
   "ms-005": [
    {
     "kind": "uz",
-    "text": "Mimkharifah. Mimkharifahinin telafuzo uzbek tila daga ma taushublan berkhil.",
+    "text": "Mim harfi. Mim harfining talaffuzi oʻzbek tilidagi «m» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 6.29,
     "conf": 1.0
@@ -230,7 +223,7 @@
   "ms-006": [
    {
     "kind": "uz",
-    "text": "Ta xarifa. Ta xarifainin telafuzu uzbek tila dagi t taushubilan bir xil.",
+    "text": "Ta harfi. Ta harfining talaffuzi oʻzbek tilidagi «t» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 6.25,
     "conf": 1.0
@@ -264,21 +257,14 @@
     "row": 3,
     "text": "اَمَرْتُمْ اُمِرْتُمْ مَرَرْتُمْ مُرِرْتُمْ",
     "start": 35.52,
-    "end": 42.02,
-    "conf": 0.57
-   },
-   {
-    "kind": "uz",
-    "text": "مررتم",
-    "start": 42.02,
     "end": 43.16,
-    "conf": 1.0
+    "conf": 0.57
    }
   ],
   "ms-007": [
    {
     "kind": "uz",
-    "text": "NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE NUN XARIFE OZBEEK TILA DAGEE NU TAOUSHU BILAN BIRXHIL NU NU NU NU",
+    "text": "Nun harfi. Nun harfining talaffuzi oʻzbek tilidagi «n» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 10.33,
     "conf": 1.0
@@ -319,7 +305,7 @@
   "ms-008": [
    {
     "kind": "uz",
-    "text": "Ya xarifah. Ya xarifah. Ya xarifahnin talafuzah uzbek tila daga ye taushublan bərxal.",
+    "text": "Ya harfi. Ya harfining talaffuzi oʻzbek tilidagi «y» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 6.67,
     "conf": 1.0
@@ -337,15 +323,8 @@
     "row": 1,
     "text": "اَيْ اَيْمُ زَيْتُ مَيْتُ رَاْيُ رَمْيُ",
     "start": 12.25,
-    "end": 25.93,
-    "conf": 0.92
-   },
-   {
-    "kind": "uz",
-    "text": "zaynu,",
-    "start": 25.93,
     "end": 27.61,
-    "conf": 1.0
+    "conf": 0.92
    },
    {
     "kind": "ar",
@@ -360,13 +339,6 @@
     "row": 3,
     "text": "اَمْرَيْنِ زَيْتَيْنِ اَيْمَيْنِ مَيْتَيْنِ",
     "start": 39.95,
-    "end": 50.97,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Ramyayni",
-    "start": 51.75,
     "end": 54.08,
     "conf": 1.0
    }
@@ -374,7 +346,7 @@
   "ms-009": [
    {
     "kind": "uz",
-    "text": "Ba xarafa. Ba xarafa nii ng talafuzu uzbek tila dagi ba ta uši bilan bir xil.",
+    "text": "Ba harfi. Ba harfining talaffuzi oʻzbek tilidagi «b» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 6.79,
     "conf": 1.0
@@ -400,36 +372,22 @@
     "row": 2,
     "text": "زَيْنَبْ بَرْبَرْ بَيْرَمْ اَبْرَمْ مِنْبَرْ",
     "start": 25.41,
-    "end": 34.55,
-    "conf": 0.79
-   },
-   {
-    "kind": "uz",
-    "text": "Bi",
-    "start": 34.55,
     "end": 36.4,
-    "conf": 1.0
+    "conf": 0.79
    },
    {
     "kind": "ar",
     "row": 3,
     "text": "بِاَمْرَيْنِ بِبَيْتَيْنِ مِنْبَرَيْنِ زَيْنَبَيْنِ",
     "start": 36.4,
-    "end": 54.47,
-    "conf": 0.86
-   },
-   {
-    "kind": "uz",
-    "text": "Zaynabayni",
-    "start": 54.47,
     "end": 54.98,
-    "conf": 1.0
+    "conf": 0.86
    }
   ],
   "ms-010": [
    {
     "kind": "uz",
-    "text": "Kaf harifa. Kaf harifa ning telafuze uzbek telada ge k tavooshu bilan berkhil.",
+    "text": "Kaf harfi. Kaf harfining talaffuzi oʻzbek tilidagi «k» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 6.69,
     "conf": 1.0
@@ -478,7 +436,7 @@
   "ms-011": [
    {
     "kind": "uz",
-    "text": "Lam harfa. Lam harfinin telafuzu uzbek teladagi l -taoshi bilan barxal.",
+    "text": "Lam harfi. Lam harfining talaffuzi oʻzbek tilidagi «l» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 7.51,
     "conf": 1.0
@@ -527,7 +485,7 @@
   "ms-012": [
    {
     "kind": "uz",
-    "text": "Vav xarifah Vav xarifinin telafuzi Uzbek teladagi v -tauushidan b 'ras farxli. Onda lablar tishke tegimai aldiingi b 'ras chozilada. V",
+    "text": "Vav harfi. Vav harfining talaffuzi oʻzbek tilidagi «v» tovushidan biroz farqli: unda lablar tishga tegmay, oldinga biroz choʻziladi.",
     "start": 0.0,
     "end": 11.82,
     "conf": 1.0
@@ -565,54 +523,19 @@
     "conf": 0.0
    },
    {
-    "kind": "uz",
-    "text": "اولو وزنو ويلو كونو يومو",
-    "start": 32.94,
-    "end": 44.78,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "رومو",
-    "start": 44.78,
-    "end": 47.44,
-    "conf": 1.0
-   },
-   {
     "kind": "ar",
     "row": 4,
     "text": "كَوْكَبْ مَوْكِبْ اَوْلَمْتُمْ اَوْتَرْتُمْ",
     "start": 47.44,
-    "end": 58.13,
-    "conf": 0.78
-   },
-   {
-    "kind": "uz",
-    "text": "وزنتم",
-    "start": 58.13,
     "end": 60.72,
-    "conf": 1.0
+    "conf": 0.78
    }
   ],
   "ms-013": [
    {
     "kind": "uz",
-    "text": "XARFienia XARF 진행 XARF greninIOg XARFcir Khalfin��오 XARF circumänger",
+    "text": "Ha harfi.",
     "start": 0.0,
-    "end": 4.83,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "XARF",
-    "start": 4.83,
-    "end": 8.11,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "XARF XARF XARF",
-    "start": 8.11,
     "end": 9.68,
     "conf": 1.0
    },
@@ -621,16 +544,9 @@
     "row": 0,
     "text": "هَ ـهِـ ـهُ",
     "start": 9.68,
-    "end": 12.1,
+    "end": 15.92,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "XARF ZARF EXARF",
-    "start": 12.1,
-    "end": 15.92,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -676,7 +592,7 @@
    },
    {
     "kind": "uz",
-    "text": "Fā kharifinin telafuzı uzbek tlidakī fā",
+    "text": "Fa harfining talaffuzi oʻzbek tilidagi «f» tovushi bilan bir xil.",
     "start": 1.15,
     "end": 5.22,
     "conf": 1.0
@@ -709,7 +625,7 @@
   "ms-015": [
    {
     "kind": "uz",
-    "text": "Qaf xarifah Qaf xarifinin telafuzi Uzbek tlidagi qi taoshi bilan bir xil Bu xarif fatxali bolub kilian vaqtda Yohan raq telafuz qilnada",
+    "text": "Qof harfi. Qof harfining talaffuzi oʻzbek tilidagi «q» tovushi bilan bir xil. Bu harf fathali boʻlib kelgan vaqtda yoʻgʻonroq talaffuz qilinadi.",
     "start": 0.0,
     "end": 11.38,
     "conf": 1.0
@@ -758,7 +674,7 @@
   "ms-016": [
    {
     "kind": "uz",
-    "text": "Shinxarifa. Shinxarifinin telafuzu ozbektilidagi",
+    "text": "Shin harfi. Shin harfining talaffuzi oʻzbek tilidagi «sh» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 4.56,
     "conf": 1.0
@@ -807,14 +723,14 @@
   "ms-017": [
    {
     "kind": "uz",
-    "text": "SINXARFY.",
+    "text": "Sin harfi.",
     "start": 0.0,
     "end": 1.57,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "SINXARFYNIN TALAFUZU OZB Applause from Uzbek diladzagy sû tauxgillan birxalw!?",
+    "text": "Sin harfining talaffuzi oʻzbek tilidagi «s» tovushi bilan bir xil.",
     "start": 1.57,
     "end": 7.05,
     "conf": 1.0
@@ -858,40 +774,12 @@
     "start": null,
     "end": null,
     "conf": 0.0
-   },
-   {
-    "kind": "uz",
-    "text": "مسلك مسكن مسلم مسرف سمسم",
-    "start": 31.58,
-    "end": 42.12,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "أسلم يسلم",
-    "start": 42.12,
-    "end": 48.13,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "استيسر",
-    "start": 48.13,
-    "end": 50.93,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يستيسر",
-    "start": 50.93,
-    "end": 52.9,
-    "conf": 1.0
    }
   ],
   "ms-018": [
    {
     "kind": "uz",
-    "text": "Sa xarfi. Sa xarfi 'ni ifadolubçu xarfi və tavuş Uzbek dildə yox. U, tildin uçunu paski və yuqarit işlərinin orasigə qoygan xalda təlafuz qilnədə.",
+    "text": "Sa harfi. Sa harfini ifodalovchi harf va tovush oʻzbek tilida yoʻq. U tilning uchini pastki va yuqori tishlarning orasiga qoʻygan holda talaffuz qilinadi.",
     "start": 0.0,
     "end": 11.25,
     "conf": 1.0
@@ -922,7 +810,7 @@
    },
    {
     "kind": "uz",
-    "text": "Masal",
+    "text": "Masalan:",
     "start": 39.92,
     "end": 41.63,
     "conf": 1.0
@@ -955,21 +843,21 @@
   "ms-019": [
    {
     "kind": "uz",
-    "text": "Saad xarifa.",
+    "text": "Sod harfi.",
     "start": 0.0,
     "end": 1.31,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Saad xarifa ni aynan ifad alaydiyyan xarifa uzbek tila da mawgud imas. Bu tavuish pastgi alt tishilari ni yukari qismiga tila ni trab qatdiq talafuz qilish bilan hasil",
+    "text": "Sod harfini aynan ifodalaydigan harf oʻzbek tilida mavjud emas. Bu tovush pastki old tishlarning yuqori qismiga tilni tirab, qattiq talaffuz qilish bilan hosil",
     "start": 1.31,
     "end": 13.54,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "qilinada. Saad xarifa fatxali bolub kelyanda yogan o qilada.",
+    "text": "qilinadi. Sod harfi fathali boʻlib kelganda yoʻgʻon oʻqiladi.",
     "start": 13.54,
     "end": 19.29,
     "conf": 1.0
@@ -987,15 +875,8 @@
     "row": 1,
     "text": "صُمْ صِفْ فَصْ صَرَفْ صَبَرْ بَصَرْ قَصَبْ",
     "start": 24.81,
-    "end": 36.54,
-    "conf": 0.78
-   },
-   {
-    "kind": "uz",
-    "text": "نصر",
-    "start": 36.54,
     "end": 38.52,
-    "conf": 1.0
+    "conf": 0.78
    },
    {
     "kind": "ar",
@@ -1012,19 +893,12 @@
     "start": null,
     "end": null,
     "conf": 0.0
-   },
-   {
-    "kind": "uz",
-    "text": "سفر صفر سيفو صيفو",
-    "start": 46.8,
-    "end": 55.02,
-    "conf": 1.0
    }
   ],
   "ms-020": [
    {
     "kind": "uz",
-    "text": "TA XARFI TA XARFINI AYNAN IFADALAYDIGAN XARF VA TAVUJ OZBEKTILIDA MAVCUD EMAZ. BU",
+    "text": "To harfi. To harfini aynan ifodalaydigan harf va tovush oʻzbek tilida mavjud emas. U",
     "start": 0.0,
     "end": 7.16,
     "conf": 1.0
@@ -1039,15 +913,8 @@
    },
    {
     "kind": "uz",
-    "text": "YUQARDAGI ALT TISHLARNIN TUB QISMIGA TILNI TEKIZIŞ BILAN XASIL QILNADA. TA XARFI FATXALI BOLUB GELGENDA YOGAN OQILADA. طا",
+    "text": "yuqoridagi old tishlarning tub qismiga tilni tekkizish bilan hosil qilinadi. To harfi fathali boʻlib kelganda yoʻgʻon oʻqiladi.",
     "start": 7.54,
-    "end": 18.96,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "طي طو",
-    "start": 18.96,
     "end": 20.86,
     "conf": 1.0
    },
@@ -1056,15 +923,8 @@
     "row": 1,
     "text": "طَلْ طَيْ شَطْ بَطْ قَطْ فَقَطْ",
     "start": 20.86,
-    "end": 29.22,
-    "conf": 0.75
-   },
-   {
-    "kind": "uz",
-    "text": "فقط",
-    "start": 29.22,
     "end": 30.72,
-    "conf": 1.0
+    "conf": 0.75
    },
    {
     "kind": "ar",
@@ -1097,19 +957,12 @@
     "start": null,
     "end": null,
     "conf": 0.0
-   },
-   {
-    "kind": "uz",
-    "text": "Faraf Faraf",
-    "start": 61.08,
-    "end": 63.6,
-    "conf": 1.0
    }
   ],
   "ms-021": [
    {
     "kind": "uz",
-    "text": "ким binmari. Jim kharifini tellafuzu Uzbektile dagyi ca taufi fashion bilan bar axil. g Nou.\" g,",
+    "text": "Jim harfi. Jim harfining talaffuzi oʻzbek tilidagi «j» tovushi bilan bir xil.",
     "start": 0.0,
     "end": 8.56,
     "conf": 1.0
@@ -1135,15 +988,8 @@
     "row": 2,
     "text": "جَبَلْ جَمَلْ اَجْرُ فَجْرُ جَوْهَرْ جَوْرَبْ",
     "start": 20.43,
-    "end": 30.88,
-    "conf": 0.69
-   },
-   {
-    "kind": "uz",
-    "text": "جورب",
-    "start": 30.88,
     "end": 32.92,
-    "conf": 1.0
+    "conf": 0.69
    },
    {
     "kind": "ar",
@@ -1157,7 +1003,7 @@
   "ms-022": [
    {
     "kind": "uz",
-    "text": "XAXARF XAXARF",
+    "text": "Xo harfi.",
     "start": 0.0,
     "end": 2.1,
     "conf": 1.0
@@ -1191,44 +1037,23 @@
     "row": 3,
     "text": "اَخْرَجَ يُخْرِجُ اَخْبَرَ يُخْبِرُ",
     "start": 40.38,
-    "end": 50.28,
-    "conf": 0.7
-   },
-   {
-    "kind": "uz",
-    "text": "استخبار يستخبار يستخبرو",
-    "start": 50.28,
     "end": 56.7,
-    "conf": 1.0
+    "conf": 0.7
    },
    {
     "kind": "ar",
     "row": 4,
     "text": "اِسْتَخْبَرَ يَسْتَخْبِرُ اِسْتَخْرَجَ يَسْتَخْرِجُ",
     "start": 56.7,
-    "end": 58.92,
+    "end": 63.64,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "استخرج",
-    "start": 58.92,
-    "end": 61.51,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يستخرج",
-    "start": 61.51,
-    "end": 63.64,
-    "conf": 1.0
    }
   ],
   "ms-023": [
    {
     "kind": "uz",
-    "text": "Xa xarfa. Xa xarfa uzbek tilda mawujud emas. Bu taurj boğuzdan hech kandai tusksiz chikada.",
+    "text": "Ha harfi. Ha harfi oʻzbek tilida mavjud emas. Bu tovush boʻgʻizdan hech qanday toʻsiqsiz chiqadi.",
     "start": 0.0,
     "end": 8.41,
     "conf": 1.0
@@ -1238,20 +1063,6 @@
     "row": 0,
     "text": "حَ ـحِـ ـحُ",
     "start": 8.41,
-    "end": 13.21,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "hi,",
-    "start": 13.21,
-    "end": 15.03,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "hil,",
-    "start": 15.03,
     "end": 16.91,
     "conf": 1.0
    },
@@ -1268,50 +1079,8 @@
     "row": 2,
     "text": "مُحْسِنْ مَحْشَرْ مِنْحَرْ مَحْفَلْ اَحْسَنْ",
     "start": 24.19,
-    "end": 38.93,
-    "conf": 0.87
-   },
-   {
-    "kind": "uz",
-    "text": "امتحن",
-    "start": 38.93,
-    "end": 42.43,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يمتحنوا",
-    "start": 43.09,
-    "end": 46.43,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "احتملا",
-    "start": 46.43,
-    "end": 48.87,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يحتمنوا",
-    "start": 48.87,
-    "end": 52.69,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "استحسن",
-    "start": 52.69,
-    "end": 54.77,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يستحسنوا",
-    "start": 55.63,
     "end": 57.92,
-    "conf": 1.0
+    "conf": 0.87
    },
    {
     "kind": "ar",
@@ -1335,15 +1104,8 @@
     "row": 5,
     "text": "خَلْقُ – حَلْقُ . خَتْمُ – حَتْمُ . اَرْخَمْ – اَرْحَمْ",
     "start": 65.89,
-    "end": 82.01,
-    "conf": 0.97
-   },
-   {
-    "kind": "uz",
-    "text": "arham, arham, arham.",
-    "start": 82.01,
     "end": 84.2,
-    "conf": 1.0
+    "conf": 0.97
    }
   ],
   "ms-024": [
@@ -1365,50 +1127,8 @@
    },
    {
     "kind": "uz",
-    "text": "ғاين خرف. ғاين خرفنی تلفوز ازبیک تلده گه ғا تاوشبلن برخل. بو خرف فتخلی بولب گیلگنده یوғان تلفوز خلنده.",
+    "text": "Gʻayn harfi. Gʻayn harfining talaffuzi oʻzbek tilidagi «gʻ» tovushi bilan bir xil. Bu harf fathali boʻlib kelganda yoʻgʻon talaffuz qilinadi.",
     "start": 0.0,
-    "end": 11.65,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ғا ғي",
-    "start": 11.65,
-    "end": 14.93,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ғو",
-    "start": 14.93,
-    "end": 16.63,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ғم ғاب",
-    "start": 16.63,
-    "end": 19.71,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ғیل ғایرو",
-    "start": 19.71,
-    "end": 22.69,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ғغلو",
-    "start": 22.69,
-    "end": 25.41,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ғرғو",
-    "start": 25.41,
     "end": 27.18,
     "conf": 1.0
    },
@@ -1425,29 +1145,15 @@
     "row": 3,
     "text": "اِشْتَغَلَ يَشْتَغِلُ اِسْتَغْفَرَ يَسْتَغْفِرُ",
     "start": 39.01,
-    "end": 48.61,
-    "conf": 0.69
-   },
-   {
-    "kind": "uz",
-    "text": "يستغفر U.",
-    "start": 48.61,
     "end": 49.76,
-    "conf": 1.0
+    "conf": 0.69
    }
   ],
   "ms-025": [
    {
     "kind": "uz",
-    "text": "Ayn xarifah. Ayn xarifinin uzbek tildan muqabili yok. Bu xarif xalqum arastan chikada. Unin telafuzda kichik tildjanin aqamiyat ketda.",
+    "text": "Ayn harfi. Ayn harfining oʻzbek tilida muqobili yoʻq. Bu harf halqum oʻrtasidan chiqadi. Uning talaffuzida kichik tilning ahamiyati katta.",
     "start": 0.0,
-    "end": 11.65,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "A.",
-    "start": 11.65,
     "end": 13.41,
     "conf": 1.0
    },
@@ -1456,22 +1162,8 @@
     "row": 0,
     "text": "عَ ـعِـ ـعُ",
     "start": 13.41,
-    "end": 15.01,
-    "conf": 0.5
-   },
-   {
-    "kind": "uz",
-    "text": "H.",
-    "start": 15.01,
-    "end": 16.19,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "B.",
-    "start": 16.19,
     "end": 17.33,
-    "conf": 1.0
+    "conf": 0.5
    },
    {
     "kind": "ar",
@@ -1486,15 +1178,8 @@
     "row": 2,
     "text": "عَجَبْ عَمَلْ عِلْمُ عُمْرُ جَمْعُ جَعْلُ",
     "start": 30.12,
-    "end": 41.5,
-    "conf": 0.94
-   },
-   {
-    "kind": "uz",
-    "text": "ʔjamʔu ʔjālʔu",
-    "start": 41.5,
     "end": 42.96,
-    "conf": 1.0
+    "conf": 0.94
    },
    {
     "kind": "ar",
@@ -1511,19 +1196,12 @@
     "start": null,
     "end": null,
     "conf": 0.0
-   },
-   {
-    "kind": "uz",
-    "text": "ʔʔanbar ʔarabʔ",
-    "start": 54.14,
-    "end": 54.58,
-    "conf": 1.0
    }
   ],
   "ms-026": [
    {
     "kind": "uz",
-    "text": "ДАЛХАРФА ДАЛХАРФНИНИН ТАЛАФУЗУ ОЗБЕКТЛАДАГИ ДЫ ТАУШИ КАБАДАР.",
+    "text": "Dal harfi. Dal harfining talaffuzi oʻzbek tilidagi «d» tovushi kabidir.",
     "start": 0.0,
     "end": 6.06,
     "conf": 1.0
@@ -1551,16 +1229,9 @@
     "row": 2,
     "text": "دَرْسُ دَفْعُ دَبْغُ دَلْكُ دَهْرُ دُهْنُ",
     "start": 17.48,
-    "end": 31.28,
+    "end": 35.98,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "دهرو دهنو دل",
-    "start": 31.28,
-    "end": 35.98,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -1582,14 +1253,14 @@
   "ms-027": [
    {
     "kind": "uz",
-    "text": "ZAD KHARIFE ZAD KHARIFE NING OZBIK TILIDA AYINAN AUK SHASHI YOG ZAD KHARIFE TILINING ONG VE CHAP YANLAR BILAN USTGY VE PASKET SHLAR NING ARALGDAN CHKADA BU",
+    "text": "Zod harfi. Zod harfining oʻzbek tilida aynan oʻxshashi yoʻq. Zod harfi tilning oʻng va chap yonlari bilan ustki va pastki tishlarning orasidan chiqadi. Bu",
     "start": 0.0,
     "end": 11.62,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "KHARIF FATKALI BOLUB KILGYANDA YOGAN AUKLADA",
+    "text": "harf fathali boʻlib kelganda yoʻgʻon oʻqiladi.",
     "start": 11.62,
     "end": 14.78,
     "conf": 1.0
@@ -1599,15 +1270,8 @@
     "row": 0,
     "text": "ضَ ـضِـ ـضُ",
     "start": 14.78,
-    "end": 16.36,
-    "conf": 0.62
-   },
-   {
-    "kind": "uz",
-    "text": "ضي ضو",
-    "start": 16.36,
     "end": 19.88,
-    "conf": 1.0
+    "conf": 0.62
    },
    {
     "kind": "ar",
@@ -1645,14 +1309,14 @@
   "ms-028": [
    {
     "kind": "uz",
-    "text": "zal harfa",
+    "text": "Zal harfi.",
     "start": 0.0,
     "end": 1.03,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "zal harfa nشifadhalo ce harfa ta oj is O Ojbayk halda youk. O talni ka qini pastila ha yukari šhti langar ni arasig guguyan hualda Telafoiz qylnada.",
+    "text": "Zal harfini ifodalovchi harf va tovush oʻzbek tilida yoʻq. U tilning uchini pastki va yuqori tishlarning orasiga qoʻygan holda talaffuz qilinadi.",
     "start": 1.03,
     "end": 12.29,
     "conf": 1.0
@@ -1678,15 +1342,8 @@
     "row": 2,
     "text": "اِذْنُ بَذْلُ ذِكْرُ ذِهْنُ ذَهَبْ مَذْهَبْ",
     "start": 32.04,
-    "end": 42.74,
-    "conf": 0.5
-   },
-   {
-    "kind": "uz",
-    "text": "مذهب ذهل",
-    "start": 42.74,
     "end": 46.68,
-    "conf": 1.0
+    "conf": 0.5
    },
    {
     "kind": "ar",
@@ -1709,14 +1366,14 @@
   "ms-029": [
    {
     "kind": "uz",
-    "text": "ZA XARFI Uzbek tlidda ZA XARFINI IFADALAWCHA XARF VA TAVUSH MAVCUD EMAZ U tlnin ikki yan qismini yoyib, unin yuqardagi tanglayinin altishlargi yakın caigeti",
+    "text": "Zo harfi. Oʻzbek tilida zo harfini ifodalovchi harf va tovush mavjud emas. U tilning ikki yon qismini yoyib, uchini yuqoridagi old tishlarga yaqin joyga tekkizgan",
     "start": 0.0,
     "end": 11.76,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "gizgan xalda, talafuz qilnada.",
+    "text": "holda talaffuz qilinadi.",
     "start": 11.76,
     "end": 14.55,
     "conf": 1.0
@@ -1742,36 +1399,8 @@
     "row": 2,
     "text": "ظَفَرْ نَظَرْ حَظَرْ ظَمَرْ ظَلَفْ عِظَمْ",
     "start": 32.11,
-    "end": 44.53,
-    "conf": 0.7
-   },
-   {
-    "kind": "uz",
-    "text": "نظم",
-    "start": 44.53,
-    "end": 47.49,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ظلف",
-    "start": 47.49,
-    "end": 50.47,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ظفل حظل ظلم",
-    "start": 50.47,
-    "end": 58.33,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ظهر",
-    "start": 58.33,
     "end": 60.44,
-    "conf": 1.0
+    "conf": 0.7
    },
    {
     "kind": "ar",
@@ -1787,15 +1416,8 @@
     "row": 4,
     "text": "اَظْهَرْ اَظْفَرْ مَظْهَرْ مَنْظَرْ مَظْهِرْ مُظْلِمْ",
     "start": 63.36,
-    "end": 76.22,
-    "conf": 0.79
-   },
-   {
-    "kind": "uz",
-    "text": "ظهر",
-    "start": 76.22,
     "end": 78.8,
-    "conf": 1.0
+    "conf": 0.79
    },
    {
     "kind": "ar",
@@ -1833,42 +1455,42 @@
   "ms-030": [
    {
     "kind": "uz",
-    "text": "Madli xariflar.",
+    "text": "Madli harflar.",
     "start": 0.0,
     "end": 2.37,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Madsuzuzuzuzuz, uzaytiruz, manosuzuzuz da keeladi.",
+    "text": "Mad soʻzi «uzaytirish» maʼnosida keladi.",
     "start": 2.37,
     "end": 5.75,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Madsarifu uchta. Ular quyda gilar. Alif,",
+    "text": "Mad harflari uchta. Ular quyidagilar: alif,",
     "start": 5.75,
     "end": 11.23,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "vau,",
+    "text": "vov,",
     "start": 11.23,
     "end": 12.47,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "ya. Fatxadan kiyin alif,",
+    "text": "yo. Fathadan keyin alif,",
     "start": 12.47,
     "end": 15.75,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "kasaradan kiyin ya va, zamadan kiyin vau kilsa, çözub oqaladi. Quyda ularini korup chıxamiz.",
+    "text": "kasradan keyin yo va zammadan keyin vov kelsa, choʻzib oʻqiladi. Quyida ularni koʻrib chiqamiz.",
     "start": 15.75,
     "end": 23.22,
     "conf": 1.0
@@ -1887,37 +1509,9 @@
     "row": 1,
     "text": "ثٰا ثِى ثُو  جٰا جِى جُو  حٰا حِى حُو",
     "start": 26.3,
-    "end": 30.0,
+    "end": 47.35,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "terifu.",
-    "start": 30.0,
-    "end": 31.85,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Tātidhu.",
-    "start": 33.07,
-    "end": 35.57,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Sāsidhu.",
-    "start": 36.03,
-    "end": 39.33,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Dja -jiju . Ha -che -jeechu.",
-    "start": 39.33,
-    "end": 47.35,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -1972,15 +1566,8 @@
     "row": 8,
     "text": "نٰا نِى نُو  وٰا وِى وُو  هٰا هِى هُو",
     "start": 129.51,
-    "end": 143.37,
-    "conf": 0.97
-   },
-   {
-    "kind": "uz",
-    "text": "Bu",
-    "start": 144.11,
     "end": 146.2,
-    "conf": 1.0
+    "conf": 0.97
    },
    {
     "kind": "ar",
@@ -2059,19 +1646,12 @@
     "row": 18,
     "text": "صُو طِى صٰا  طُو صِى طٰا  ضُو اِى ضٰا",
     "start": 252.73,
-    "end": 261.93,
+    "end": 265.93,
     "conf": 0.53
    },
    {
     "kind": "uz",
-    "text": "Lu -i -ha,",
-    "start": 261.93,
-    "end": 265.93,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Yukarıda berilgən musallarını kunt ila urgenip čıqeyin. Bu blankiyengi darslarını uzlaştırışıngiz Osamboladi.",
+    "text": "Yuqorida berilgan misollarni puxta oʻrganib chiqing. Bu keyingi darslarni oʻzlashtirishingizni osonlashtiradi.",
     "start": 265.93,
     "end": 274.23,
     "conf": 1.0
@@ -2097,15 +1677,8 @@
     "row": 21,
     "text": "كَلٰامْ سَلٰامْ حَلٰالْ حَرٰامْ جَلٰالْ جَمٰالْ كَمٰالْ",
     "start": 297.79,
-    "end": 312.74,
-    "conf": 0.97
-   },
-   {
-    "kind": "uz",
-    "text": "kamal",
-    "start": 312.74,
     "end": 314.24,
-    "conf": 1.0
+    "conf": 0.97
    },
    {
     "kind": "ar",
@@ -2152,15 +1725,8 @@
     "row": 27,
     "text": "قٰامٰا طٰافٰا تٰابٰا قُولِى طُوفِى تُوبِى",
     "start": 397.83,
-    "end": 413.57,
-    "conf": 0.54
-   },
-   {
-    "kind": "uz",
-    "text": "يقال يطاف",
-    "start": 415.01,
     "end": 419.56,
-    "conf": 1.0
+    "conf": 0.54
    },
    {
     "kind": "ar",
@@ -2176,15 +1742,8 @@
     "row": 29,
     "text": "يَتُوبٰانِ يَقُولُونَ تَقُومُونَ يَطُوفُونَ تَقُولُونَ",
     "start": 446.17,
-    "end": 455.73,
-    "conf": 0.58
-   },
-   {
-    "kind": "uz",
-    "text": "ya",
-    "start": 455.73,
     "end": 457.08,
-    "conf": 1.0
+    "conf": 0.58
    },
    {
     "kind": "ar",
@@ -2231,30 +1790,9 @@
     "row": 35,
     "text": "اُشْكُرٰا اُنْصُرٰا اِعْلَمٰا اُشْكُرِى اُنْصُرِى اِعْلَمِى",
     "start": 520.48,
-    "end": 522.94,
+    "end": 536.16,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "انصراء",
-    "start": 522.94,
-    "end": 525.29,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يعلماء اشكري",
-    "start": 525.29,
-    "end": 530.67,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "انصري i 'lami",
-    "start": 530.67,
-    "end": 536.16,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -2317,31 +1855,17 @@
     "row": 43,
     "text": "تَعْلِيمْ تَدْرِيسْ تَبْرِيكْ تَحْسِينْ",
     "start": 608.46,
-    "end": 619.27,
-    "conf": 0.65
-   },
-   {
-    "kind": "uz",
-    "text": "بيحة ميلا عيشة يبيعوا",
-    "start": 619.87,
     "end": 628.02,
-    "conf": 1.0
+    "conf": 0.65
    },
    {
     "kind": "ar",
     "row": 44,
     "text": "بِيعَ مِيلَ عِيشَ يَبِيعُ يَمِيلُ تَعِيشُ",
     "start": 628.02,
-    "end": 630.53,
+    "end": 634.73,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "yameenu, ta 'ishu,",
-    "start": 630.53,
-    "end": 634.73,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -2355,21 +1879,21 @@
   "ms-031": [
    {
     "kind": "uz",
-    "text": "Tashditli xariflar. Tashdit sözu ikkilantirish manasida bolib, iki -bir xil undash yanmayan kelib, birincisi sükunli, keyingisi xarakatli bolsa, yazuda ularinin faqat",
+    "text": "Tashdidli harflar. Tashdid soʻzi «ikkilantirish» maʼnosida boʻlib, ikki bir xil undosh yonma-yon kelib, birinchisi sukunli, keyingisi harakatli boʻlsa, yozuvda ularning faqat",
     "start": 0.0,
     "end": 11.58,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "bitdasi yazılıb, üstüge tashdit belgesi qoyilada.",
+    "text": "bittasi yozilib, ustiga tashdid belgisi qoʻyiladi.",
     "start": 11.58,
     "end": 15.65,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Quyda misallar blan, tanishams.",
+    "text": "Quyida misollar bilan tanishamiz.",
     "start": 15.65,
     "end": 18.06,
     "conf": 1.0
@@ -2397,30 +1921,9 @@
     "row": 2,
     "text": "اِنَّ اَنَّ اَمَّ بَرَّ جَرَّ حَجَّ شَكَّ",
     "start": 24.1,
-    "end": 30.41,
+    "end": 42.24,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "أما",
-    "start": 30.41,
-    "end": 33.59,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "برّ",
-    "start": 33.59,
-    "end": 35.91,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "جرّ حجّ شكّ",
-    "start": 35.91,
-    "end": 42.24,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -2467,15 +1970,8 @@
     "row": 8,
     "text": "دَبَّرَ كَثَّرَ فَجَّرَ وَحَّدَ سَخَّرَ اَدَّبَ",
     "start": 132.13,
-    "end": 146.7,
-    "conf": 0.65
-   },
-   {
-    "kind": "uz",
-    "text": "Siddab,",
-    "start": 146.7,
     "end": 147.73,
-    "conf": 1.0
+    "conf": 0.65
    },
    {
     "kind": "ar",
@@ -2617,14 +2113,14 @@
   "ms-032": [
    {
     "kind": "uz",
-    "text": "TANWINLI XARFLAR XARF OSTYOKI USTUDA QUYDAGY BELGELERDAN BIR KILSA, BIR SKUNLI NUN ORTTYR BOGILADY.",
+    "text": "Tanvinli harflar. Harf ostida yoki ustida quyidagi belgilardan biri kelsa, bir sukunli nun orttirib oʻqiladi.",
     "start": 0.0,
     "end": 9.07,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "FATHA TANWINI AN KASRA",
+    "text": "Fatha tanvini, kasra tanvini",
     "start": 9.07,
     "end": 12.5,
     "conf": 1.0
@@ -2639,7 +2135,7 @@
    },
    {
     "kind": "uz",
-    "text": "ZAMMA",
+    "text": "va zamma tanvini.",
     "start": 14.08,
     "end": 15.66,
     "conf": 1.0
@@ -2675,27 +2171,6 @@
     "start": null,
     "end": null,
     "conf": 0.0
-   },
-   {
-    "kind": "uz",
-    "text": "din",
-    "start": 86.04,
-    "end": 87.09,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "zin",
-    "start": 87.09,
-    "end": 88.99,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "rin",
-    "start": 88.99,
-    "end": 90.91,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -2750,15 +2225,8 @@
     "row": 11,
     "text": "ثَوْبًا ثَوْبٍ ثَوْبٌ فَوْتًا فَوْتٍ فَوْتٌ",
     "start": 181.99,
-    "end": 196.94,
-    "conf": 0.83
-   },
-   {
-    "kind": "uz",
-    "text": "LAYثAN FOWJIN LOHUN",
-    "start": 196.94,
     "end": 204.04,
-    "conf": 1.0
+    "conf": 0.83
    },
    {
     "kind": "ar",
@@ -2820,7 +2288,7 @@
    },
    {
     "kind": "uz",
-    "text": "TASHDIT",
+    "text": "Tanvinli tashdid.",
     "start": 29.98,
     "end": 29.99,
     "conf": 1.0
@@ -2869,7 +2337,7 @@
   "ms-034": [
    {
     "kind": "uz",
-    "text": "Alif ve Hamza",
+    "text": "Alif va hamza.",
     "start": 0.0,
     "end": 1.88,
     "conf": 1.0
@@ -2884,7 +2352,7 @@
    },
    {
     "kind": "uz",
-    "text": "Hamza toqqis qil korunışta mawujud ular Quyda gilar. Indi ularini misallar yardamda korub ciqhamis.",
+    "text": "Hamza toʻqqiz xil koʻrinishda mavjud. Ular quyidagilar. Endi ularni misollar yordamida koʻrib chiqamiz.",
     "start": 3.34,
     "end": 10.57,
     "conf": 1.0
@@ -2950,36 +2418,8 @@
     "row": 8,
     "text": "بِئْسَ بِئْرُ سَئَلَ يَسْئَلُ مَسْئُولْ",
     "start": 68.42,
-    "end": 81.18,
-    "conf": 0.98
-   },
-   {
-    "kind": "uz",
-    "text": "Shaaah Saaaah Jaa 'a Yasha",
-    "start": 81.18,
-    "end": 92.14,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "'a",
-    "start": 92.14,
-    "end": 93.83,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Masaa 'a Shia 'a Ji 'a Yajii 'u",
-    "start": 93.83,
-    "end": 105.76,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Yusii 'u Musii 'u",
-    "start": 105.76,
     "end": 111.8,
-    "conf": 1.0
+    "conf": 0.98
    },
    {
     "kind": "ar",
@@ -3018,15 +2458,8 @@
     "row": 13,
     "text": "اَلْمَرْءُ اِمْرَأً اِمْرِئٍ اِمْرُؤٌ",
     "start": 186.23,
-    "end": 194.65,
-    "conf": 0.6
-   },
-   {
-    "kind": "uz",
-    "text": "امرئ",
-    "start": 194.65,
     "end": 197.85,
-    "conf": 1.0
+    "conf": 0.6
    },
    {
     "kind": "ar",
@@ -3040,7 +2473,7 @@
   "ms-035": [
    {
     "kind": "uz",
-    "text": "Ta marbutta. Ta marbutta tini asasa.",
+    "text": "Ta marbuta. Ta marbuta «t» tovushini beruvchi",
     "start": 0.0,
     "end": 3.23,
     "conf": 1.0
@@ -3055,7 +2488,7 @@
    },
    {
     "kind": "uz",
-    "text": "un dashi bolib u muannas. Ayal cinsige dalalat qiluči sozlar ahirida kollanilada. Quyida unge misallar kildaramis.",
+    "text": "undosh boʻlib, u muannas, yaʼni ayol jinsiga dalolat qiluvchi soʻzlar oxirida qoʻllaniladi. Quyida unga misollar keltiramiz.",
     "start": 3.66,
     "end": 13.69,
     "conf": 1.0
@@ -3088,7 +2521,7 @@
   "ms-036": [
    {
     "kind": "uz",
-    "text": "Yazılmasa xam uqiladigyan xariflar.",
+    "text": "Yozilmasa ham oʻqiladigan harflar.",
     "start": 0.0,
     "end": 2.55,
     "conf": 1.0
@@ -3103,7 +2536,7 @@
    },
    {
     "kind": "uz",
-    "text": "Artdırilgen alif. Üstuda fatxalomat bilan tike yazilgen kiçik alif xarifi hudda alif kabir çözib uqiladi. Quyuda misallar bilan tanışib çıxamiz.",
+    "text": "Orttirilgan alif. Ustida fatha alomati bilan tik yozilgan kichik alif harfi xuddi alif kabi choʻzib oʻqiladi. Quyida misollar bilan tanishib chiqamiz.",
     "start": 4.29,
     "end": 16.53,
     "conf": 1.0
@@ -3144,14 +2577,14 @@
    },
    {
     "kind": "uz",
-    "text": "artdırilgan ya. Soz ahirda kilgan kəsirali ha -dan aldingi xarif xam kəsirali bolsa, ha -dan kin bir ya xarifı qoşıb çözilib oquladı. Bu belgi Usman",
+    "text": "Orttirilgan yo. Soʻz oxirida kelgan kasrali ha harfidan oldingi harf ham kasrali boʻlsa, ha harfidan keyin bir yo harfi qoʻshib, choʻzib oʻqiladi. Bu belgi Usmoniy",
     "start": 1.67,
     "end": 13.72,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "mushafıda quyudakce kornishda kilgan.",
+    "text": "mushafda quyidagi koʻrinishda kelgan.",
     "start": 13.72,
     "end": 17.07,
     "conf": 1.0
@@ -3176,14 +2609,14 @@
    },
    {
     "kind": "uz",
-    "text": "ОРТТРИЛГЕН ВАВ СОЗ АХИРДА КЕЛГЕН ЗАММАЛИ ХА ХАРФДАН АЛДИНГЕ ХАРФХАМ ЗАММАЛИ ЯКИ ФАТХАЛИП ОЛСА ХА ХАРФДАН СОЙН БР",
+    "text": "Orttirilgan vov. Soʻz oxirida kelgan zammali ha harfidan oldingi harf ham zammali yoki fathali boʻlsa, ha harfidan soʻng bir",
     "start": 1.52,
     "end": 13.36,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "ВАВ КОШЮП ЧОЗБОКЛАДА КУЙДА ОНГЕ МСАЛЛАР КЕЛТРАМИЗ",
+    "text": "vov qoʻshib choʻzib oʻqiladi. Quyida unga misollar keltiramiz.",
     "start": 13.36,
     "end": 17.5,
     "conf": 1.0
@@ -3217,15 +2650,8 @@
    },
    {
     "kind": "uz",
-    "text": "Sos ahirda fatqadankin nuktalarsız gelgan ya -xarfi alfi maksura dip atalada. O, çözıq A tarzda uqalada. Quyda bunga misallar keldirilgan.",
+    "text": "Soʻz oxirida fathadan keyin nuqtasiz kelgan yo harfi alifi maqsura deb ataladi. U choʻziq «a» tarzida oʻqiladi. Quyida bunga misollar keltirilgan.",
     "start": 1.43,
-    "end": 13.79,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "A 'la, Mousa,",
-    "start": 30.01,
     "end": 35.61,
     "conf": 1.0
    },
@@ -3248,7 +2674,7 @@
    },
    {
     "kind": "uz",
-    "text": "Shunindik qoydagi sozlar ortasta keelgan",
+    "text": "Shuningdek, quyidagi soʻzlar oʻrtasida kelgan",
     "start": 48.91,
     "end": 51.94,
     "conf": 1.0
@@ -3263,7 +2689,7 @@
    },
    {
     "kind": "uz",
-    "text": "talafuz qılınada.",
+    "text": "talaffuz qilinadi.",
     "start": 54.74,
     "end": 56.02,
     "conf": 1.0
@@ -3288,7 +2714,7 @@
    },
    {
     "kind": "uz",
-    "text": "Fatqadan ki in kelgan vav, un dashi kham, chozik aqilip uqilada. Quyida musallarini korib chikhamis.",
+    "text": "Fathadan keyin kelgan vov «a» kabi choʻzib oʻqiladi. Quyida misollarni koʻrib chiqamiz.",
     "start": 1.99,
     "end": 9.61,
     "conf": 1.0
@@ -3305,14 +2731,14 @@
   "ms-041": [
    {
     "kind": "uz",
-    "text": "Yazılsakam uqilmeydigyan xarflar. Quydaqi sözlarinin başıdagi əlif, Vov blan yazılgen bolsa da, Vov matqilip yani çözib uqilmeydi, balki addi zem makabu",
+    "text": "Yozilsa ham oʻqilmaydigan harflar. Quyidagi soʻzlarning boshidagi alif vov bilan yozilgan boʻlsa-da, vov oʻqilmaydi, yaʼni choʻzib oʻqilmaydi, balki oddiy zamma kabi",
     "start": 0.0,
     "end": 11.98,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "uqiladi.",
+    "text": "oʻqiladi.",
     "start": 11.98,
     "end": 12.4,
     "conf": 1.0
@@ -3328,7 +2754,7 @@
    },
    {
     "kind": "uz",
-    "text": "Shunindek sözlar ahirdaqi kəlimelarinin cem, Qublik alamati bolgan",
+    "text": "Shuningdek, soʻzlar oxiridagi koʻplik alomati boʻlgan",
     "start": 24.37,
     "end": 29.52,
     "conf": 1.0
@@ -3352,15 +2778,8 @@
    },
    {
     "kind": "uz",
-    "text": "Quydaagi misallar kabhi sozlardah ham orta dagi alif uqilmeyda.",
+    "text": "Quyidagi misollar kabi soʻzlarda ham oʻrtadagi alif oʻqilmaydi.",
     "start": 47.55,
-    "end": 53.33,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "wa Jalākhira kaalfarash wal 'asr wal 'har",
-    "start": 56.89,
     "end": 66.38,
     "conf": 1.0
    },
@@ -3377,15 +2796,8 @@
     "row": 4,
     "text": "غَيْرِ الْمَغْضُوبِ . هُمُ الْمُفْلِحُونَ . لَيْلَةُ الْقَدْرِ",
     "start": 78.3,
-    "end": 87.86,
-    "conf": 0.75
-   },
-   {
-    "kind": "uz",
-    "text": "kāalafrāsh waal 'a srāt al -lazīn ghayri al -maghdub. Siylatul Qadr",
-    "start": 87.86,
     "end": 89.98,
-    "conf": 1.0
+    "conf": 0.75
    },
    {
     "kind": "ar",
@@ -3399,15 +2811,8 @@
   "ms-042": [
    {
     "kind": "uz",
-    "text": "IDGHAM SHAMSIYA Quyidagi misallar ka bu sozlar da xam ortadagi lam uqilmeyda",
+    "text": "Idgʻom shamsiya. Quyidagi misollar kabi soʻzlarda ham oʻrtadagi lom oʻqilmaydi.",
     "start": 0.0,
-    "end": 6.61,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "al -dararu, al",
-    "start": 30.13,
     "end": 34.14,
     "conf": 1.0
    },
@@ -3428,13 +2833,6 @@
     "conf": 0.0
    },
    {
-    "kind": "uz",
-    "text": "al",
-    "start": 41.27,
-    "end": 42.64,
-    "conf": 1.0
-   },
-   {
     "kind": "ar",
     "row": 2,
     "text": "اَلطَّلَبُ . اَلظَّفَرُ . اَللَّهَبُ . اَلنَّسَبُ",
@@ -3452,15 +2850,8 @@
    },
    {
     "kind": "uz",
-    "text": "Quy dagi misallar ki abu sozlar daxam, orta dagi alif vallam uqilmeyda. هو التبعو هو السمرو",
+    "text": "Quyidagi misollar kabi soʻzlarda ham oʻrtadagi alif va lom oʻqilmaydi.",
     "start": 46.61,
-    "end": 57.92,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "هو الدخلو هو الذهبو",
-    "start": 57.92,
     "end": 63.88,
     "conf": 1.0
    },
@@ -3492,21 +2883,21 @@
   "ms-043": [
    {
     "kind": "uz",
-    "text": "Ishar, Qamariya. Quyidagi misallar kabi sözlar qošip oqilganda, aval keleotgen söz, mat xariflari blan tukilgan bolsa xam, kengi söznin baş xarifu blan yapıq boğun xasil",
+    "text": "Izhor qamariya. Quyidagi misollar kabi soʻzlar qoʻshib oʻqilganda, avval kelayotgan soʻz mad harflari bilan tugagan boʻlsa ham, keyingi soʻzning bosh harfi bilan yopiq boʻgʻin hosil",
     "start": 0.0,
     "end": 11.9,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "qilganligi uçun qisqa onli kabi oqiladi.",
+    "text": "qilganligi uchun qisqa unli kabi oʻqiladi.",
     "start": 11.9,
     "end": 15.17,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Bundai xallarda ikta xarif oqilmeyi tuship qalada.",
+    "text": "Bunday hollarda ikkita harf oʻqilmay tushib qoladi.",
     "start": 15.17,
     "end": 17.92,
     "conf": 1.0
@@ -3534,30 +2925,9 @@
     "row": 2,
     "text": "بِئْسَ الْاِسْمُ . اِهْدِنَا الصِّرٰاطَ . يٰآاَيُّهَا النّٰاسُ",
     "start": 26.27,
-    "end": 30.0,
+    "end": 59.76,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "هذا الذي من ذا الذي تحتها الأنهار",
-    "start": 30.0,
-    "end": 41.59,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "فقلنا انضرب بئس الاسم",
-    "start": 41.59,
-    "end": 49.97,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "اهدنا الصراط يا أيها الناس",
-    "start": 49.97,
-    "end": 59.76,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -3576,20 +2946,6 @@
     "conf": 0.0
    },
    {
-    "kind": "uz",
-    "text": "قالوا اتخذ قالوا ادعوا",
-    "start": 74.06,
-    "end": 81.35,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "لقوا الذين أوتوا الكتاب",
-    "start": 81.35,
-    "end": 89.59,
-    "conf": 1.0
-   },
-   {
     "kind": "ar",
     "row": 5,
     "text": "وَاَقِيمُوا الصَّلٰوةَ . وَاٰتُوا الزَّكٰوةَ . وَعَمِلُوا الصّٰالِحٰاتِ",
@@ -3601,14 +2957,14 @@
   "ms-044": [
    {
     "kind": "uz",
-    "text": "Vasil",
+    "text": "Vasl.",
     "start": 0.0,
     "end": 1.27,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Koshubokush",
+    "text": "Qoʻshib oʻqish.",
     "start": 1.27,
     "end": 3.15,
     "conf": 1.0
@@ -3623,14 +2979,14 @@
    },
    {
     "kind": "uz",
-    "text": "ni birga koshubokush dar. Vasil Ali, alif üstuda xamza bilgis bolmayda. 2 söz birga koshubokul ganda, xar daim orta lardagi bir, 2 ya ki, 3 xarf okulmay chupqalada.",
+    "text": "Vasl ikki, uch yoki toʻrt soʻzni birga qoʻshib oʻqishdir. Vasl alifi ustida hamza belgisi boʻlmaydi. Ikki soʻz birga qoʻshib oʻqilganda, har doim oʻrtalaridagi bir, ikki yoki uch harf oʻqilmay tushib qoladi.",
     "start": 5.48,
     "end": 17.15,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Bunday vaxte 2 söz niy ortasta keliyatgan bir alif, hec bir bilgisiz xalda, fatqa zama ya ki, kasrasiz tura da. Quydagi misalarda, 3 söz vasil qilingan.",
+    "text": "Bunday vaqtda ikki soʻzning oʻrtasida kelayotgan bir alif hech bir belgisiz, fatha, zamma yoki kasrasiz turadi. Quyidagi misollarda uchta soʻz vasl qilingan.",
     "start": 17.15,
     "end": 29.83,
     "conf": 1.0
@@ -3652,49 +3008,21 @@
     "conf": 0.0
    },
    {
-    "kind": "uz",
-    "text": "نار الله الموقدة",
-    "start": 42.33,
-    "end": 48.59,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "كمثل الذي استوقد",
-    "start": 49.47,
-    "end": 54.79,
-    "conf": 1.0
-   },
-   {
     "kind": "ar",
     "row": 3,
     "text": "فَاتَّقُوا النّٰارَ الَّتِى . هُوَ التَّوّٰابُ الرَّحِيمُ",
     "start": 56.41,
-    "end": 69.43,
-    "conf": 0.56
-   },
-   {
-    "kind": "uz",
-    "text": "ذو الفضل العظيم",
-    "start": 69.43,
     "end": 74.44,
-    "conf": 1.0
+    "conf": 0.56
    },
    {
     "kind": "ar",
     "row": 4,
     "text": "ذُو الْفَضْلِ الْعَظِيمِ . اَنْتَ الْعَزِيزُ الْحَكِيمُ",
     "start": 74.44,
-    "end": 77.98,
+    "end": 83.6,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "أنت العزيز الحكيم PLEASE PLEASE PLEASE PLEASE",
-    "start": 77.98,
-    "end": 83.6,
-    "conf": 1.0
    }
   ],
   "ms-045": [
@@ -3708,14 +3036,14 @@
    },
    {
     "kind": "uz",
-    "text": "Vaqf sozı toqtash manasada kilib, Qur 'an karimda uniyin belgilari kilgan jayda braz toqtashge aytilada. Toqtash alamata aldada gie sozniin halatiga qarab ya sikun,",
+    "text": "Vaqf soʻzi «toʻxtash» maʼnosida kelib, Qurʼoni karimda uning belgilari kelgan joyda biroz toʻxtashga aytiladi. Toʻxtash alomati oldidagi soʻzning holatiga qarab yo sukun,",
     "start": 1.96,
     "end": 13.45,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "ya alif, ya khud sikunli hablan vaqf qilnada. Quyida ularege misallar berilgan.",
+    "text": "yo alif, yoxud sukunli ha bilan vaqf qilinadi. Quyida ularga misollar berilgan.",
     "start": 13.45,
     "end": 20.77,
     "conf": 1.0
@@ -3764,14 +3092,14 @@
    },
    {
     "kind": "uz",
-    "text": "uqış qaydalara. Maddeb unli tavşlarini iki xarakat mqtarda ya ki, ondan kubraq çözüb uqışiga aytilishini va madxariflar uçda. Alif, vao,",
+    "text": "Mad, choʻzib oʻqish qoidalari. Mad unli tovushlarni ikki harakat miqdorida yoki undan koʻproq choʻzib oʻqishga aytilishini va mad harflari uchta: alif, vov,",
     "start": 0.92,
     "end": 12.71,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "yalar ekanini yukarda takidlab utgan edik. Yindi madxariflarinin çözüb uqilishiga sabab boladigyan belgilar haqda bilbalamiz. Madga",
+    "text": "yo ekanini yuqorida taʼkidlab oʻtgan edik. Endi mad harflarining choʻzib oʻqilishiga sabab boʻladigan belgilar haqida bilib olamiz.",
     "start": 12.71,
     "end": 22.52,
     "conf": 1.0
@@ -3786,7 +3114,7 @@
    },
    {
     "kind": "uz",
-    "text": "Skunnin ozu iki xil boladi. Birincisi, lazım sikun. Xarf üstuda əvvəldən bar bolub, daima turadigən sikundur. Misallar.",
+    "text": "Sukunning oʻzi ikki xil boʻladi. Birinchisi, lozim sukun: harf ustida avvaldan bor boʻlib, doimo turadigan sukundir. Misollar:",
     "start": 26.49,
     "end": 36.78,
     "conf": 1.0
@@ -3802,14 +3130,14 @@
    },
    {
     "kind": "uz",
-    "text": "Yukarıdagi sözlarda təşdid içi dəgi birinci ha, birinci lam və birinci sinlərin sikunu lazım sikundur. 2.",
+    "text": "Yuqoridagi soʻzlarda tashdid ichidagi birinchi ha, birinchi lom va birinchi sinlarning sukuni lozim sukundir. Ikkinchisi,",
     "start": 50.09,
     "end": 60.13,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Aruz sikun Vaqf qilish sabapli payda boladigan sikundir. Agar söz ozdan ki ingi jumlaga ulab uqilsa, unda oz harakatiga muhafiq uqla",
+    "text": "oriz sukun: vaqf qilish sababli paydo boʻladigan sukundir. Agar soʻz oʻzidan keyingi jumlaga ulab oʻqilsa, unda oʻz harakatiga muvofiq oʻqiladi.",
     "start": 60.13,
     "end": 70.46,
     "conf": 1.0
@@ -3819,26 +3147,19 @@
     "row": 3,
     "text": "سِيٓءَ . جِيٓءَ . سِيٓئَتْ . سُوٓءَ . اَبُوٓءَ",
     "start": 70.46,
-    "end": 73.24,
+    "end": 75.77,
     "conf": 0.5
    },
    {
     "kind": "uz",
-    "text": "-alamin",
-    "start": 73.24,
-    "end": 75.77,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Al -rahim Al -nas Yukaridagi sözlar ahiridagi nun, mim və sinlərнің yuskını",
+    "text": "Yuqoridagi soʻzlar oxiridagi nun, mim va sinlarning sukuni",
     "start": 75.77,
     "end": 87.54,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "orz kındır.",
+    "text": "oriz sukundir.",
     "start": 87.54,
     "end": 89.1,
     "conf": 1.0
@@ -3847,85 +3168,8 @@
   "ms-047": [
    {
     "kind": "uz",
-    "text": "Tabi mat. Mat, kharafı songidan sabab mat kelimasa tabi mat boladi wa bir alif miktarca çozu boquladi. Tabi mat ke misallar.",
+    "text": "Tabiiy mad. Mad harfidan soʻng mad sababi kelmasa, tabiiy mad boʻladi va bir alif miqdoricha choʻzib oʻqiladi. Tabiiy madga misollar:",
     "start": 0.0,
-    "end": 10.39,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Inna, ra,",
-    "start": 13.37,
-    "end": 17.63,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ta,",
-    "start": 17.63,
-    "end": 20.13,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "bu,",
-    "start": 20.35,
-    "end": 22.99,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "nu,",
-    "start": 22.99,
-    "end": 26.67,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "hu.",
-    "start": 26.67,
-    "end": 28.51,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "伊غ ۷ۃ ذي قِيلَ طيني فیها ما",
-    "start": 28.51,
-    "end": 41.45,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "اعلمي",
-    "start": 42.29,
-    "end": 45.55,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "اشكرا",
-    "start": 45.55,
-    "end": 47.73,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "انصرا",
-    "start": 48.55,
-    "end": 52.55,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "اعلمى",
-    "start": 52.55,
-    "end": 54.69,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Ushkuri",
-    "start": 54.69,
     "end": 57.12,
     "conf": 1.0
    }
@@ -3933,57 +3177,15 @@
   "ms-048": [
    {
     "kind": "uz",
-    "text": "Muttasil mat. Mat xarifı sungidan sabab mat xamza bolub, ikis xam bir kalimada kelsa, muttasil mat bolada. Muttasil mat tort alif mxtarca chozulada.",
+    "text": "Muttasil mad. Mad harfidan soʻng mad sababi hamza boʻlib, ikkisi ham bir kalimada kelsa, muttasil mad boʻladi. Muttasil mad toʻrt alif miqdoricha choʻziladi.",
     "start": 0.0,
     "end": 12.03,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Muttasil mat ge musallar.",
+    "text": "Muttasil madga misollar:",
     "start": 12.03,
-    "end": 15.21,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Ja -a,",
-    "start": 15.87,
-    "end": 19.75,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "su -a,",
-    "start": 19.75,
-    "end": 23.09,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ji -a,",
-    "start": 23.09,
-    "end": 26.31,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "alfa -i -za.",
-    "start": 26.31,
-    "end": 30.97,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "۱۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲۲ damn sayא",
-    "start": 51.49,
-    "end": 57.07,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "MSA sea Qulu o Qulu o",
-    "start": 62.01,
     "end": 70.74,
     "conf": 1.0
    }
@@ -3991,50 +3193,15 @@
   "ms-049": [
    {
     "kind": "uz",
-    "text": "MUNFASIL MAD Agar MAD kharafartadan sabab MAD khamza bolub, başqa sözda kilse, MUNFASIL MAD bolada. MUNFASIL MAD na bir alifdan tort alifkače çözış",
+    "text": "Munfasil mad. Agar mad harfidan soʻng mad sababi hamza boʻlib, boshqa soʻzda kelsa, munfasil mad boʻladi. Munfasil madni bir alifdan toʻrt alifgacha choʻzish",
     "start": 0.0,
     "end": 11.82,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "caiz. MUNFASIL MAD kem saallar.",
+    "text": "joiz. Munfasil madga misollar:",
     "start": 11.82,
-    "end": 14.81,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Inna ilayhi",
-    "start": 16.51,
-    "end": 20.25,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Inna a'tadna",
-    "start": 22.33,
-    "end": 25.43,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Maza a 'rada wa inna in bima unzila",
-    "start": 26.33,
-    "end": 38.8,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ya ayyuhaa inna arsalna",
-    "start": 38.8,
-    "end": 48.9,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "innama amwalukum.",
-    "start": 48.9,
     "end": 55.04,
     "conf": 1.0
    }
@@ -4042,71 +3209,15 @@
   "ms-050": [
    {
     "kind": "uz",
-    "text": "ЛАЗММАТ Әгер мад харфы сонгиды келген сабаб, мад сукону лазым болса, лазым мад болады. Лазым мад, торт әлиф мықтарча чозылыши шарт. Лазым мад",
+    "text": "Lozim mad. Agar mad harfidan soʻng kelgan mad sababi lozim sukun boʻlsa, lozim mad boʻladi. Lozim madni toʻrt alif miqdoricha choʻzish shart. Lozim mad",
     "start": 0.0,
     "end": 11.92,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "ке мысалдар.",
+    "text": "ga misollar:",
     "start": 11.92,
-    "end": 13.39,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Әлиф ләммим сады Әлиф ләммим сады Әлиф ләммим сады Әлиф ләммим сады Al",
-    "start": 17.39,
-    "end": 30.06,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "-Amiim",
-    "start": 30.06,
-    "end": 34.07,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Walallallin",
-    "start": 38.55,
-    "end": 40.89,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Qaf",
-    "start": 44.11,
-    "end": 47.27,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Saad",
-    "start": 47.61,
-    "end": 50.43,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Yasin",
-    "start": 52.31,
-    "end": 54.71,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Alif Laam Meem",
-    "start": 57.89,
-    "end": 64.59,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Noon Alif Laam Ra",
-    "start": 67.85,
     "end": 75.66,
     "conf": 1.0
    }
@@ -4114,64 +3225,8 @@
   "ms-051": [
    {
     "kind": "uz",
-    "text": "Arzmat. Agar mad kharafı songida kilgan sabab mad arz kun bolsa, arzmat bolada. Arizmat ikki aliften tord alifkaçya çozu boqulada. Arizmat ke misallar.",
+    "text": "Oriz mad. Agar mad harfidan soʻng kelgan mad sababi oriz sukun boʻlsa, oriz mad boʻladi. Oriz mad ikki alifdan toʻrt alifgacha choʻzib oʻqiladi. Oriz madga misollar:",
     "start": 0.0,
-    "end": 12.71,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Yash 'uroon,",
-    "start": 12.71,
-    "end": 15.37,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Ya 'lamoon,",
-    "start": 16.03,
-    "end": 19.65,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Tek -siboon,",
-    "start": 20.19,
-    "end": 23.85,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Walil mu'minin,",
-    "start": 23.85,
-    "end": 27.37,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ملع المحسنين",
-    "start": 28.35,
-    "end": 32.19,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يشتهون",
-    "start": 33.43,
-    "end": 36.17,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "وتقضعون",
-    "start": 37.23,
-    "end": 40.73,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "مفسدين",
-    "start": 40.73,
     "end": 42.52,
     "conf": 1.0
    }
@@ -4179,29 +3234,15 @@
   "ms-052": [
    {
     "kind": "uz",
-    "text": "LIN LAZIMMAT LIN YUMŞAX MANASINI BILDIRADI LIN XARIFLARI 2D SÜKÜNLİ VAV VA SÜKÜNLİ YA XARIFLARI LIN XARIFI SÜKÜNLİ LAZIMGƏ",
+    "text": "Lin lozim mad. Lin «yumshoq» maʼnosini bildiradi. Lin harflari ikkita: sukunli vov va sukunli yo. Lin harfi lozim sukunga",
     "start": 0.0,
     "end": 11.8,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "YOLQQANIDA LIN LAZIMMAT BOLADY LIN LAZIMMAT TORT ALIF MĞTARCYI CHOZUB OQILADY MISALLAR",
+    "text": "yoʻliqqanida lin lozim mad boʻladi. Lin lozim mad toʻrt alif miqdoricha choʻzib oʻqiladi. Misollar:",
     "start": 11.8,
-    "end": 19.83,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "KÄF HƏYƏ AIN SAD",
-    "start": 21.83,
-    "end": 28.87,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Hamim Aynsinqaf",
-    "start": 35.47,
     "end": 39.28,
     "conf": 1.0
    }
@@ -4209,57 +3250,8 @@
   "ms-053": [
    {
     "kind": "uz",
-    "text": "Lin arizmat. Lin xarifis kunli arizge yoluqanda lin arizmat bolada. Lin arizmatna ikki aliften tord alifkecha chozish mumkun. Musallar.",
+    "text": "Lin oriz mad. Lin harfi oriz sukunga yoʻliqqanda lin oriz mad boʻladi. Lin oriz madni ikki alifdan toʻrt alifgacha choʻzish mumkin. Misollar:",
     "start": 0.0,
-    "end": 12.49,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Wassayif",
-    "start": 13.13,
-    "end": 15.87,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Amrain",
-    "start": 16.99,
-    "end": 18.73,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Assu",
-    "start": 21.31,
-    "end": 23.75,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Shauq",
-    "start": 25.93,
-    "end": 28.47,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "қوص",
-    "start": 28.47,
-    "end": 31.65,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ғایض",
-    "start": 33.13,
-    "end": 36.57,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "қوف",
-    "start": 36.57,
     "end": 38.42,
     "conf": 1.0
    }
@@ -4267,22 +3259,8 @@
   "ms-054": [
    {
     "kind": "uz",
-    "text": "Исхар, скунли нун, яки танвейн қуйдаги алтитақ арфнин бірге йолыққаныда нунны білдіріп оқыш. Мысалылар.",
+    "text": "Izhor: sukunli nun yoki tanvin quyidagi oltita harfning biriga yoʻliqqanida nunni bildirib oʻqish. Misollar:",
     "start": 0.0,
-    "end": 10.13,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Lobeika Ni ha juguka Ukrautik ila bukmun umyun wa minhum",
-    "start": 29.21,
-    "end": 40.78,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "walahum azabun alim haqqan alal muttaqin.",
-    "start": 40.78,
     "end": 49.34,
     "conf": 1.0
    }
@@ -4298,7 +3276,7 @@
    },
    {
     "kind": "uz",
-    "text": "Skunli nun yaki tanwin bax harfiqi yolqqanida nunni mimga almaştirib dmaqı bulan iki xarakat maxtarca uşlab duruş.",
+    "text": "Iqlob: sukunli nun yoki tanvin ba harfiga yoʻliqqanida nunni mimga almashtirib, dimogʻ bilan ikki harakat miqdoricha ushlab turish.",
     "start": 0.85,
     "end": 11.31,
     "conf": 1.0
@@ -4308,35 +3286,14 @@
     "row": 1,
     "text": "مِنْ بَعْدِ – مِمْ بَعْدِ . سَمِيعٌ بَصِيرٌ – سَمِيعُمْ بَصِيرٌ",
     "start": 11.31,
-    "end": 25.24,
-    "conf": 0.54
-   },
-   {
-    "kind": "uz",
-    "text": "bil ma 'ruf.",
-    "start": 25.24,
-    "end": 28.45,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "غرفة بيده كثيرة بإذن الله",
-    "start": 29.45,
-    "end": 39.77,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "أمدا بعيدا من بعض",
-    "start": 41.49,
     "end": 47.96,
-    "conf": 1.0
+    "conf": 0.54
    }
   ],
   "ms-056": [
    {
     "kind": "uz",
-    "text": "ғұннали",
+    "text": "Gʻunnali idgʻom.",
     "start": 0.0,
     "end": 0.82,
     "conf": 1.0
@@ -4351,42 +3308,42 @@
    },
    {
     "kind": "uz",
-    "text": "ғұннабу дымақ, yani, бұрынбошлығдан чықадиган аваздар. ғұннали харфлар тортта улар, куиләгелар.",
+    "text": "Gʻunna — dimogʻ, yaʼni burun boʻshligʻidan chiqadigan ovoz. Gʻunnali harflar toʻrtta, ular quyidagilar:",
     "start": 1.59,
     "end": 10.01,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Үләу,",
+    "text": "vov,",
     "start": 10.01,
     "end": 11.51,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "нун,",
+    "text": "nun,",
     "start": 11.51,
     "end": 12.71,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "мим,",
+    "text": "mim,",
     "start": 12.71,
     "end": 14.87,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "я. Скунли нун, яки, танвин ғұннали харфларны бірге, еолыққанды нунны, ұша харфның ичеге киргызып, дымағы білен, икі харакат мақтарчы оқыш ғұннали",
+    "text": "yo. Sukunli nun yoki tanvin gʻunnali harflarning biriga yoʻliqqanda nunni oʻsha harfning ichiga kiritib, dimogʻ bilan ikki harakat miqdoricha oʻqish gʻunnali",
     "start": 14.87,
     "end": 26.66,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "идиғам қса біленады. Misallar.",
+    "text": "idgʻom deyiladi. Misollar:",
     "start": 26.66,
     "end": 29.22,
     "conf": 1.0
@@ -4423,29 +3380,22 @@
     "row": 4,
     "text": "اِلٰهٌ وٰاحِدٌ – اِلٰهُوْ وٰاحِدٌ . خَيْرًا يَرَهُ – خَيْرَيْ يَرَهُ",
     "start": 49.64,
-    "end": 58.85,
+    "end": 63.62,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "صبرا وثبت",
-    "start": 60.83,
-    "end": 63.62,
-    "conf": 1.0
    }
   ],
   "ms-057": [
    {
     "kind": "uz",
-    "text": "ғұннасыз итіғам Үскүңли нұн яки тәнвіні ра яки лам қарфлардан бірге йол қаныда нұнну оша қарфның ечіге кирғызып ғұннасыз оқыш",
+    "text": "Gʻunnasiz idgʻom: sukunli nun yoki tanvin ro yoki lom harflaridan biriga yoʻliqqanida nunni oʻsha harfning ichiga kiritib, gʻunnasiz oʻqish",
     "start": 0.0,
     "end": 10.94,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "ғұннасыз итіғамдар Мысалдар",
+    "text": "gʻunnasiz idgʻom deyiladi. Misollar:",
     "start": 10.94,
     "end": 13.92,
     "conf": 1.0
@@ -4464,79 +3414,23 @@
     "row": 1,
     "text": "هُدًى لِلْمُتَّقِينَ – هُدَلْ لِلْمُتَّقِينَ . غَفُورٌ رَحِيمٌ – غَفُورُرْ رَحِيمٌ",
     "start": 19.91,
-    "end": 30.71,
+    "end": 37.58,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "همزت اللمزه ما لن نبدأ",
-    "start": 30.71,
-    "end": 37.58,
-    "conf": 1.0
    }
   ],
   "ms-058": [
    {
     "kind": "uz",
-    "text": "Ихфа. Скунли нун яки, танвин хуйдаги 15 -та Ихфа харфлардан бирге йолканда нунни яшырыб, дымағ билан 2 харакат мүхтарча ғуна қылып",
+    "text": "Ixfo: sukunli nun yoki tanvin quyidagi 15 ta ixfo harfidan biriga yoʻliqqanda nunni yashirib, dimogʻ bilan ikki harakat miqdoricha gʻunna qilib",
     "start": 0.0,
     "end": 11.92,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "оқылада.",
+    "text": "oʻqiladi.",
     "start": 11.92,
-    "end": 12.93,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "wa ve fa civ misal oughtlar Musibatu",
-    "start": 29.95,
-    "end": 40.26,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "qaloo",
-    "start": 40.26,
-    "end": 43.13,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "min douni wa ansulunak",
-    "start": 43.13,
-    "end": 50.41,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "rahmetun famen famen",
-    "start": 50.41,
-    "end": 56.79,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "kh purch down",
-    "start": 56.79,
-    "end": 59.67,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "حلالا طيبا",
-    "start": 60.53,
-    "end": 64.89,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "منفقين من كتاب فمن جاء",
-    "start": 67.19,
     "end": 76.84,
     "conf": 1.0
    }
@@ -4544,78 +3438,50 @@
   "ms-059": [
    {
     "kind": "uz",
-    "text": "Tachvimlii ra. Ra xarifu 6 -da xalatda tachvim, yani yoghan qilib uqiladi. Bular qiidagilar.",
+    "text": "Tafximli ro. Ro harfi oltita holatda tafxim, yaʼni yoʻgʻon qilib oʻqiladi. Ular quyidagilar.",
     "start": 0.0,
     "end": 9.25,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Ra xarifu zammali ya ki fathali bolsa.",
+    "text": "Ro harfi zammali yoki fathali boʻlsa.",
     "start": 9.25,
-    "end": 13.67,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "Rahim, birabbikum.",
-    "start": 15.73,
     "end": 18.59,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Ra xarifu sikunli bolib, undan avvalgi xarif zammali ya ki fathali bolsa.",
+    "text": "Ro harfi sukunli boʻlib, undan avvalgi harf zammali yoki fathali boʻlsa.",
     "start": 18.59,
-    "end": 25.17,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "وَلْأَرْضُ",
-    "start": 27.83,
     "end": 28.87,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "مَرْيَم Ra kharaf sikunli bolib, undan ki ingi kharaf, istila kharaflerden bolsa.",
+    "text": "Ro harfi sukunli boʻlib, undan keyingi harf istiʼlo harflaridan boʻlsa.",
     "start": 28.87,
-    "end": 36.99,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "فِرْقَ",
-    "start": 36.99,
     "end": 38.75,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "قِرْطَاس Ra kharaf sikunli bolib, undan avvalgi kharaf kəsrali bolsa, kəsrasi arzi ya ki, başqa sözda bolsa. Iroji 'hu",
+    "text": "Ro harfi sukunli boʻlib, undan avvalgi harf kasrali boʻlsa-yu, kasrasi oriz yoki boshqa soʻzda boʻlsa.",
     "start": 39.71,
     "end": 53.03,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Amiru tabu Skun bilan tukhtalgan raadan awalgi kharf Istila kharf lardan bolib O khams kuli bolsa Aynal qidr",
+    "text": "Sukun bilan toʻxtalgan rodan avvalgi harf istiʼlo harflaridan boʻlib, oʻzi sukunli boʻlsa.",
     "start": 53.03,
     "end": 66.28,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Skun bilan tukhtalgan raadan awalgi kharf Khams kuli bolib Ondan awalgi kharf Zammali ya ki Fadhali bolsa Walfajr",
+    "text": "Sukun bilan toʻxtalgan rodan avvalgi harf sukunli boʻlib, undan avvalgi harf zammali yoki fathali boʻlsa.",
     "start": 66.28,
-    "end": 77.82,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "بالكفر",
-    "start": 77.82,
     "end": 80.5,
     "conf": 1.0
    }
@@ -4623,35 +3489,35 @@
   "ms-060": [
    {
     "kind": "uz",
-    "text": "Tarkiqli ra. Ra xarifi turdda xolatda tarqiq, yani ingička qilib oqulada. Bular kuyidagilar.",
+    "text": "Tarqiqli ro. Ro harfi toʻrt holatda tarqiq, yaʼni ingichka qilib oʻqiladi. Ular quyidagilar.",
     "start": 0.0,
     "end": 8.49,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Birincisi, ra xarifi kəsrali bolsa.",
+    "text": "Birinchisi, ro harfi kasrali boʻlsa.",
     "start": 8.49,
     "end": 13.31,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "İkinciisi, ra xarifi skuli bolib, uzdan avvalgi xarif kəsrali bolsa. Фағуфир 3. Скунбылан тоқталген",
+    "text": "Ikkinchisi, ro harfi sukunli boʻlib, undan avvalgi harf kasrali boʻlsa. Uchinchisi, sukun bilan toʻxtalgan",
     "start": 15.53,
     "end": 27.6,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Ра харфыдан аввәлгі харф, лин харфы болса 4.",
+    "text": "ro harfidan avvalgi harf lin harfi boʻlsa. Toʻrtinchisi,",
     "start": 27.6,
     "end": 34.05,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Скунбылан тоқталген Ра дан алдингі харф, скунли болып, ондан аввәлгі харф, кәсралли болса 4. Хичари PANASY",
+    "text": "sukun bilan toʻxtalgan rodan oldingi harf sukunli boʻlib, undan avvalgi harf kasrali boʻlsa.",
     "start": 35.45,
     "end": 46.4,
     "conf": 1.0
@@ -4660,14 +3526,14 @@
   "ms-061": [
    {
     "kind": "uz",
-    "text": "Allah ləvzi Allah ləvzinin lamıda ikta qayda bar Təvhim və tərqiq Allah ləvzinin lamı qaçanki Uş bu sözdan",
+    "text": "Alloh lafzi. Alloh lafzining lomida ikkita qoida bor: tafxim va tarqiq. Alloh lafzining lomi, qachonki shu soʻzdan",
     "start": 0.0,
     "end": 11.58,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "aldingi xərf Fatxayaki zəmməli bolsa Təvhim, yəni yogan qılıb o qilada Misallar",
+    "text": "oldingi harf fathali yoki zammali boʻlsa, tafxim, yaʼni yoʻgʻon qilib oʻqiladi. Misollar:",
     "start": 11.58,
     "end": 19.86,
     "conf": 1.0
@@ -4677,16 +3543,9 @@
     "row": 0,
     "text": "عَبْدُ اللّٰهِ – عَبْدُ وَلّٰاهِ . عُبَيْدُ اللّٰهِ – عُبَيْدُ وَلّٰاهِ",
     "start": 19.86,
-    "end": 21.68,
+    "end": 24.42,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "إِنَّ اللَّهَ",
-    "start": 21.68,
-    "end": 24.42,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -4706,7 +3565,7 @@
    },
    {
     "kind": "uz",
-    "text": "lafzıdan əvvəlgi xarif kəsirəli bulsa, lam tarqiq, yəni ingiçikə qılıb oxuladı. Misallar Billə",
+    "text": "Lafzdan avvalgi harf kasrali boʻlsa, lom tarqiq, yaʼni ingichka qilib oʻqiladi. Misollar:",
     "start": 50.12,
     "end": 61.22,
     "conf": 1.0
@@ -4716,16 +3575,9 @@
     "row": 3,
     "text": "لُطْفُ اللّٰهِ . عِنٰايَةُ اللّٰهِ . هِدٰايَةُ اللّٰهِ . عَطِيَّةُ اللّٰهِ",
     "start": 61.22,
-    "end": 62.35,
+    "end": 64.62,
     "conf": 0.3,
     "estimated": true
-   },
-   {
-    "kind": "uz",
-    "text": "Lillah",
-    "start": 62.35,
-    "end": 64.62,
-    "conf": 1.0
    }
   ],
   "ms-062": [
@@ -4795,7 +3647,7 @@
    },
    {
     "kind": "uz",
-    "text": "Qur 'ani kərimdə bazı surələr Allahıda xarflər bilən başlanədə. Misallər",
+    "text": "Qurʼoni karimda baʼzi suralar alohida harflar bilan boshlanadi. Misollar:",
     "start": 2.12,
     "end": 7.78,
     "conf": 1.0
@@ -4804,70 +3656,49 @@
   "ms-063": [
    {
     "kind": "uz",
-    "text": "SAKTA İki kalima rasta nafas almastan bir az tohtab otisna SAKTA deyil adi. Qur 'an -i kerimnin turta surasda KAHF, YASN, Qiyamat,",
+    "text": "Sakta. Ikki kalima orasida nafas olmasdan biroz toʻxtab oʻtishga sakta deyiladi. Qurʼoni karimning toʻrtta surasida: Kahf, Yosin, Qiyomat",
     "start": 0.0,
     "end": 11.59,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Mutafifim suralarda SAKTA qilish vacibdir.",
+    "text": "va Mutaffifin suralarida sakta qilish vojibdir.",
     "start": 11.59,
     "end": 15.71,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "KAHF surasdagi SAKTA ayata.",
+    "text": "Kahf surasidagi sakta oyati.",
     "start": 15.71,
-    "end": 19.71,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "ولم يجعل له عوجا قيما لينذر بأسا",
-    "start": 29.01,
-    "end": 40.3,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "شديدا من لدنه ويبشر المؤمنين الذين",
-    "start": 40.3,
-    "end": 50.26,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "يعملون الصالحات",
-    "start": 50.26,
     "end": 54.71,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Yosun surasidagi sakta ayatda.",
+    "text": "Yosin surasidagi sakta oyati.",
     "start": 60.57,
     "end": 63.97,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Qiyamat surasidagi sakti ayatda.",
+    "text": "Qiyomat surasidagi sakta oyati.",
     "start": 83.91,
     "end": 88.63,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Mutafifun surasidagi sakti ayatda.",
+    "text": "Mutaffifin surasidagi sakta oyati.",
     "start": 92.41,
     "end": 97.53,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Yukarıdagi sakti ayatlarini ustaz yardamda urgenişini tafsiyye qılamız.",
+    "text": "Yuqoridagi sakta oyatlarini ustoz yordamida oʻrganishni tavsiya qilamiz.",
     "start": 106.37,
     "end": 112.08,
     "conf": 1.0
@@ -4876,7 +3707,7 @@
   "ms-064": [
    {
     "kind": "uz",
-    "text": "Istiaza Istiaza, Qur 'an -ı kərimini, qiraat qilişini, quyidəgi cümlə bilən başləşdir. Ə",
+    "text": "Istiʼoza. Istiʼoza Qurʼoni karimni qiroat qilishni quyidagi jumla bilan boshlashdir.",
     "start": 0.0,
     "end": 7.34,
     "conf": 1.0
@@ -4891,7 +3722,7 @@
    },
    {
     "kind": "uz",
-    "text": "Istiaza ni mənası pənax soraş və ilticab olub yuqardəgi cümləni mənası şeytanin yamanliklərdən Allah qə sığınəmən digənidir.",
+    "text": "Istiʼozaning maʼnosi panoh soʻrash va iltijo boʻlib, yuqoridagi jumlaning maʼnosi «Shaytonning yomonliklaridan Allohga sigʻinaman» deganidir.",
     "start": 14.03,
     "end": 24.56,
     "conf": 1.0
@@ -4900,7 +3731,7 @@
   "ms-065": [
    {
     "kind": "uz",
-    "text": "Basmala, Basmala Qur 'an -ı Kerimdagi xarbir surana, Tavva surastan tashqara, Quydagi cümlə bilan başlashdir.",
+    "text": "Basmala. Basmala Qurʼoni karimdagi har bir surani, Tavba surasidan tashqari, quyidagi jumla bilan boshlashdir.",
     "start": 0.0,
     "end": 8.41,
     "conf": 1.0
@@ -4915,7 +3746,7 @@
    },
    {
     "kind": "uz",
-    "text": "Yani, bu cümlə asli Nəmil surasinin 30 -cı ayatı dagi cümlə bolub, Qiraatda xarbir suranı ubilan başlash sünnəttir.",
+    "text": "Yaʼni bu jumla aslida Naml surasining 30-oyatidagi jumla boʻlib, qiroatda har bir surani u bilan boshlash sunnatdir.",
     "start": 14.74,
     "end": 23.96,
     "conf": 1.0
@@ -4924,21 +3755,21 @@
   "ms-066": [
    {
     "kind": "uz",
-    "text": "хамза хақыда хамза халқумның ең юқар таманы, yani, көкірәкі яқын жайдан талафуз қылына деген таушдыр. О тауш пайларды пайда болган jarансыз",
+    "text": "Hamza haqida. Hamza halqumning eng quyi tomoni, yaʼni koʻkrakka yaqin joydan talaffuz qilinadigan tovushdir. U tovush paychalarida paydo boʻlgan jarangsiz",
     "start": 0.0,
     "end": 11.64,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "шауқынли портловчо ондашдыр. Партлап чыққан хава ағыз пошлығыге отгэнда еңгел тамақ қыршыяки, юталге оқшап кетаде. Узбек тілді бұндай тавыш йоқ. Бірақ,",
+    "text": "shovqinli portlovchi undoshdir. Portlab chiqqan havo ogʻiz boʻshligʻiga oʻtganda yengil tomoq qirish yoki yoʻtalga oʻxshab ketadi. Oʻzbek tilida bunday tovush yoʻq. Biroq",
     "start": 11.64,
     "end": 23.65,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "айрым араб тілдан узлашкен созларнин талапузыда оны сезеш мүмкун.",
+    "text": "arab tilidan oʻzlashgan ayrim soʻzlarning talaffuzida uni sezish mumkin.",
     "start": 23.65,
     "end": 28.06,
     "conf": 1.0
@@ -4947,7 +3778,7 @@
   "ms-067": [
    {
     "kind": "uz",
-    "text": "KALIMATI IYMAN KALIMATI IYMAN",
+    "text": "Kalimai iymon.",
     "start": 0.0,
     "end": 5.2,
     "conf": 1.0
@@ -4993,13 +3824,6 @@
     "start": null,
     "end": null,
     "conf": 0.0
-   },
-   {
-    "kind": "uz",
-    "text": "إلا الله وأشهد أن محمدا عبده ورسوله",
-    "start": 6.46,
-    "end": 14.44,
-    "conf": 1.0
    }
   ],
   "ms-069": [
@@ -5020,33 +3844,12 @@
     "conf": 0.0
    },
    {
-    "kind": "uz",
-    "text": "أشهد أن لا إله إلا الله وحده لا شريك",
-    "start": 2.3,
-    "end": 11.96,
-    "conf": 1.0
-   },
-   {
     "kind": "ar",
     "row": 2,
     "text": "لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِى وَيُمِيتُ",
     "start": 11.96,
-    "end": 20.32,
-    "conf": 0.53
-   },
-   {
-    "kind": "uz",
-    "text": "وهو حي لا يموت بيده الخير وهو على كل شيء",
-    "start": 20.32,
-    "end": 31.58,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "قدير",
-    "start": 31.58,
     "end": 33.7,
-    "conf": 1.0
+    "conf": 0.53
    },
    {
     "kind": "ar",
@@ -5074,20 +3877,6 @@
     "start": null,
     "end": null,
     "conf": 0.0
-   },
-   {
-    "kind": "uz",
-    "text": "ايمان مفصل",
-    "start": 0.0,
-    "end": 2.91,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "آمنت بالله وملائكته وكتبه ورسله",
-    "start": 2.91,
-    "end": 11.98,
-    "conf": 1.0
    },
    {
     "kind": "ar",
@@ -5132,13 +3921,6 @@
     "conf": 0.0
    },
    {
-    "kind": "uz",
-    "text": "من كل ذنب أذنبته عمدا أو خطأا سرا أو علانية",
-    "start": 17.42,
-    "end": 29.29,
-    "conf": 1.0
-   },
-   {
     "kind": "ar",
     "row": 3,
     "text": "وَاَتُوبُ اِلَيْهِ مِنَ الذَّنْبِ الَّذِى اَعْلَمُ",
@@ -5169,142 +3951,100 @@
     "row": 1,
     "text": "سُبْحٰانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلٰٓا اِلٰهَ اِلَّا اللّٰهُ وَاللّٰهُ اَكْبَرُ",
     "start": 2.14,
-    "end": 17.6,
-    "conf": 0.58
-   },
-   {
-    "kind": "uz",
-    "text": "لا حول",
-    "start": 17.6,
     "end": 20.34,
-    "conf": 1.0
+    "conf": 0.58
    },
    {
     "kind": "ar",
     "row": 2,
     "text": "لٰا حَوْلَ وَلٰا قُوَّةَ اِلَّا بِاللّٰهِ الْعَلِىِّ الْعَظِيمِ",
     "start": 20.34,
-    "end": 27.26,
-    "conf": 0.53
-   },
-   {
-    "kind": "uz",
-    "text": "ما شاء الله كان",
-    "start": 27.26,
     "end": 32.78,
-    "conf": 1.0
+    "conf": 0.53
    },
    {
     "kind": "ar",
     "row": 3,
     "text": "مٰا شٰآءَ اللّٰهُ كٰانَ وَمٰا لَمْ يَشَأْ لَمْ يَكُنْ",
     "start": 32.78,
-    "end": 37.65,
-    "conf": 0.53
-   },
-   {
-    "kind": "uz",
-    "text": "الإيمان إقرار باللسان وتصديق بالقلب بما جاء به من",
-    "start": 37.65,
-    "end": 49.54,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "عند الله",
-    "start": 49.54,
-    "end": 52.79,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "من عند الله محمد رسول الله صلى الله عليه",
-    "start": 52.79,
-    "end": 64.72,
-    "conf": 1.0
-   },
-   {
-    "kind": "uz",
-    "text": "وسلم",
-    "start": 64.72,
     "end": 66.18,
-    "conf": 1.0
+    "conf": 0.53
    }
   ],
   "ms-073": [
    {
     "kind": "uz",
-    "text": "Sözbaşı Bütün barlıq Yer -Oasman kainat egiasi bolgan zat Allah ta 'alaga uzunin ululugi qadar Xamdu sanalarımız",
+    "text": "Soʻz boshi. Butun borliq, yeru osmon, koinot egasi boʻlgan zot Alloh taologa Uning ulugʻligi qadar hamdu sanolarimiz,",
     "start": 0.0,
     "end": 10.76,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Alamlarga rahmat qilip yubarilgan Paiğambarimiz Muhammad Mustafa sallallahu aleyhi və sallamga Duru du salavatlarımız bolsin Immatimnin en yaxshisi",
+    "text": "olamlarga rahmat qilib yuborilgan Paygʻambarimiz Muhammad Mustafo sollallohu alayhi va sallamga durudu salavotlarimiz boʻlsin. «Ummatimning eng yaxshisi,",
     "start": 10.76,
     "end": 22.0,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Hayrlisi Quran okşini organib Sonura Başqalarga orga toqcidir Canacan yurtimizda qadimda xam, xazirgi kullarimizda xam, anasunday uluq",
+    "text": "xayrlisi Qurʼon oʻqishni oʻrganib, soʻngra boshqalarga oʻrgatuvchidir». Jonajon yurtimizda qadimda ham, hozirgi kunlarimizda ham ana shunday ulugʻ",
     "start": 22.0,
     "end": 33.58,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "ustazlarimiz bar. Shunin uchun xam, bu zamindan xariyili onlap, yüzlap, qarilar,",
+    "text": "ustozlarimiz bor. Shuning uchun ham bu zamindan xayrli oʻnlab, yuzlab qorilar,",
     "start": 33.58,
     "end": 40.33,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Quran bilimdanlar yetishib çiqmaqda. Quranlı uqish büyük fazilet, tügemma saadatdır. Shun deyikin, xarbirimiz ilahi dasturnu beynuxsan uqish və uqish",
+    "text": "Qurʼon bilimdonlari yetishib chiqmoqda. Qurʼonni oʻqish buyuk fazilat, tugamas saodatdir. Shunday ekan, har birimiz ilohiy dasturni benuqson oʻqish va uqish",
     "start": 40.33,
     "end": 52.16,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "baqtiga irishish yolu da xarakat qilmaqimiz lazim boladi. Qol ingizda ki ušbu risala anasho saadatli manzilgi yitiklochi kharihda dar. Bu kitab",
+    "text": "baxtiga erishish yoʻlida harakat qilmogʻimiz lozim boʻladi. Qoʻlingizdagi ushbu risola ana shu saodatli manzilga yetaklovchi qoʻllanmadir. Bu kitob",
     "start": 52.16,
     "end": 63.96,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "azalden yurtumizda mashquur bolib gilgan. Sababe organochi uchun saadda wa asanligi dar. Bu uku qolla masajudakob nashir bolgan. Biraq ular nii kharbrada ozgi khas",
+    "text": "azaldan yurtimizda mashhur boʻlib kelgan. Sababi, oʻrganuvchi uchun soddaligi va osonligidir. Bu qoʻllanmaning koʻplab nashrlari mavjud. Biroq ularning har birida oʻziga xos",
     "start": 63.96,
     "end": 75.94,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "juzi yangiliklar bar. Kitab nii ušbu nashir khambra sada lashkan usulubta čap itil maqda. Maksad ukuji ga asan bolsan. Shunindegi qollama songiga",
+    "text": "juzʼiy yangiliklar bor. Kitobning ushbu nashri soddalashgan uslubda chop etilmoqda. Maqsad, oʻquvchiga oson boʻlsin. Shuningdek, qoʻllanma soʻngiga",
     "start": 75.94,
     "end": 87.56,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "eynmuxum dualar və kəlimelar xam ila vaqilina da.",
+    "text": "ayrim muhim duolar va kalimalar ham ilova qilinadi.",
     "start": 87.56,
     "end": 91.13,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "Oylaymiz ki, mubarək Quran -ı kərimini uqşuna niyat qilgan muxtaram uqucularimiz uçun bu xam faydali bolada. Allah taala bu acizanı işlarimizin uzu xayirli",
+    "text": "Oʻylaymizki, muborak Qurʼoni karimni oʻqishni niyat qilgan muhtaram oʻquvchilarimiz uchun bu ham foydali boʻladi. Alloh taolo bu ojizona ishlarimizni Oʻzi xayrli",
     "start": 91.13,
     "end": 103.58,
     "conf": 1.0
    },
    {
     "kind": "uz",
-    "text": "qılsın. Qollanma muallifi Ahmed Xadi Maxsudi xazaratlarina rəhmatiga olsun.",
+    "text": "qilsin. Qoʻllanma muallifi Ahmad Hodiy Maqsudiy hazratlarini Alloh rahmatiga olsin.",
     "start": 103.58,
     "end": 109.9,
     "conf": 1.0
