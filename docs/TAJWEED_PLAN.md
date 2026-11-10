@@ -214,6 +214,19 @@ The original T2–T4 (quizzes, diagram + Learn tab, Reader colours) fold into P1
 
 ## 15. P2: line-by-line text tracking (built 2026-11-10)
 
+> **Status (2026-11-10): code done; waiting for the owner's Colab results.** The aligner, review
+> buttons, bot 📄 Matn and Mini App highlighting are built and tested on synthetic data. No lesson
+> has timings yet, so nothing is visible to users. Next, once the owner sends the Colab zip
+> (`quranayat_muallimi.zip`):
+>
+> 1. Run `align_text` on it.
+> 2. Fix the weak lines.
+> 3. Commit `muallimi_timings.json`.
+> 4. Re-export the Mini App content.
+> 5. The owner reviews and approves each lesson.
+>
+> The same check confirms which lesson the rows of 41–45 and 55–57/61 belong to.
+
 **Text.**
 - `data/tajweed/muallimi_text.txt` (`## NNN`, then `ar:` / `uz:` lines) holds the Arabic exercise rows. They were typed from the primer's exercise pages, pages 1–32 of a 2009 printed edition.
   - Its Uzbek prose belongs to that edition and is not used.
