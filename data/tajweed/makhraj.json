@@ -1,0 +1,888 @@
+{
+ "about": "Makhraj (articulation) data for the 3D screens: docs/MAKHRAJ_3D_PLAN.md. Poses are first drafts in the figure's profile coordinates (x forward to the lips, y up); tune them in the Mini App's debug panel (?debug=1, reviewers) and paste the JSON back here. A letter's clip is its Muallimi lesson's first Arabic row unless `clip` [start, end] overrides it.",
+ "makhraj": [
+  {
+   "id": "jawf",
+   "region": "jawf",
+   "name_uz": "Javf (ogʻiz va tomoq boʻshligʻi)",
+   "body_uz": "Mad harflari (oldi fathali sokin ا, oldi dammali sokin و, oldi kasrali sokin ي) ogʻiz va tomoqdagi ichki boʻshliqdan chiqadi. Ularning aniq bir nuqtasi yoʻq: tovush havo tugaguncha choʻziladi.",
+   "contact": "cavity",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.37,
+      -0.07
+     ],
+     [
+      0.22,
+      -0.01
+     ],
+     [
+      0.02,
+      0.03
+     ],
+     [
+      -0.15,
+      -0.03
+     ],
+     [
+      -0.2,
+      -0.27
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.6,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "halq-aqsa",
+   "region": "throat",
+   "name_uz": "Boʻgʻizning eng chuqur qismi",
+   "body_uz": "ء (hamza) va ه (ho) boʻgʻizning koʻkrakka eng yaqin, eng chuqur qismidan chiqadi. Til ishtirok etmaydi.",
+   "contact": "glottis",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.38,
+      -0.02
+     ],
+     [
+      0.24,
+      0.06
+     ],
+     [
+      0.04,
+      0.1
+     ],
+     [
+      -0.14,
+      0.03
+     ],
+     [
+      -0.2,
+      -0.25
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.3,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "halq-wasat",
+   "region": "throat",
+   "name_uz": "Boʻgʻizning oʻrtasi",
+   "body_uz": "ع (ayn) va ح (ha) boʻgʻizning oʻrtasidan chiqadi: boʻgʻiz oʻrtada biroz torayadi. ح — shovqinsiz, ammo kuchli nafasli tovush.",
+   "contact": "pharynx-mid",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.37,
+      -0.04
+     ],
+     [
+      0.22,
+      0.04
+     ],
+     [
+      0.02,
+      0.07
+     ],
+     [
+      -0.17,
+      0.0
+     ],
+     [
+      -0.27,
+      -0.22
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.3,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0.7
+   }
+  },
+  {
+   "id": "halq-adna",
+   "region": "throat",
+   "name_uz": "Boʻgʻizning yuqori qismi",
+   "body_uz": "غ (gʻoyn) va خ (xo) boʻgʻizning ogʻizga eng yaqin qismidan chiqadi: til orqasi kichik tilchaga yaqinlashadi.",
+   "contact": "uvula",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.36,
+      -0.04
+     ],
+     [
+      0.2,
+      0.06
+     ],
+     [
+      0.0,
+      0.12
+     ],
+     [
+      -0.17,
+      0.13
+     ],
+     [
+      -0.22,
+      -0.2
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.3,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "lisan-aqsa",
+   "region": "tongue",
+   "name_uz": "Til orqasi va yumshoq tanglay",
+   "body_uz": "ق (qof): tilning eng orqa qismi yuqoridagi yumshoq tanglayga tegadi.",
+   "contact": "velum-back",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.36,
+      -0.03
+     ],
+     [
+      0.2,
+      0.07
+     ],
+     [
+      0.0,
+      0.16
+     ],
+     [
+      -0.12,
+      0.21
+     ],
+     [
+      -0.2,
+      -0.18
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "lisan-aqsa-2",
+   "region": "tongue",
+   "name_uz": "Til orqasi, qofdan biroz oldinroq",
+   "body_uz": "ك (kof): tilning orqa qismi qofdan biroz oldinroq va pastroqda tanglayga tegadi.",
+   "contact": "velum-front",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.37,
+      -0.03
+     ],
+     [
+      0.22,
+      0.09
+     ],
+     [
+      0.06,
+      0.22
+     ],
+     [
+      -0.08,
+      0.18
+     ],
+     [
+      -0.2,
+      -0.2
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "lisan-wasat",
+   "region": "tongue",
+   "name_uz": "Til oʻrtasi va qattiq tanglay",
+   "body_uz": "ج, ش va harakatli yoki madsiz ي: til oʻrtasi qattiq tanglayning oʻrtasiga koʻtariladi.",
+   "contact": "palate-mid",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.37,
+      -0.02
+     ],
+     [
+      0.24,
+      0.14
+     ],
+     [
+      0.12,
+      0.24
+     ],
+     [
+      -0.06,
+      0.14
+     ],
+     [
+      -0.2,
+      -0.22
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "hafa",
+   "region": "tongue",
+   "name_uz": "Tilning yon tomoni va jagʻ tishlari",
+   "body_uz": "ض (zod): tilning bir yoki ikkala yon tomoni yuqori jagʻ tishlariga tegadi. Boshni burab, yon tomondan koʻring.",
+   "contact": "molars-side",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.37,
+      0.0
+     ],
+     [
+      0.25,
+      0.12
+     ],
+     [
+      0.08,
+      0.18
+     ],
+     [
+      -0.1,
+      0.1
+     ],
+     [
+      -0.2,
+      -0.22
+     ]
+    ],
+    "tongue_side": 1,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "lam",
+   "region": "tongue",
+   "name_uz": "Til uchining chetlari",
+   "body_uz": "ل (lom): til uchidan boshlab chetlari yuqori old tishlar ildizidagi milkka keng tegadi.",
+   "contact": "alveolar-wide",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.37,
+      0.15
+     ],
+     [
+      0.27,
+      0.13
+     ],
+     [
+      0.08,
+      0.1
+     ],
+     [
+      -0.12,
+      0.04
+     ],
+     [
+      -0.2,
+      -0.24
+     ]
+    ],
+    "tongue_side": 0.6,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "nun",
+   "region": "tongue",
+   "name_uz": "Til uchi (lomdan biroz pastroq)",
+   "body_uz": "ن (nun): til uchi lomdan biroz pastroqda, old tishlar ildizidagi milkka tegadi.",
+   "contact": "alveolar",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.38,
+      0.15
+     ],
+     [
+      0.27,
+      0.11
+     ],
+     [
+      0.06,
+      0.1
+     ],
+     [
+      -0.12,
+      0.04
+     ],
+     [
+      -0.2,
+      -0.24
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "ra",
+   "region": "tongue",
+   "name_uz": "Til uchi va ustki qismi",
+   "body_uz": "ر (ro): nunga yaqin joydan, til uchi va uning ustki qismidan chiqadi.",
+   "contact": "alveolar-back",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.35,
+      0.15
+     ],
+     [
+      0.25,
+      0.14
+     ],
+     [
+      0.06,
+      0.11
+     ],
+     [
+      -0.12,
+      0.05
+     ],
+     [
+      -0.2,
+      -0.24
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "nit",
+   "region": "tongue",
+   "name_uz": "Til uchi va old tishlar ildizi",
+   "body_uz": "ت, د, ط: til uchi yuqori old tishlarning ildiziga tegadi. ط da til orqasi ham koʻtariladi (yoʻgʻon harf).",
+   "contact": "incisor-root",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.4,
+      0.13
+     ],
+     [
+      0.28,
+      0.1
+     ],
+     [
+      0.06,
+      0.09
+     ],
+     [
+      -0.12,
+      0.04
+     ],
+     [
+      -0.2,
+      -0.24
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "asala",
+   "region": "tongue",
+   "name_uz": "Til uchi va old tishlar orasi",
+   "body_uz": "ص, س, ز: til uchi old tishlarga juda yaqin keladi va havo tor joydan hushtak tovushi bilan chiqadi.",
+   "contact": "incisor-gap",
+   "airflow": "hiss",
+   "pose": {
+    "tongue": [
+     [
+      0.42,
+      0.02
+     ],
+     [
+      0.3,
+      0.09
+     ],
+     [
+      0.08,
+      0.1
+     ],
+     [
+      -0.12,
+      0.04
+     ],
+     [
+      -0.2,
+      -0.24
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.1,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "lisa",
+   "region": "tongue",
+   "name_uz": "Til uchi va old tishlar uchi",
+   "body_uz": "ث, ذ, ظ: til uchi yuqori old tishlarning uchiga tegadi. ظ da til orqasi ham koʻtariladi.",
+   "contact": "incisor-edge",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.46,
+      0.0
+     ],
+     [
+      0.32,
+      0.05
+     ],
+     [
+      0.1,
+      0.08
+     ],
+     [
+      -0.12,
+      0.03
+     ],
+     [
+      -0.2,
+      -0.24
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "shafa-fa",
+   "region": "lips",
+   "name_uz": "Pastki lab va old tishlar",
+   "body_uz": "ف (fa): pastki labning ichki tomoni yuqori old tishlarning uchiga tegadi.",
+   "contact": "lip-teeth",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.38,
+      -0.02
+     ],
+     [
+      0.24,
+      0.06
+     ],
+     [
+      0.04,
+      0.1
+     ],
+     [
+      -0.14,
+      0.03
+     ],
+     [
+      -0.2,
+      -0.25
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 1,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "shafatan",
+   "region": "lips",
+   "name_uz": "Ikki lab",
+   "body_uz": "ب va م da ikki lab yopiladi; harakatli yoki madsiz و da lablar yumaloqlanadi, toʻliq yopilmaydi. Arabcha و da tish ishtirok etmaydi.",
+   "contact": "lips",
+   "airflow": "oral",
+   "pose": {
+    "tongue": [
+     [
+      0.38,
+      -0.02
+     ],
+     [
+      0.24,
+      0.06
+     ],
+     [
+      0.04,
+      0.1
+     ],
+     [
+      -0.14,
+      0.03
+     ],
+     [
+      -0.2,
+      -0.25
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 1,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 0,
+    "pharynx": 0
+   }
+  },
+  {
+   "id": "khayshum",
+   "region": "nose",
+   "name_uz": "Xayshum (burun boʻshligʻi)",
+   "body_uz": "Gʻunna — nun va mimga hamroh boʻladigan burun ovozi. Yumshoq tanglay pastga tushadi va havo burundan chiqadi.",
+   "contact": "nasal",
+   "airflow": "nasal",
+   "pose": {
+    "tongue": [
+     [
+      0.38,
+      0.15
+     ],
+     [
+      0.27,
+      0.11
+     ],
+     [
+      0.06,
+      0.1
+     ],
+     [
+      -0.12,
+      0.04
+     ],
+     [
+      -0.2,
+      -0.24
+     ]
+    ],
+    "tongue_side": 0,
+    "jaw": 0.2,
+    "lips_close": 0,
+    "lips_round": 0,
+    "lip_to_teeth": 0,
+    "velum": 1,
+    "pharynx": 0
+   }
+  }
+ ],
+ "letters": [
+  {
+   "letter": "ا",
+   "makhraj": "halq-aqsa",
+   "layers": {},
+   "clip": null,
+   "note_uz": "Harakatli alif — hamza (ء). Mad harfi sifatida alif «Mad harflari» sahifasida."
+  },
+  {
+   "letter": "ب",
+   "makhraj": "shafatan",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ت",
+   "makhraj": "nit",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ث",
+   "makhraj": "lisa",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ج",
+   "makhraj": "lisan-wasat",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ح",
+   "makhraj": "halq-wasat",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "خ",
+   "makhraj": "halq-adna",
+   "layers": {
+    "heavy": 1
+   },
+   "clip": null
+  },
+  {
+   "letter": "د",
+   "makhraj": "nit",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ذ",
+   "makhraj": "lisa",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ر",
+   "makhraj": "ra",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ز",
+   "makhraj": "asala",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "س",
+   "makhraj": "asala",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ش",
+   "makhraj": "lisan-wasat",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ص",
+   "makhraj": "asala",
+   "layers": {
+    "heavy": 1
+   },
+   "clip": null
+  },
+  {
+   "letter": "ض",
+   "makhraj": "hafa",
+   "layers": {
+    "heavy": 1
+   },
+   "clip": null
+  },
+  {
+   "letter": "ط",
+   "makhraj": "nit",
+   "layers": {
+    "heavy": 1
+   },
+   "clip": null
+  },
+  {
+   "letter": "ظ",
+   "makhraj": "lisa",
+   "layers": {
+    "heavy": 1
+   },
+   "clip": null
+  },
+  {
+   "letter": "ع",
+   "makhraj": "halq-wasat",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "غ",
+   "makhraj": "halq-adna",
+   "layers": {
+    "heavy": 1
+   },
+   "clip": null
+  },
+  {
+   "letter": "ف",
+   "makhraj": "shafa-fa",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ق",
+   "makhraj": "lisan-aqsa",
+   "layers": {
+    "heavy": 1
+   },
+   "clip": null
+  },
+  {
+   "letter": "ك",
+   "makhraj": "lisan-aqsa-2",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "ل",
+   "makhraj": "lam",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "م",
+   "makhraj": "shafatan",
+   "layers": {
+    "nasal": 0.4
+   },
+   "clip": null
+  },
+  {
+   "letter": "ن",
+   "makhraj": "nun",
+   "layers": {
+    "nasal": 0.4
+   },
+   "clip": null
+  },
+  {
+   "letter": "ه",
+   "makhraj": "halq-aqsa",
+   "layers": {},
+   "clip": null
+  },
+  {
+   "letter": "و",
+   "makhraj": "shafatan",
+   "layers": {
+    "round": 1
+   },
+   "clip": null,
+   "note_uz": "Harakatli yoki sukunli (mad boʻlmagan) و. Mad harfi sifatida — «Mad harflari» sahifasida."
+  },
+  {
+   "letter": "ي",
+   "makhraj": "lisan-wasat",
+   "layers": {},
+   "clip": null,
+   "note_uz": "Harakatli yoki sukunli (mad boʻlmagan) ي. Mad harfi sifatida — «Mad harflari» sahifasida."
+  }
+ ],
+ "extra": [
+  {
+   "id": "madd",
+   "title_uz": "Mad harflari",
+   "glyph": "ا و ي",
+   "makhraj": "jawf",
+   "layers": {},
+   "lesson": "ms-030",
+   "clip": [
+    118.59,
+    129.51
+   ]
+  },
+  {
+   "id": "ghunna",
+   "title_uz": "Gʻunna",
+   "glyph": "نّ مّ",
+   "makhraj": "khayshum",
+   "layers": {},
+   "lesson": "ms-056",
+   "clip": [
+    29.22,
+    35.73
+   ],
+   "check": "clip timing confidence is low (0.3): listen and adjust"
+  }
+ ]
+}

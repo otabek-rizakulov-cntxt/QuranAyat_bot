@@ -33,6 +33,7 @@ class TajweedOut(BaseModel):
     reviewer: bool  # may approve lessons and sees their status
     tracking: List[str]  # audio lessons whose line-by-line text a reviewer approved
     practice: Dict[str, int]  # lesson -> best practice score, percent
+    makhraj: bool = False  # may open the 3D makhraj screens (reviewers until released)
 
 
 class DoneIn(BaseModel):
@@ -55,6 +56,7 @@ async def state(user_id: int = Depends(require_user)) -> TajweedOut:
         reviewer=service.is_reviewer(user_id),
         tracking=sorted(await service.tracking_ids(store)),
         practice={k: best for k, (_, best) in (await store.tajweed.practice(user_id)).items()},
+        makhraj=service.makhraj_visible(user_id),
     )
 
 
