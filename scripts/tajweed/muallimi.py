@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """The Muallimi soniy audio lessons -> data/tajweed/muallimi.json.
 
-    python3 scripts/tajweed/muallimi.py
+    python3 scripts/tajweed/muallimi.py            # the 64 kbps files (v2), the default
+    python3 scripts/tajweed/muallimi.py --original # the 192 kbps downloads
 
-Reads the 73 lesson mp3s from data/tajweed/downloads/ (NNN_<Slug>.mp3, gitignored;
-the files themselves live on R2, see scripts/tajweed/upload_r2.py) and writes the
-committed manifest: id, title, unit, R2 file name, size, duration and sha256 per
-lesson. Durations come from walking the MPEG frames, so nothing is decoded.
+Reads the 73 lesson mp3s and writes the committed manifest: id, title, unit, R2 file
+name, size, duration and sha256 per lesson. The files themselves live on R2 (see
+scripts/tajweed/upload_r2.py). By default they are the speech re-encodes in
+data/tajweed/encoded/NNN.mp3 (scripts/tajweed/encode_speech.py), named `v2/NNN.mp3`;
+with --original, the downloads in data/tajweed/downloads/NNN_<Slug>.mp3, named
+`NNN.mp3`. Both folders are gitignored. Durations come from walking the MPEG frames, so nothing is decoded.
 Deterministic and light: one read of ~134 MB, seconds.
 """
 
@@ -18,6 +21,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOWNLOADS = os.path.join(ROOT, "data", "tajweed", "downloads")
+ENCODED = os.path.join(ROOT, "data", "tajweed", "encoded")
+V2 = "v2/"  # the R2 key prefix of the encoded files, under tajweed/muallimi-soniy/
 OUT = os.path.join(ROOT, "data", "tajweed", "muallimi.json")
 
 # Lesson titles as the book names them (apostrophes normalised to ʻ / ʼ).
@@ -140,14 +145,20 @@ def duration(data: bytes) -> float:
 
 
 def main() -> int:
+    original = "--original" in sys.argv[1:]
+    folder, pattern = (
+        (DOWNLOADS, r"^(\d{3})_.+\.mp3$") if original else (ENCODED, r"^(\d{3})\.mp3$")
+    )
+    prefix = "" if original else V2
     files = {}
-    for name in os.listdir(DOWNLOADS):
-        m = re.match(r"^(\d{3})_.+\.mp3$", name)
+    for name in os.listdir(folder) if os.path.isdir(folder) else []:
+        m = re.match(pattern, name)
         if m:
-            files[int(m.group(1))] = os.path.join(DOWNLOADS, name)
+            files[int(m.group(1))] = os.path.join(folder, name)
     missing = sorted(set(TITLES) - set(files))
     if missing:
-        print("missing downloads:", missing, file=sys.stderr)
+        hint = "" if original else " (run scripts/tajweed/encode_speech.py first)"
+        print("missing in %s%s:" % (folder, hint), missing, file=sys.stderr)
         return 1
 
     unit_of = {n: u for u, _, ns in UNITS for n in ns}
@@ -162,7 +173,7 @@ def main() -> int:
                     "n": n,
                     "unit": unit_of[n],
                     "title": TITLES[n],
-                    "file": "%03d.mp3" % n,
+                    "file": "%s%03d.mp3" % (prefix, n),
                     "bytes": len(data),
                     "seconds": round(duration(data), 1),
                     "sha256": hashlib.sha256(data).hexdigest(),
