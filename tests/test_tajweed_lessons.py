@@ -105,10 +105,11 @@ def _buttons(mock):
     return [c.data for row in (choices or []) for c in row]
 
 
-async def test_nothing_published_means_coming_soon(store):
+async def test_users_see_the_rules_track_without_approvals(store):
+    first = tajweed_lessons.lessons()[0]
     ctx = _ctx(store)
     await feature.tajvid(ctx)
-    assert ctx.reply.await_args.args[0] == "tj_soon"
+    assert "tj:u:" + first.unit in _buttons(ctx.reply)
 
 
 async def test_reviewer_sees_drafts_and_approves(store):
@@ -130,12 +131,14 @@ async def test_reviewer_sees_drafts_and_approves(store):
     assert "tj:ok:" + first.id not in _buttons(user.edit)  # but no review buttons
 
 
-async def test_users_cannot_open_or_approve_drafts(store):
+async def test_users_open_drafts_without_draft_marks_and_cannot_approve(store):
     first = tajweed_lessons.lessons()[0]
     user = _ctx(store)
+    await feature.on_tajweed(user, "tj:u:" + first.unit)
+    assert not any("tj_draft" in c.label for row in user.edit.await_args.args[1] for c in row)
     await feature.on_tajweed(user, "tj:l:" + first.id)
-    user.edit.assert_not_awaited()
-    user.answer.assert_awaited_with("tj_unavailable")
+    assert "tj_status_draft" not in user.edit.await_args.args[0]
+    assert "tj:ok:" + first.id not in _buttons(user.edit)
     await feature.on_tajweed(user, "tj:ok:" + first.id)
     assert await store.tajweed.approvals() == {}
 
@@ -143,9 +146,9 @@ async def test_users_cannot_open_or_approve_drafts(store):
 async def test_editing_a_lesson_sends_it_back_to_draft(store):
     first = tajweed_lessons.lessons()[0]
     await store.tajweed.approve(first.id, "an-older-text", REVIEWER)  # approved, then edited
-    user = _ctx(store)
-    await feature.on_tajweed(user, "tj:l:" + first.id)
-    user.edit.assert_not_awaited()
+    rev = _ctx(store, REVIEWER)
+    await feature.on_tajweed(rev, "tj:l:" + first.id)
+    assert "tj_status_draft" in rev.edit.await_args.args[0]
 
 
 async def test_example_button_plays_the_ayah_in_the_users_reciter(store, monkeypatch):

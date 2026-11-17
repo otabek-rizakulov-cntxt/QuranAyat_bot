@@ -96,8 +96,9 @@ lesson Latin→Cyrillic→Latin.
 ## 6. Review workflow
 
 - A new setting lists reviewer Telegram ids (non-secret, e.g. a comma-separated env value).
-- Reviewers see `draft` lessons marked "📝 qoralama" with an **Approve** button; everyone else sees
-  only `approved` lessons. With no approved lesson the section shows "Tez orada" (coming soon).
+- Reviewers see `draft` lessons marked "📝 qoralama" with an **Approve** button. Since 2026-11-17
+  (owner's call) everyone else sees every lesson too, drafts included, without the draft mark
+  or the review buttons; the same goes for the audio lessons' text tracking (§15).
 - Approving is an in-bot button that writes a `tajweed_approval` row with the lesson's content
   hash; editing the text changes the hash, so the lesson is a draft again until re-approved.
 
@@ -240,7 +241,7 @@ The original T2–T4 (quizzes, diagram + Learn tab, Reader colours) fold into P1
    - Pins live in `data/tajweed/muallimi_overrides.json`; re-run `align_text` after editing them.
 
 **Review.**
-- A lesson's tracking is shown only after a reviewer approves it, in the bot (lesson card) or the Mini App (lesson page).
+- A lesson's tracking is shown to everyone, in the bot (lesson card) or the Mini App (lesson page). Reviewers still approve it; only they see its status (since 2026-11-17, see §6).
 - The approval stores the hash of the lines and times, so re-aligning puts the lesson back to draft.
 - `GET /api/v1/tajweed` lists approved `tracking`. `POST /api/v1/tajweed/review` is for reviewers only.
 

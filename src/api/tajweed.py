@@ -28,10 +28,10 @@ router = APIRouter()
 
 class TajweedOut(BaseModel):
     audio_base: Optional[str]  # None: the audio lessons are not available yet
-    approved: List[str]  # rules lessons everyone may open
+    approved: List[str]  # rules lessons a reviewer approved (all are open to everyone)
     done: List[str]
-    reviewer: bool  # may open drafts too
-    tracking: List[str]  # audio lessons whose line-by-line text is approved
+    reviewer: bool  # may approve lessons and sees their status
+    tracking: List[str]  # audio lessons whose line-by-line text a reviewer approved
     practice: Dict[str, int]  # lesson -> best practice score, percent
 
 

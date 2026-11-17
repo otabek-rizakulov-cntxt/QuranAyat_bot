@@ -222,7 +222,7 @@ async def test_api_practice(client):
     assert (await client.get("/api/v1/tajweed", headers=h)).json()["practice"] == {"ms-056": 80}
 
     assert (await client.get("/api/v1/tajweed/practice/nope?seed=1", headers=h)).status_code == 404
-    draft = tajweed_lessons.lessons()[0].id  # not approved: not for users
+    draft = tajweed_lessons.lessons()[0].id  # not approved: open to users all the same
     assert (
         await client.get("/api/v1/tajweed/practice/%s?seed=1" % draft, headers=h)
-    ).status_code == 404
+    ).status_code == 200
