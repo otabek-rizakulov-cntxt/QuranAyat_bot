@@ -234,6 +234,7 @@ async def test_api_state_and_done(client):
         "reviewer": False,
         "tracking": [],
         "practice": {},
+        "makhraj": False,  # the 3D screens: reviewers only until released
     }
 
     r = await client.post("/api/v1/tajweed/done", headers=h, json={"lesson_id": "ms-001"})

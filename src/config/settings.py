@@ -57,6 +57,9 @@ class Settings:
     # Public base URL of the Muallimi soniy lesson audio on R2 (…/tajweed/muallimi-soniy/).
     # Unset = the audio lessons track stays hidden.
     tajweed_audio_base_url: Optional[str] = None
+    # The 3D makhraj screens (docs/MAKHRAJ_3D_PLAN.md D7): off = only the reviewers above
+    # see them (testing and tuning), on = everyone.
+    tajweed_makhraj_public: bool = False
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -86,6 +89,7 @@ class Settings:
                 int(x) for x in (env("TAJWEED_REVIEWERS") or "").split(",") if x.strip().isdigit()
             ),
             tajweed_audio_base_url=(env("TAJWEED_AUDIO_BASE_URL") or "").strip() or None,
+            tajweed_makhraj_public=_flag(env("TAJWEED_MAKHRAJ_PUBLIC")),
         )
 
     @property

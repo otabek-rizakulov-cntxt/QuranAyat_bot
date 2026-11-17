@@ -36,8 +36,9 @@ import random
 
 from bot.features import Ctx, callback, command
 from bot.media import deliver_quran
+from bot.miniapp import app_choice_row
 from channels import Choice
-from domain import tajweed, tajweed_cards, tajweed_lessons, tajweed_practice
+from domain import tajweed, tajweed_cards, tajweed_lessons, tajweed_makhraj, tajweed_practice
 from domain.tajweed_lessons import TRACK_AUDIO, TRACK_RULES
 from domain.uz_translit import to_cyrillic
 from services import tajweed as service
@@ -182,6 +183,15 @@ def _nav_row(ctx: Ctx, lesson_id: str, unit_id: str, ids: list) -> list:
     return nav
 
 
+def _makhraj_row(ctx: Ctx, lesson_id: str) -> list:
+    """🦷 opens the lesson's letter on the Mini App's 3D makhraj screen; [] when the app
+    is off, the lesson has no letter, or the screens aren't released to this user."""
+    index = tajweed_makhraj.lesson_screen(lesson_id)
+    if index is None or not service.makhraj_visible(ctx.user_id):
+        return []
+    return app_choice_row(ctx.tr("tj_makhraj"), "/learn/makhraj/%d" % index)
+
+
 def _duration(seconds: float) -> str:
     s = int(round(seconds))
     return "%d:%02d" % (s // 60, s % 60)
@@ -210,6 +220,7 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
         rows = [
             listen,
             _practice_row(ctx, audio.id),
+            *_makhraj_row(ctx, audio.id),
             _done_row(ctx, audio.id, done),
             _nav_row(ctx, audio.id, audio.unit, ids),
         ]
@@ -234,6 +245,7 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
             ]
         )
     rows.append(_practice_row(ctx, lesson.id))
+    rows.extend(_makhraj_row(ctx, lesson.id))
     rows.append(_done_row(ctx, lesson.id, done))
     rows.append(_nav_row(ctx, lesson.id, lesson.unit, [x.id for x in lessons]))
     if service.is_reviewer(ctx.user_id):

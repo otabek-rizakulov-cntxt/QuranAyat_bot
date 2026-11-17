@@ -17,6 +17,9 @@ when a lesson that teaches it is done. Grades are 0 Bilmadim, 1 Qiyin, 2 Bildim.
 Per day: every due card (not yet seen today) and up to NEW_PER_DAY new ones, at most
 SESSION_MAX in all; finishing the day's cards counts a `tajweed` streak day.
 
+Makhraj (P5): the 3D letter screens are shown to reviewers only until the release
+setting turns them on for everyone (`makhraj_visible`); there is no approval step.
+
 Text tracking (P2): an audio lesson's lines and times are shown to everyone;
 reviewers approve them all the same, and the approval row (same table, id `ms-NNN`) holds the hash
 of the timings, so re-aligning a lesson puts it back to draft.
@@ -36,6 +39,11 @@ from services.streaks import SessionOutcome, record_session, user_today
 
 def is_reviewer(user_id: int) -> bool:
     return user_id in get_settings().tajweed_reviewers
+
+
+def makhraj_visible(user_id: int) -> bool:
+    """The 3D makhraj screens: reviewers while they are tuned, everyone once released."""
+    return get_settings().tajweed_makhraj_public or is_reviewer(user_id)
 
 
 def audio_base() -> Optional[str]:

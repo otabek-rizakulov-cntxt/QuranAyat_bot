@@ -35,7 +35,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from domain import tajweed, tajweed_lessons, tajweed_practice  # noqa: E402
+from domain import tajweed, tajweed_lessons, tajweed_makhraj, tajweed_practice  # noqa: E402
 from domain.quran import (  # noqa: E402
     _QURAN_DATA,  # noqa: E402
     TRANSLATIONS_DIR,
@@ -199,7 +199,34 @@ def tajweed_doc(lang: str) -> dict:
                 "units": units(tajweed_lessons.units(lang)),
                 "lessons": rules,
             },
-        ]
+        ],
+        "makhraj": makhraj_doc(lang),
+    }
+
+
+def makhraj_doc(lang: str) -> dict:
+    """The 3D makhraj screens (docs/MAKHRAJ_3D_PLAN.md): the 17 makhraj with their
+    poses, and the 30 screens in order with each one's clip in its lesson's mp3."""
+    return {
+        "makhraj": [m._asdict() for m in tajweed_makhraj.makhraj_list(lang)],
+        "screens": [
+            {
+                "key": s.key,
+                "glyph": s.glyph,
+                "title": s.title,
+                "makhraj": s.makhraj,
+                "layers": s.layers,
+                "lesson": s.lesson,
+                "clip": list(s.clip) if s.clip else None,
+                "note": s.note,
+            }
+            for s in tajweed_makhraj.screens(lang)
+        ],
+        "lessons": {
+            x.id: i
+            for x in list(tajweed_lessons.audio_lessons()) + list(tajweed_lessons.lessons())
+            if (i := tajweed_makhraj.lesson_screen(x.id)) is not None
+        },
     }
 
 
