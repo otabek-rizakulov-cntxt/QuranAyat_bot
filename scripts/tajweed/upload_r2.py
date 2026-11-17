@@ -97,7 +97,9 @@ def verify() -> int:
     bad = 0
     for lesson in _lessons():
         url = base + lesson["file"]
-        req = urllib.request.Request(url, method="HEAD", headers={"Range": "bytes=0-1"})
+        # r2.dev answers 403 to urllib's default User-Agent
+        headers = {"Range": "bytes=0-1", "User-Agent": "quranayat-verify/1"}
+        req = urllib.request.Request(url, method="HEAD", headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=20) as res:
                 status = res.status
