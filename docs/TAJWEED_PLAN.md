@@ -108,6 +108,9 @@ lesson Latin→Cyrillic→Latin.
 > App. Their page allows exporting "to use in a lesson or a handout" but is marked "© Noqta. All
 > rights reserved", and an exported PNG cannot be animated. Before P5: ask Noqta for permission and
 > the vector source, or draw our own as below, using noqta.tn only as a reference.
+>
+> 2026-11-17: superseded by [MAKHRAJ_3D_PLAN.md](MAKHRAJ_3D_PLAN.md) (animated 3D tongue positions,
+> built in code, so the Noqta question no longer applies).
 
 
 An original SVG: side view of the head (lips, teeth, tongue, palate, throat, nasal cavity) with

@@ -26,7 +26,9 @@ from services import tajweed as service
 
 REVIEWER, USER = 9001, 9002
 BASE = "https://media.example.test/tajweed/muallimi-soniy/"
-DOWNLOADS = os.path.join(os.path.dirname(__file__), "..", "data", "tajweed", "downloads")
+DATA = os.path.join(os.path.dirname(__file__), "..", "data", "tajweed")
+V2 = tajweed_lessons.audio_lessons()[0].file.startswith("v2/")  # the 64 kbps re-encodes
+LOCAL = os.path.join(DATA, "encoded" if V2 else "downloads")
 
 
 # --- the manifest ----------------------------------------------------------------------
@@ -41,7 +43,7 @@ def test_manifest_covers_the_73_lessons_once_preface_first():
     assert [x.unit for x in lessons] == sorted((x.unit for x in lessons), key=units.index)
     assert not {u.id for u in tajweed_lessons.units()} & set(units)  # unit ids never clash
     for x in lessons:
-        assert x.file == "%03d.mp3" % x.n
+        assert x.file == ("v2/" if V2 else "") + "%03d.mp3" % x.n  # all from one source
         assert 0 < x.seconds < 15 * 60 and 0 < x.bytes < 20_000_000  # Telegram fetches ≤ 20 MB
         assert not re.search(r"https?://|www\.|\.(uz|com)\b", x.title)
         assert len("tj:l:" + x.id) <= 64
@@ -54,11 +56,11 @@ def test_cyrillic_titles_round_trip():
         assert lat.id == cyr.id and to_latin(cyr.title) == lat.title
 
 
-@pytest.mark.skipif(not os.path.isdir(DOWNLOADS), reason="lesson audio not downloaded here")
+@pytest.mark.skipif(not os.path.isdir(LOCAL), reason="lesson audio not on this machine")
 def test_manifest_matches_the_local_files():
-    names = {n[:3]: n for n in os.listdir(DOWNLOADS) if n.endswith(".mp3")}
+    names = {n[:3]: n for n in os.listdir(LOCAL) if n.endswith(".mp3")}
     for x in tajweed_lessons.audio_lessons():
-        with open(os.path.join(DOWNLOADS, names["%03d" % x.n]), "rb") as fp:
+        with open(os.path.join(LOCAL, names["%03d" % x.n]), "rb") as fp:
             data = fp.read()
         assert (len(data), hashlib.sha256(data).hexdigest()) == (x.bytes, x.sha256), x.id
 
@@ -161,7 +163,7 @@ async def test_audio_card_listen_and_done(store, sessions):
     await feature.on_tajweed(ctx, "tj:a:ms-073")
     lesson = tajweed_lessons.audio_lesson("ms-073")
     call = ctx.channel.send_audio.await_args
-    assert call.args[0] == BASE + "073.mp3"
+    assert call.args[0] == BASE + lesson.file
     assert call.kwargs["cache_key"] == "tjm:" + lesson.sha256[:12]
     assert call.kwargs["caption"] == "🎧 " + lesson.title  # no source line
 

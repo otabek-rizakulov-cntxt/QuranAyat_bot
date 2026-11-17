@@ -5,8 +5,10 @@
     uv run --with boto3 python scripts/tajweed/upload_r2.py
     python3 scripts/tajweed/upload_r2.py --verify      # public URLs only, no keys
 
-Source: data/tajweed/downloads/NNN_<Slug>.mp3 (gitignored), as listed in
-data/tajweed/muallimi.json. Each file goes to `tajweed/muallimi-soniy/NNN.mp3` with
+Source: the files data/tajweed/muallimi.json lists: `v2/NNN.mp3` from
+data/tajweed/encoded/ (the 64 kbps re-encodes, encode_speech.py), or `NNN.mp3` from
+data/tajweed/downloads/NNN_<Slug>.mp3 (both gitignored). Each goes to
+`tajweed/muallimi-soniy/<file>` with
 audio/mpeg, a year-long immutable cache and its sha256 as object metadata, so a
 re-run skips every file that is already there unchanged.
 
@@ -24,6 +26,7 @@ import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOWNLOADS = os.path.join(ROOT, "data", "tajweed", "downloads")
+ENCODED = os.path.join(ROOT, "data", "tajweed", "encoded")
 MANIFEST = os.path.join(ROOT, "data", "tajweed", "muallimi.json")
 PREFIX = "tajweed/muallimi-soniy/"
 CACHE = "public, max-age=31536000, immutable"
@@ -34,7 +37,10 @@ def _lessons() -> list:
         return json.load(fp)["lessons"]
 
 
-def _local(n: int) -> str:
+def _local(lesson: dict) -> str:
+    if lesson["file"].startswith("v2/"):
+        return os.path.join(ENCODED, os.path.basename(lesson["file"]))
+    n = lesson["n"]
     for name in os.listdir(DOWNLOADS):
         if re.match(r"^%03d_.+\.mp3$" % n, name):
             return os.path.join(DOWNLOADS, name)
@@ -73,7 +79,7 @@ def upload(dry_run: bool) -> int:
         except ClientError as err:
             if err.response.get("Error", {}).get("Code") not in ("404", "NoSuchKey", "NotFound"):
                 raise
-        with open(_local(lesson["n"]), "rb") as fp:
+        with open(_local(lesson), "rb") as fp:
             data = fp.read()
         if hashlib.sha256(data).hexdigest() != lesson["sha256"]:
             sys.exit("%s differs from muallimi.json; re-run scripts/tajweed/muallimi.py" % key)
