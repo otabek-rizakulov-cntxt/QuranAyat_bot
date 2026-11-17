@@ -13,3 +13,5 @@
 | [MULTI_PLATFORM_PLAN.md](MULTI_PLATFORM_PLAN.md) | Serving WhatsApp from the same code (proposal). |
 | [RECITATION_CHECKER_INVESTIGATION.md](RECITATION_CHECKER_INVESTIGATION.md) | Checking a user's recitation, word by word (investigation). |
 | [KOYEB_CAPACITY_REPORT.md](KOYEB_CAPACITY_REPORT.md) | Load-test results on the Koyeb free tier. |
+| [TAJWEED_PLAN.md](TAJWEED_PLAN.md) | The tajweed section: lessons, audio track, practice, cards. |
+| [MAKHRAJ_3D_PLAN.md](MAKHRAJ_3D_PLAN.md) | Tajweed P5: 360° 3D tongue positions letter by letter, and the audio latency fix (proposal). |
