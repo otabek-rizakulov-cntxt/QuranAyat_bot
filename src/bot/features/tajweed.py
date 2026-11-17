@@ -7,7 +7,7 @@
     tj:l:<lesson>           a lesson card
     tj:a:<lesson>           send an audio lesson (alifbo)
     tj:d:<lesson>           ✅ Oʻqidim: mark the lesson done (a streak session, once)
-    tj:m:<lesson>           📄 Matn: send an audio lesson's text (once its tracking is approved)
+    tj:m:<lesson>           📄 Matn: send an audio lesson's text
     tj:p:<lesson>:<n>       play example n of a rules lesson in the user's reciter
     tj:q:<lesson>:<seed>:<i>:<score>        quiz question i (i == N: the result)
     tj:qa:<lesson>:<seed>:<i>:<score>:<c>   answer c to question i
@@ -49,12 +49,9 @@ _TRACK_KEYS = {TRACK_AUDIO: "tj_track_alifbo", TRACK_RULES: "tj_track_qoidalar"}
 
 
 async def _rules_visible(ctx: Ctx) -> tuple:
-    """(rules lessons this user may see, ids of the approved ones)."""
-    approved = await service.approved_ids(ctx.store)
-    lessons = tajweed_lessons.lessons(ctx.ui_lang)
-    if service.is_reviewer(ctx.user_id):
-        return lessons, approved
-    return tuple(x for x in lessons if x.id in approved), approved
+    """(the rules lessons, ids of the approved ones). Everyone sees every lesson;
+    the approval only shows to reviewers."""
+    return tajweed_lessons.lessons(ctx.ui_lang), await service.approved_ids(ctx.store)
 
 
 async def _say(ctx: Ctx, edit: bool, text: str, choices) -> None:
@@ -117,19 +114,22 @@ async def _unit(ctx: Ctx, unit_id: str) -> None:
     if track == TRACK_AUDIO:
         units = tajweed_lessons.audio_units(ctx.ui_lang)
         mine = [x for x in tajweed_lessons.audio_lessons(ctx.ui_lang) if x.unit == unit_id]
-        approved = {x.id for x in mine}
         per_row = 2 if len(mine) > 8 else 1  # the 28 letters fit as two columns
     else:
         units = tajweed_lessons.units(ctx.ui_lang)
-        lessons, approved = await _rules_visible(ctx)
+        lessons, _ = await _rules_visible(ctx)
         mine = [x for x in lessons if x.unit == unit_id]
         per_row = 1
+    # drafts are marked for reviewers only
+    drafts = set()
+    if track == TRACK_RULES and service.is_reviewer(ctx.user_id):
+        drafts = {x.id for x in mine} - await service.approved_ids(ctx.store)
     unit = next(u for u in units if u.id == unit_id)
     buttons = [
         Choice(
             ("✓ " if x.id in done else "")
             + x.title
-            + ("" if x.id in approved else " · " + ctx.tr("tj_draft")),
+            + (" · " + ctx.tr("tj_draft") if x.id in drafts else ""),
             data="tj:l:" + x.id,
         )
         for x in mine
@@ -205,7 +205,7 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
         has_text = bool(tajweed_lessons.audio_timings(audio.id))
         tracked = audio.id in await service.tracking_ids(ctx.store)
         listen = [Choice(ctx.tr("tj_listen"), data="tj:a:" + audio.id)]
-        if has_text and (tracked or reviewer):
+        if has_text:
             listen.append(Choice(ctx.tr("tj_text"), data="tj:m:" + audio.id))
         rows = [
             listen,
@@ -267,8 +267,7 @@ async def _send_text(ctx: Ctx, lesson_id: str) -> None:
     in italics. Telegram can't highlight along with the audio, so this is the whole
     text at once, split under the message limit."""
     lines = tajweed_lessons.audio_timings(lesson_id, ctx.ui_lang)
-    allowed = service.is_reviewer(ctx.user_id) or lesson_id in await service.tracking_ids(ctx.store)
-    if not lines or not allowed:
+    if not lines:
         await ctx.answer(ctx.tr("tj_unavailable"))
         return
     await ctx.answer()

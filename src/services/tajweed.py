@@ -5,9 +5,10 @@ open this lesson?" the same way:
 
 - `alifbo` (the Muallimi soniy audio lessons) is open to everyone once the audio
   base URL is configured; until then the track does not exist.
-- `qoidalar` (our own lessons) shows approved lessons to everyone and drafts to
-  reviewers only. A lesson is approved while the stored hash equals its current
-  content hash, so an edited lesson is a draft again.
+- `qoidalar` (our own lessons) is open to everyone. Reviewers still approve each
+  lesson, and only they see whether it is approved or a draft: a lesson is
+  approved while the stored hash equals its current content hash, so an edited
+  lesson is a draft again.
 
 Marking a lesson done counts as a `tajweed` streak session, once per lesson.
 
@@ -16,8 +17,8 @@ when a lesson that teaches it is done. Grades are 0 Bilmadim, 1 Qiyin, 2 Bildim.
 Per day: every due card (not yet seen today) and up to NEW_PER_DAY new ones, at most
 SESSION_MAX in all; finishing the day's cards counts a `tajweed` streak day.
 
-Text tracking (P2): an audio lesson's lines and times are shown to everyone once a
-reviewer approved them; the approval row (same table, id `ms-NNN`) holds the hash
+Text tracking (P2): an audio lesson's lines and times are shown to everyone;
+reviewers approve them all the same, and the approval row (same table, id `ms-NNN`) holds the hash
 of the timings, so re-aligning a lesson puts it back to draft.
 """
 
@@ -56,9 +57,7 @@ async def can_open(store, user_id: int, lesson_id: str) -> bool:
     track = tajweed_lessons.track_of(lesson_id)
     if track == TRACK_AUDIO:
         return audio_base() is not None
-    if track == TRACK_RULES:
-        return is_reviewer(user_id) or lesson_id in await approved_ids(store)
-    return False
+    return track == TRACK_RULES
 
 
 async def visible_tracks(store, user_id: int) -> tuple:
@@ -66,7 +65,7 @@ async def visible_tracks(store, user_id: int) -> tuple:
     tracks = []
     if audio_base() is not None:
         tracks.append(TRACK_AUDIO)
-    if is_reviewer(user_id) or await approved_ids(store):
+    if tajweed_lessons.lessons():
         tracks.append(TRACK_RULES)
     return tuple(tracks)
 

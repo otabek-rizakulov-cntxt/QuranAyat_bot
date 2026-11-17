@@ -115,18 +115,17 @@ def _labels(mock):
     return [c.label for row in mock.await_args.args[1] for c in row]
 
 
-async def test_only_the_audio_track_goes_straight_to_its_units(store):
+async def test_users_pick_between_both_tracks(store):
     ctx = _ctx(store)
     await feature.tajvid(ctx)
-    assert _buttons(ctx.reply)[0] == "tj:u:ms-kirish"
-    assert "tj:units" not in _buttons(ctx.reply)  # nothing to go back to
+    assert _buttons(ctx.reply) == ["tj:t:alifbo", "tj:t:qoidalar", "tj:s"]
 
 
-async def test_without_the_audio_base_url_there_is_nothing_yet(store, monkeypatch):
+async def test_without_the_audio_base_url_there_is_no_audio_track(store, monkeypatch):
     monkeypatch.delenv("TAJWEED_AUDIO_BASE_URL")
     ctx = _ctx(store)
     await feature.tajvid(ctx)
-    assert ctx.reply.await_args.args[0] == "tj_soon"
+    assert "tj:u:ms-kirish" not in _buttons(ctx.reply)  # the rules track only
     await feature.on_tajweed(ctx, "tj:l:ms-073")
     ctx.edit.assert_not_awaited()
     await feature.on_tajweed(ctx, "tj:a:ms-073")
@@ -176,12 +175,9 @@ async def test_audio_card_listen_and_done(store, sessions):
     ctx.answer.assert_awaited_with("tj_done_already")
 
 
-async def test_rules_lessons_can_be_marked_done_once_published(store, sessions):
-    lesson = tajweed_lessons.lessons()[0]
+async def test_rules_lessons_can_be_marked_done_even_as_drafts(store, sessions):
+    lesson = tajweed_lessons.lessons()[0]  # not approved
     ctx = _ctx(store)
-    await feature.on_tajweed(ctx, "tj:d:" + lesson.id)  # a draft: not for users
-    assert sessions == []
-    await store.tajweed.approve(lesson.id, lesson.content_hash, REVIEWER)
     await feature.on_tajweed(ctx, "tj:l:" + lesson.id)
     assert "tj:d:" + lesson.id in _buttons(ctx.edit)
     await feature.on_tajweed(ctx, "tj:d:" + lesson.id)
@@ -249,12 +245,13 @@ async def test_api_state_and_done(client):
     assert len(sessions) == 1
 
 
-async def test_api_refuses_unknown_and_draft_lessons(client):
+async def test_api_refuses_unknown_lessons_but_not_drafts(client):
     h = await _login(client, USER)
+    r = await client.post("/api/v1/tajweed/done", headers=h, json={"lesson_id": "nope"})
+    assert r.status_code == 404
     draft = tajweed_lessons.lessons()[0].id
-    for lesson_id in ("nope", draft):
-        r = await client.post("/api/v1/tajweed/done", headers=h, json={"lesson_id": lesson_id})
-        assert r.status_code == 404
+    r = await client.post("/api/v1/tajweed/done", headers=h, json={"lesson_id": draft})
+    assert r.status_code == 200
     r = await client.get("/api/v1/tajweed", headers=await _login(client, REVIEWER))
     assert r.json()["reviewer"] is True
 
@@ -277,12 +274,13 @@ def timed(monkeypatch):
     return table
 
 
-async def test_text_tracking_is_shown_once_a_reviewer_approves_it(store, timed):
+async def test_text_tracking_is_shown_to_everyone_and_reviewed(store, timed):
     user = _ctx(store)
     await feature.on_tajweed(user, "tj:l:ms-004")
-    assert "tj:m:ms-004" not in _buttons(user.edit)  # a draft: hidden from users
+    assert "tj:m:ms-004" in _buttons(user.edit)  # a draft, shown all the same
+    assert "tj:ok:ms-004" not in _buttons(user.edit)  # but no review buttons
     await feature.on_tajweed(user, "tj:m:ms-004")
-    user.reply.assert_not_awaited()
+    assert "زَ زِ زُ" in user.reply.await_args.args[0]
 
     rev = _ctx(store, REVIEWER)
     await feature.on_tajweed(rev, "tj:l:ms-004")
