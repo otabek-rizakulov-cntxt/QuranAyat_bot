@@ -709,7 +709,11 @@
    "layers": {
     "heavy": 1
    },
-   "clip": null
+   "clip": [
+    11.1,
+    13.8
+   ],
+   "check": "clip set from loudness (kh hiss blurs the syllable gaps), not heard: listen and adjust in ?debug=1"
   },
   {
    "letter": "د",
@@ -745,7 +749,11 @@
    "letter": "ش",
    "makhraj": "lisan-wasat",
    "layers": {},
-   "clip": null
+   "clip": [
+    8.9,
+    12.0
+   ],
+   "check": "clip set from loudness and word counts, not heard: listen and adjust in ?debug=1"
   },
   {
    "letter": "ص",
@@ -769,7 +777,10 @@
    "layers": {
     "heavy": 1
    },
-   "clip": null
+   "clip": [
+    17.8,
+    21.0
+   ]
   },
   {
    "letter": "ظ",
@@ -791,13 +802,19 @@
    "layers": {
     "heavy": 1
    },
-   "clip": null
+   "clip": [
+    11.6,
+    16.4
+   ]
   },
   {
    "letter": "ف",
    "makhraj": "shafa-fa",
    "layers": {},
-   "clip": null
+   "clip": [
+    7.7,
+    13.1
+   ]
   },
   {
    "letter": "ق",
@@ -833,7 +850,10 @@
    "layers": {
     "nasal": 0.4
    },
-   "clip": null
+   "clip": [
+    6.8,
+    11.5
+   ]
   },
   {
    "letter": "ه",

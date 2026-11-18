@@ -73,7 +73,7 @@ def test_clips_are_usable_spans_of_their_lesson():
         assert 0 <= start < end <= seconds + 0.5, s.key
         assert tajweed_makhraj.CLIP_MIN <= end - start <= tajweed_makhraj.CLIP_MAX, s.key
         with_clip += 1
-    assert with_clip >= 24  # the rest get hand-set clips while tuning (§2.1)
+    assert with_clip == len(tajweed_makhraj.screens())  # every screen has its sound
 
 
 def test_cyrillic_screens_round_trip():
