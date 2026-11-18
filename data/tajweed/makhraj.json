@@ -1,5 +1,5 @@
 {
- "about": "Makhraj (articulation) data for the 3D screens: docs/MAKHRAJ_3D_PLAN.md. Poses are first drafts in the figure's profile coordinates (x forward to the lips, y up); tune them in the Mini App's debug panel (?debug=1, reviewers) and paste the JSON back here. A letter's clip is its Muallimi lesson's first Arabic row unless `clip` [start, end] overrides it.",
+ "about": "Makhraj (articulation) data for the 3D screens: docs/MAKHRAJ_3D_PLAN.md. Poses are tuned to the cutaway head (2026-11-18) in the figure's profile coordinates (x forward to the lips, y up); the 5 tongue points run tip to upper root, and the figure continues the root to a fixed anchor in the throat; tune them in the Mini App's debug panel (?debug=1, reviewers) and paste the JSON back here. A letter's clip is its Muallimi lesson's first Arabic row unless `clip` [start, end] overrides it.",
  "makhraj": [
   {
    "id": "jawf",
@@ -94,19 +94,19 @@
      ],
      [
       0.22,
-      0.04
+      0.03
      ],
      [
       0.02,
-      0.07
+      0.05
      ],
      [
-      -0.17,
+      -0.23,
       0.0
      ],
      [
-      -0.27,
-      -0.22
+      -0.29,
+      -0.1
      ]
     ],
     "tongue_side": 0,
@@ -132,20 +132,20 @@
       -0.04
      ],
      [
-      0.2,
+      0.18,
       0.06
      ],
      [
-      0.0,
-      0.12
+      -0.03,
+      0.145
      ],
      [
-      -0.17,
-      0.13
+      -0.2,
+      0.188
      ],
      [
-      -0.22,
-      -0.2
+      -0.285,
+      0.0
      ]
     ],
     "tongue_side": 0,
@@ -171,20 +171,20 @@
       -0.03
      ],
      [
-      0.2,
-      0.07
+      0.19,
+      0.1
      ],
      [
       0.0,
-      0.16
+      0.215
      ],
      [
-      -0.12,
-      0.21
+      -0.125,
+      0.252
      ],
      [
-      -0.2,
-      -0.18
+      -0.25,
+      0.06
      ]
     ],
     "tongue_side": 0,
@@ -210,16 +210,16 @@
       -0.03
      ],
      [
-      0.22,
-      0.09
+      0.23,
+      0.1
      ],
      [
-      0.06,
-      0.22
+      0.04,
+      0.27
      ],
      [
-      -0.08,
-      0.18
+      -0.09,
+      0.2
      ],
      [
       -0.2,
@@ -249,16 +249,16 @@
       -0.02
      ],
      [
-      0.24,
-      0.14
+      0.25,
+      0.15
      ],
      [
-      0.12,
-      0.24
+      0.13,
+      0.265
      ],
      [
-      -0.06,
-      0.14
+      -0.05,
+      0.16
      ],
      [
       -0.2,
@@ -289,15 +289,15 @@
      ],
      [
       0.25,
-      0.12
+      0.13
      ],
      [
       0.08,
-      0.18
+      0.2
      ],
      [
       -0.1,
-      0.1
+      0.11
      ],
      [
       -0.2,
@@ -401,12 +401,12 @@
    "pose": {
     "tongue": [
      [
-      0.35,
-      0.15
+      0.335,
+      0.19
      ],
      [
       0.25,
-      0.14
+      0.15
      ],
      [
       0.06,
@@ -440,12 +440,12 @@
    "pose": {
     "tongue": [
      [
-      0.4,
-      0.13
+      0.41,
+      0.108
      ],
      [
-      0.28,
-      0.1
+      0.29,
+      0.09
      ],
      [
       0.06,
