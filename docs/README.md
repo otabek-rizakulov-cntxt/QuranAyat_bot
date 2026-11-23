@@ -15,3 +15,4 @@
 | [KOYEB_CAPACITY_REPORT.md](KOYEB_CAPACITY_REPORT.md) | Load-test results on the Koyeb free tier. |
 | [TAJWEED_PLAN.md](TAJWEED_PLAN.md) | The tajweed section: lessons, audio track, practice, cards. |
 | [MAKHRAJ_3D_PLAN.md](MAKHRAJ_3D_PLAN.md) | Tajweed P5: 360° 3D tongue positions letter by letter, and the audio latency fix (proposal). |
+| [TAJWEED_NEXT_PLAN.md](TAJWEED_NEXT_PLAN.md) | Next round: fixing lesson text and timing, lesson icons, tajweed colours in the reader, a sculpted 3D head (draft). |
