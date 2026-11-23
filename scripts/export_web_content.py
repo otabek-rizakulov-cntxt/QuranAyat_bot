@@ -35,7 +35,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from domain import tajweed, tajweed_lessons, tajweed_makhraj, tajweed_practice  # noqa: E402
+from domain import tajweed, tajweed_icons, tajweed_lessons, tajweed_makhraj, tajweed_practice  # noqa: E402
 from domain.quran import (  # noqa: E402
     _QURAN_DATA,  # noqa: E402
     TRANSLATIONS_DIR,
@@ -154,6 +154,7 @@ def tajweed_doc(lang: str) -> dict:
             "unit": x.unit,
             "n": x.n,
             "title": x.title,
+            "icon": tajweed_icons.icon(x.id),
             "file": x.file,
             "seconds": x.seconds,
             "quiz": bool(tajweed_practice.rules_for(x.id)),  # else reading drills only
@@ -170,6 +171,7 @@ def tajweed_doc(lang: str) -> dict:
             "id": x.id,
             "unit": x.unit,
             "title": x.title,
+            "icon": tajweed_icons.icon(x.id),
             "body": list(x.body),
             "quiz": bool(tajweed_practice.rules_for(x.id)),
             "examples": [
