@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "language": "en",
+  "note": "English translation of lessons.uz.json for readers of every other language (docs/TAJWEED_NEXT_PLAN.md §3). Same ids, units, rules and examples; the Uzbek file is the source, and a lesson's approval follows its Uzbek original.",
+  "units": [
+    {"id": "harflar", "title": "Letters and their articulation points"},
+    {"id": "harakatlar", "title": "Vowel marks"},
+    {"id": "mad", "title": "Madd (lengthening)"},
+    {"id": "nun", "title": "Nun sakin and tanwin"},
+    {"id": "mim", "title": "Mim sakin"},
+    {"id": "boshqa", "title": "Other rules"}
+  ],
+  "lessons": [
+    {
+      "id": "maxraj-kirish",
+      "title": "What is a makhraj?",
+      "body": [
+        "A <b>makhraj</b> is the place a letter's sound comes from. Every letter of the Arabic alphabet has its own; producing each letter from the right place is the first step of tajweed.",
+        "The makhraj fall into five areas: the <b>jawf</b> (the open space of the mouth and throat), the <b>halq</b> (throat), the <b>tongue</b>, the <b>lips</b> and the <b>khayshum</b> (nasal cavity). By the best-known count of the scholars there are 17 in all: 1 in the jawf, 3 in the throat, 10 on the tongue, 2 at the lips and 1 in the nose.",
+        "The next lessons go through each area in turn. To find a letter's makhraj, say it with a sukun after a hamza with a vowel (for example «ab», «at»): where the sound stops is that letter's makhraj."
+      ]
+    },
+    {
+      "id": "maxraj-bogiz",
+      "title": "Throat letters",
+      "body": [
+        "Six letters come from the throat, from three makhraj:",
+        "• <b>The deepest part of the throat</b> (near the chest): ء (hamza) and ه (ha).\n• <b>The middle of the throat</b>: ع (ʿayn) and ح (ḥa).\n• <b>The top of the throat</b> (near the mouth): غ (ghayn) and خ (kha).",
+        "Many languages lack some of these sounds, so take care to tell ح from ه and ع from hamza. ح comes from the middle of the throat: a breathy sound with no voice, but with a strong stream of air."
+      ]
+    },
+    {
+      "id": "maxraj-til",
+      "title": "Tongue letters",
+      "body": [
+        "Eighteen letters come from the tongue, the largest area. The main groups:",
+        "• The back of the tongue against the soft palate: ق (qaf); a little further forward: ك (kaf).\n• The middle of the tongue against the palate: ج, ش and ي when it has a vowel or is not a madd letter.\n• The side of the tongue against the upper molars: ض.\n• The front of the tongue: ل, ن, ر, each from a slightly different place.\n• The tip of the tongue against the roots of the upper front teeth: ت, د, ط.\n• The tip of the tongue near the front teeth, with a whistle: ص, س, ز.\n• The tip of the tongue against the edges of the upper front teeth: ث, ذ, ظ.",
+        "The most common mistakes are saying ق like ك, ض like د or ظ, and ث like س. Practise the letters one by one with a sukun."
+      ]
+    },
+    {
+      "id": "maxraj-lab",
+      "title": "Lip letters",
+      "body": [
+        "Four letters come from the lips, from two makhraj:",
+        "• <b>ف</b>: the inside of the lower lip touches the edges of the upper front teeth.\n• <b>ب, م</b> and <b>و</b> (when it has a vowel or is not a madd letter): both lips. For ب and م the lips close; for و they round and do not close fully.",
+        "Don't say و like an English «v», with the teeth on the lip: the teeth play no part in the Arabic و."
+      ]
+    },
+    {
+      "id": "maxraj-javf-xayshum",
+      "title": "The jawf and the khayshum",
+      "body": [
+        "The <b>jawf</b> is the open space of the mouth and throat. The three <b>madd letters</b> come from it: a silent ا after a fatha, a silent و after a damma and a silent ي after a kasra. They last as long as the air does, so they have no single point.",
+        "The <b>khayshum</b> is the nasal cavity. The <b>ghunna</b> comes from here: the nasal sound that goes with nun and mim. Pinch your nose and the ghunna stops, which shows it comes from the khayshum."
+      ]
+    },
+    {
+      "id": "harakatlar",
+      "title": "Fatha, kasra, damma and sukun",
+      "body": [
+        "The vowel marks show which vowel a letter is read with:",
+        "• <b>Fatha</b> (a slanted stroke above the letter, ـَ): the «a» sound.\n• <b>Kasra</b> (a slanted stroke below the letter, ـِ): the «i» sound.\n• <b>Damma</b> (a small waw above the letter, ـُ): the «u» sound.\n• <b>Sukun</b> (a small circle above the letter, ـْ): the letter has no vowel and is said short and clean.",
+        "These vowels are short: one count each. Stretching them goes against the rules of madd and can change the meaning."
+      ]
+    },
+    {
+      "id": "tashdid",
+      "title": "Tashdid (shadda)",
+      "body": [
+        "A <b>tashdid</b> (ـّ) means the letter is said twice: first silent, then with its vowel. In رَبِّ, for example, the ب is said twice: «rab-bi».",
+        "Hold the doubled letter for a moment, then say it with its vowel. Dropping a tashdid can change a word's meaning, so watch for it. A doubled nun or mim is said with ghunna (see the Ghunna lesson)."
+      ]
+    },
+    {
+      "id": "tanvin",
+      "title": "Tanwin",
+      "body": [
+        "<b>Tanwin</b> is a doubled vowel mark at the end of a word (ـً ـٍ ـٌ). It stands for a silent <b>nun</b> that is pronounced but not written: «-an», «-in», «-un».",
+        "Depending on the letter after it, this nun is said clearly, hidden, or merged into the next letter; those rules are in the section «Nun sakin and tanwin».",
+        "When stopping (waqf) on a fatha tanwin, it becomes a long «a»; when stopping on a kasra or damma tanwin, the letter ends with a sukun."
+      ]
+    },
+    {
+      "id": "mad-tabiiy",
+      "title": "Natural madd",
+      "body": [
+        "<b>Madd</b> is stretching a sound. There are three madd letters: a silent ا after a fatha, a silent و after a damma and a silent ي after a kasra.",
+        "When no hamza or sukun follows the madd letter, it is a <b>natural madd</b>, stretched two counts: twice a short vowel. Cutting it short and stretching it too far are both mistakes.",
+        "Listen to the marked places in the examples and match the length to the reciter's."
+      ]
+    },
+    {
+      "id": "mad-muttasil",
+      "title": "Connected madd (muttasil)",
+      "body": [
+        "When a <b>hamza follows a madd letter in the same word</b>, it is a <b>connected</b> (muttasil) madd. In the Hafs narration it is stretched <b>4 or 5 counts</b> and never shortened, which is why it is also called the «obligatory madd».",
+        "For example: جَآءَ, ٱلسَّمَآءِ. Keep the length you choose (4 or 5) the same throughout a recitation."
+      ]
+    },
+    {
+      "id": "mad-munfasil",
+      "title": "Separated madd (munfasil)",
+      "body": [
+        "When a madd letter <b>ends a word</b> and a hamza <b>starts the next word</b>, it is a <b>separated</b> (munfasil) madd. In the Hafs narration, by the best-known way, it is stretched <b>4 or 5 counts</b>.",
+        "For example: يَـٰٓأَيُّهَا, إِنَّآ أَعْطَيْنَـٰكَ. The difference from the connected madd: the hamza is in another word."
+      ]
+    },
+    {
+      "id": "mad-lozim",
+      "title": "Necessary madd (lazim)",
+      "body": [
+        "When a madd letter is followed in the same word by a <b>permanent sukun or a shadda</b>, it is a <b>necessary</b> (lazim) madd, always stretched <b>6 counts</b>.",
+        "The best-known example is ٱلضَّآلِّينَ at the end of al-Fatiha. The separate letters that open some surahs also have it (for example the «lam» and «mim» of الٓمٓ)."
+      ]
+    },
+    {
+      "id": "mad-oriz-lin",
+      "title": "Madd when stopping, and lin",
+      "body": [
+        "When you stop (waqf) at the end of an ayah or a word, the letter after a madd letter becomes silent because of the stop. This makes a <b>temporary</b> (ʿarid) madd, which may be stretched <b>2, 4 or 6 counts</b>. For example, stopping on ٱلْعَـٰلَمِينَ.",
+        "<b>Lin madd</b>: stopping after a silent و or ي that follows a fatha, as in خَوْفٍ, ٱلْبَيْتِ. It is also 2, 4 or 6 counts. When you read on without stopping, these are not stretched."
+      ]
+    },
+    {
+      "id": "nun-izhor",
+      "title": "Izhar (clear)",
+      "body": [
+        "When one of the <b>throat letters</b> (ء ه ع ح غ خ) follows a nun sakin (نْ) or tanwin, the nun is said <b>clearly</b>, with no ghunna. This is <b>izhar</b> (making clear).",
+        "The reason: the throat letters come from far from the nun, so the two sounds don't merge. For example: أَنْعَمْتَ (al-Fatiha, ayah 7), مِّنْ خَوْفٍ, كُفُوًا أَحَدٌ."
+      ]
+    },
+    {
+      "id": "nun-idgom",
+      "title": "Idgham (merging)",
+      "body": [
+        "When one of the letters <b>ي ر م ل و ن</b> follows a nun sakin or tanwin, the nun merges into the next letter: this is <b>idgham</b>. The word «yarmalun» (يَرْمَلُونَ) helps to remember them.",
+        "• <b>Idgham with ghunna</b>: with ي ن م و, the merge carries a ghunna of two counts.\n• <b>Idgham without ghunna</b>: with ل and ر, the nun disappears completely, with no ghunna.",
+        "Idgham only happens between two words. When the nun and one of these letters are in the same word (for example دُنْيَا), the nun is said clearly."
+      ]
+    },
+    {
+      "id": "nun-iqlob",
+      "title": "Iqlab (turning)",
+      "body": [
+        "When <b>ب</b> follows a nun sakin or tanwin, the nun turns into a <b>mim</b> sound, said with ghunna and lightly closed lips. This is <b>iqlab</b> (turning).",
+        "The mushaf marks these places with a small mim (ۢ or ۭ) over the nun or tanwin: the sign of iqlab. For example: مِنۢ بَعْدِ, كِرَامٍۭ بَرَرَةٍ."
+      ]
+    },
+    {
+      "id": "nun-ixfo",
+      "title": "Ikhfa (hiding)",
+      "body": [
+        "When one of the remaining <b>15 letters</b> (ص ذ ث ك ج ش ق س د ط ز ف ت ض ظ) follows a nun sakin or tanwin, the nun is <b>hidden</b> and said with ghunna. This is <b>ikhfa</b>.",
+        "Ikhfa sits between izhar and idgham: the nun is neither fully clear nor fully merged. The tongue doesn't touch the nun's place; the sound comes through the nose as ghunna while the mouth gets ready for the next letter. The ghunna lasts two counts."
+      ]
+    },
+    {
+      "id": "mim-ixfo",
+      "title": "Lip ikhfa (shafawi)",
+      "body": [
+        "When <b>ب</b> follows a mim sakin (مْ), the mim is hidden with lightly closed lips and a ghunna. This is <b>lip</b> (shafawi) <b>ikhfa</b>, because both letters come from the lips.",
+        "For example: تَرْمِيهِم بِحِجَارَةٍ (surah al-Fil). The ghunna lasts two counts."
+      ]
+    },
+    {
+      "id": "mim-idgom",
+      "title": "Lip idgham (shafawi)",
+      "body": [
+        "When another <b>mim</b> follows a mim sakin, the two become one doubled mim, said with ghunna. This is <b>lip idgham</b> (the idgham of two identical letters).",
+        "For example: لَهُم مَّا. The ghunna lasts two counts."
+      ]
+    },
+    {
+      "id": "mim-izhor",
+      "title": "Lip izhar (shafawi)",
+      "body": [
+        "When any letter <b>other than ب and م</b> follows a mim sakin, the mim is said <b>clearly</b>, with no ghunna. This is <b>lip izhar</b>.",
+        "Take special care before <b>و</b> and <b>ف</b>: they also come from near the lips, so it is easy to hide the mim by mistake. For example: عَلَيْهِمْ غَيْرِ, أَلَمْ تَرَ, هُمْ فِيهَا."
+      ]
+    },
+    {
+      "id": "gunna",
+      "title": "Ghunna",
+      "body": [
+        "<b>Ghunna</b> is the sound that comes from the nasal cavity. It is part of every nun and mim.",
+        "It is at its fullest in a <b>doubled nun</b> (نّ) and a <b>doubled mim</b> (مّ), where it is held for <b>two counts</b>. For example: إِنَّ, ثُمَّ, ٱلنَّاسِ. Don't rush over these letters."
+      ]
+    },
+    {
+      "id": "qalqala",
+      "title": "Qalqala (echo)",
+      "body": [
+        "There are five <b>qalqala</b> letters: <b>ق ط ب ج د</b>. The phrase «qutbu jad» (قُطْبُ جَدٍّ) helps to remember them.",
+        "When these letters have a sukun, they get a slight echo, a bounce, as they leave their makhraj. In the middle of a word the qalqala is light; when stopping at the end of an ayah it is stronger. For example: stopping on ٱلصَّمَدُ, and يَخْلُقْ.",
+        "Don't turn the qalqala into a vowel: it isn't an «a», «i» or «u», only a short bounce."
+      ]
+    },
+    {
+      "id": "lom-hamza",
+      "title": "Sun and moon lam, and the connecting hamza",
+      "body": [
+        "The lam of the article <b>ال</b> is read in two ways:",
+        "• <b>Moon lam</b> (qamariyya): said clearly. The letters after it are gathered in the phrase «ابغ حجك وخف عقيمه»: ٱلْقَمَرُ, ٱلْحَمْدُ.\n• <b>Sun lam</b> (shamsiyya): not said, and the next letter is doubled. The other 14 letters: ٱلشَّمْسُ, ٱلرَّحْمَـٰنِ, ٱلنَّاسِ.",
+        "The <b>connecting hamza</b> (ٱ) is only said when you start from that word; when it is joined to the word before, it falls silent. The mushaf also has letters that are written but not read; the examples mark them."
+      ]
+    },
+    {
+      "id": "mutajonis-mutaqorib",
+      "title": "Idgham of kindred and close letters",
+      "body": [
+        "When a silent letter is followed by a letter from the <b>same makhraj</b> but with different qualities, the first merges into the second: this is the <b>idgham of kindred letters</b> (mutajanisayn). For example: قَد تَّبَيَّنَ (د into ت), إِذ ظَّلَمُوٓا۟.",
+        "When two letters from <b>nearby</b> makhraj meet, it is the <b>idgham of close letters</b> (mutaqaribayn). For example: أَلَمْ نَخْلُقكُّم (ق into ك), قُل رَّبِّ.",
+        "These cases are rare in the Qur'an, so watch for the shadda sign in the mushaf."
+      ]
+    },
+    {
+      "id": "ro-alloh",
+      "title": "The letter ra and the word «Allah»",
+      "body": [
+        "<b>Ra (ر)</b> is said in two ways:\n• <b>Heavy (tafkhim)</b>: with a fatha or damma, or when silent after a fatha or damma: رَبِّ, قُرْءَانٌ.\n• <b>Light (tarqiq)</b>: with a kasra, or when silent after a kasra (and no heavy letter follows): رِجَالٌ, فِرْعَوْنَ.",
+        "<b>The lam in the word «Allah»</b> is heavy after a fatha or damma (قُلْ هُوَ ٱللَّهُ, شَهِدَ ٱللَّهُ) and light after a kasra (بِسْمِ ٱللَّهِ, لِلَّهِ)."
+      ]
+    },
+    {
+      "id": "vaqf",
+      "title": "Stopping signs (waqf)",
+      "body": [
+        "The mushaf has signs inside the ayahs that show where you may stop (waqf):",
+        "• <b>مـ</b>: you must stop; reading on could spoil the meaning.\n• <b>لا</b>: don't stop here.\n• <b>ج</b>: stopping and reading on are both allowed.\n• <b>صلى</b>: reading on is better.\n• <b>قلى</b>: stopping is better.\n• <b>∴ ∴</b> (two sets of three dots): stop at only one of the two places.",
+        "When you stop, the word ends with a sukun (except a fatha tanwin). If your breath runs out, stop at a suitable place and go back a word or two."
+      ]
+    }
+  ]
+}
