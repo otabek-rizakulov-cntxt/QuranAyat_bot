@@ -23,6 +23,10 @@
 #                                   API reports, and their timed lines) and rules
 #                                   lessons with marked examples.
 #                                   Drafts are included; GET /tajweed says which to show.
+#   tajweed/text/{surah}.json       the reader's tajweed colours (TAJWEED_NEXT_PLAN §3):
+#                                   per ayah [Uthmani text, [[rule index, start, end]]]
+#   tajweed/rules.{en,uz,uz-Cyrl}.json  the rules in that index order: name, one-line
+#                                   hint, and the rules-track lesson that teaches it
 #
 # Everything is read through `modules.Quran`, the same parser the bot uses, so
 # the app and the bot can never disagree on an ayah boundary.
@@ -35,7 +39,14 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from domain import tajweed, tajweed_icons, tajweed_lessons, tajweed_makhraj, tajweed_practice  # noqa: E402
+from domain import (  # noqa: E402
+    tajweed,
+    tajweed_icons,
+    tajweed_lessons,
+    tajweed_makhraj,
+    tajweed_practice,
+    tajweed_reader,
+)
 from domain.quran import (  # noqa: E402
     _QURAN_DATA,  # noqa: E402
     TRANSLATIONS_DIR,
@@ -127,6 +138,12 @@ def export(out_dir: str = DEFAULT_OUT_DIR) -> dict:
 
     for lang in tajweed_lessons.LANGS:
         _write(os.path.join(out_dir, "tajweed", "%s.json" % lang), tajweed_doc(lang))
+    for n in range(1, 115):
+        _write(os.path.join(out_dir, "tajweed", "text", "%d.json" % n), tajweed_reader.surah_doc(n))
+    for lang in tajweed_reader.HINT_LANGS:
+        _write(
+            os.path.join(out_dir, "tajweed", "rules.%s.json" % lang), tajweed_reader.rules_doc(lang)
+        )
 
     meta = build_meta(codes)
     _write(os.path.join(out_dir, "meta.json"), meta)

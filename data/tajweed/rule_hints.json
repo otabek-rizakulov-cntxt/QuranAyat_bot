@@ -1,0 +1,77 @@
+{
+  "note": "One-line hints for the reader's tajweed colours (docs/TAJWEED_NEXT_PLAN.md §3). Written for this project; uz-Cyrl is generated from uz. Keys are cpfair rule ids.",
+  "rules": {
+    "madd_2": {
+      "en": {"name": "Natural madd", "hint": "A madd letter (ا و ي) after its matching vowel is stretched two counts."},
+      "uz": {"name": "Tabiiy mad", "hint": "Mad harfi (ا و ي) oʻziga mos harakatdan keyin kelsa, ikki harakat choʻziladi."}
+    },
+    "madd_muttasil": {
+      "en": {"name": "Connected madd", "hint": "A madd letter followed by a hamza in the same word: stretched four or five counts."},
+      "uz": {"name": "Muttasil mad", "hint": "Mad harfidan keyin bir soʻzning ichida hamza kelsa, toʻrt yoki besh harakat choʻziladi."}
+    },
+    "madd_munfasil": {
+      "en": {"name": "Separated madd", "hint": "A word ends in a madd letter and the next word starts with a hamza: stretched two, four or five counts."},
+      "uz": {"name": "Munfasil mad", "hint": "Soʻz mad harfi bilan tugab, keyingi soʻz hamza bilan boshlansa, ikki, toʻrt yoki besh harakat choʻziladi."}
+    },
+    "madd_6": {
+      "en": {"name": "Necessary madd", "hint": "A madd letter followed by a permanent sukun or shadda: always stretched six counts."},
+      "uz": {"name": "Lozim mad", "hint": "Mad harfidan keyin doimiy sukun yoki tashdid kelsa, har doim olti harakat choʻziladi."}
+    },
+    "madd_246": {
+      "en": {"name": "Madd when stopping", "hint": "Stopping makes the last letter silent after a madd or lin letter: stretched two, four or six counts."},
+      "uz": {"name": "Oriz va lin mad", "hint": "Toʻxtalganda oxirgi harf sukunli boʻlib, undan oldin mad yoki lin harfi kelsa, ikki, toʻrt yoki olti harakat choʻziladi."}
+    },
+    "ikhfa": {
+      "en": {"name": "Ikhfa (hiding)", "hint": "Nun sakin or tanwin before one of 15 letters is hidden, with a nasal sound of two counts."},
+      "uz": {"name": "Ixfo", "hint": "Sukunli nun yoki tanvin 15 ixfo harfidan biriga yoʻliqsa, nun yashirilib, ikki harakat gʻunna qilinadi."}
+    },
+    "idghaam_ghunnah": {
+      "en": {"name": "Idgham with ghunna", "hint": "Nun sakin or tanwin before ي ن م و merges into that letter, with a nasal sound of two counts."},
+      "uz": {"name": "Gʻunnali idgʻom", "hint": "Sukunli nun yoki tanvin ي ن م و harflariga yoʻliqsa, oʻsha harfga qoʻshilib, gʻunna bilan oʻqiladi."}
+    },
+    "idghaam_no_ghunnah": {
+      "en": {"name": "Idgham without ghunna", "hint": "Nun sakin or tanwin before ل or ر merges fully into it, with no nasal sound."},
+      "uz": {"name": "Gʻunnasiz idgʻom", "hint": "Sukunli nun yoki tanvin ل yoki ر ga yoʻliqsa, unga toʻliq qoʻshilib, gʻunnasiz oʻqiladi."}
+    },
+    "iqlab": {
+      "en": {"name": "Iqlab (turning)", "hint": "Nun sakin or tanwin before ب turns into a mim, hidden with a nasal sound of two counts."},
+      "uz": {"name": "Iqlob", "hint": "Sukunli nun yoki tanvin ب ga yoʻliqsa, mimga aylanib, ikki harakat gʻunna bilan oʻqiladi."}
+    },
+    "ikhfa_shafawi": {
+      "en": {"name": "Lip ikhfa", "hint": "Mim sakin before ب is hidden between the lips, with a nasal sound of two counts."},
+      "uz": {"name": "Shafaviy ixfo", "hint": "Sukunli mim ب ga yoʻliqsa, lablar orasida yashirilib, ikki harakat gʻunna qilinadi."}
+    },
+    "idghaam_shafawi": {
+      "en": {"name": "Lip idgham", "hint": "Mim sakin before another mim merges into it, with a nasal sound of two counts."},
+      "uz": {"name": "Shafaviy idgʻom", "hint": "Sukunli mim boshqa mimga yoʻliqsa, unga qoʻshilib, ikki harakat gʻunna bilan oʻqiladi."}
+    },
+    "ghunnah": {
+      "en": {"name": "Ghunna", "hint": "Nun or mim with a shadda is held with a nasal sound for two counts."},
+      "uz": {"name": "Gʻunna", "hint": "Tashdidli nun yoki mim burundan chiqadigan ovoz bilan ikki harakat ushlab turiladi."}
+    },
+    "qalqalah": {
+      "en": {"name": "Qalqala (echo)", "hint": "ق ط ب ج د with a sukun get a slight bounce, strongest when stopping on them."},
+      "uz": {"name": "Qalqala", "hint": "Sukunli ق ط ب ج د harflari biroz silkinib oʻqiladi; ularda toʻxtalganda kuchliroq."}
+    },
+    "lam_shamsiyyah": {
+      "en": {"name": "Silent lam (sun letters)", "hint": "The lam of «al» before a sun letter is not read; that letter is doubled instead."},
+      "uz": {"name": "Shamsiy lom", "hint": "«Al»ning lomi shamsiy harf oldida oʻqilmaydi; oʻsha harf tashdid bilan oʻqiladi."}
+    },
+    "hamzat_wasl": {
+      "en": {"name": "Connecting hamza", "hint": "Read only when starting from this word; it falls silent when joined to the word before."},
+      "uz": {"name": "Hamzai vasl", "hint": "Faqat shu soʻzdan boshlaganda oʻqiladi; oldingi soʻzga qoʻshib oʻqilganda tushib qoladi."}
+    },
+    "silent": {
+      "en": {"name": "Silent letter", "hint": "Written in the mushaf but not pronounced."},
+      "uz": {"name": "Oʻqilmaydigan harf", "hint": "Mushafda yozilgan, lekin talaffuz qilinmaydi."}
+    },
+    "idghaam_mutajanisayn": {
+      "en": {"name": "Idgham of kindred letters", "hint": "Two letters from the same point of articulation meet; the first merges into the second (e.g. ت into ط)."},
+      "uz": {"name": "Mutajonis idgʻom", "hint": "Maxraji bir xil ikki harf yonma-yon kelsa, birinchisi ikkinchisiga qoʻshiladi (masalan, ت ط ga)."}
+    },
+    "idghaam_mutaqaribayn": {
+      "en": {"name": "Idgham of close letters", "hint": "Two letters from nearby points of articulation meet; the first merges into the second (e.g. ق into ك)."},
+      "uz": {"name": "Mutaqorib idgʻom", "hint": "Maxraji yaqin ikki harf yonma-yon kelsa, birinchisi ikkinchisiga qoʻshiladi (masalan, ق ك ga)."}
+    }
+  }
+}
