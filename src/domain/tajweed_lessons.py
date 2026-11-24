@@ -9,6 +9,8 @@
   itself is on R2 under the configured base URL.
 
 Everything is written in Uzbek Latin; `uz-Cyrl` is generated with domain.uz_translit.
+The rules track also has an English translation (lessons.en.json) for readers of every
+other language; it keeps the Uzbek lessons' structure and approval.
 """
 
 import hashlib
@@ -25,6 +27,7 @@ _DATA = os.path.join(
     "tajweed",
 )
 _PATH = os.path.join(_DATA, "lessons.uz.json")
+_EN_PATH = os.path.join(_DATA, "lessons.en.json")
 _AUDIO_PATH = os.path.join(_DATA, "muallimi.json")
 _TEXT_PATH = os.path.join(_DATA, "muallimi_text.txt")
 _TIMINGS_PATH = os.path.join(_DATA, "muallimi_timings.json")
@@ -32,6 +35,7 @@ TRACK_AUDIO, TRACK_RULES = "alifbo", "qoidalar"
 TRACKS = (TRACK_AUDIO, TRACK_RULES)
 AUTO_EXAMPLES = 3  # examples per lesson when the lesson says "auto"
 LANGS = ("uz", "uz-Cyrl")
+RULES_LANGS = LANGS + ("en",)  # the rules track only; "en" serves every other language
 
 Example = Tuple[int, int, Tuple[str, ...]]  # (surah, ayah, rules to mark)
 
@@ -93,20 +97,29 @@ def _load(lang: str) -> Tuple[Tuple[Unit, ...], Tuple[Lesson, ...]]:
         with open(_PATH, encoding="utf-8") as fp:
             raw = json.load(fp)
         tr = to_cyrillic if lang == "uz-Cyrl" else (lambda s: s)
+        # English: the translated titles and text over the Uzbek lessons' structure
+        english = {}
+        if lang == "en":
+            with open(_EN_PATH, encoding="utf-8") as fp:
+                en = json.load(fp)
+            english = {x["id"]: x for x in en["lessons"]}
+            unit_titles = {u["id"]: u["title"] for u in en["units"]}
+            raw["units"] = [{"id": u["id"], "title": unit_titles[u["id"]]} for u in raw["units"]]
         units = tuple(Unit(u["id"], tr(u["title"])) for u in raw["units"])
         lessons = []
         for item in raw["lessons"]:
             rules = tuple(item["rules"])
             examples = _examples(item["examples"], rules)
+            text = english.get(item["id"], item)
             lessons.append(
                 Lesson(
                     id=item["id"],
                     unit=item["unit"],
-                    title=tr(item["title"]),
+                    title=tr(text["title"]),
                     rules=rules,
-                    body=tuple(tr(p) for p in item["body"]),
+                    body=tuple(tr(p) for p in text["body"]),
                     examples=examples,
-                    # one hash for both scripts: approval is of the Latin source
+                    # one hash for every language: approval is of the Uzbek Latin source
                     content_hash=_hash(item, examples),
                 )
             )

@@ -188,3 +188,20 @@ def test_command_is_in_the_uzbek_menu_only():
     assert "tajvid" in [c.command for c in _commands_for("uz")]
     assert "tajvid" not in [c.command for c in _commands_for("en")]
     assert "tajvid" not in [c.command for c in _commands_for("ru")]
+
+
+def test_english_rules_track_mirrors_the_uzbek():
+    uz, en = tajweed_lessons.lessons("uz"), tajweed_lessons.lessons("en")
+    assert [x.id for x in en] == [x.id for x in uz]
+    for a, b in zip(uz, en):
+        assert (b.unit, b.rules, b.examples, b.content_hash) == (
+            a.unit,
+            a.rules,
+            a.examples,
+            a.content_hash,
+        )
+        assert b.body != a.body and len(b.body) == len(a.body), a.id
+    assert [u.id for u in tajweed_lessons.units("en")] == [
+        u.id for u in tajweed_lessons.units("uz")
+    ]
+    assert tajweed_lessons.units("en")[2].title == "Madd (lengthening)"
