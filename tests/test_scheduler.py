@@ -716,3 +716,36 @@ class TestTransientFailuresAreRetried:
         await scheduler.tick(bot, {}, now=late, store=store)
         stored = await store.schedule.get(row.id)
         assert stored is None or stored.state == "failed"
+
+
+# --- Redis keep-alive ------------------------------------------------------------
+
+from infra.scheduler import runner  # noqa: E402
+
+
+async def test_redis_is_pinged_once_a_day(monkeypatch):
+    pings = []
+    monkeypatch.setattr(runner, "_ping_redis", lambda: pings.append(1))
+    day = runner.REDIS_KEEPALIVE_SECONDS
+    last = await runner.keep_redis_alive(None, 1000.0)  # the first pass pings
+    last = await runner.keep_redis_alive(last, 1000.0 + day - 1)  # not again within a day
+    assert len(pings) == 1 and last == 1000.0
+    last = await runner.keep_redis_alive(last, 1000.0 + day)
+    assert len(pings) == 2 and last == 1000.0 + day
+
+
+async def test_a_failed_ping_never_stops_the_scheduler(monkeypatch, caplog):
+    def broken():
+        raise ConnectionError("gone")
+
+    monkeypatch.setattr(runner, "_ping_redis", broken)
+    assert await runner.keep_redis_alive(None, 5.0) == 5.0
+    assert "keep-alive ping failed" in caplog.text
+
+
+async def test_the_scheduler_loop_pings_redis(monkeypatch):
+    pings = []
+    monkeypatch.setattr(runner, "_ping_redis", lambda: pings.append(1))
+    store = InMemoryStore()
+    await scheduler.run_scheduler(AsyncMock(), {}, interval=0, store=store, max_ticks=3)
+    assert len(pings) == 1  # three ticks inside a day: one ping
