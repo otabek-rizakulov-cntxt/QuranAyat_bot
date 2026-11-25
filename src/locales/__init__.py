@@ -153,6 +153,7 @@ BOT_COMMANDS = (
     ("forgot", "cmd_forgot"),
     ("streak", "cmd_streak"),
     ("leaderboard", "cmd_leaderboard"),
+    ("tajvid", "tj_cmd"),  # Uzbek: the whole course; other languages: the rules in English
     # Settings
     ("profile", "cmd_profile"),
     ("language", "cmd_language"),
@@ -164,9 +165,7 @@ BOT_COMMANDS = (
 
 # Commands that exist only in some languages' menus (Telegram's language_code), kept
 # out of BOT_COMMANDS so the other menus and /start lists stay as they are.
-LANG_COMMANDS = {
-    "uz": (("tajvid", "tj_cmd"),),  # tajweed lessons: Uzbek only (docs/TAJWEED_PLAN.md)
-}
+LANG_COMMANDS: dict = {}
 
 
 def command_lines(lang: str) -> str:

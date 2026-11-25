@@ -436,6 +436,7 @@ strings = {
     "tj_colors_legend": "Ranglar",
     "tj_open_rule": "Darsni ochish",
     "tj_close": "Yopish",
+    "tj_show_colors": "🎨 Qurʼonda rangli koʻrish",
     "tj_mx_heavy": "Yoʻgʻon harf: til orqasi ham koʻtariladi.",
     "tj_mx_copy": "JSON nusxalash",
     "tj_mx_copied": "Nusxalandi",

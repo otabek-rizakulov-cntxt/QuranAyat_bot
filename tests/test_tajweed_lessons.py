@@ -176,18 +176,41 @@ async def test_bad_callbacks_are_only_acknowledged(store, cb, monkeypatch):
     ctx.answer.assert_awaited()
 
 
-async def test_non_uzbek_users_are_pointed_to_language(store):
-    ctx = _ctx(store, lang="en")
+async def test_other_languages_get_the_rules_lessons_in_english(store):
+    ctx = _ctx(store, lang="de")
     await feature.tajvid(ctx)
-    assert ctx.reply.await_args.args[0] == "tj_uzbek_only"
+    buttons = _buttons(ctx.reply)
+    english_units = {u.id for u in tajweed_lessons.units("en")}
+    assert buttons and all(b.startswith("tj:u:") and b[5:] in english_units for b in buttons)
+    assert "tj:s" not in buttons  # the review cards are Uzbek
 
 
-def test_command_is_in_the_uzbek_menu_only():
+async def test_english_lesson_card_has_drills_but_no_quiz(store):
+    lesson = next(x for x in tajweed_lessons.lessons("en") if x.rules and x.examples)
+    ctx = _ctx(store, lang="en")
+    await feature.on_tajweed(ctx, "tj:l:" + lesson.id)
+    text = ctx.edit.await_args.args[0]
+    assert lesson.title in text and lesson.title == tajweed_lessons.lesson(lesson.id, "en").title
+    buttons = _buttons(ctx.edit)
+    assert any(b.startswith("tj:r:") for b in buttons)
+    assert not any(b.startswith("tj:q:") for b in buttons)
+
+
+async def test_english_readers_cannot_open_the_uzbek_parts(store):
+    ctx = _ctx(store, lang="en")
+    await feature.on_tajweed(ctx, "tj:s")  # review cards
+    ctx.answer.assert_awaited_with("tj_uzbek_only")
+    ctx = _ctx(store, lang="en")
+    await feature.on_tajweed(ctx, "tj:t:alifbo")
+    ctx.edit.assert_awaited()  # back to the rules track instead
+    assert all(not b.startswith("tj:u:ms-") for b in _buttons(ctx.edit))
+
+
+def test_command_is_in_every_menu():
     from app.lifespan import _commands_for
 
-    assert "tajvid" in [c.command for c in _commands_for("uz")]
-    assert "tajvid" not in [c.command for c in _commands_for("en")]
-    assert "tajvid" not in [c.command for c in _commands_for("ru")]
+    for lang in ("uz", "en", "ru"):
+        assert "tajvid" in [c.command for c in _commands_for(lang)]
 
 
 def test_english_rules_track_mirrors_the_uzbek():
