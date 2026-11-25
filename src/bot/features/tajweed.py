@@ -45,14 +45,26 @@ from services import tajweed as service
 
 _PREFIX = "tj:"
 _LANGS = tajweed_lessons.LANGS
+# What a reader of another language can open: the rules lessons in English, their
+# examples and reading drills. The audio course, cards and quizzes are Uzbek.
+_ENGLISH_KINDS = {"units", "t", "u", "l", "d", "p", "r", "ra", "rp"}
 _MAX_TEXT = 4000  # Telegram's message limit is 4096
 _TRACK_KEYS = {TRACK_AUDIO: "tj_track_alifbo", TRACK_RULES: "tj_track_qoidalar"}
+
+
+def _lang(ctx: Ctx) -> str:
+    """The lessons' language for this user: their Uzbek script, else English."""
+    return ctx.ui_lang if ctx.ui_lang in _LANGS else "en"
+
+
+def _english(ctx: Ctx) -> bool:
+    return ctx.ui_lang not in _LANGS
 
 
 async def _rules_visible(ctx: Ctx) -> tuple:
     """(the rules lessons, ids of the approved ones). Everyone sees every lesson;
     the approval only shows to reviewers."""
-    return tajweed_lessons.lessons(ctx.ui_lang), await service.approved_ids(ctx.store)
+    return tajweed_lessons.lessons(_lang(ctx)), await service.approved_ids(ctx.store)
 
 
 async def _say(ctx: Ctx, edit: bool, text: str, choices) -> None:
@@ -63,6 +75,9 @@ async def _say(ctx: Ctx, edit: bool, text: str, choices) -> None:
 
 
 async def _start(ctx: Ctx, edit: bool) -> None:
+    if _english(ctx):
+        await _track(ctx, TRACK_RULES, edit, alone=True)
+        return
     tracks = await service.visible_tracks(ctx.store, ctx.user_id)
     if not tracks:
         await _say(ctx, edit, ctx.tr("tj_soon"), None)
@@ -76,14 +91,19 @@ async def _start(ctx: Ctx, edit: bool) -> None:
 
 
 async def _track(ctx: Ctx, track: str, edit: bool = True, alone: bool = False) -> None:
-    if track not in await service.visible_tracks(ctx.store, ctx.user_id):
+    english = _english(ctx)
+    if (
+        (track != TRACK_RULES)
+        if english
+        else track not in await service.visible_tracks(ctx.store, ctx.user_id)
+    ):
         await _start(ctx, edit)
         return
     done = await ctx.store.tajweed.done(ctx.user_id)
     if track == TRACK_AUDIO:
         units, lessons = tajweed_lessons.audio_units(ctx.ui_lang), tajweed_lessons.audio_lessons()
     else:
-        units, lessons = tajweed_lessons.units(ctx.ui_lang), (await _rules_visible(ctx))[0]
+        units, lessons = tajweed_lessons.units(_lang(ctx)), (await _rules_visible(ctx))[0]
     rows = []
     for u in units:
         mine = [x.id for x in lessons if x.unit == u.id]
@@ -91,7 +111,8 @@ async def _track(ctx: Ctx, track: str, edit: bool = True, alone: bool = False) -
             count = sum(1 for i in mine if i in done)
             rows.append([Choice("%s  %d/%d" % (u.title, count, len(mine)), data="tj:u:" + u.id)])
     if alone:
-        rows.append([Choice(ctx.tr("tj_srs"), data="tj:s")])
+        if not english:  # the review cards are Uzbek
+            rows.append([Choice(ctx.tr("tj_srs"), data="tj:s")])
     else:
         rows.append([Choice(ctx.tr("tj_tracks"), data="tj:units")])
     text = "<b>%s</b>\n\n%s" % (ctx.tr(_TRACK_KEYS[track]), ctx.tr("tj_pick_unit"))
@@ -108,7 +129,13 @@ def _unit_track(unit_id: str):
 
 async def _unit(ctx: Ctx, unit_id: str) -> None:
     track = _unit_track(unit_id)
-    if track is None or track not in await service.visible_tracks(ctx.store, ctx.user_id):
+    if _english(ctx):
+        allowed = track == TRACK_RULES
+    else:
+        allowed = track is not None and track in await service.visible_tracks(
+            ctx.store, ctx.user_id
+        )
+    if not allowed:
         await _start(ctx, edit=True)
         return
     done = await ctx.store.tajweed.done(ctx.user_id)
@@ -117,7 +144,7 @@ async def _unit(ctx: Ctx, unit_id: str) -> None:
         mine = [x for x in tajweed_lessons.audio_lessons(ctx.ui_lang) if x.unit == unit_id]
         per_row = 2 if len(mine) > 8 else 1  # the 28 letters fit as two columns
     else:
-        units = tajweed_lessons.units(ctx.ui_lang)
+        units = tajweed_lessons.units(_lang(ctx))
         lessons, _ = await _rules_visible(ctx)
         mine = [x for x in lessons if x.unit == unit_id]
         per_row = 1
@@ -136,7 +163,8 @@ async def _unit(ctx: Ctx, unit_id: str) -> None:
         for x in mine
     ]
     rows = [buttons[i : i + per_row] for i in range(0, len(buttons), per_row)]
-    rows.append([Choice(ctx.tr("tj_back"), data="tj:t:" + track)])
+    back = "tj:units" if _english(ctx) else "tj:t:" + track  # English has one track
+    rows.append([Choice(ctx.tr("tj_back"), data=back)])
     await ctx.edit("<b>%s</b>" % html.escape(unit.title), rows, html=True)
 
 
@@ -166,7 +194,7 @@ def _done_row(ctx: Ctx, lesson_id: str, done: set) -> list:
 def _practice_row(ctx: Ctx, lesson_id: str) -> list:
     seed = random.randrange(1, 100000)
     row = []
-    if tajweed_practice.rules_for(lesson_id):
+    if tajweed_practice.rules_for(lesson_id) and not _english(ctx):  # quizzes are in Uzbek
         row.append(Choice(ctx.tr("tj_quiz"), data="tj:q:%s:%d:0:0" % (lesson_id, seed)))
     row.append(Choice(ctx.tr("tj_drill"), data="tj:r:%s:%d:0:0" % (lesson_id, seed)))
     return row
@@ -201,6 +229,8 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
     """Show the lesson card; False if this user can't open that lesson (nothing sent)."""
     if not await service.can_open(ctx.store, ctx.user_id, lesson_id):
         return False
+    if _english(ctx) and tajweed_lessons.audio_lesson(lesson_id) is not None:
+        return False  # the audio course is Uzbek
     done = await ctx.store.tajweed.done(ctx.user_id)
     audio = tajweed_lessons.audio_lesson(lesson_id, ctx.ui_lang)
     if audio is not None:
@@ -235,7 +265,7 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
         return True
 
     lessons, approved = await _rules_visible(ctx)
-    lesson = tajweed_lessons.lesson(lesson_id, ctx.ui_lang)
+    lesson = tajweed_lessons.lesson(lesson_id, _lang(ctx))
     rows = []
     if lesson.examples:
         rows.append(
@@ -244,6 +274,9 @@ async def _lesson(ctx: Ctx, lesson_id: str) -> bool:
                 for n in range(1, len(lesson.examples) + 1)
             ]
         )
+        # the first example in the Mini App's reader, with the tajweed colours on
+        s, a, _ = lesson.examples[0]
+        rows.extend(app_choice_row(ctx.tr("tj_show_colors"), "/read/%d?a=%d&tj=1" % (s, a)))
     rows.append(_practice_row(ctx, lesson.id))
     rows.extend(_makhraj_row(ctx, lesson.id))
     rows.append(_done_row(ctx, lesson.id, done))
@@ -561,20 +594,17 @@ async def _review(ctx: Ctx, lesson_id: str, approve: bool) -> None:
 
 @command("tajvid")
 async def tajvid(ctx: Ctx) -> None:
-    if ctx.ui_lang not in _LANGS:
-        await ctx.reply(ctx.tr("tj_uzbek_only"))
-        return
     await _start(ctx, edit=False)
 
 
 @callback(_PREFIX)
 async def on_tajweed(ctx: Ctx, cb_data: str) -> None:
     """Every tj: tap. callback_data is untrusted: unknown shapes are just acknowledged."""
-    if ctx.ui_lang not in _LANGS:
-        await ctx.answer(ctx.tr("tj_uzbek_only"))
-        return
     parts = cb_data[len(_PREFIX) :].split(":")
     kind, args = parts[0], parts[1:]
+    if _english(ctx) and kind not in _ENGLISH_KINDS:
+        await ctx.answer(ctx.tr("tj_uzbek_only"))
+        return
     if kind == "units" and not args:
         await ctx.answer()
         await _start(ctx, edit=True)

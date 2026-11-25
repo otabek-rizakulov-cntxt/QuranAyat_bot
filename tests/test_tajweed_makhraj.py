@@ -113,7 +113,9 @@ def _ctx(user):
 
 
 def _web_apps(ctx):
-    return [c.web_app for row in ctx.edit.await_args.args[1] for c in row if c.web_app]
+    """The card's 3D makhraj buttons (rules cards also link to the coloured reader)."""
+    rows = ctx.edit.await_args.args[1]
+    return [c.web_app for row in rows for c in row if c.web_app and "/learn/makhraj/" in c.web_app]
 
 
 async def test_reviewers_only_until_released(monkeypatch):

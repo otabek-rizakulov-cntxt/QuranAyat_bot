@@ -436,6 +436,7 @@ strings = {
     "tj_colors_legend": "Ранглар",
     "tj_open_rule": "Дарсни очиш",
     "tj_close": "Ёпиш",
+    "tj_show_colors": "🎨 Қуръонда рангли кўриш",
     "tj_mx_heavy": "Йўғон ҳарф: тил орқаси ҳам кўтарилади.",
     "tj_mx_copy": "JSON нусхалаш",
     "tj_mx_copied": "Нусхаланди",
