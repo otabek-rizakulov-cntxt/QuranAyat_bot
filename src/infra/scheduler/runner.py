@@ -3,6 +3,7 @@ until the app shuts down."""
 
 import asyncio
 import logging
+import time
 from datetime import datetime
 from typing import Optional
 
@@ -16,6 +17,34 @@ logger = logging.getLogger(__name__)
 # to a user and costs one trivial query per minute against a table that holds a
 # few rows per user per day.
 POLL_INTERVAL_SECONDS = 60
+
+# Upstash deletes a free database after 14 days without a single command (it did,
+# in November 2026, and the bot fell back to memory). A ping a day keeps it alive
+# however quiet the bot is.
+REDIS_KEEPALIVE_SECONDS = 24 * 3600
+
+
+def _ping_redis() -> None:
+    from infra.redis_client import RedisSingleton
+
+    redis = RedisSingleton()
+    if not redis.degraded:  # the in-memory fallback has nothing to keep alive
+        redis.connection.ping()
+
+
+async def keep_redis_alive(last: Optional[float], now: float) -> Optional[float]:
+    """Ping Redis if a day has passed since `last` (monotonic seconds; None: never).
+    Returns when it last tried. A failed ping is logged, never raised: the cache
+    is optional and the scheduler must keep running."""
+    if last is not None and now - last < REDIS_KEEPALIVE_SECONDS:
+        return last
+    try:
+        await asyncio.to_thread(_ping_redis)
+    except Exception as err:
+        logger.warning(
+            "Scheduler: Redis keep-alive ping failed: %s: %s" % (type(err).__name__, err)
+        )
+    return now
 
 
 async def catch_up(
@@ -74,6 +103,7 @@ async def run_scheduler(
         % (interval, ", ".join(sorted(SEND_HANDLERS)) or "none")
     )
     ticks = 0
+    pinged: Optional[float] = None
     try:
         while max_ticks is None or ticks < max_ticks:
             try:
@@ -86,6 +116,7 @@ async def run_scheduler(
             except Exception as err:
                 logger.exception("Scheduler: tick failed: %s: %s" % (type(err).__name__, err))
             ticks += 1
+            pinged = await keep_redis_alive(pinged, time.monotonic())
             if stop_event is not None and stop_event.is_set():
                 break
             if max_ticks is not None and ticks >= max_ticks:
